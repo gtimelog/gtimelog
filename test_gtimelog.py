@@ -51,29 +51,40 @@ def doctest_parse_datetime():
 
     """
 
+def doctest_parse_time():
+    """Tests for parse_time
+
+        >>> from gtimelog import parse_time
+        >>> parse_time('02:13')
+        datetime.time(2, 13)
+        >>> parse_time('xyzzy')
+        Traceback (most recent call last):
+          ...
+        ValueError: ('bad time: ', 'xyzzy')
+
+    """
+
 def doctest_virtual_day():
     """Tests for virtual_day
 
-        >>> from datetime import datetime
+        >>> from datetime import datetime, time
         >>> from gtimelog import virtual_day
 
-    If this assumption fails, you will have to fix the test 
+    Virtual midnight
 
-        >>> from gtimelog import virtual_midnight
-        >>> virtual_midnight
-        datetime.time(2, 0)
+        >>> vm = time(2, 0)
 
     The tests themselves:
 
-        >>> virtual_day(datetime(2005, 2, 3, 1, 15))
+        >>> virtual_day(datetime(2005, 2, 3, 1, 15), vm)
         datetime.date(2005, 2, 2)
-        >>> virtual_day(datetime(2005, 2, 3, 1, 59))
+        >>> virtual_day(datetime(2005, 2, 3, 1, 59), vm)
         datetime.date(2005, 2, 2)
-        >>> virtual_day(datetime(2005, 2, 3, 2, 0))
+        >>> virtual_day(datetime(2005, 2, 3, 2, 0), vm)
         datetime.date(2005, 2, 3)
-        >>> virtual_day(datetime(2005, 2, 3, 12, 0))
+        >>> virtual_day(datetime(2005, 2, 3, 12, 0), vm)
         datetime.date(2005, 2, 3)
-        >>> virtual_day(datetime(2005, 2, 3, 23, 59))
+        >>> virtual_day(datetime(2005, 2, 3, 23, 59), vm)
         datetime.date(2005, 2, 3)
 
     """
@@ -81,22 +92,20 @@ def doctest_virtual_day():
 def doctest_different_days():
     """Tests for different_days
 
-        >>> from datetime import datetime
+        >>> from datetime import datetime, time
         >>> from gtimelog import different_days
 
-    If this assumption fails, you will have to fix the test 
+    Virtual midnight
 
-        >>> from gtimelog import virtual_midnight
-        >>> virtual_midnight
-        datetime.time(2, 0)
+        >>> vm = time(2, 0)
 
     The tests themselves:
 
         >>> different_days(datetime(2005, 2, 3, 1, 15),
-        ...                datetime(2005, 2, 3, 2, 15))
+        ...                datetime(2005, 2, 3, 2, 15), vm)
         True
         >>> different_days(datetime(2005, 2, 3, 11, 15),
-        ...                datetime(2005, 2, 3, 12, 15))
+        ...                datetime(2005, 2, 3, 12, 15), vm)
         False
 
     """

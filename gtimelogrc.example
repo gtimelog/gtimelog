@@ -25,3 +25,6 @@ gtk-completion = False
 # How many hours' work in a day.
 hours = 8
 
+# When does one work end and another begin
+virtual_midnight = 02:00
+
