@@ -33,9 +33,10 @@ which activities are not work related add two asterisks to the activity name:
 GTimeLog displays all the things you've done today, and calculates the total
 time you spent working, and the total time you spent "slacking".  It also
 advises you how much time you still have to work today to get 8 hours of work
-done.  There are two basic views: one shows all the activities in chronological
-order, with starting and ending times; while another groups all entries with
-the same into one activity and just shows the total duration.
+done (the number of hours in a day is configurable in ~/.gtimelog/gtimelogrc).
+There are two basic views: one shows all the activities in chronological order,
+with starting and ending times; while another groups all entries with the same
+into one activity and just shows the total duration.
 
 At the end of the day you can send off a daily report by choosing File -> Daily
 Report.  A mail program (Mutt in a terminal, unless you have changed it in
@@ -151,3 +152,11 @@ Author
 
 Marius Gedminas
 <mgedmin@b4net.lt>
+
+
+Contributors
+------------
+
+Thom May
+Dafydd Harries
+
