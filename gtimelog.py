@@ -339,6 +339,7 @@ class MainWindow(object):
     def __init__(self, timelog):
         """Create the main window."""
         self.timelog = timelog
+        self.last_tick = None
         tree = gtk.glade.XML("gtimelog.glade")
         tree.signal_autoconnect(self)
         self.about_dialog = tree.get_widget("about_dialog")
@@ -640,7 +641,10 @@ class MainWindow(object):
 
     def tick(self):
         """Tick every second."""
-        now = datetime.datetime.now()
+        now = datetime.datetime.now().replace(second=0, microsecond=0)
+        if now == self.last_tick:
+            return
+        self.last_tick = now
         last_time = self.timelog.window.last_time()
         if last_time is None:
             self.time_label.set_text(now.strftime("%H:%M"))
