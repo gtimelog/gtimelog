@@ -7,7 +7,7 @@ This script is probably completely unsafe, security-wise.  Caveat user.
 import os
 import shutil
 
-REPOSITORY = "file:///home/mg/svnroot/timelog"
+REPOSITORY = "svn+ssh://fridge/home/mg/svn/timelog"
 
 def make_dist():
     try:
@@ -15,7 +15,10 @@ def make_dist():
     except OSError:
         pass
     os.chdir("dist")
-    shutil.rmtree("timelog")
+    try:
+        shutil.rmtree("timelog")
+    except OSError:
+        pass
 
     pipe = os.popen("svn export %s" % REPOSITORY, "r")
     rev = None
