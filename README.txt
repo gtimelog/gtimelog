@@ -32,41 +32,34 @@ which activities are not work related add two asterisks to the activity name:
 
 GTimeLog displays all the things you've done today, and calculates the total
 time you spent working, and the total time you spent "slacking".  It also
-advises you how much time you still have to work today to get 8 hours of
-work done (XXX this should be configurable).  There are two basic views:
-one shows all the activities in chronological order, with starting and ending
-times; while another groups all entries with the same into one activity
-and just shows the total duration.
+advises you how much time you still have to work today to get 8 hours of work
+done.  There are two basic views: one shows all the activities in chronological
+order, with starting and ending times; while another groups all entries with
+the same into one activity and just shows the total duration.
 
 At the end of the day you can send off a daily report by choosing File -> Daily
-Report.  A mail program (Mutt in a terminal, to be precise) will be started
-with all the activities listed in it(XXX it should be configurable).  You can
-edit the report if wou want to (e.g. group closely related activities into one
-entry), and then send it.  (XXX The recipient and subject format should be
-configurable -- now they're activity@pov.lt and "%B report for Marius (week
-%V)" respectively).
+Report.  A mail program (Mutt in a terminal, unless you have changed it in
+~/.gtimelog/gtimelogrc) will be started with all the activities listed in it.
+My Mutt configuration lets me edit the report before sending it.
 
 If you make a mistake and type in the wrong activity name, or just forget to
 enter an activity, don't worry.  GTimeLog stores the time log in a simple plain
-text file $HOME/.gtimelog/timelog.txt (or just timelog.txt in the current
-directory if you are a Windows user and do not have $HOME set).  Every line
-contains a timestamp and the name of the activity that was finished at the
-time.  All other lines are ignored, so you can add comments if you want to --
-just make sure no comment begins with a timestamp.  You do not have to worry
-about GTimeLog overwriting your changes -- GTimeLog always appends entries at
-the end of the file, and does not keep the log file open all the time.  You do
-have to worry about overwriting changes made by GTimeLog with your editor --
-make sure you do not enter any activities in GTimeLog while you have
-timelog.txt open in a text editor.
+text file ~/.gtimelog/timelog.txt.  Every line contains a timestamp and the
+name of the activity that was finished at the time.  All other lines are
+ignored, so you can add comments if you want to -- just make sure no comment
+begins with a timestamp.  You do not have to worry about GTimeLog overwriting
+your changes -- GTimeLog always appends entries at the end of the file, and
+does not keep the log file open all the time.  You do have to worry about
+overwriting changes made by GTimeLog with your editor -- make sure you do not
+enter any activities in GTimeLog while you have timelog.txt open in a text
+editor.
 
 
 Future Plans
 ------------
 
-Configurability (see the XXXes).  The ability to generate weekly reports.
-The ability to see at a glance how much work you've done this week.  The
-ability to browse through history (view daily and weekly reports for past
-days and weeks).
+Configuration dialog.  The ability to browse through history (view daily and
+weekly reports for past days and weeks).
 
 Somewhat more vague is the idea of integrating GTimeLog with some sort of
 planning system, so that you did not have to type in all the task names

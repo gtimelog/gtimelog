@@ -4,16 +4,21 @@ Minor bugs
 Sometimes the log view is repainted incorrectly when you are in grouped view
 with a scrollbar, and add an entry for an existing activity.
 
-Midnight
+Midnight handling sometimes acts funny and you need to refresh the view.
 
 
 Unimplemented features
 ----------------------
 
-Use a consistent location of timelog.txt (rather than forcing the user to
-always chdir to the same directory), perhaps ~/.gtimelog/timelog.txt?
-
-Let the user specify his name, at least (currently "Daily report for Marius"
-is hardcoded).
+Options dialog.
 
 Re-reading of timelog.txt should be automatic (watch mtime of the file).
+
+History browsing.
+
+Better integration with GNOME (gconf for options, use user's preferred editor
+and mailer).
+
+More options: "virtual midnight" (currently hardcoded at 2 am), length of the
+normal working day (currently hardcoded as 8 hours).
+
