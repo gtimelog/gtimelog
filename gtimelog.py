@@ -144,6 +144,16 @@ class TimeWindow(object):
             duration = stop - start
             yield start, stop, duration, entry
 
+    def count_days(self):
+        """Count days that have entries."""
+        count = 0
+        last = None
+        for start, stop, duration, entry in self.all_entries():
+            if last is None or different_days(last, start):
+                last = start
+                count += 1
+        return count
+
     def last_entry(self):
         """Return the last entry (or None if there are no events).
 
@@ -384,6 +394,7 @@ class MainWindow(object):
         if self.footer_mark is not None:
             buffer.delete_mark(self.footer_mark)
             self.footer_mark = None
+        # XXX this will likely fail between 0 and 2 AM
         today = datetime.date.today().strftime('%A, %Y-%m-%d (week %V)')
         self.w(today + '\n\n', 'today')
         if self.chronological:
@@ -412,20 +423,34 @@ class MainWindow(object):
         self.footer_mark = buffer.create_mark('footer', buffer.get_end_iter(),
                                               gtk.TRUE)
         total_work, total_slacking = self.timelog.window.totals()
-        week_total_work, week_total_slacking = self.weekly_window().totals()
+        weekly_window = self.weekly_window()
+        week_total_work, week_total_slacking = weekly_window.totals()
+        work_days_this_week = weekly_window.count_days()
+        datetime.date.today().strftime('%A, %Y-%m-%d (week %V)')
+
         self.w('\n')
         self.w('Total work done: ')
         self.w(format_duration(total_work), 'duration')
         self.w(' (')
         self.w(format_duration(week_total_work), 'duration')
-        self.w(' this week)')
-        self.w('\n')
+        self.w(' this week')
+        if work_days_this_week:
+            per_diem = week_total_work / work_days_this_week
+            self.w(', ')
+            self.w(format_duration(per_diem), 'duration')
+            self.w(' per day')
+        self.w(')\n')
         self.w('Total slacking: ')
         self.w(format_duration(total_slacking), 'duration')
         self.w(' (')
         self.w(format_duration(week_total_slacking), 'duration')
-        self.w(' this week)')
-        self.w('\n')
+        self.w(' this week')
+        if work_days_this_week:
+            per_diem = week_total_slacking / work_days_this_week
+            self.w(', ')
+            self.w(format_duration(per_diem), 'duration')
+            self.w(' per day')
+        self.w(')\n')
         last_time = self.timelog.window.last_time()
         if last_time is not None:
             now = datetime.datetime.now()
