@@ -584,34 +584,15 @@ class MainWindow(object):
 
     def on_daily_report_activate(self, widget):
         """File -> Daily Report"""
-        draftfn = tempfile.mktemp(suffix='gtimelog') # XXX
-        draft = open(draftfn, 'w')
-        self.timelog.window.daily_report(draft, 'Marius')
-        draft.close()
-        os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
-        # XXX rm draftfn when done
+        window = self.timelog.window
+        self.mail(lambda draft: window.daily_report(draft, 'Marius'))
 
     def on_yesterdays_report_activate(self, widget):
         """File -> Daily Report for Yesterday"""
-        draftfn = tempfile.mktemp(suffix='gtimelog') # XXX
-        draft = open(draftfn, 'w')
         min = self.timelog.window.min_timestamp - datetime.timedelta(1)
         max = self.timelog.window.min_timestamp
         window = self.timelog.window_for(min, max)
-        window.daily_report(draft, 'Marius')
-        draft.close()
-        os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
-        # XXX rm draftfn when done
-
-    def on_weekly_report_activate(self, widget):
-        """File -> Weekly Report"""
-        draftfn = tempfile.mktemp(suffix='gtimelog') # XXX
-        draft = open(draftfn, 'w')
-        window = self.weekly_window()
-        window.weekly_report(draft, 'Marius')
-        draft.close()
-        os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
-        # XXX rm draftfn when done
+        self.mail(lambda draft: window.daily_report(draft, 'Marius'))
 
     def weekly_window(self, delta=datetime.timedelta(0)):
         day = self.timelog.day
@@ -621,25 +602,44 @@ class MainWindow(object):
         window = self.timelog.window_for(min, max)
         return window
 
+    def on_weekly_report_activate(self, widget):
+        """File -> Weekly Report"""
+        window = self.weekly_window()
+        self.mail(lambda draft: window.weekly_report(draft, 'Marius'))
+
     def on_last_weeks_report_activate(self, widget):
         """File -> Weekly Report for Last Week"""
-        draftfn = tempfile.mktemp(suffix='gtimelog') # XXX
-        draft = open(draftfn, 'w')
         window = self.weekly_window(delta=-datetime.timedelta(7))
-        window.weekly_report(draft, 'Marius')
-        draft.close()
-        os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
-        # XXX rm draftfn when done
+        self.mail(lambda draft: window.weekly_report(draft, 'Marius'))
 
     def on_edit_timelog_activate(self, widget):
         """File -> Edit timelog.txt"""
-        os.system("gvim %s &" % self.timelog.filename)
+        self.spawn("gvim", self.timelog.filename)
+
+    def mail(self, write_draft):
+        """Send an email."""
+        draftfn = tempfile.mktemp(suffix='gtimelog') # XXX
+        draft = open(draftfn, 'w')
+        write_draft(draft)
+        draft.close()
+        self.spawn("x-terminal-emulator -e mutt -H %s", draftfn)
+        # XXX rm draftfn when done
+
+    def spawn(self, command, arg=None):
+        """Spawn a process in background"""
+        if arg is not None:
+            if '%s' in command:
+                command = command % arg
+            else:
+                command += ' ' + arg
+        os.system(command + " &")
 
     def on_reread_activate(self, widget):
         """File -> Reread"""
         self.timelog.reread()
         self.set_up_history()
         self.populate_log()
+        self.tick(True)
 
     def task_entry_changed(self, widget):
         """Reset history position when the task entry is changed."""
