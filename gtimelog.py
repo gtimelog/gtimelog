@@ -15,7 +15,7 @@ import gtk.glade
 
 # Hardcoded global settings
 virtual_midnight = datetime.time(2, 0)
-enable_gtk_completion = True # doesn't integrate with my homebrew history well
+enable_gtk_completion = False # doesn't integrate with my homebrew history well
 
 
 def format_duration(duration):
