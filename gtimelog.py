@@ -548,6 +548,20 @@ class MainWindow(object):
         os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
         # XXX rm draftfn when done
 
+    def on_last_weeks_report_activate(self, widget):
+        """File -> Weekly Report for Last Week"""
+        draftfn = tempfile.mktemp(suffix='gtimelog') # XXX
+        draft = open(draftfn, 'w')
+        day = self.timelog.day
+        monday = day - datetime.timedelta(day.weekday())
+        max = datetime.datetime.combine(monday, virtual_midnight)
+        min = max - datetime.timedelta(7)
+        window = TimeWindow(self.timelog.filename, min, max)
+        window.weekly_report(draft, 'Marius')
+        draft.close()
+        os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
+        # XXX rm draftfn when done
+
     def on_edit_timelog_activate(self, widget):
         """File -> Edit timelog.txt"""
         os.system("gvim %s &" % self.timelog.filename)
