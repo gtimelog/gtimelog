@@ -8,6 +8,8 @@ import os
 import sets
 import datetime
 import tempfile
+import ConfigParser
+
 import pygtk
 pygtk.require('2.0')
 import gobject
@@ -373,6 +375,35 @@ class Settings(object):
 
     enable_gtk_completion = False # I like my homebrew history better
 
+    def _config(self):
+        config = ConfigParser.RawConfigParser()
+        config.add_section('gtimelog')
+        config.set('gtimelog', 'list-email', self.email)
+        config.set('gtimelog', 'name', self.name)
+        config.set('gtimelog', 'editor', self.editor)
+        config.set('gtimelog', 'mailer', self.mailer)
+        config.set('gtimelog', 'gtk-completion',
+                   str(self.enable_gtk_completion))
+        return config
+
+    def load(self, filename):
+        config = self._config()
+        config.read([filename])
+        self.email = config.get('gtimelog', 'list-email')
+        self.name = config.get('gtimelog', 'name')
+        self.editor = config.get('gtimelog', 'editor')
+        self.mailer = config.get('gtimelog', 'mailer')
+        self.enable_gtk_completion = config.getboolean('gtimelog',
+                                                       'gtk-completion')
+
+    def save(self, filename):
+        config = self._config()
+        f = file(filename, 'w')
+        try:
+            config.write(f)
+        finally:
+            f.close()
+
 
 class MainWindow(object):
     """Main application window."""
@@ -735,6 +766,11 @@ def main():
     except OSError:
         pass
     settings = Settings()
+    settings_file = os.path.join(configdir, 'gtimelogrc') 
+    if not os.path.exists(settings_file):
+        settings.save(settings_file)
+    else:
+        settings.load(settings_file)
     timelog = TimeLog(os.path.join(configdir, 'timelog.txt'))
     main_window = MainWindow(timelog, settings)
     try:
