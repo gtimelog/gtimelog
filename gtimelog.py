@@ -643,6 +643,8 @@ class MainWindow(object):
             self.populate_log()
         self.task_entry.set_text("")
         self.task_entry.grab_focus()
+        self.last_tick = None
+        self.tick()
 
     def tick(self):
         """Tick every second."""
