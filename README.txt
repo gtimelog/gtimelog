@@ -1,0 +1,159 @@
+Time Tracking Tools
+-------------------
+
+This package contains a bunch of Python scripts that I use to keep track of
+my (working, mostly) time.
+
+
+GTimeLog
+--------
+
+The most interesting of those is GTimeLog, which is a Gtk+ application.  Here's
+how it works: every day, when you arrive to work, start up gtimelog and type
+"arrived".  Then start doing some activity (e.g. reading mail, or working on
+a task).  Whenever you stop doing an activity (either when you have finished
+it, or when you switch to working on something else), type the name of the
+activity into the gtimelog prompt.  Try to use the same text if you make
+several entries for an activity (history helps here -- just use the up and down
+arrow keys).  They key principle here is to name the activity after you've
+stopped working on it, and not when you've started.  Of course you can type
+the activity name upfront, and just delay pressing the Enter key until you're
+done.
+
+There are two broad categories of activities: ones that count as work (coding,
+planning, writing proposals or reports, answering work-related email), and ones
+that don't (browsing the web for fun, reading personal email, chatting with
+a friend on the phone for two hours, going out for a lunch break).  To indicate
+which activities are not work related add two asterisks to the activity name:
+
+  lunch **
+  browsing slashdot **
+  napping on the couch **
+
+GTimeLog displays all the things you've done today, and calculates the total
+time you spent working, and the total time you spent "slacking".  It also
+advises you how much time you still have to work today to get 8 hours of
+work done (XXX this should be configurable).  There are two basic views:
+one shows all the activities in chronological order, with starting and ending
+times; while another groups all entries with the same into one activity
+and just shows the total duration.
+
+At the end of the day you can send off a daily report by choosing File -> Daily
+Report.  A mail program (Mutt in a terminal, to be precise) will be started
+with all the activities listed in it(XXX it should be configurable).  You can
+edit the report if wou want to (e.g. group closely related activities into one
+entry), and then send it.  (XXX The recipient and subject format should be
+configurable -- now they're activity@pov.lt and "%B report for Marius (week
+%V)" respectively).
+
+If you make a mistake and type in the wrong activity name, or just forget
+to enter an activity, don't worry.  GTimeLog stores the time log in a simple
+plain text file timelog.txt in the current directory (XXX make it
+configurable).  Every line contains a timestamp and the name of the activity
+that was finished at the time.  All other lines are ignored, so you can add
+comments if you want to -- just make sure no comment begins with a timestamp.
+You do not have to worry about GTimeLog overwriting your changes -- GTimeLog
+always appends entries at the end of the file, and does not keep the log file
+open all the time.  You do have to worry about overwriting changes made by
+GTimeLog with your editor -- make sure you do not enter any activities in
+GTimeLog while you have timelog.txt open in a text editor.
+
+
+Future Plans
+------------
+
+Configurability (see the XXXes).  The ability to generate weekly reports.
+The ability to see at a glance how much work you've done this week.  The
+ability to browse through history (view daily and weekly reports for past
+days and weeks).
+
+Somewhat more vague is the idea of integrating GTimeLog with some sort of
+planning system, so that you did not have to type in all the task names
+manually, and so that task names would be consistent.
+
+
+Other Tools
+-----------
+
+timelog.py is an earlier, less powerful text-mode version of gtimelog.  You
+type in activity names, and timelog writes them down into timelog.txt with
+timestamps prepended.
+
+today.py can generate a daily report from timelog.txt.  It does not group
+activities with the same name, and it does not spawn a mail client.
+You can also specify the date on the command line -- generating reports for
+earlier days is not yet possible with GTimeLog.
+
+sum.py can help you consolidate daily reports.  It is designed to work as a
+filter: it reads lines from the standard input, extracts durations from
+those lines (formatted as "N hours, M min" at the end of the line, and
+separated by at least two spaces from other text), sums them and prints the
+total.  If you use vim for editing daily reports, you can select a bunch of
+lines and pipe them through sum.py.
+
+difftime.py is a hacky interactive calculator that I used to generate daily
+reports from timelog.txt before today.py and gtimelog.py could automate the
+task.  The biggest feature of difftime.py (it's raison d'etre if you will)
+is the ability to calculate the duration between two timestamps.
+
+
+Data Formats
+------------
+
+These tools were designed for easy interoperability.  There are two data
+formats: one is used for timelog.txt, another is used for daily reports.
+They are both human and machine readable, easy to edit, easy to parse.
+
+Timelog.txt is already described above.  Here is a more formal grammar:
+
+  file ::= (entry|comment)*
+
+  entry ::= timestamp ":" space title newline
+
+  comment ::= anything* newline
+
+  title ::= anything*
+
+  timestamp is 'YYYY-MM-DD HH:MM' with a single space between the date and
+  time.
+
+Daily reports look like this:
+
+  random text
+  random text
+  Entry title                Duration
+  Entry title                Duration
+  random text
+  Entry title                Duration
+  Entry title                Duration
+  random text
+
+Formal grammar:
+
+  report ::= (entry|comment)*
+
+  entry ::= title space space duration newline
+
+  comment ::= anything* newline
+
+  title ::= anything*
+
+  duration ::= hours "," space minutes
+            |  hours space minutes
+            |  hours
+            |  minutes
+
+  hours ::= number space "hour"
+         |  number space "hours"
+
+  minutes ::= number space "min"
+
+There is a convention that entries that include two asterisks in their titles
+indicate slacking or pauses between work activities.
+
+
+Author
+------
+
+Marius Gedminas
+<mgedmin@b4net.lt>
