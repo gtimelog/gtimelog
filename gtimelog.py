@@ -367,8 +367,9 @@ class TimeLog(object):
 class Settings(object):
     """Configurable settings for GTimeLog."""
 
-    email = 'activity@pov.lt'
-    name = 'Marius'
+    # Insane defaults
+    email = 'activity-list@example.com'
+    name = 'Anonymous'
 
     editor = 'gvim'
     mailer = 'x-terminal-emulator -e mutt -H %s'
