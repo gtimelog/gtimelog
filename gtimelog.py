@@ -8,6 +8,8 @@ import os
 import sets
 import datetime
 import tempfile
+import pygtk
+pygtk.require('2.0')
 import gobject
 import gtk
 import gtk.glade
@@ -426,6 +428,7 @@ class MainWindow(object):
         weekly_window = self.weekly_window()
         week_total_work, week_total_slacking = weekly_window.totals()
         work_days_this_week = weekly_window.count_days()
+        # XXX WTF is this???
         datetime.date.today().strftime('%A, %Y-%m-%d (week %V)')
 
         self.w('\n')
@@ -693,7 +696,12 @@ class MainWindow(object):
 
 def main():
     """Run the program."""
-    timelog = TimeLog('timelog.txt')
+    home = os.environ.get('HOME')
+    if home:
+        filename = os.path.join(home, '.gtimelog', 'timelog.txt')
+    else:
+        filename = 'timelog.txt'
+    timelog = TimeLog(filename)
     main_window = MainWindow(timelog)
     try:
         gtk.main()
