@@ -5,6 +5,7 @@ A Gtk+ application for keeping track of time.
 
 import re
 import os
+import sets
 import datetime
 import tempfile
 import gobject
@@ -464,7 +465,13 @@ class MainWindow(object):
         self.filtered_history = []
         self.history_pos = 0
         self.history_undo = ''
-        # XXX: update self.completion_choices
+        if not self.have_completion:
+            return
+        seen = sets.Set()
+        for entry in self.history:
+            if entry not in seen:
+                seen.add(entry)
+                self.completion_choices.append([entry])
 
     def set_up_completion(self):
         """Set up autocompletion."""
@@ -578,6 +585,8 @@ class MainWindow(object):
 
     def task_entry_key_press(self, widget, event):
         """Handle key presses in task entry."""
+        # XXX This interferes with the completion box.  How do I determine
+        # whether the completion box is visible or not?
         if event.keyval == gtk.gdk.keyval_from_name('Up'):
             self._do_history(1)
             return gtk.TRUE
