@@ -38,6 +38,81 @@ def doctest_format_duration_long():
 
     """
 
+def doctest_parse_datetime():
+    """Tests for parse_datetime
+
+        >>> from gtimelog import parse_datetime
+        >>> parse_datetime('2005-02-03 02:13')
+        datetime.datetime(2005, 2, 3, 2, 13)
+        >>> parse_datetime('xyzzy')
+        Traceback (most recent call last):
+          ...
+        ValueError: ('bad date time: ', 'xyzzy')
+
+    """
+
+def doctest_virtual_day():
+    """Tests for virtual_day
+
+        >>> from datetime import datetime
+        >>> from gtimelog import virtual_day
+
+    If this assumption fails, you will have to fix the test 
+
+        >>> from gtimelog import virtual_midnight
+        >>> virtual_midnight
+        datetime.time(2, 0)
+
+    The tests themselves:
+
+        >>> virtual_day(datetime(2005, 2, 3, 1, 15))
+        datetime.date(2005, 2, 2)
+        >>> virtual_day(datetime(2005, 2, 3, 1, 59))
+        datetime.date(2005, 2, 2)
+        >>> virtual_day(datetime(2005, 2, 3, 2, 0))
+        datetime.date(2005, 2, 3)
+        >>> virtual_day(datetime(2005, 2, 3, 12, 0))
+        datetime.date(2005, 2, 3)
+        >>> virtual_day(datetime(2005, 2, 3, 23, 59))
+        datetime.date(2005, 2, 3)
+
+    """
+
+def doctest_different_days():
+    """Tests for different_days
+
+        >>> from datetime import datetime
+        >>> from gtimelog import different_days
+
+    If this assumption fails, you will have to fix the test 
+
+        >>> from gtimelog import virtual_midnight
+        >>> virtual_midnight
+        datetime.time(2, 0)
+
+    The tests themselves:
+
+        >>> different_days(datetime(2005, 2, 3, 1, 15),
+        ...                datetime(2005, 2, 3, 2, 15))
+        True
+        >>> different_days(datetime(2005, 2, 3, 11, 15),
+        ...                datetime(2005, 2, 3, 12, 15))
+        False
+
+    """
+
+def doctest_uniq():
+    """Tests for uniq
+
+        >>> from gtimelog import uniq
+        >>> uniq(['a', 'b', 'b', 'c', 'd', 'b', 'd'])
+        ['a', 'b', 'c', 'd', 'b', 'd']
+        >>> uniq(['a'])
+        ['a']
+        >>> uniq([])
+        []
+
+    """
 
 if __name__ == '__main__':
     import doctest
