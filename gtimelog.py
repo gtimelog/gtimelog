@@ -332,7 +332,7 @@ class TimeLog(object):
 
     def reread(self):
         """Reload today's log."""
-        self.day = datetime.date.today()
+        self.day = virtual_day(datetime.datetime.now())
         min = datetime.datetime.combine(self.day, virtual_midnight)
         max = min + datetime.timedelta(1)
         self.history = []
@@ -467,8 +467,8 @@ class MainWindow(object):
         if self.footer_mark is not None:
             buffer.delete_mark(self.footer_mark)
             self.footer_mark = None
-        # XXX this will likely fail between 0 and 2 AM
-        today = datetime.date.today().strftime('%A, %Y-%m-%d (week %V)')
+        today = virtual_day(datetime.datetime.now())
+        today = today.strftime('%A, %Y-%m-%d (week %V)')
         self.w(today + '\n\n', 'today')
         if self.chronological:
             for item in self.timelog.window.all_entries():
