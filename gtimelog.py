@@ -42,13 +42,31 @@ def parse_datetime(dt):
 
 
 def virtual_day(dt):
+    """Return the "virtual day" of a timestamp.
+
+    Timestamps between midnight and "virtual midnight" (e.g. 2 am) are
+    assigned to the previous "virtual day".
+    """
     if dt.time() < virtual_midnight:     # assign to previous day
         return dt.date() - datetime.timedelta(1)
     return dt.date()
 
 
 def different_days(dt1, dt2):
+    """Check whether dt1 and dt2 are on different "virtual days".
+
+    See virtual_day().
+    """
     return virtual_day(dt1) != virtual_day(dt2)
+
+
+def uniq(l):
+    """Return list with consecutive duplicates removed."""
+    result = l[:1]
+    for item in l[1:]:
+        if item != result[-1]:
+            result.append(item)
+    return result
 
 
 class TimeWindow(object):
@@ -560,8 +578,8 @@ class MainWindow(object):
             return
         if self.history_pos == 0:
             self.history_undo = self.task_entry.get_text()
-            self.filtered_history = [l for l in self.history
-                                     if l.startswith(self.history_undo)]
+            self.filtered_history = uniq([l for l in self.history
+                                          if l.startswith(self.history_undo)])
         history = self.filtered_history
         new_pos = max(0, min(self.history_pos + delta, len(history)))
         if new_pos == 0:
