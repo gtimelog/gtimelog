@@ -51,20 +51,34 @@ def different_days(dt1, dt2):
     return virtual_day(dt1) != virtual_day(dt2)
 
 
-class TimeLog(object):
-    """Time log."""
+class TimeWindow(object):
+    """A window into a time log.
 
-    def __init__(self, filename):
+    Reads a time log file and remembers all events that took place between
+    min_timestamp and max_timestamp.  Includes events that took place at
+    min_timestamp, but excludes events that took place at max_timestamp.
+
+    self.items is a list of (timestamp, event_title) tuples.
+
+    Time intervals between events within the time window form entries that have
+    a start time, a stop time, and a duration.  Entry title is the title of the
+    event that occurred at the stop time.
+
+    The first event also creates a special "arrival" entry of zero duration.
+
+    Entries that span virtual midnight boundaries are also converted to
+    "arrival" entries at their end point.
+    """
+
+    def __init__(self, filename, min_timestamp, max_timestamp, callback=None):
         self.filename = filename
-        self.items = []
-        self.history = []
-        self.read_today()
-        self.need_space = False
+        self.min_timestamp = min_timestamp
+        self.max_timestamp = max_timestamp
+        self.reread(callback)
 
-    def read_today(self):
-        today = datetime.date.today()
-        min = datetime.datetime.combine(today, virtual_midnight)
-        max = min + datetime.timedelta(1)
+    def reread(self, callback=None):
+        """Parse the time log file and update self.items."""
+        self.items = []
         try:
             f = open(self.filename)
         except IOError:
@@ -80,50 +94,66 @@ class TimeLog(object):
                 continue
             else:
                 entry = entry.strip()
-                self.history.append(entry)
-                if min <= time < max:
+                if callback:
+                    callback(entry)
+                if self.min_timestamp <= time < self.max_timestamp:
                     self.items.append((time, entry))
-        self.need_space = not line.strip()
         f.close()
-
-    def raw_append(self, line):
-        f = open(self.filename, "a")
-        if self.need_space:
-            self.need_space = False
-            print >> f
-        print >> f, line
-        f.close()
-
-    def append(self, entry):
-        now = datetime.datetime.now()
-        last = self.last_time()
-        if last and different_days(now, last):
-            self.need_space = True
-        self.items.append((now, entry))
-        line = '%s: %s' % (now.strftime("%Y-%m-%d %H:%M"), entry)
-        self.raw_append(line)
-        return now
 
     def last_time(self):
+        """Return the time of the last event (or None if there are no events).
+        """
         if not self.items:
             return None
         return self.items[-1][0]
 
-    def all_items(self):
+    def all_entries(self):
+        """Iterate over all entries.
+
+        Yields (start, stop, duration, entry) tuples.  The first entry
+        has a duration of 0.
+        """
         stop = None
         for item in self.items:
             start = stop
-            stop = item[0].replace(second=0, microsecond=0)
+            stop = item[0]
             entry = item[1]
-            if start is None:
+            if start is None or different_days(start, stop):
                 start = stop
             duration = stop - start
             yield start, stop, duration, entry
 
-    def grouped(self, skip_first=True):
+    def last_entry(self):
+        """Return the last entry (or None if there are no events).
+
+        It is always true that
+
+            self.last_entry() == list(self.all_entries())[-1]
+
+        """
+        if not self.items:
+            return None
+        stop = self.items[-1][0]
+        entry = self.items[-1][1]
+        if len(self.items) == 1:
+            start = stop
+        else:
+            start = self.items[-2][0]
+        if different_days(start, stop):
+            start = stop
+        duration = stop - start
+        return start, stop, duration, entry
+
+    def grouped_entries(self, skip_first=True):
+        """Return consolidated entries (grouped by entry title).
+
+        Returns two list: work entries and slacking entries.  Slacking
+        entries are identified by finding two asterisks in the title.
+        Entry lists are sorted, and contain (start, entry, duration) tuples.
+        """
         work = {}
         slack = {}
-        for start, stop, duration, entry in self.all_items():
+        for start, stop, duration, entry in self.all_entries():
             if skip_first:
                 skip_first = False
                 continue
@@ -142,35 +172,46 @@ class TimeLog(object):
         slack.sort()
         return work, slack
 
-    def last_item(self):
-        if not self.items:
-            return None
-        stop = self.items[-1][0].replace(second=0, microsecond=0)
-        entry = self.items[-1][1]
-        if len(self.items) == 1:
-            start = stop
-        else:
-            start = self.items[-2][0].replace(second=0, microsecond=0)
-        duration = stop - start
-        return start, stop, duration, entry
-
     def totals(self):
+        """Calculate total time of work and slacking entries.
+
+        Returns (total_work, total_slacking) tuple.
+
+        Slacking entries are identified by finding two asterisks in the title.
+
+        Assuming that
+
+            total_work, total_slacking = self.totals()
+            work, slacking = self.grouped_entries()
+
+        It is always true that
+
+            total_work = sum([duration for start, entry, duration in work])
+            total_slacking = sum([duration
+                                  for start, entry, duration in slacking])
+
+        (that is, it would be true if sum could operate on timedeltas).
+        """
         total_work = total_slacking = datetime.timedelta(0)
-        for start, stop, duration, entry in self.all_items():
+        for start, stop, duration, entry in self.all_entries():
             if '**' in entry:
                 total_slacking += duration
             else:
                 total_work += duration
         return total_work, total_slacking
 
-    def daily_report(self, output):
-        weekday = datetime.date.today().strftime('%A')
-        week = datetime.date.today().strftime('%V')
+    def daily_report(self, output, who):
+        """Format a daily report.
+
+        Writes a daily report template in RFC-822 format to output.
+        """
+        weekday = self.min_timestamp.strftime('%A')
+        week = self.min_timestamp.strftime('%V')
         print >> output, "To: activity@pov.lt"
-        print >> output, "Subject: %s report for Marius (week %s)" % (weekday,
-                                                                      week)
+        print >> output, "Subject: %s report for %s (week %s)" % (weekday, who,
+                                                                  week)
         print >> output
-        items = list(self.all_items())
+        items = list(self.all_entries())
         if not items:
             print >> output, "No work done today."
             return
@@ -178,7 +219,7 @@ class TimeLog(object):
         entry = entry[:1].upper() + entry[1:]
         print >> output, "%s at %s" % (entry, start.strftime('%H:%M'))
         print >> output
-        work, slack = self.grouped()
+        work, slack = self.grouped_entries()
         total_work, total_slacking = self.totals()
         if work:
             for start, entry, duration in work:
@@ -186,7 +227,8 @@ class TimeLog(object):
                 print >> output, "%-62s  %s" % (entry,
                                                 format_duration_long(duration))
             print >> output
-        print >> output, "Total work done: %s" % format_duration_long(total_work)
+        print >> output, ("Total work done: %s" %
+                          format_duration_long(total_work))
         print >> output
         if slack:
             for start, entry, duration in slack:
@@ -194,10 +236,75 @@ class TimeLog(object):
                 print >> output, "%-62s  %s" % (entry,
                                                 format_duration_long(duration))
             print >> output
-        print >> output, "Time spent slacking: %s" % format_duration_long(total_slacking)
+        print >> output, ("Time spent slacking: %s" %
+                          format_duration_long(total_slacking))
         print >> output
         now = datetime.datetime.now().strftime('%H:%M')
         print >> output, "Time now: %s" % now
+
+    def weekly_report(self, output, who):
+        """Format a weekly report.
+
+        Writes a weekly report template in RFC-822 format to output.
+        """
+        week = self.min_timestamp.strftime('%V')
+        print >> output, "To: activity@pov.lt"
+        print >> output, "Subject: Weekly report for %s (week %s)" % (who,
+                                                                      week)
+        print >> output
+        items = list(self.all_entries())
+        if not items:
+            print >> output, "No work done this week."
+            return
+        print >> output, "                                               estimated       actual"
+        work, slack = self.grouped_entries()
+        total_work, total_slacking = self.totals()
+        if work:
+            work = [(entry, duration) for start, entry, duration in work]
+            work.sort()
+            for entry, duration in work:
+                if not duration:
+                    continue # skip empty "arrival" entries
+                entry = entry[:1].upper() + entry[1:]
+                print >> output, ("%-46s  %-14s  %s" %
+                                  (entry, '-', format_duration_long(duration)))
+            print >> output
+        print >> output, ("Total work done this week: %s" %
+                          format_duration_long(total_work))
+
+
+class TimeLog(object):
+    """Time log."""
+
+    def __init__(self, filename):
+        self.filename = filename
+        self.reread()
+
+    def reread(self):
+        self.day = datetime.date.today()
+        min = datetime.datetime.combine(self.day, virtual_midnight)
+        max = min + datetime.timedelta(1)
+        self.history = []
+        self.window = TimeWindow(self.filename, min, max, self.history.append)
+        self.need_space = not self.window.items
+
+    def raw_append(self, line):
+        f = open(self.filename, "a")
+        if self.need_space:
+            self.need_space = False
+            print >> f
+        print >> f, line
+        f.close()
+
+    def append(self, entry):
+        now = datetime.datetime.now().replace(second=0, microsecond=0)
+        last = self.window.last_time()
+        if last and different_days(now, last):
+            # next day: reset self.window
+            self.reread()
+        self.window.items.append((now, entry))
+        line = '%s: %s' % (now.strftime("%Y-%m-%d %H:%M"), entry)
+        self.raw_append(line)
 
 
 class MainWindow(object):
@@ -258,10 +365,10 @@ class MainWindow(object):
         today = datetime.date.today().strftime('%A, %Y-%m-%d (week %V)')
         self.w(today + '\n\n', 'today')
         if self.chronological:
-            for item in self.timelog.all_items():
+            for item in self.timelog.window.all_entries():
                 self.write_item(item)
         else:
-            work, slack = self.timelog.grouped()
+            work, slack = self.timelog.window.grouped_entries()
             for start, entry, duration in work + slack:
                 self.write_group(entry, duration)
             where = buffer.get_end_iter()
@@ -282,7 +389,7 @@ class MainWindow(object):
         buffer = self.log_buffer
         self.footer_mark = buffer.create_mark('footer', buffer.get_end_iter(),
                                               gtk.TRUE)
-        total_work, total_slacking = self.timelog.totals()
+        total_work, total_slacking = self.timelog.window.totals()
         self.w('\n')
         self.w('Total work done: ')
         self.w(format_duration(total_work), 'duration')
@@ -290,7 +397,7 @@ class MainWindow(object):
         self.w('Total slacking: ')
         self.w(format_duration(total_slacking), 'duration')
         self.w('\n')
-        last_time = self.timelog.last_time()
+        last_time = self.timelog.window.last_time()
         if last_time is not None:
             now = datetime.datetime.now()
             current_task = self.task_entry.get_text()
@@ -391,7 +498,33 @@ class MainWindow(object):
         """File -> Daily Report"""
         draftfn = tempfile.mktemp(suffix='gtimelog') # XXX
         draft = open(draftfn, 'w')
-        self.timelog.daily_report(draft)
+        self.timelog.window.daily_report(draft, 'Marius')
+        draft.close()
+        os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
+        # XXX rm draftfn when done
+
+    def on_yesterdays_report_activate(self, widget):
+        """File -> Daily Report for Yesterday"""
+        draftfn = tempfile.mktemp(suffix='gtimelog') # XXX
+        draft = open(draftfn, 'w')
+        min = self.timelog.window.min_timestamp - datetime.timedelta(1)
+        max = self.timelog.window.min_timestamp
+        window = TimeWindow(self.timelog.filename, min, max)
+        window.daily_report(draft, 'Marius')
+        draft.close()
+        os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
+        # XXX rm draftfn when done
+
+    def on_weekly_report_activate(self, widget):
+        """File -> Weekly Report"""
+        draftfn = tempfile.mktemp(suffix='gtimelog') # XXX
+        draft = open(draftfn, 'w')
+        day = self.timelog.day
+        monday = day - datetime.timedelta(day.weekday())
+        min = datetime.datetime.combine(monday, virtual_midnight)
+        max = min + datetime.timedelta(7)
+        window = TimeWindow(self.timelog.filename, min, max)
+        window.weekly_report(draft, 'Marius')
         draft.close()
         os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
         # XXX rm draftfn when done
@@ -438,7 +571,7 @@ class MainWindow(object):
         self.timelog.append(entry)
         if self.chronological:
             self.delete_footer()
-            self.write_item(self.timelog.last_item())
+            self.write_item(self.timelog.window.last_entry())
             self.add_footer()
             self.scroll_to_end()
         else:
@@ -449,7 +582,7 @@ class MainWindow(object):
     def tick(self):
         """Tick every second."""
         now = datetime.datetime.now()
-        last_time = self.timelog.last_time()
+        last_time = self.timelog.window.last_time()
         if last_time is None:
             self.time_label.set_text(now.strftime("%H:%M"))
         else:
