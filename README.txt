@@ -46,17 +46,18 @@ entry), and then send it.  (XXX The recipient and subject format should be
 configurable -- now they're activity@pov.lt and "%B report for Marius (week
 %V)" respectively).
 
-If you make a mistake and type in the wrong activity name, or just forget
-to enter an activity, don't worry.  GTimeLog stores the time log in a simple
-plain text file timelog.txt in the current directory (XXX make it
-configurable).  Every line contains a timestamp and the name of the activity
-that was finished at the time.  All other lines are ignored, so you can add
-comments if you want to -- just make sure no comment begins with a timestamp.
-You do not have to worry about GTimeLog overwriting your changes -- GTimeLog
-always appends entries at the end of the file, and does not keep the log file
-open all the time.  You do have to worry about overwriting changes made by
-GTimeLog with your editor -- make sure you do not enter any activities in
-GTimeLog while you have timelog.txt open in a text editor.
+If you make a mistake and type in the wrong activity name, or just forget to
+enter an activity, don't worry.  GTimeLog stores the time log in a simple plain
+text file $HOME/.gtimelog/timelog.txt (or just timelog.txt in the current
+directory if you are a Windows user and do not have $HOME set).  Every line
+contains a timestamp and the name of the activity that was finished at the
+time.  All other lines are ignored, so you can add comments if you want to --
+just make sure no comment begins with a timestamp.  You do not have to worry
+about GTimeLog overwriting your changes -- GTimeLog always appends entries at
+the end of the file, and does not keep the log file open all the time.  You do
+have to worry about overwriting changes made by GTimeLog with your editor --
+make sure you do not enter any activities in GTimeLog while you have
+timelog.txt open in a text editor.
 
 
 Future Plans
