@@ -338,7 +338,7 @@ class TimeLog(object):
         self.window = TimeWindow(self.filename, min, max, self.history.append)
         self.need_space = not self.window.items
 
-    def window(self, min, max):
+    def window_for(self, min, max):
         """Return a TimeWindow for a specified time interval."""
         return TimeWindow(self.filename, min, max)
 
@@ -599,7 +599,7 @@ class MainWindow(object):
         draft = open(draftfn, 'w')
         min = self.timelog.window.min_timestamp - datetime.timedelta(1)
         max = self.timelog.window.min_timestamp
-        window = self.timelog.window(min, max)
+        window = self.timelog.window_for(min, max)
         window.daily_report(draft, 'Marius')
         draft.close()
         os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
@@ -620,7 +620,7 @@ class MainWindow(object):
         monday = day - datetime.timedelta(day.weekday())
         min = datetime.datetime.combine(monday, virtual_midnight) + delta
         max = min + datetime.timedelta(7)
-        window = self.timelog.window(min, max)
+        window = self.timelog.window_for(min, max)
         return window
 
     def on_last_weeks_report_activate(self, widget):
