@@ -340,8 +340,8 @@ class MainWindow(object):
         buffer.create_tag('duration', foreground='red')
         buffer.create_tag('time', foreground='green')
         buffer.create_tag('slacking', foreground='gray')
-        self.set_up_history()
         self.set_up_completion()
+        self.set_up_history()
         self.populate_log()
         self.tick()
         gobject.timeout_add(1000, self.tick)
@@ -446,6 +446,7 @@ class MainWindow(object):
         self.filtered_history = []
         self.history_pos = 0
         self.history_undo = ''
+        # XXX: update self.completion_choices
 
     def set_up_completion(self):
         """Set up autocompletion."""
@@ -528,6 +529,16 @@ class MainWindow(object):
         draft.close()
         os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
         # XXX rm draftfn when done
+
+    def on_edit_timelog_activate(self, widget):
+        """File -> Edit timelog.txt"""
+        os.system("gvim %s &" % self.timelog.filename)
+
+    def on_reread_activate(self, widget):
+        """File -> Reread"""
+        self.timelog.reread()
+        self.set_up_history()
+        self.populate_log()
 
     def task_entry_changed(self, widget):
         """Reset history position when the task entry is changed."""
