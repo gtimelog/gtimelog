@@ -278,9 +278,6 @@ class TimeWindow(object):
             print >> output
         print >> output, ("Time spent slacking: %s" %
                           format_duration_long(total_slacking))
-        print >> output
-        now = datetime.datetime.now().strftime('%H:%M')
-        print >> output, "Time now: %s" % now
 
     def weekly_report(self, output, who, estimated_column=False):
         """Format a weekly report.
