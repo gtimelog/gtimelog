@@ -19,6 +19,8 @@ import gtk.glade
 virtual_midnight = datetime.time(2, 0)
 enable_gtk_completion = False # doesn't integrate with my homebrew history well
 
+ui_file = os.path.join(os.path.dirname(__file__), "gtimelog.glade")
+
 
 def format_duration(duration):
     """Format a datetime.timedelta with minute precision."""
@@ -275,7 +277,7 @@ class TimeWindow(object):
         now = datetime.datetime.now().strftime('%H:%M')
         print >> output, "Time now: %s" % now
 
-    def weekly_report(self, output, who):
+    def weekly_report(self, output, who, estimated_column=False):
         """Format a weekly report.
 
         Writes a weekly report template in RFC-822 format to output.
@@ -289,7 +291,11 @@ class TimeWindow(object):
         if not items:
             print >> output, "No work done this week."
             return
-        print >> output, "                                               estimated       actual"
+        print >> output, " " * 46,
+        if estimated_column:
+            print >> output, "estimated       actual"
+        else:
+            print >> output, "                time"
         work, slack = self.grouped_entries()
         total_work, total_slacking = self.totals()
         if work:
@@ -299,8 +305,12 @@ class TimeWindow(object):
                 if not duration:
                     continue # skip empty "arrival" entries
                 entry = entry[:1].upper() + entry[1:]
-                print >> output, ("%-46s  %-14s  %s" %
-                                  (entry, '-', format_duration_long(duration)))
+                if estimated_column:
+                    print >> output, ("%-46s  %-14s  %s" %
+                                (entry, '-', format_duration_long(duration)))
+                else:
+                    print >> output, ("%-62s  %s" %
+                                (entry, format_duration_long(duration)))
             print >> output
         print >> output, ("Total work done this week: %s" %
                           format_duration_long(total_work))
@@ -354,7 +364,7 @@ class MainWindow(object):
         """Create the main window."""
         self.timelog = timelog
         self.last_tick = None
-        tree = gtk.glade.XML("gtimelog.glade")
+        tree = gtk.glade.XML(ui_file)
         tree.signal_autoconnect(self)
         self.about_dialog = tree.get_widget("about_dialog")
         self.about_dialog_ok_btn = tree.get_widget("ok_button")
