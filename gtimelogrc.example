@@ -22,3 +22,6 @@ editor = gvim
 # 2.4), False disables and lets you access history by pressing Up/Down.
 gtk-completion = False
 
+# How many hours' work in a day.
+hours = 8
+

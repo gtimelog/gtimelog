@@ -376,6 +376,8 @@ class Settings(object):
 
     enable_gtk_completion = False # I like my homebrew history better
 
+    hours = 8
+
     def _config(self):
         config = ConfigParser.RawConfigParser()
         config.add_section('gtimelog')
@@ -385,6 +387,7 @@ class Settings(object):
         config.set('gtimelog', 'mailer', self.mailer)
         config.set('gtimelog', 'gtk-completion',
                    str(self.enable_gtk_completion))
+        config.set('gtimelog', 'hours', str(self.hours))
         return config
 
     def load(self, filename):
@@ -396,6 +399,7 @@ class Settings(object):
         self.mailer = config.get('gtimelog', 'mailer')
         self.enable_gtk_completion = config.getboolean('gtimelog',
                                                        'gtk-completion')
+        self.hours = config.getint('gtimelog', 'hours')
 
     def save(self, filename):
         config = self._config()
@@ -528,7 +532,8 @@ class MainWindow(object):
                 total_time = total_work
             else:
                 total_time = total_work + current_task_time
-            time_left = datetime.timedelta(hours=8) - total_time
+            time_left = (datetime.timedelta(hours=self.settings.hours) -
+                total_time)
             time_to_leave = now + time_left
             if time_left < datetime.timedelta(0):
                 time_left = datetime.timedelta(0)
