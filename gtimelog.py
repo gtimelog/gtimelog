@@ -643,7 +643,7 @@ class MainWindow(object):
         """Tick every second."""
         now = datetime.datetime.now().replace(second=0, microsecond=0)
         if now == self.last_tick:
-            return
+            return gtk.TRUE
         self.last_tick = now
         last_time = self.timelog.window.last_time()
         if last_time is None:
