@@ -247,6 +247,29 @@ class TimeWindow(object):
                 total_work += duration
         return total_work, total_slacking
 
+    def icalendar(self, output):
+        """Create an iCalendar file with activities."""
+        print >> output, "BEGIN:VCALENDAR"
+        print >> output, "PRODID:-//mg.pov.lt/NONSGML GTimeLog//EN"
+        print >> output, "VERSION:2.0"
+        try:
+            import socket
+            idhost = socket.getfqdn()
+        except: # can it actually ever fail?
+            idhost = 'localhost'
+        dtstamp = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        for start, stop, duration, entry in self.all_entries():
+            print >> output, "BEGIN:VEVENT"
+            print >> output, "UID:%s@%s" % (hash((start, stop, entry)), idhost)
+            print >> output, "SUMMARY:%s" % (entry.replace('\\', '\\\\')
+                                                  .replace(';', '\\;')
+                                                  .replace(',', '\\,'))
+            print >> output, "DTSTART:%s" % start.strftime('%Y%m%dT%H%M%S')
+            print >> output, "DTEND:%s" % stop.strftime('%Y%m%dT%H%M%S')
+            print >> output, "DTSTAMP:%s" % dtstamp
+            print >> output, "END:VEVENT"
+        print >> output, "END:VCALENDAR"
+
     def daily_report(self, output, email, who):
         """Format a daily report.
 
