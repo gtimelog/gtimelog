@@ -12,6 +12,9 @@ import gtk
 import gtk.glade
 
 
+virtual_midnight = datetime.time(2, 0)
+
+
 def format_duration(duration):
     """Format a datetime.timedelta with minute precision."""
     h, m = divmod((duration.days * 24 * 60 + duration.seconds // 60), 60)
@@ -38,6 +41,16 @@ def parse_datetime(dt):
     return datetime.datetime(year, month, day, hour, min)
 
 
+def virtual_day(dt):
+    if dt.time() < virtual_midnight:     # assign to previous day
+        return dt.date() - datetime.timedelta(1)
+    return dt.date()
+
+
+def different_days(dt1, dt2):
+    return virtual_day(dt1) != virtual_day(dt2)
+
+
 class TimeLog(object):
     """Time log."""
 
@@ -46,13 +59,18 @@ class TimeLog(object):
         self.items = []
         self.history = []
         self.read_today()
+        self.need_space = False
 
     def read_today(self):
-        # assume "day turnover" at 2 am
         today = datetime.date.today()
-        min = datetime.datetime.combine(today, datetime.time(2, 0))
+        min = datetime.datetime.combine(today, virtual_midnight)
         max = min + datetime.timedelta(1)
-        for line in file(self.filename):
+        try:
+            f = open(self.filename)
+        except IOError:
+            return
+        line = ''
+        for line in f:
             if ': ' not in line:
                 continue
             time, entry = line.split(': ', 1)
@@ -65,17 +83,22 @@ class TimeLog(object):
                 self.history.append(entry)
                 if min <= time < max:
                     self.items.append((time, entry))
+        self.need_space = not line.strip()
+        f.close()
 
     def raw_append(self, line):
         f = open(self.filename, "a")
+        if self.need_space:
+            self.need_space = False
+            print >> f
         print >> f, line
         f.close()
 
-    def empty_line(self):
-        self.raw_append('')
-
     def append(self, entry):
         now = datetime.datetime.now()
+        last = self.last_time()
+        if last and different_days(now, last):
+            self.need_space = True
         self.items.append((now, entry))
         line = '%s: %s' % (now.strftime("%Y-%m-%d %H:%M"), entry)
         self.raw_append(line)
@@ -216,13 +239,9 @@ class MainWindow(object):
         self.tick()
         gobject.timeout_add(1000, self.tick)
 
-    def w(self, text, tag=None, at=None):
+    def w(self, text, tag=None):
         """Write some text at the end of the log buffer."""
         buffer = self.log_buffer
-        if at is None:
-            iter = buffer.get_end_iter()
-        else:
-            iter = buffer.get_iter_at_mark(at)
         if tag:
             buffer.insert_with_tags_by_name(buffer.get_end_iter(), text, tag)
         else:
@@ -304,7 +323,6 @@ class MainWindow(object):
         buffer.place_cursor(where)
 
     def write_group(self, entry, duration):
-        buffer = self.log_buffer
         self.w(format_duration(duration), 'duration')
         tag = '**' in entry and 'slacking' or None
         self.w('\t' + entry + '\n', tag)
@@ -446,7 +464,6 @@ class MainWindow(object):
 def main():
     """Run the program."""
     timelog = TimeLog('timelog.txt')
-    timelog.empty_line()
     main_window = MainWindow(timelog)
     try:
         gtk.main()
