@@ -409,12 +409,19 @@ class MainWindow(object):
         self.footer_mark = buffer.create_mark('footer', buffer.get_end_iter(),
                                               gtk.TRUE)
         total_work, total_slacking = self.timelog.window.totals()
+        week_total_work, week_total_slacking = self.weekly_window().totals()
         self.w('\n')
         self.w('Total work done: ')
         self.w(format_duration(total_work), 'duration')
+        self.w(' (')
+        self.w(format_duration(week_total_work), 'duration')
+        self.w(' this week)')
         self.w('\n')
         self.w('Total slacking: ')
         self.w(format_duration(total_slacking), 'duration')
+        self.w(' (')
+        self.w(format_duration(week_total_slacking), 'duration')
+        self.w(' this week)')
         self.w('\n')
         last_time = self.timelog.window.last_time()
         if last_time is not None:
@@ -545,25 +552,25 @@ class MainWindow(object):
         """File -> Weekly Report"""
         draftfn = tempfile.mktemp(suffix='gtimelog') # XXX
         draft = open(draftfn, 'w')
-        day = self.timelog.day
-        monday = day - datetime.timedelta(day.weekday())
-        min = datetime.datetime.combine(monday, virtual_midnight)
-        max = min + datetime.timedelta(7)
-        window = TimeWindow(self.timelog.filename, min, max)
+        window = self.weekly_window()
         window.weekly_report(draft, 'Marius')
         draft.close()
         os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
         # XXX rm draftfn when done
 
+    def weekly_window(self, delta=datetime.timedelta(0)):
+        day = self.timelog.day
+        monday = day - datetime.timedelta(day.weekday())
+        min = datetime.datetime.combine(monday, virtual_midnight) + delta
+        max = min + datetime.timedelta(7)
+        window = TimeWindow(self.timelog.filename, min, max)
+        return window
+
     def on_last_weeks_report_activate(self, widget):
         """File -> Weekly Report for Last Week"""
         draftfn = tempfile.mktemp(suffix='gtimelog') # XXX
         draft = open(draftfn, 'w')
-        day = self.timelog.day
-        monday = day - datetime.timedelta(day.weekday())
-        max = datetime.datetime.combine(monday, virtual_midnight)
-        min = max - datetime.timedelta(7)
-        window = TimeWindow(self.timelog.filename, min, max)
+        window = self.weekly_window(delta=-datetime.timedelta(7))
         window.weekly_report(draft, 'Marius')
         draft.close()
         os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
