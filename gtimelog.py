@@ -713,7 +713,10 @@ def main():
     """Run the program."""
     home = os.environ.get('HOME')
     if home:
-        filename = os.path.join(home, '.gtimelog', 'timelog.txt')
+        dir = os.path.join(home, '.gtimelog')
+        if not os.path.exists(dir):
+            os.mkdir(dir) # racy, but we don't care
+        filename = os.path.join(dir, 'timelog.txt')
     else:
         filename = 'timelog.txt'
     timelog = TimeLog(filename)
