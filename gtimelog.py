@@ -17,9 +17,6 @@ import gtk
 import gtk.glade
 
 
-# Hardcoded global settings
-virtual_midnight = datetime.time(2, 0)
-
 ui_file = os.path.join(os.path.dirname(__file__), "gtimelog.glade")
 
 
@@ -49,7 +46,16 @@ def parse_datetime(dt):
     return datetime.datetime(year, month, day, hour, min)
 
 
-def virtual_day(dt):
+def parse_time(t):
+    """Parse a time instance from 'HH:MM' formatted string."""
+    m = re.match(r'^(\d+):(\d+)$', t)
+    if not m:
+        raise ValueError('bad time: ', t)
+    hour, min = map(int, m.groups())
+    return datetime.time(hour, min)
+
+
+def virtual_day(dt, virtual_midnight):
     """Return the "virtual day" of a timestamp.
 
     Timestamps between midnight and "virtual midnight" (e.g. 2 am) are
@@ -60,12 +66,13 @@ def virtual_day(dt):
     return dt.date()
 
 
-def different_days(dt1, dt2):
+def different_days(dt1, dt2, virtual_midnight):
     """Check whether dt1 and dt2 are on different "virtual days".
 
     See virtual_day().
     """
-    return virtual_day(dt1) != virtual_day(dt2)
+    return virtual_day(dt1, virtual_midnight) != virtual_day(dt2,
+                                                             virtual_midnight)
 
 
 def uniq(l):
@@ -96,10 +103,12 @@ class TimeWindow(object):
     "arrival" entries at their end point.
     """
 
-    def __init__(self, filename, min_timestamp, max_timestamp, callback=None):
+    def __init__(self, filename, min_timestamp, max_timestamp,
+                 virtual_midnight, callback=None):
         self.filename = filename
         self.min_timestamp = min_timestamp
         self.max_timestamp = max_timestamp
+        self.virtual_midnight = virtual_midnight
         self.reread(callback)
 
     def reread(self, callback=None):
@@ -144,7 +153,8 @@ class TimeWindow(object):
             start = stop
             stop = item[0]
             entry = item[1]
-            if start is None or different_days(start, stop):
+            if start is None or different_days(start, stop,
+                                               self.virtual_midnight):
                 start = stop
             duration = stop - start
             yield start, stop, duration, entry
@@ -154,7 +164,8 @@ class TimeWindow(object):
         count = 0
         last = None
         for start, stop, duration, entry in self.all_entries():
-            if last is None or different_days(last, start):
+            if last is None or different_days(last, start,
+                                              self.virtual_midnight):
                 last = start
                 count += 1
         return count
@@ -175,7 +186,7 @@ class TimeWindow(object):
             start = stop
         else:
             start = self.items[-2][0]
-        if different_days(start, stop):
+        if different_days(start, stop, self.virtual_midnight):
             start = stop
         duration = stop - start
         return start, stop, duration, entry
@@ -326,22 +337,25 @@ class TimeLog(object):
     the end.
     """
 
-    def __init__(self, filename):
+    def __init__(self, filename, virtual_midnight):
         self.filename = filename
+        self.virtual_midnight = virtual_midnight
         self.reread()
 
     def reread(self):
         """Reload today's log."""
-        self.day = virtual_day(datetime.datetime.now())
-        min = datetime.datetime.combine(self.day, virtual_midnight)
+        self.day = virtual_day(datetime.datetime.now(), self.virtual_midnight)
+        min = datetime.datetime.combine(self.day, self.virtual_midnight)
         max = min + datetime.timedelta(1)
         self.history = []
-        self.window = TimeWindow(self.filename, min, max, self.history.append)
+        self.window = TimeWindow(self.filename, min, max,
+                                 self.virtual_midnight,
+                                 callback=self.history.append)
         self.need_space = not self.window.items
 
     def window_for(self, min, max):
         """Return a TimeWindow for a specified time interval."""
-        return TimeWindow(self.filename, min, max)
+        return TimeWindow(self.filename, min, max, self.virtual_midnight)
 
     def raw_append(self, line):
         """Append a line to the time log file."""
@@ -356,7 +370,7 @@ class TimeLog(object):
         """Append a new entry to the time log."""
         now = datetime.datetime.now().replace(second=0, microsecond=0)
         last = self.window.last_time()
-        if last and different_days(now, last):
+        if last and different_days(now, last, self.virtual_midnight):
             # next day: reset self.window
             self.reread()
         self.window.items.append((now, entry))
@@ -377,6 +391,7 @@ class Settings(object):
     enable_gtk_completion = False # I like my homebrew history better
 
     hours = 8
+    virtual_midnight = datetime.time(2, 0)
 
     def _config(self):
         config = ConfigParser.RawConfigParser()
@@ -388,6 +403,8 @@ class Settings(object):
         config.set('gtimelog', 'gtk-completion',
                    str(self.enable_gtk_completion))
         config.set('gtimelog', 'hours', str(self.hours))
+        config.set('gtimelog', 'virtual_midnight',
+                   self.virtual_midnight.strftime('%H:%M'))
         return config
 
     def load(self, filename):
@@ -400,6 +417,8 @@ class Settings(object):
         self.enable_gtk_completion = config.getboolean('gtimelog',
                                                        'gtk-completion')
         self.hours = config.getint('gtimelog', 'hours')
+        self.virtual_midnight = parse_time(config.get('gtimelog',
+                                                      'virtual_midnight'))
 
     def save(self, filename):
         config = self._config()
@@ -467,7 +486,8 @@ class MainWindow(object):
         if self.footer_mark is not None:
             buffer.delete_mark(self.footer_mark)
             self.footer_mark = None
-        today = virtual_day(datetime.datetime.now())
+        today = virtual_day(datetime.datetime.now(),
+                            self.timelog.virtual_midnight)
         today = today.strftime('%A, %Y-%m-%d (week %V)')
         self.w(today + '\n\n', 'today')
         if self.chronological:
@@ -646,7 +666,8 @@ class MainWindow(object):
     def weekly_window(self, delta=datetime.timedelta(0)):
         day = self.timelog.day
         monday = day - datetime.timedelta(day.weekday())
-        min = datetime.datetime.combine(monday, virtual_midnight) + delta
+        min = datetime.datetime.combine(monday,
+                        self.timelog.virtual_midnight) + delta
         max = min + datetime.timedelta(7)
         window = self.timelog.window_for(min, max)
         return window
@@ -777,7 +798,8 @@ def main():
         settings.save(settings_file)
     else:
         settings.load(settings_file)
-    timelog = TimeLog(os.path.join(configdir, 'timelog.txt'))
+    timelog = TimeLog(os.path.join(configdir, 'timelog.txt'),
+                      settings.virtual_midnight)
     main_window = MainWindow(timelog, settings)
     try:
         gtk.main()
