@@ -235,7 +235,7 @@ class TimeWindow(object):
                 total_work += duration
         return total_work, total_slacking
 
-    def daily_report(self, output, who):
+    def daily_report(self, output, email, who):
         """Format a daily report.
 
         Writes a daily report template in RFC-822 format to output.
@@ -245,7 +245,7 @@ class TimeWindow(object):
         weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         weekday = weekday_names[self.min_timestamp.weekday()]
         week = self.min_timestamp.strftime('%V')
-        print >> output, "To: activity@pov.lt"
+        print >> output, "To: %(email)s" % {'email': email}
         print >> output, ("Subject: %(date)s report for %(who)s"
                           " (%(weekday)s, week %(week)s)"
                           % {'date': self.min_timestamp.strftime('%Y-%m-%d'),
@@ -279,13 +279,13 @@ class TimeWindow(object):
         print >> output, ("Time spent slacking: %s" %
                           format_duration_long(total_slacking))
 
-    def weekly_report(self, output, who, estimated_column=False):
+    def weekly_report(self, output, email, who, estimated_column=False):
         """Format a weekly report.
 
         Writes a weekly report template in RFC-822 format to output.
         """
         week = self.min_timestamp.strftime('%V')
-        print >> output, "To: activity@pov.lt"
+        print >> output, "To: %(email)s" % {'email': email}
         print >> output, "Subject: Weekly report for %s (week %s)" % (who,
                                                                       week)
         print >> output
@@ -585,14 +585,16 @@ class MainWindow(object):
     def on_daily_report_activate(self, widget):
         """File -> Daily Report"""
         window = self.timelog.window
-        self.mail(lambda draft: window.daily_report(draft, 'Marius'))
+        self.mail(lambda draft: window.daily_report(draft, 'activity@pov.lt',
+                                                    'Marius'))
 
     def on_yesterdays_report_activate(self, widget):
         """File -> Daily Report for Yesterday"""
         min = self.timelog.window.min_timestamp - datetime.timedelta(1)
         max = self.timelog.window.min_timestamp
         window = self.timelog.window_for(min, max)
-        self.mail(lambda draft: window.daily_report(draft, 'Marius'))
+        self.mail(lambda draft: window.daily_report(draft, 'activity@pov.lt',
+                                                    'Marius'))
 
     def weekly_window(self, delta=datetime.timedelta(0)):
         day = self.timelog.day
@@ -605,12 +607,14 @@ class MainWindow(object):
     def on_weekly_report_activate(self, widget):
         """File -> Weekly Report"""
         window = self.weekly_window()
-        self.mail(lambda draft: window.weekly_report(draft, 'Marius'))
+        self.mail(lambda draft: window.weekly_report(draft, 'activity@pov.lt',
+                                                     'Marius'))
 
     def on_last_weeks_report_activate(self, widget):
         """File -> Weekly Report for Last Week"""
         window = self.weekly_window(delta=-datetime.timedelta(7))
-        self.mail(lambda draft: window.weekly_report(draft, 'Marius'))
+        self.mail(lambda draft: window.weekly_report(draft, 'activity@pov.lt',
+                                                     'Marius'))
 
     def on_edit_timelog_activate(self, widget):
         """File -> Edit timelog.txt"""
