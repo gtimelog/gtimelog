@@ -240,11 +240,16 @@ class TimeWindow(object):
 
         Writes a daily report template in RFC-822 format to output.
         """
-        weekday = self.min_timestamp.strftime('%A')
+        # Locale is set as a side effect of 'import gtk', so strftime('%a')
+        # would give us translated names
+        weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        weekday = weekday_names[self.min_timestamp.weekday()]
         week = self.min_timestamp.strftime('%V')
         print >> output, "To: activity@pov.lt"
-        print >> output, "Subject: %s report for %s (week %s)" % (weekday, who,
-                                                                  week)
+        print >> output, ("Subject: %(date)s report for %(who)s"
+                          " (%(weekday)s, week %(week)s)"
+                          % {'date': self.min_timestamp.strftime('%Y-%m-%d'),
+                             'weekday': weekday, 'week': week, 'who': who})
         print >> output
         items = list(self.all_entries())
         if not items:
