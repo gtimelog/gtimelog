@@ -400,7 +400,7 @@ class MainWindow(object):
         self.set_up_completion()
         self.set_up_history()
         self.populate_log()
-        self.tick()
+        self.tick(True)
         gobject.timeout_add(1000, self.tick)
 
     def w(self, text, tag=None):
@@ -694,13 +694,13 @@ class MainWindow(object):
             self.populate_log()
         self.task_entry.set_text("")
         self.task_entry.grab_focus()
-        self.last_tick = None
-        self.tick()
+        self.tick(True)
 
-    def tick(self):
+    def tick(self, force_update=False):
         """Tick every second."""
         now = datetime.datetime.now().replace(second=0, microsecond=0)
-        if now == self.last_tick:
+        if now == self.last_tick and not force_update:
+            # Do not eat CPU unnecessarily
             return gtk.TRUE
         self.last_tick = now
         last_time = self.timelog.window.last_time()
