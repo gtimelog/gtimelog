@@ -15,7 +15,7 @@ import gtk.glade
 
 # Hardcoded global settings
 virtual_midnight = datetime.time(2, 0)
-enable_gtk_completion = False # doesn't integrate with my homebrew history well
+enable_gtk_completion = True # doesn't integrate with my homebrew history well
 
 
 def format_duration(duration):
@@ -625,6 +625,8 @@ class MainWindow(object):
         """Handle key presses in task entry."""
         # XXX This interferes with the completion box.  How do I determine
         # whether the completion box is visible or not?
+        if self.have_completion:
+            return gtk.FALSE
         if event.keyval == gtk.gdk.keyval_from_name('Up'):
             self._do_history(1)
             return gtk.TRUE
