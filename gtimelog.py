@@ -13,7 +13,9 @@ import gtk
 import gtk.glade
 
 
+# Hardcoded global settings
 virtual_midnight = datetime.time(2, 0)
+enable_gtk_completion = False # doesn't integrate with my homebrew history well
 
 
 def format_duration(duration):
@@ -483,6 +485,9 @@ class MainWindow(object):
 
     def set_up_completion(self):
         """Set up autocompletion."""
+        if not enable_gtk_completion:
+            self.have_completion = False
+            return
         self.have_completion = hasattr(gtk, 'EntryCompletion')
         if not self.have_completion:
             return
