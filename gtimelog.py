@@ -585,16 +585,14 @@ class MainWindow(object):
     def on_daily_report_activate(self, widget):
         """File -> Daily Report"""
         window = self.timelog.window
-        self.mail(lambda draft: window.daily_report(draft, 'activity@pov.lt',
-                                                    'Marius'))
+        self.mail(window.daily_report)
 
     def on_yesterdays_report_activate(self, widget):
         """File -> Daily Report for Yesterday"""
         min = self.timelog.window.min_timestamp - datetime.timedelta(1)
         max = self.timelog.window.min_timestamp
         window = self.timelog.window_for(min, max)
-        self.mail(lambda draft: window.daily_report(draft, 'activity@pov.lt',
-                                                    'Marius'))
+        self.mail(window.daily_report)
 
     def weekly_window(self, delta=datetime.timedelta(0)):
         day = self.timelog.day
@@ -607,14 +605,12 @@ class MainWindow(object):
     def on_weekly_report_activate(self, widget):
         """File -> Weekly Report"""
         window = self.weekly_window()
-        self.mail(lambda draft: window.weekly_report(draft, 'activity@pov.lt',
-                                                     'Marius'))
+        self.mail(window.weekly_report)
 
     def on_last_weeks_report_activate(self, widget):
         """File -> Weekly Report for Last Week"""
         window = self.weekly_window(delta=-datetime.timedelta(7))
-        self.mail(lambda draft: window.weekly_report(draft, 'activity@pov.lt',
-                                                     'Marius'))
+        self.mail(window.weekly_report)
 
     def on_edit_timelog_activate(self, widget):
         """File -> Edit timelog.txt"""
@@ -624,7 +620,7 @@ class MainWindow(object):
         """Send an email."""
         draftfn = tempfile.mktemp(suffix='gtimelog') # XXX
         draft = open(draftfn, 'w')
-        write_draft(draft)
+        write_draft(draft, 'activity@pov.lt', 'Marius') # XXX
         draft.close()
         self.spawn("x-terminal-emulator -e mutt -H %s", draftfn)
         # XXX rm draftfn when done
