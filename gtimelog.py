@@ -729,16 +729,13 @@ class MainWindow(object):
 
 def main():
     """Run the program."""
-    home = os.environ.get('HOME')
-    if home:
-        dir = os.path.join(home, '.gtimelog')
-        if not os.path.exists(dir):
-            os.mkdir(dir) # racy, but we don't care
-        filename = os.path.join(dir, 'timelog.txt')
-    else:
-        filename = 'timelog.txt'
-    timelog = TimeLog(filename)
+    configdir = os.path.expanduser('~/.gtimelog')
+    try:
+        os.makedirs(configdir) # create it if it doesn't exist
+    except OSError:
+        pass
     settings = Settings()
+    timelog = TimeLog(os.path.join(configdir, 'timelog.txt'))
     main_window = MainWindow(timelog, settings)
     try:
         gtk.main()
