@@ -514,7 +514,7 @@ class MainWindow(object):
     def add_footer(self):
         buffer = self.log_buffer
         self.footer_mark = buffer.create_mark('footer', buffer.get_end_iter(),
-                                              gtk.TRUE)
+                                              True)
         total_work, total_slacking = self.timelog.window.totals()
         weekly_window = self.weekly_window()
         week_total_work, week_total_slacking = weekly_window.totals()
@@ -627,7 +627,7 @@ class MainWindow(object):
     def delete_event(self, widget, data=None):
         """Try to close the window."""
         gtk.main_quit()
-        return gtk.FALSE
+        return False
 
     def close_about_dialog(self, widget):
         """Ok clicked in the about dialog."""
@@ -720,14 +720,14 @@ class MainWindow(object):
         # XXX This interferes with the completion box.  How do I determine
         # whether the completion box is visible or not?
         if self.have_completion:
-            return gtk.FALSE
+            return False
         if event.keyval == gtk.gdk.keyval_from_name('Up'):
             self._do_history(1)
-            return gtk.TRUE
+            return True
         if event.keyval == gtk.gdk.keyval_from_name('Down'):
             self._do_history(-1)
-            return gtk.TRUE
-        return gtk.FALSE
+            return True
+        return False
 
     def _do_history(self, delta):
         """Handle movement in history."""
@@ -771,7 +771,7 @@ class MainWindow(object):
         now = datetime.datetime.now().replace(second=0, microsecond=0)
         if now == self.last_tick and not force_update:
             # Do not eat CPU unnecessarily
-            return gtk.TRUE
+            return True
         self.last_tick = now
         last_time = self.timelog.window.last_time()
         if last_time is None:
@@ -782,7 +782,7 @@ class MainWindow(object):
             if not self.lock:
                 self.delete_footer()
                 self.add_footer()
-        return gtk.TRUE
+        return True
 
 
 def main():
