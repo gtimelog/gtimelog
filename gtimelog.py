@@ -17,7 +17,6 @@ import gtk.glade
 
 # Hardcoded global settings
 virtual_midnight = datetime.time(2, 0)
-enable_gtk_completion = False # doesn't integrate with my homebrew history well
 
 ui_file = os.path.join(os.path.dirname(__file__), "gtimelog.glade")
 
@@ -363,6 +362,18 @@ class TimeLog(object):
         self.raw_append(line)
 
 
+class Settings(object):
+    """Configurable settings for GTimeLog."""
+
+    email = 'activity@pov.lt'
+    name = 'Marius'
+
+    editor = 'gvim'
+    mailer = 'x-terminal-emulator -e mutt -H %s'
+
+    enable_gtk_completion = False # I like my homebrew history better
+
+
 class MainWindow(object):
     """Main application window."""
 
@@ -373,9 +384,10 @@ class MainWindow(object):
     # mucking with the buffer.  Not sure if it is necessary.
     lock = False
 
-    def __init__(self, timelog):
+    def __init__(self, timelog, settings):
         """Create the main window."""
         self.timelog = timelog
+        self.settings = settings
         self.last_tick = None
         tree = gtk.glade.XML(ui_file)
         tree.signal_autoconnect(self)
@@ -534,7 +546,7 @@ class MainWindow(object):
 
     def set_up_completion(self):
         """Set up autocompletion."""
-        if not enable_gtk_completion:
+        if not self.settings.enable_gtk_completion:
             self.have_completion = False
             return
         self.have_completion = hasattr(gtk, 'EntryCompletion')
@@ -614,16 +626,16 @@ class MainWindow(object):
 
     def on_edit_timelog_activate(self, widget):
         """File -> Edit timelog.txt"""
-        self.spawn("gvim", self.timelog.filename)
+        self.spawn(self.settings.editor, self.timelog.filename)
 
     def mail(self, write_draft):
         """Send an email."""
-        draftfn = tempfile.mktemp(suffix='gtimelog') # XXX
+        draftfn = tempfile.mktemp(suffix='gtimelog') # XXX unsafe!
         draft = open(draftfn, 'w')
-        write_draft(draft, 'activity@pov.lt', 'Marius') # XXX
+        write_draft(draft, self.settings.email, self.settings.name)
         draft.close()
-        self.spawn("x-terminal-emulator -e mutt -H %s", draftfn)
-        # XXX rm draftfn when done
+        self.spawn(self.settings.mailer, draftfn)
+        # XXX rm draftfn when done -- but how?
 
     def spawn(self, command, arg=None):
         """Spawn a process in background"""
@@ -726,7 +738,8 @@ def main():
     else:
         filename = 'timelog.txt'
     timelog = TimeLog(filename)
-    main_window = MainWindow(timelog)
+    settings = Settings()
+    main_window = MainWindow(timelog, settings)
     try:
         gtk.main()
     except KeyboardInterrupt:
