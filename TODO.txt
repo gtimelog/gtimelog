@@ -8,7 +8,4 @@ with a scrollbar, and add an entry for an existing activity.
 Unimplemented features
 ----------------------
 
-File -> Reread is not implemented.  In fact, re-reading should be automatic
-(watch mtime of the file).
-
-File -> Weekly report is not implemented.
+Re-reading should be automatic (watch mtime of the file).

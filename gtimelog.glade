@@ -48,9 +48,31 @@
 		      <accelerator key="R" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image2">
+			<widget class="GtkImage" id="image4">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-refresh</property>
+			  <property name="icon_size">1</property>
+			  <property name="xalign">0.5</property>
+			  <property name="yalign">0.5</property>
+			  <property name="xpad">0</property>
+			  <property name="ypad">0</property>
+			</widget>
+		      </child>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkImageMenuItem" id="edit_timelog">
+		      <property name="visible">True</property>
+		      <property name="tooltip" translatable="yes">Open timelog.txt in a text editor</property>
+		      <property name="label" translatable="yes">_Edit timelog.txt</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="on_edit_timelog_activate" last_modification_time="Mon, 13 Sep 2004 17:40:33 GMT"/>
+
+		      <child internal-child="image">
+			<widget class="GtkImage" id="image5">
+			  <property name="visible">True</property>
+			  <property name="stock">gtk-execute</property>
 			  <property name="icon_size">1</property>
 			  <property name="xalign">0.5</property>
 			  <property name="yalign">0.5</property>
@@ -70,7 +92,7 @@
 		      <accelerator key="D" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image3">
+			<widget class="GtkImage" id="image6">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-justify-fill</property>
 			  <property name="icon_size">1</property>
@@ -91,7 +113,7 @@
 		      <signal name="activate" handler="on_yesterdays_report_activate" last_modification_time="Tue, 07 Sep 2004 07:02:40 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image3">
+			<widget class="GtkImage" id="image7">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-justify-fill</property>
 			  <property name="icon_size">1</property>
@@ -112,7 +134,7 @@
 		      <signal name="activate" handler="on_weekly_report_activate" last_modification_time="Wed, 08 Sep 2004 17:47:01 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image4">
+			<widget class="GtkImage" id="image8">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-indent</property>
 			  <property name="icon_size">1</property>
