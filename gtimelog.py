@@ -319,13 +319,18 @@ class TimeWindow(object):
 
 
 class TimeLog(object):
-    """Time log."""
+    """Time log.
+
+    A time log contains a time window for today, and can add new entries at
+    the end.
+    """
 
     def __init__(self, filename):
         self.filename = filename
         self.reread()
 
     def reread(self):
+        """Reload today's log."""
         self.day = datetime.date.today()
         min = datetime.datetime.combine(self.day, virtual_midnight)
         max = min + datetime.timedelta(1)
@@ -333,7 +338,12 @@ class TimeLog(object):
         self.window = TimeWindow(self.filename, min, max, self.history.append)
         self.need_space = not self.window.items
 
+    def window(self, min, max):
+        """Return a TimeWindow for a specified time interval."""
+        return TimeWindow(self.filename, min, max)
+
     def raw_append(self, line):
+        """Append a line to the time log file."""
         f = open(self.filename, "a")
         if self.need_space:
             self.need_space = False
@@ -342,6 +352,7 @@ class TimeLog(object):
         f.close()
 
     def append(self, entry):
+        """Append a new entry to the time log."""
         now = datetime.datetime.now().replace(second=0, microsecond=0)
         last = self.window.last_time()
         if last and different_days(now, last):
@@ -588,7 +599,7 @@ class MainWindow(object):
         draft = open(draftfn, 'w')
         min = self.timelog.window.min_timestamp - datetime.timedelta(1)
         max = self.timelog.window.min_timestamp
-        window = TimeWindow(self.timelog.filename, min, max)
+        window = self.timelog.window(min, max)
         window.daily_report(draft, 'Marius')
         draft.close()
         os.system("x-terminal-emulator -e mutt -H %s &" % draftfn)
@@ -609,7 +620,7 @@ class MainWindow(object):
         monday = day - datetime.timedelta(day.weekday())
         min = datetime.datetime.combine(monday, virtual_midnight) + delta
         max = min + datetime.timedelta(7)
-        window = TimeWindow(self.timelog.filename, min, max)
+        window = self.timelog.window(min, max)
         return window
 
     def on_last_weeks_report_activate(self, widget):
