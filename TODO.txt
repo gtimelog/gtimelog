@@ -4,8 +4,16 @@ Minor bugs
 Sometimes the log view is repainted incorrectly when you are in grouped view
 with a scrollbar, and add an entry for an existing activity.
 
+Midnight
+
 
 Unimplemented features
 ----------------------
 
-Re-reading should be automatic (watch mtime of the file).
+Use a consistent location of timelog.txt (rather than forcing the user to
+always chdir to the same directory), perhaps ~/.gtimelog/timelog.txt?
+
+Let the user specify his name, at least (currently "Daily report for Marius"
+is hardcoded).
+
+Re-reading of timelog.txt should be automatic (watch mtime of the file).
