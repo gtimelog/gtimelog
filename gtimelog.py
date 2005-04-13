@@ -472,6 +472,10 @@ class MainWindow(object):
         self.about_dialog = tree.get_widget("about_dialog")
         self.about_dialog_ok_btn = tree.get_widget("ok_button")
         self.about_dialog_ok_btn.connect("clicked", self.close_about_dialog)
+        self.calendar_dialog = tree.get_widget("calendar_dialog")
+        self.calendar = tree.get_widget("calendar")
+        self.calendar.connect("day_selected_double_click",
+                              self.on_calendar_day_selected_double_click)
         main_window = tree.get_widget("main_window")
         main_window.connect("delete_event", self.delete_event)
         self.log_view = tree.get_widget("log_view")
@@ -679,18 +683,39 @@ class MainWindow(object):
         window = self.timelog.window
         self.mail(window.daily_report)
 
-    def on_yesterdays_report_activate(self, widget):
+    def on_previous_day_report_activate(self, widget):
         """File -> Daily Report for Yesterday"""
-        min = self.timelog.window.min_timestamp - datetime.timedelta(1)
-        max = self.timelog.window.min_timestamp
-        window = self.timelog.window_for(min, max)
-        self.mail(window.daily_report)
+        day = self.choose_date()
+        if day:
+            min = datetime.datetime.combine(day,
+                            self.timelog.virtual_midnight)
+            max = min + datetime.timedelta(1)
+            window = self.timelog.window_for(min, max)
+            self.mail(window.daily_report)
 
-    def weekly_window(self, delta=datetime.timedelta(0)):
-        day = self.timelog.day
+    def choose_date(self):
+        """Pop up a calendar dialog.
+
+        Returns either a datetime.date, or one.
+        """
+        if self.calendar_dialog.run() == gtk.RESPONSE_OK:
+            y, m1, d = self.calendar.get_date()
+            day = datetime.date(y, m1+1, d)
+        else:
+            day = None
+        self.calendar_dialog.hide()
+        return day
+
+    def on_calendar_day_selected_double_click(self, widget):
+        """Double-click on a calendar day: close the dialog."""
+        self.calendar_dialog.response(gtk.RESPONSE_OK)
+
+    def weekly_window(self, day=None):
+        if not day:
+            day = self.timelog.day
         monday = day - datetime.timedelta(day.weekday())
         min = datetime.datetime.combine(monday,
-                        self.timelog.virtual_midnight) + delta
+                        self.timelog.virtual_midnight)
         max = min + datetime.timedelta(7)
         window = self.timelog.window_for(min, max)
         return window
@@ -700,10 +725,12 @@ class MainWindow(object):
         window = self.weekly_window()
         self.mail(window.weekly_report)
 
-    def on_last_weeks_report_activate(self, widget):
+    def on_previous_week_report_activate(self, widget):
         """File -> Weekly Report for Last Week"""
-        window = self.weekly_window(delta=-datetime.timedelta(7))
-        self.mail(window.weekly_report)
+        day = self.choose_date()
+        if day:
+            window = self.weekly_window(day=day)
+            self.mail(window.weekly_report)
 
     def on_edit_timelog_activate(self, widget):
         """File -> Edit timelog.txt"""
