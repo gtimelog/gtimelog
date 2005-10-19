@@ -531,7 +531,8 @@ class TrayIcon(object):
         try:
             import egg.trayicon
         except ImportError:
-            pass
+            return # nothing to do here, move along
+                   # or install python-gnome2-extras
         self.tooltips = gtk.Tooltips()
         self.trayicon = egg.trayicon.TrayIcon("GTimeLog")
         self.time_label = gtk.Label()
