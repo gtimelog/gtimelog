@@ -20,6 +20,9 @@ stopped working on it, and not when you've started.  Of course you can type
 the activity name upfront, and just delay pressing the Enter key until you're
 done.
 
+There's also a Tasks pane that lists tasks found in ~/.gtimelog/tasks.txt.
+You can click on those to save typing.
+
 There are two broad categories of activities: ones that count as work (coding,
 planning, writing proposals or reports, answering work-related email), and ones
 that don't (browsing the web for fun, reading personal email, chatting with
@@ -151,7 +154,7 @@ Author
 ------
 
 Marius Gedminas
-<mgedmin@b4net.lt>
+<marius@pov.lt>
 
 
 Contributors
@@ -159,4 +162,11 @@ Contributors
 
 Thom May
 Dafydd Harries
+
+
+Icon
+----
+
+gtimelog.png is really a renamed copy of gnome-set-time.png from
+/usr/share/pixmaps/
 
