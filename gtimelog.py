@@ -18,6 +18,7 @@ import gtk.glade
 
 
 ui_file = os.path.join(os.path.dirname(__file__), "gtimelog.glade")
+icon_file = os.path.join(os.path.dirname(__file__), "gtimelog-small.png")
 
 
 def format_duration(duration):
@@ -534,10 +535,15 @@ class TrayIcon(object):
             return # nothing to do here, move along
                    # or install python-gnome2-extras
         self.tooltips = gtk.Tooltips()
-        self.trayicon = egg.trayicon.TrayIcon("GTimeLog")
-        self.time_label = gtk.Label()
         self.eventbox = gtk.EventBox()
-        self.eventbox.add(self.time_label)
+        hbox = gtk.HBox()
+        icon = gtk.Image()
+        icon.set_from_file(icon_file)
+        hbox.add(icon)
+        self.time_label = gtk.Label()
+        hbox.add(self.time_label)
+        self.eventbox.add(hbox)
+        self.trayicon = egg.trayicon.TrayIcon("GTimeLog")
         self.trayicon.add(self.eventbox)
         self.last_tick = False
         self.tick(force_update=True)
