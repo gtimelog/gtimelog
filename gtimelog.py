@@ -401,6 +401,69 @@ class TimeLog(object):
         self.raw_append(line)
 
 
+class TaskTree(object):
+    """Task tree.
+
+    You can have a tree of common tasks in a text file that looks like this
+
+        Arrived **
+        Reading mail
+        Project1: do some task
+        Project2: do some other task
+        Project1: do yet another task
+
+    These tasks are grouped by their common prefix (separated with ':').
+    Tasks without a ':' are grouped under "Other".
+
+    A TaskTree has an attribute 'groups' which is a list of tuples
+    (group_name, list_of_group_items).
+    """
+
+    other_title = 'Other'
+
+    def __init__(self, filename):
+        self.filename = filename
+        self.load()
+
+    def check_reload(self):
+        """Look at the mtime of tasks.txt, and reload it if necessary.
+
+        Returns True if the file was reloaded.
+        """
+        mtime = self.get_mtime()
+        if mtime != self.last_mtime:
+            self.load()
+            return True
+        else:
+            return False
+
+    def get_mtime(self):
+        """Return the mtime of self.filename, or None if the file doesn't exist."""
+        try:
+            return os.stat(self.filename).st_mtime
+        except OSError:
+            return None
+
+    def load(self):
+        """Load task list from a file named self.filename."""
+        groups = {}
+        self.last_mtime = self.get_mtime()
+        try:
+            for line in file(self.filename):
+                line = line.strip()
+                if not line:
+                    continue
+                if ':' in line:
+                    group, task = [s.strip() for s in line.split(':', 1)]
+                else:
+                    group, task = self.other_title, line
+                groups.setdefault(group, []).append(task)
+        except IOError:
+            pass # the file's not there, so what?
+        self.groups = groups.items()
+        self.groups.sort()
+
+
 class Settings(object):
     """Configurable settings for GTimeLog."""
 
@@ -462,10 +525,11 @@ class MainWindow(object):
     # mucking with the buffer.  Not sure if it is necessary.
     lock = False
 
-    def __init__(self, timelog, settings):
+    def __init__(self, timelog, settings, tasks):
         """Create the main window."""
         self.timelog = timelog
         self.settings = settings
+        self.tasks = tasks
         self.last_tick = None
         tree = gtk.glade.XML(ui_file)
         tree.signal_autoconnect(self)
@@ -479,6 +543,12 @@ class MainWindow(object):
         main_window = tree.get_widget("main_window")
         main_window.connect("delete_event", self.delete_event)
         self.log_view = tree.get_widget("log_view")
+        self.task_list = tree.get_widget("task_list")
+        self.task_store = gtk.TreeStore(str, str)
+        self.task_list.set_model(self.task_store)
+        column = gtk.TreeViewColumn("Task", gtk.CellRendererText(), text=0)
+        self.task_list.append_column(column)
+        self.task_list.connect("row_activated", self.task_list_row_activated)
         self.time_label = tree.get_widget("time_label")
         self.task_entry = tree.get_widget("task_entry")
         self.task_entry.connect("changed", self.task_entry_changed)
@@ -491,6 +561,7 @@ class MainWindow(object):
         buffer.create_tag('duration', foreground='red')
         buffer.create_tag('time', foreground='green')
         buffer.create_tag('slacking', foreground='gray')
+        self.set_up_task_list()
         self.set_up_completion()
         self.set_up_history()
         self.populate_log()
@@ -614,6 +685,19 @@ class MainWindow(object):
         self.log_view.scroll_to_mark(end_mark, 0)
         buffer.delete_mark(end_mark)
 
+    def set_up_task_list(self):
+        """Set up the task list pane."""
+        self.task_store.clear()
+        for group_name, group_items in self.tasks.groups:
+            t = self.task_store.append(None, [group_name, group_name + ': '])
+            for item in group_items:
+                if group_name == self.tasks.other_title:
+                    task = item
+                else:
+                    task = group_name + ': ' + item
+                self.task_store.append(t, [item, task])
+        self.task_list.expand_all()
+
     def set_up_history(self):
         """Set up history."""
         self.history = self.timelog.history
@@ -736,6 +820,10 @@ class MainWindow(object):
         """File -> Edit timelog.txt"""
         self.spawn(self.settings.editor, self.timelog.filename)
 
+    def on_edit_tasks_activate(self, widget):
+        """File -> Edit timelog.txt"""
+        self.spawn(self.settings.editor, self.tasks.filename)
+
     def mail(self, write_draft):
         """Send an email."""
         draftfn = tempfile.mktemp(suffix='gtimelog') # XXX unsafe!
@@ -760,6 +848,15 @@ class MainWindow(object):
         self.set_up_history()
         self.populate_log()
         self.tick(True)
+
+    def task_list_row_activated(self, treeview, path, view_column):
+        """A task was selected in the task pane -- put it to the entry."""
+        model = treeview.get_model()
+        task = model[path][1]
+        self.task_entry.set_text(task)
+        self.task_entry.grab_focus()
+        self.task_entry.set_position(-1)
+        # XXX: how does this integrate with history?
 
     def task_entry_changed(self, widget):
         """Reset history position when the task entry is changed."""
@@ -818,6 +915,8 @@ class MainWindow(object):
 
     def tick(self, force_update=False):
         """Tick every second."""
+        if self.tasks.check_reload():
+            self.set_up_task_list()
         now = datetime.datetime.now().replace(second=0, microsecond=0)
         if now == self.last_tick and not force_update:
             # Do not eat CPU unnecessarily
@@ -850,7 +949,8 @@ def main():
         settings.load(settings_file)
     timelog = TimeLog(os.path.join(configdir, 'timelog.txt'),
                       settings.virtual_midnight)
-    main_window = MainWindow(timelog, settings)
+    tasks = TaskTree(os.path.join(configdir, 'tasks.txt'))
+    main_window = MainWindow(timelog, settings, tasks)
     try:
         gtk.main()
     except KeyboardInterrupt:
