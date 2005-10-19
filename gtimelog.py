@@ -26,6 +26,12 @@ def format_duration(duration):
     return '%d h %d min' % (h, m)
 
 
+def format_duration_short(duration):
+    """Format a datetime.timedelta with minute precision."""
+    h, m = divmod((duration.days * 24 * 60 + duration.seconds // 60), 60)
+    return '%d:%02d' % (h, m)
+
+
 def format_duration_long(duration):
     """Format a datetime.timedelta with minute precision, long format."""
     h, m = divmod((duration.days * 24 * 60 + duration.seconds // 60), 60)
@@ -515,6 +521,48 @@ class Settings(object):
             f.close()
 
 
+class TrayIcon(object):
+    """Tray icon for gtimelog."""
+
+    def __init__(self, gtimelog_window):
+        self.gtimelog_window = gtimelog_window
+        self.timelog = gtimelog_window.timelog
+        self.trayicon = None
+        try:
+            import egg.trayicon
+        except ImportError:
+            pass
+        self.tooltips = gtk.Tooltips()
+        self.trayicon = egg.trayicon.TrayIcon("GTimeLog")
+        self.time_label = gtk.Label()
+        self.eventbox = gtk.EventBox()
+        self.eventbox.add(self.time_label)
+        self.trayicon.add(self.eventbox)
+        self.last_tick = False
+        self.tick(force_update=True)
+        self.trayicon.show_all()
+        self.eventbox.connect("button-release-event", self.on_click)
+        gobject.timeout_add(1000, self.tick)
+
+    def on_click(self, widget, event):
+        """A mouse button was released on the tray icon label."""
+        self.gtimelog_window.main_window.present()
+
+    def tick(self, force_update=False):
+        """Tick every second."""
+        now = datetime.datetime.now().replace(second=0, microsecond=0)
+        if now != self.last_tick or force_update: # Do not eat CPU too much
+            self.last_tick = now
+            last_time = self.timelog.window.last_time()
+            if last_time is None:
+                self.time_label.set_text(now.strftime("%H:%M"))
+            else:
+                self.time_label.set_text(format_duration_short(now - last_time))
+        tip = "GTimeLog: " + self.gtimelog_window.task_entry.get_text()
+        self.tooltips.set_tip(self.trayicon, tip)
+        return True
+
+
 class MainWindow(object):
     """Main application window."""
 
@@ -540,8 +588,8 @@ class MainWindow(object):
         self.calendar = tree.get_widget("calendar")
         self.calendar.connect("day_selected_double_click",
                               self.on_calendar_day_selected_double_click)
-        main_window = tree.get_widget("main_window")
-        main_window.connect("delete_event", self.delete_event)
+        self.main_window = tree.get_widget("main_window")
+        self.main_window.connect("delete_event", self.delete_event)
         self.log_view = tree.get_widget("log_view")
         self.task_list = tree.get_widget("task_list")
         self.task_store = gtk.TreeStore(str, str)
@@ -957,6 +1005,7 @@ def main():
                       settings.virtual_midnight)
     tasks = TaskTree(os.path.join(configdir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
+    tray_icon = TrayIcon(main_window)
     try:
         gtk.main()
     except KeyboardInterrupt:

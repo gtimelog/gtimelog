@@ -17,6 +17,24 @@ def doctest_format_duration():
 
     """
 
+def doctest_format_short():
+    """Tests for format_duration_short.
+
+        >>> from gtimelog import format_duration_short
+        >>> from datetime import timedelta
+        >>> format_duration_short(timedelta(0))
+        '0:00'
+        >>> format_duration_short(timedelta(minutes=1))
+        '0:01'
+        >>> format_duration_short(timedelta(minutes=59))
+        '0:59'
+        >>> format_duration_short(timedelta(minutes=60))
+        '1:00'
+        >>> format_duration_short(timedelta(days=1, hours=2, minutes=3))
+        '26:03'
+
+    """
+
 
 def doctest_format_duration_long():
     """Tests for format_duration_long.
