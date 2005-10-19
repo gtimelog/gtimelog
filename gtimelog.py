@@ -474,7 +474,7 @@ class Settings(object):
     editor = 'gvim'
     mailer = 'x-terminal-emulator -e mutt -H %s'
 
-    enable_gtk_completion = False # I like my homebrew history better
+    enable_gtk_completion = True  # False enables gvim-style completion
 
     hours = 8
     virtual_midnight = datetime.time(2, 0)
@@ -864,6 +864,12 @@ class MainWindow(object):
 
     def task_entry_key_press(self, widget, event):
         """Handle key presses in task entry."""
+        if event.keyval == gtk.gdk.keyval_from_name('Prior'):
+            self._do_history(1)
+            return True
+        if event.keyval == gtk.gdk.keyval_from_name('Next'):
+            self._do_history(-1)
+            return True
         # XXX This interferes with the completion box.  How do I determine
         # whether the completion box is visible or not?
         if self.have_completion:
