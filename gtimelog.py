@@ -550,10 +550,15 @@ class TrayIcon(object):
         self.trayicon.show_all()
         self.eventbox.connect("button-release-event", self.on_click)
         gobject.timeout_add(1000, self.tick)
+        self.gtimelog_window.entry_watchers.append(self.entry_added)
 
     def on_click(self, widget, event):
         """A mouse button was released on the tray icon label."""
         self.gtimelog_window.main_window.present()
+
+    def entry_added(self, entry):
+        """An entry has been added."""
+        self.tick(force_update=True)
 
     def tick(self, force_update=False):
         """Tick every second."""
@@ -586,6 +591,7 @@ class MainWindow(object):
         self.settings = settings
         self.tasks = tasks
         self.last_tick = None
+        self.entry_watchers = []
         tree = gtk.glade.XML(ui_file)
         tree.signal_autoconnect(self)
         self.about_dialog = tree.get_widget("about_dialog")
@@ -973,6 +979,8 @@ class MainWindow(object):
         self.task_entry.set_text("")
         self.task_entry.grab_focus()
         self.tick(True)
+        for watcher in self.entry_watchers:
+            watcher(entry)
 
     def tick(self, force_update=False):
         """Tick every second."""
