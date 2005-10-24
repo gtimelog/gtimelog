@@ -680,4 +680,34 @@ TimeLog is a time tracking application.
   </child>
 </widget>
 
+<widget class="GtkMenu" id="tray_icon_popup_menu">
+
+  <child>
+    <widget class="GtkMenuItem" id="tray_hide">
+      <property name="visible">True</property>
+      <property name="label" translatable="yes">_Hide</property>
+      <property name="use_underline">True</property>
+      <signal name="activate" handler="on_hide_activate" last_modification_time="Mon, 24 Oct 2005 17:45:27 GMT"/>
+    </widget>
+  </child>
+
+  <child>
+    <widget class="GtkMenuItem" id="tray_show">
+      <property name="visible">True</property>
+      <property name="label" translatable="yes">_Show</property>
+      <property name="use_underline">True</property>
+      <signal name="activate" handler="on_show_activate" last_modification_time="Mon, 24 Oct 2005 17:45:27 GMT"/>
+    </widget>
+  </child>
+
+  <child>
+    <widget class="GtkImageMenuItem" id="quit">
+      <property name="visible">True</property>
+      <property name="label">gtk-quit</property>
+      <property name="use_stock">True</property>
+      <signal name="activate" handler="on_quit_activate" last_modification_time="Mon, 24 Oct 2005 17:45:27 GMT"/>
+    </widget>
+  </child>
+</widget>
+
 </glade-interface>
