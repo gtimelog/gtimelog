@@ -605,12 +605,30 @@ class TrayIcon(object):
         self.last_tick = False
         self.tick(force_update=True)
         self.trayicon.show_all()
-        self.eventbox.connect("button-release-event", self.on_click)
+        tray_icon_popup_menu = gtimelog_window.tray_icon_popup_menu
+        self.eventbox.connect_object("button-press-event", self.on_press,
+                                     tray_icon_popup_menu)
+        self.eventbox.connect("button-release-event", self.on_release)
         gobject.timeout_add(1000, self.tick)
         self.gtimelog_window.entry_watchers.append(self.entry_added)
 
-    def on_click(self, widget, event):
+    def on_press(self, widget, event):
+        """A mouse button was pressed on the tray icon label."""
+        if event.button != 3:
+            return
+        main_window = self.gtimelog_window.main_window
+        if main_window.get_property("visible"):
+            self.gtimelog_window.tray_show.hide()
+            self.gtimelog_window.tray_hide.show()
+        else:
+            self.gtimelog_window.tray_show.show()
+            self.gtimelog_window.tray_hide.hide()
+        widget.popup(None, None, None, event.button, event.time)
+
+    def on_release(self, widget, event):
         """A mouse button was released on the tray icon label."""
+        if event.button != 1:
+            return
         main_window = self.gtimelog_window.main_window
         if main_window.get_property("visible"):
            main_window.hide()
@@ -655,6 +673,9 @@ class MainWindow(object):
         self.entry_watchers = []
         tree = gtk.glade.XML(ui_file)
         tree.signal_autoconnect(self)
+        self.tray_icon_popup_menu = tree.get_widget("tray_icon_popup_menu")
+        self.tray_show = tree.get_widget("tray_show")
+        self.tray_hide = tree.get_widget("tray_hide")
         self.about_dialog = tree.get_widget("about_dialog")
         self.about_dialog_ok_btn = tree.get_widget("ok_button")
         self.about_dialog_ok_btn.connect("clicked", self.close_about_dialog)
@@ -873,6 +894,14 @@ class MainWindow(object):
     def close_about_dialog(self, widget):
         """Ok clicked in the about dialog."""
         self.about_dialog.hide()
+
+    def on_show_activate(self, widget):
+        """Tray icon menu -> Show selected"""
+        self.main_window.present()
+
+    def on_hide_activate(self, widget):
+        """Tray icon menu -> Hide selected"""
+        self.main_window.hide()
 
     def on_quit_activate(self, widget):
         """File -> Quit selected"""
