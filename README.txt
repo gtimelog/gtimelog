@@ -21,7 +21,8 @@ the activity name upfront, and just delay pressing the Enter key until you're
 done.
 
 There's also a Tasks pane that lists tasks found in ~/.gtimelog/tasks.txt.
-You can click on those to save typing.
+You can click on those to save typing.  Or you can specify a URL in
+~/.gtimelog/gtimelogrc and download the task list from a wiki or wherever.
 
 There are two broad categories of activities: ones that count as work (coding,
 planning, writing proposals or reports, answering work-related email), and ones
@@ -64,10 +65,6 @@ Future Plans
 
 Configuration dialog.  The ability to browse through history (view daily and
 weekly reports for past days and weeks).
-
-Somewhat more vague is the idea of integrating GTimeLog with some sort of
-planning system, so that you did not have to type in all the task names
-manually, and so that task names would be consistent.
 
 
 Other Tools
@@ -149,6 +146,11 @@ Formal grammar:
 There is a convention that entries that include two asterisks in their titles
 indicate slacking or pauses between work activities.
 
+Task list is a text file, with one task per line.  Empty lines are ignored.
+Task names should consist of a group name (project name, XP-style story,
+whatever), a colon, and a task name.  Tasks will be grouped.  If there is no
+colon on a line, the task will be grouped under "Other".
+
 
 Author
 ------
@@ -162,6 +164,7 @@ Contributors
 
 Thom May
 Dafydd Harries
+Ignas Mikalajūnas
 
 
 Icon

@@ -644,4 +644,16 @@ TimeLog is a time tracking application.
   </child>
 </widget>
 
+<widget class="GtkMenu" id="task_list_popup_menu">
+
+  <child>
+    <widget class="GtkMenuItem" id="task_list_reload">
+      <property name="visible">True</property>
+      <property name="label" translatable="yes">_Reload</property>
+      <property name="use_underline">True</property>
+      <signal name="activate" handler="on_task_list_reload" last_modification_time="Mon, 24 Oct 2005 11:05:24 GMT"/>
+    </widget>
+  </child>
+</widget>
+
 </glade-interface>

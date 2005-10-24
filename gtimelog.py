@@ -6,6 +6,7 @@ A Gtk+ application for keeping track of time.
 import re
 import os
 import sets
+import urllib
 import datetime
 import tempfile
 import ConfigParser
@@ -470,6 +471,32 @@ class TaskList(object):
         self.groups = groups.items()
         self.groups.sort()
 
+    def reload(self):
+        """Reload the task list."""
+        self.load()
+
+
+class RemoteTaskList(TaskList):
+    """Task list stored on a remote server.
+
+    Keeps a cached copy of the list in a local file, so you can use it offline.
+    """
+
+    def __init__(self, url, cache_filename):
+        self.url = url
+        TaskList.__init__(self, cache_filename)
+        if not os.path.exists(self.filename):
+            self.download()
+
+    def download(self):
+        """Download the task list from the server."""
+        urllib.urlretrieve(self.url, self.filename)
+        self.load()
+
+    def reload(self):
+        """Reload the task list."""
+        self.download()
+
 
 class Settings(object):
     """Configurable settings for GTimeLog."""
@@ -486,6 +513,8 @@ class Settings(object):
     hours = 8
     virtual_midnight = datetime.time(2, 0)
 
+    task_list_url = ''
+
     def _config(self):
         config = ConfigParser.RawConfigParser()
         config.add_section('gtimelog')
@@ -498,6 +527,7 @@ class Settings(object):
         config.set('gtimelog', 'hours', str(self.hours))
         config.set('gtimelog', 'virtual_midnight',
                    self.virtual_midnight.strftime('%H:%M'))
+        config.set('gtimelog', 'task_list_url', self.task_list_url)
         return config
 
     def load(self, filename):
@@ -512,6 +542,7 @@ class Settings(object):
         self.hours = config.getint('gtimelog', 'hours')
         self.virtual_midnight = parse_time(config.get('gtimelog',
                                                       'virtual_midnight'))
+        self.task_list_url = config.get('gtimelog', 'task_list_url')
 
     def save(self, filename):
         config = self._config()
@@ -610,6 +641,10 @@ class MainWindow(object):
         column = gtk.TreeViewColumn("Task", gtk.CellRendererText(), text=0)
         self.task_list.append_column(column)
         self.task_list.connect("row_activated", self.task_list_row_activated)
+        self.task_list_popup_menu = tree.get_widget("task_list_popup_menu")
+        self.task_list.connect_object("button_press_event",
+                                      self.task_list_button_press,
+                                      self.task_list_popup_menu)
         self.time_label = tree.get_widget("time_label")
         self.task_entry = tree.get_widget("task_entry")
         self.task_entry.connect("changed", self.task_entry_changed)
@@ -919,6 +954,17 @@ class MainWindow(object):
         self.task_entry.set_position(-1)
         # XXX: how does this integrate with history?
 
+    def task_list_button_press(self, menu, event):
+        if event.button == 3:
+            menu.popup(None, None, None, event.button, event.time)
+            return True
+        else:
+            return False
+
+    def on_task_list_reload(self, event):
+        self.tasks.reload()
+        self.set_up_task_list()
+
     def task_entry_changed(self, widget):
         """Reset history position when the task entry is changed."""
         self.history_pos = 0
@@ -1018,7 +1064,11 @@ def main():
         settings.load(settings_file)
     timelog = TimeLog(os.path.join(configdir, 'timelog.txt'),
                       settings.virtual_midnight)
-    tasks = TaskList(os.path.join(configdir, 'tasks.txt'))
+    if settings.task_list_url:
+        tasks = RemoteTaskList(settings.task_list_url,
+                               os.path.join(configdir, 'remote-tasks.txt'))
+    else:
+        tasks = TaskList(os.path.join(configdir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
     tray_icon = TrayIcon(main_window)
     try:
