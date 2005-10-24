@@ -490,7 +490,10 @@ class RemoteTaskList(TaskList):
 
     def download(self):
         """Download the task list from the server."""
-        urllib.urlretrieve(self.url, self.filename)
+        try:
+            urllib.urlretrieve(self.url, self.filename)
+        except IOError:
+            pass # TODO: show an indication that it failed
         self.load()
 
     def reload(self):
@@ -585,7 +588,11 @@ class TrayIcon(object):
 
     def on_click(self, widget, event):
         """A mouse button was released on the tray icon label."""
-        self.gtimelog_window.main_window.present()
+        main_window = self.gtimelog_window.main_window
+        if main_window.get_property("visible"):
+           main_window.hide()
+        else:
+           main_window.present()
 
     def entry_added(self, entry):
         """An entry has been added."""
