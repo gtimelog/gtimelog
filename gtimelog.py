@@ -429,6 +429,10 @@ class TaskList(object):
 
     other_title = 'Other'
 
+    loading_callback = None
+    loaded_callback = None
+    error_callback = None
+
     def __init__(self, filename):
         self.filename = filename
         self.load()
@@ -485,16 +489,35 @@ class RemoteTaskList(TaskList):
     def __init__(self, url, cache_filename):
         self.url = url
         TaskList.__init__(self, cache_filename)
-        if not os.path.exists(self.filename):
-            self.download()
+        self.first_time = True
+
+    def check_reload(self):
+        """Check whether the task list needs to be reloaded.
+
+        Download the task list if this is the first time, and a cached copy is
+        not found.
+
+        Returns True if the file was reloaded.
+        """
+        if self.first_time:
+            self.first_time = False
+            if not os.path.exists(self.filename):
+                self.download()
+                return True
+        return TaskList.check_reload(self)
 
     def download(self):
         """Download the task list from the server."""
+        if self.loading_callback:
+            self.loading_callback()
         try:
             urllib.urlretrieve(self.url, self.filename)
         except IOError:
-            pass # TODO: show an indication that it failed
+            if self.error_callback:
+                self.error_callback()
         self.load()
+        if self.loaded_callback:
+            self.loaded_callback()
 
     def reload(self):
         """Reload the task list."""
@@ -642,6 +665,10 @@ class MainWindow(object):
         self.main_window = tree.get_widget("main_window")
         self.main_window.connect("delete_event", self.delete_event)
         self.log_view = tree.get_widget("log_view")
+        self.task_pane_info_label = tree.get_widget("task_pane_info_label")
+        tasks.loading_callback = self.task_list_loading
+        tasks.loaded_callback = self.task_list_loaded
+        tasks.error_callback = self.task_list_error
         self.task_list = tree.get_widget("task_list")
         self.task_store = gtk.TreeStore(str, str)
         self.task_list.set_model(self.task_store)
@@ -971,6 +998,23 @@ class MainWindow(object):
     def on_task_list_reload(self, event):
         self.tasks.reload()
         self.set_up_task_list()
+
+    def task_list_loading(self):
+        self.task_list_loading_failed = False
+        self.task_pane_info_label.set_text("Loading...")
+        self.task_pane_info_label.show()
+        # let the ui update become visible
+        while gtk.events_pending():
+            gtk.main_iteration()
+
+    def task_list_error(self):
+        self.task_list_loading_failed = True
+        self.task_pane_info_label.set_text("Could not get task list.")
+        self.task_pane_info_label.show()
+
+    def task_list_loaded(self):
+        if not self.task_list_loading_failed:
+            self.task_pane_info_label.hide()
 
     def task_entry_changed(self, widget):
         """Reset history position when the task entry is changed."""
