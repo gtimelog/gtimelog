@@ -408,10 +408,10 @@ class TimeLog(object):
         self.raw_append(line)
 
 
-class TaskTree(object):
-    """Task tree.
+class TaskList(object):
+    """Task list.
 
-    You can have a tree of common tasks in a text file that looks like this
+    You can have a list of common tasks in a text file that looks like this
 
         Arrived **
         Reading mail
@@ -422,7 +422,7 @@ class TaskTree(object):
     These tasks are grouped by their common prefix (separated with ':').
     Tasks without a ':' are grouped under "Other".
 
-    A TaskTree has an attribute 'groups' which is a list of tuples
+    A TaskList has an attribute 'groups' which is a list of tuples
     (group_name, list_of_group_items).
     """
 
@@ -1018,7 +1018,7 @@ def main():
         settings.load(settings_file)
     timelog = TimeLog(os.path.join(configdir, 'timelog.txt'),
                       settings.virtual_midnight)
-    tasks = TaskTree(os.path.join(configdir, 'tasks.txt'))
+    tasks = TaskList(os.path.join(configdir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
     tray_icon = TrayIcon(main_window)
     try:
