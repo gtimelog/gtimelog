@@ -463,7 +463,7 @@ class TaskList(object):
         try:
             for line in file(self.filename):
                 line = line.strip()
-                if not line:
+                if not line or line.startswith('#'):
                     continue
                 if ':' in line:
                     group, task = [s.strip() for s in line.split(':', 1)]
