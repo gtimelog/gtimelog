@@ -146,10 +146,11 @@ Formal grammar:
 There is a convention that entries that include two asterisks in their titles
 indicate slacking or pauses between work activities.
 
-Task list is a text file, with one task per line.  Empty lines are ignored.
-Task names should consist of a group name (project name, XP-style story,
-whatever), a colon, and a task name.  Tasks will be grouped.  If there is no
-colon on a line, the task will be grouped under "Other".
+Task list is a text file, with one task per line.  Empty lines and lines
+starting with a '#' are ignored.  Task names should consist of a group name
+(project name, XP-style story, whatever), a colon, and a task name.  Tasks will
+be grouped.  If there is no colon on a line, the task will be grouped under
+"Other".
 
 
 Author
