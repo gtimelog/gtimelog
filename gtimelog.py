@@ -540,6 +540,7 @@ class Settings(object):
     virtual_midnight = datetime.time(2, 0)
 
     task_list_url = ''
+    edit_task_list_cmd = ''
 
     def _config(self):
         config = ConfigParser.RawConfigParser()
@@ -554,6 +555,7 @@ class Settings(object):
         config.set('gtimelog', 'virtual_midnight',
                    self.virtual_midnight.strftime('%H:%M'))
         config.set('gtimelog', 'task_list_url', self.task_list_url)
+        config.set('gtimelog', 'edit_task_list_cmd', self.edit_task_list_cmd)
         return config
 
     def load(self, filename):
@@ -569,6 +571,7 @@ class Settings(object):
         self.virtual_midnight = parse_time(config.get('gtimelog',
                                                       'virtual_midnight'))
         self.task_list_url = config.get('gtimelog', 'task_list_url')
+        self.edit_task_list_cmd = config.get('gtimelog', 'edit_task_list_cmd')
 
     def save(self, filename):
         config = self._config()
@@ -700,6 +703,9 @@ class MainWindow(object):
         self.task_list.connect_object("button_press_event",
                                       self.task_list_button_press,
                                       self.task_list_popup_menu)
+        task_list_edit_menu_item = tree.get_widget("task_list_edit")
+        if not self.settings.edit_task_list_cmd:
+            task_list_edit_menu_item.set_sensitive(False)
         self.time_label = tree.get_widget("time_label")
         self.task_entry = tree.get_widget("task_entry")
         self.task_entry.connect("changed", self.task_entry_changed)
@@ -1027,6 +1033,9 @@ class MainWindow(object):
     def on_task_list_reload(self, event):
         self.tasks.reload()
         self.set_up_task_list()
+
+    def on_task_list_edit(self, event):
+        self.spawn(self.settings.edit_task_list_cmd)
 
     def task_list_loading(self):
         self.task_list_loading_failed = False
