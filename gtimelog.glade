@@ -678,6 +678,15 @@ TimeLog is a time tracking application.
       <signal name="activate" handler="on_task_list_reload" last_modification_time="Mon, 24 Oct 2005 11:05:24 GMT"/>
     </widget>
   </child>
+
+  <child>
+    <widget class="GtkImageMenuItem" id="task_list_edit">
+      <property name="visible">True</property>
+      <property name="label">gtk-edit</property>
+      <property name="use_stock">True</property>
+      <signal name="activate" handler="on_task_list_edit" last_modification_time="Fri, 04 Nov 2005 11:11:05 GMT"/>
+    </widget>
+  </child>
 </widget>
 
 <widget class="GtkMenu" id="tray_icon_popup_menu">
