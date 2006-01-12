@@ -652,9 +652,23 @@ class TrayIcon(object):
                 self.time_label.set_text(now.strftime("%H:%M"))
             else:
                 self.time_label.set_text(format_duration_short(now - last_time))
-        tip = "GTimeLog: " + self.gtimelog_window.task_entry.get_text()
-        self.tooltips.set_tip(self.trayicon, tip)
+        self.tooltips.set_tip(self.trayicon, self.tip())
         return True
+
+    def tip(self):
+        """Compute tooltip text."""
+        current_task = self.gtimelog_window.task_entry.get_text()
+        if not current_task: 
+            current_task = "nothing"
+        tip = "GTimeLog: working on %s" % current_task
+        total_work, total_slacking = self.timelog.window.totals()
+        tip += "\nWork done today: %s" % format_duration(total_work)
+        time_left = self.gtimelog_window.time_left_at_work(total_work)
+        if time_left is not None:
+            if time_left < datetime.timedelta(0):
+                time_left = datetime.timedelta(0)
+            tip += "\nTime left at work: %s" % format_duration(time_left)
+        return tip
 
 
 class MainWindow(object):
@@ -798,18 +812,9 @@ class MainWindow(object):
             self.w(format_duration(per_diem), 'duration')
             self.w(' per day')
         self.w(')\n')
-        last_time = self.timelog.window.last_time()
-        if last_time is not None:
-            now = datetime.datetime.now()
-            current_task = self.task_entry.get_text()
-            current_task_time = now - last_time
-            if '**' in current_task:
-                total_time = total_work
-            else:
-                total_time = total_work + current_task_time
-            time_left = (datetime.timedelta(hours=self.settings.hours) -
-                total_time)
-            time_to_leave = now + time_left
+        time_left = self.time_left_at_work(total_work)
+        if time_left is not None:
+            time_to_leave = datetime.datetime.now() + time_left
             if time_left < datetime.timedelta(0):
                 time_left = datetime.timedelta(0)
             self.w('Time left at work: ')
@@ -817,6 +822,20 @@ class MainWindow(object):
             self.w(' (till ')
             self.w(time_to_leave.strftime('%H:%M'), 'time')
             self.w(')')
+
+    def time_left_at_work(self, total_work):
+        """Calculate time left to work."""
+        last_time = self.timelog.window.last_time()
+        if last_time is None:
+            return None
+        now = datetime.datetime.now()
+        current_task = self.task_entry.get_text()
+        current_task_time = now - last_time
+        if '**' in current_task:
+            total_time = total_work
+        else:
+            total_time = total_work + current_task_time
+        return datetime.timedelta(hours=self.settings.hours) - total_time
 
     def write_item(self, item):
         buffer = self.log_buffer
