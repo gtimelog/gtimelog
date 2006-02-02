@@ -1,0 +1,23 @@
+gtimelog (0.0+svn65-1debian1) unstable; urgency=low
+
+  * First Debian release (Closes: #351075)
+  * debian/control:
+    - Standards-Version bumped up
+    - Suggests on gvim and mutt
+    - Build-Depends on dpatch added
+  * debian/gtimelog.1: manpage added.
+  * debian/patches: two patches added (icon handling related)
+  
+ -- Gustavo Franco <stratus@debian.org>  Thu,  2 Feb 2006 11:32:24 -0200
+
+gtimelog (0.0+svn42-2) hoary; urgency=low
+
+  * Fix double build problem and copyright
+
+ -- Thom May <thom@ubuntu.com>  Wed,  9 Feb 2005 14:33:39 +0000
+
+gtimelog (0.0+svn42-1) hoary; urgency=low
+
+  * First upload.
+
+ -- Thom May <thom@ubuntu.com>  Wed, 09 Feb 2005 13:43:16 +0000
