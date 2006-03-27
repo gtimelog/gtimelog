@@ -16,6 +16,7 @@ pygtk.require('2.0')
 import gobject
 import gtk
 import gtk.glade
+import pango
 
 
 ui_file = os.path.join(os.path.dirname(__file__), "gtimelog.glade")
@@ -703,6 +704,7 @@ class MainWindow(object):
         self.main_window = tree.get_widget("main_window")
         self.main_window.connect("delete_event", self.delete_event)
         self.log_view = tree.get_widget("log_view")
+        self.set_up_log_view_columns()
         self.task_pane_info_label = tree.get_widget("task_pane_info_label")
         tasks.loading_callback = self.task_list_loading
         tasks.loaded_callback = self.task_list_loaded
@@ -738,6 +740,15 @@ class MainWindow(object):
         self.populate_log()
         self.tick(True)
         gobject.timeout_add(1000, self.tick)
+
+    def set_up_log_view_columns(self):
+        """Set up tab stops in the log view."""
+        pango_context = self.log_view.get_pango_context()
+        em = pango_context.get_font_description().get_size()
+        tabs = pango.TabArray(2, False)
+        tabs.set_tab(0, pango.TAB_LEFT, 9 * em)
+        tabs.set_tab(1, pango.TAB_LEFT, 12 * em)
+        self.log_view.set_tabs(tabs)
 
     def w(self, text, tag=None):
         """Write some text at the end of the log buffer."""
