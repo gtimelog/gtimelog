@@ -19,8 +19,9 @@ import gtk.glade
 import pango
 
 
-ui_file = os.path.join(os.path.dirname(__file__), "gtimelog.glade")
-icon_file = os.path.join(os.path.dirname(__file__), "gtimelog-small.png")
+resource_dir = os.path.dirname(os.path.realpath(__file__))
+ui_file = os.path.join(resource_dir, "gtimelog.glade")
+icon_file = os.path.join(resource_dir, "gtimelog-small.png")
 
 
 def format_duration(duration):
