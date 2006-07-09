@@ -1,3 +1,21 @@
+gtimelog (0.0+svn65-1debian2) unstable; urgency=low
+
+  * debian/control:
+    - Depends on vim-gnome. (Closes: #357826)
+    - Set Utnubu Team as Maintainer.
+    - Update Standards-Version to 3.7.2.
+    - Set debhelper dependency to 5.
+    - Add python as Build-Depends.
+    - Depends on ${python:Depends} and not python anymore.
+  * debian/rules: add dh_python call to replace ${python:Depends}  
+  * debian/copyright: license (GPL) disclaimer added.
+  * debian/changelog:
+    - Replace gdebi word with gtimelog.
+  * debian/patches/03-wrap_fix.patch: added to improve the
+    activity mail output. Thanks mvo. (Closes: #364916)
+
+ -- Gustavo Franco <stratus@debian.org>  Sat,  8 Jul 2006 21:28:11 -0300
+
 gtimelog (0.0+svn65-1debian1) unstable; urgency=low
 
   * First Debian release (Closes: #351075)

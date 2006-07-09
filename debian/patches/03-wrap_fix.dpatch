@@ -1,0 +1,154 @@
+#! /bin/sh -e
+## wrap_fix.dpatch
+## Gustavo Franco <stratus@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: Improve activity mail output. Bug by mvo, patch by Gustavo Niemeyer.
+
+if [ $# -ne 1 ]; then
+    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+    exit 1
+fi
+case "$1" in
+    -patch) patch -f --no-backup-if-mismatch -p0 < $0;;
+    -unpatch) patch -f --no-backup-if-mismatch -R -p0 < $0;;
+    *)
+        echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
+        exit 1;;
+esac
+
+exit 0
+
+--- gtimelog.py	
++++ gtimelog.py	
+@@ -9,6 +9,7 @@
+ import urllib
+ import datetime
+ import tempfile
++import textwrap
+ import ConfigParser
+ 
+ import pygtk
+@@ -44,6 +45,41 @@
+         return '%d hour%s' % (h, h != 1 and "s" or "")
+     else:
+         return '%d min' % m
++
++
++def format_duration_hm(duration):
++    """Format a datetime.timedelta with minute precision, XhXm format."""
++    h, m = divmod((duration.days * 24 * 60 + duration.seconds // 60), 60)
++    if h and m:
++        return '%dh%dm' % (h, m)
++    elif h:
++        return '%dh' % h
++    else:
++        return '%dm' % m
++
++
++def format_duration_hm_fixed(duration):
++    """Format a datetime.timedelta with minute precision, fixed length."""
++    h, m = divmod((duration.days * 24 * 60 + duration.seconds // 60), 60)
++    return '%dh%02dm' % (h, m)
++
++
++def format_entry(output, entry, duration, extra_column=False):
++    """Format entry with wrapping."""
++    if extra_column:
++        width = 46
++    else:
++        width = 56
++    lines = textwrap.wrap(entry, width,
++                          initial_indent="- ", subsequent_indent="  ")
++    for line in lines[:-1]:
++        print >> output, line
++    if extra_column:
++        print >> output, ("%-46s  %-14s  %s" %
++                          (lines[-1], '-', format_duration_hm(duration)))
++    else:
++        print >> output, ("%-56s  %s" %
++                          (lines[-1], format_duration_hm(duration)))
+ 
+ 
+ def parse_datetime(dt):
+@@ -288,12 +324,11 @@
+         # would give us translated names
+         weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+         weekday = weekday_names[self.min_timestamp.weekday()]
+-        week = self.min_timestamp.strftime('%V')
++        #week = self.min_timestamp.strftime('%V')
+         print >> output, "To: %(email)s" % {'email': email}
+-        print >> output, ("Subject: %(date)s report for %(who)s"
+-                          " (%(weekday)s, week %(week)s)"
+-                          % {'date': self.min_timestamp.strftime('%Y-%m-%d'),
+-                             'weekday': weekday, 'week': week, 'who': who})
++        print >> output, "Subject: %s (%s)" % \
++                         (self.min_timestamp.strftime('%Y-%m-%d'), weekday)
++
+         print >> output
+         items = list(self.all_entries())
+         if not items:
+@@ -308,8 +343,7 @@
+         if work:
+             for start, entry, duration in work:
+                 entry = entry[:1].upper() + entry[1:]
+-                print >> output, "%-62s  %s" % (entry,
+-                                                format_duration_long(duration))
++                format_entry(output, entry, duration)
+             print >> output
+         print >> output, ("Total work done: %s" %
+                           format_duration_long(total_work))
+@@ -317,11 +351,10 @@
+         if slack:
+             for start, entry, duration in slack:
+                 entry = entry[:1].upper() + entry[1:]
+-                print >> output, "%-62s  %s" % (entry,
+-                                                format_duration_long(duration))
++                format_entry(output, entry, duration)
+             print >> output
+-        print >> output, ("Time spent slacking: %s" %
+-                          format_duration_long(total_slacking))
++            print >> output, ("Time spent slacking: %s" %
++                              format_duration_long(total_slacking))
+ 
+     def weekly_report(self, output, email, who, estimated_column=False):
+         """Format a weekly report.
+@@ -330,8 +363,8 @@
+         """
+         week = self.min_timestamp.strftime('%V')
+         print >> output, "To: %(email)s" % {'email': email}
+-        print >> output, "Subject: Weekly report for %s (week %s)" % (who,
+-                                                                      week)
++        print >> output, "Subject: Week %s" % week
++
+         print >> output
+         items = list(self.all_entries())
+         if not items:
+@@ -352,11 +385,9 @@
+                     continue # skip empty "arrival" entries
+                 entry = entry[:1].upper() + entry[1:]
+                 if estimated_column:
+-                    print >> output, ("%-46s  %-14s  %s" %
+-                                (entry, '-', format_duration_long(duration)))
++                    format_entry(output, entry, duration, extra_column=True)
+                 else:
+-                    print >> output, ("%-62s  %s" %
+-                                (entry, format_duration_long(duration)))
++                    format_entry(output, entry, duration)
+             print >> output
+         print >> output, ("Total work done this week: %s" %
+                           format_duration_long(total_work))
+@@ -851,9 +882,9 @@
+     def write_item(self, item):
+         buffer = self.log_buffer
+         start, stop, duration, entry = item
+-        self.w(format_duration(duration), 'duration')
+-        period = '\t(%s-%s)\t' % (start.strftime('%H:%M'),
+-                                  stop.strftime('%H:%M'))
++        self.w(format_duration_hm_fixed(duration), 'duration')
++        period = ' (%s-%s) ' % (start.strftime('%H:%M'),
++                                 stop.strftime('%H:%M'))
+         self.w(period, 'time')
+         tag = '**' in entry and 'slacking' or None
+         self.w(entry + '\n', tag)
+
