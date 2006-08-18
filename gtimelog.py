@@ -1016,10 +1016,6 @@ class MainWindow(object):
         """File -> Edit timelog.txt"""
         self.spawn(self.settings.editor, self.timelog.filename)
 
-    def on_edit_tasks_activate(self, widget):
-        """File -> Edit timelog.txt"""
-        self.spawn(self.settings.editor, self.tasks.filename)
-
     def mail(self, write_draft):
         """Send an email."""
         draftfn = tempfile.mktemp(suffix='gtimelog') # XXX unsafe!
