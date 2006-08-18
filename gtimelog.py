@@ -309,7 +309,7 @@ class TimeWindow(object):
         if work:
             for start, entry, duration in work:
                 entry = entry[:1].upper() + entry[1:]
-                print >> output, "%-62s  %s" % (entry,
+                print >> output, u"%-62s  %s" % (entry,
                                                 format_duration_long(duration))
             print >> output
         print >> output, ("Total work done: %s" %
@@ -318,7 +318,7 @@ class TimeWindow(object):
         if slack:
             for start, entry, duration in slack:
                 entry = entry[:1].upper() + entry[1:]
-                print >> output, "%-62s  %s" % (entry,
+                print >> output, u"%-62s  %s" % (entry,
                                                 format_duration_long(duration))
             print >> output
         print >> output, ("Time spent slacking: %s" %
@@ -353,10 +353,10 @@ class TimeWindow(object):
                     continue # skip empty "arrival" entries
                 entry = entry[:1].upper() + entry[1:]
                 if estimated_column:
-                    print >> output, ("%-46s  %-14s  %s" %
+                    print >> output, (u"%-46s  %-14s  %s" %
                                 (entry, '-', format_duration_long(duration)))
                 else:
-                    print >> output, ("%-62s  %s" %
+                    print >> output, (u"%-62s  %s" %
                                 (entry, format_duration_long(duration)))
             print >> output
         print >> output, ("Total work done this week: %s" %
