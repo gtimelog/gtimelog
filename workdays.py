@@ -47,8 +47,10 @@ def main():
             break
         days_off += 0.5
         work_days -= 0.5
-    print "  Days off: %.1f" % days_off
-    print "  Work days: %.1f" % work_days
+    def fmt(f):
+        return ("%.1f" % f).replace(".0", "")
+    print "  Days off: %s" % fmt(days_off)
+    print "  Work days: %s" % fmt(work_days)
     print "  Average day length: %s" % format_time(avg_day_len)
 
 
