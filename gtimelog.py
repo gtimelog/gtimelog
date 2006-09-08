@@ -963,8 +963,15 @@ class MainWindow(object):
         window = self.timelog.window
         self.mail(window.daily_report)
 
-    def on_previous_day_report_activate(self, widget):
+    def on_yesterdays_report_activate(self, widget):
         """File -> Daily Report for Yesterday"""
+        max = self.timelog.window.min_timestamp
+        min = max - datetime.timedelta(1) 
+        window = self.timelog.window_for(min, max)
+        self.mail(window.daily_report)
+
+    def on_previous_day_report_activate(self, widget):
+        """File -> Daily Report for a Previous Day"""
         day = self.choose_date()
         if day:
             min = datetime.datetime.combine(day,
@@ -1005,8 +1012,14 @@ class MainWindow(object):
         window = self.weekly_window()
         self.mail(window.weekly_report)
 
-    def on_previous_week_report_activate(self, widget):
+    def on_last_weeks_report_activate(self, widget):
         """File -> Weekly Report for Last Week"""
+        day = self.timelog.day - datetime.timedelta(7)
+        window = self.weekly_window(day=day)
+        self.mail(window.weekly_report)
+
+    def on_previous_week_report_activate(self, widget):
+        """File -> Weekly Report for a Previous Week"""
         day = self.choose_date()
         if day:
             window = self.weekly_window(day=day)
