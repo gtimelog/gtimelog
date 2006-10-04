@@ -569,7 +569,7 @@ class Settings(object):
         self.mailer = config.get('gtimelog', 'mailer')
         self.enable_gtk_completion = config.getboolean('gtimelog',
                                                        'gtk-completion')
-        self.hours = config.getint('gtimelog', 'hours')
+        self.hours = config.getfloat('gtimelog', 'hours')
         self.virtual_midnight = parse_time(config.get('gtimelog',
                                                       'virtual_midnight'))
         self.task_list_url = config.get('gtimelog', 'task_list_url')
