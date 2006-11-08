@@ -53,7 +53,7 @@
 		      <accelerator key="R" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image18">
+			<widget class="GtkImage" id="image23">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-refresh</property>
 			  <property name="icon_size">1</property>
@@ -75,7 +75,7 @@
 		      <signal name="activate" handler="on_edit_timelog_activate" last_modification_time="Mon, 13 Sep 2004 17:40:33 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image19">
+			<widget class="GtkImage" id="image24">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-execute</property>
 			  <property name="icon_size">1</property>
@@ -155,7 +155,7 @@
 		      <accelerator key="D" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image20">
+			<widget class="GtkImage" id="image25">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-justify-fill</property>
 			  <property name="icon_size">1</property>
@@ -176,7 +176,7 @@
 		      <signal name="activate" handler="on_yesterdays_report_activate" last_modification_time="Wed, 13 Apr 2005 17:50:36 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image21">
+			<widget class="GtkImage" id="image26">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-justify-fill</property>
 			  <property name="icon_size">1</property>
@@ -197,7 +197,7 @@
 		      <signal name="activate" handler="on_previous_day_report_activate" last_modification_time="Wed, 13 Apr 2005 17:50:36 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image21">
+			<widget class="GtkImage" id="image27">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-justify-fill</property>
 			  <property name="icon_size">1</property>
@@ -218,7 +218,7 @@
 		      <signal name="activate" handler="on_weekly_report_activate" last_modification_time="Wed, 08 Sep 2004 17:47:01 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image22">
+			<widget class="GtkImage" id="image28">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-indent</property>
 			  <property name="icon_size">1</property>
@@ -239,7 +239,7 @@
 		      <signal name="activate" handler="on_last_weeks_report_activate" last_modification_time="Wed, 13 Apr 2005 17:51:25 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image23">
+			<widget class="GtkImage" id="image29">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-indent</property>
 			  <property name="icon_size">1</property>
@@ -260,7 +260,7 @@
 		      <signal name="activate" handler="on_previous_week_report_activate" last_modification_time="Wed, 13 Apr 2005 17:51:25 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image23">
+			<widget class="GtkImage" id="image30">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-indent</property>
 			  <property name="icon_size">1</property>
@@ -270,6 +270,21 @@
 			  <property name="ypad">0</property>
 			</widget>
 		      </child>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkSeparatorMenuItem" id="separator1">
+		      <property name="visible">True</property>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkMenuItem" id="open_in_spreadsheet">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Open in Spreadsheet</property>
+		      <property name="use_underline">True</property>
+		      <signal name="activate" handler="on_open_in_spreadsheet_activate" last_modification_time="Wed, 08 Nov 2006 00:11:50 GMT"/>
 		    </widget>
 		  </child>
 		</widget>

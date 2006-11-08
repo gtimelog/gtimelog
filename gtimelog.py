@@ -5,6 +5,7 @@ A Gtk+ application for keeping track of time.
 
 import re
 import os
+import csv
 import sets
 import urllib
 import datetime
@@ -24,9 +25,14 @@ ui_file = os.path.join(resource_dir, "gtimelog.glade")
 icon_file = os.path.join(resource_dir, "gtimelog-small.png")
 
 
+def as_minutes(duration):
+    """Convert a datetime.timedelta to an integer number of minutes."""
+    return duration.days * 24 * 60 + duration.seconds // 60
+
+
 def format_duration(duration):
     """Format a datetime.timedelta with minute precision."""
-    h, m = divmod((duration.days * 24 * 60 + duration.seconds // 60), 60)
+    h, m = divmod(as_minutes(duration), 60)
     return '%d h %d min' % (h, m)
 
 
@@ -111,6 +117,9 @@ class TimeWindow(object):
 
     Entries that span virtual midnight boundaries are also converted to
     "arrival" entries at their end point.
+
+    The earliest_timestamp attribute contains the first (which should be the
+    oldest) timestamp in the file.
     """
 
     def __init__(self, filename, min_timestamp, max_timestamp,
@@ -122,8 +131,12 @@ class TimeWindow(object):
         self.reread(callback)
 
     def reread(self, callback=None):
-        """Parse the time log file and update self.items."""
+        """Parse the time log file and update self.items.
+
+        Also updates self.earliest_timestamp.
+        """
         self.items = []
+        self.earliest_timestamp = None
         try:
             f = open(self.filename)
         except IOError:
@@ -141,6 +154,8 @@ class TimeWindow(object):
                 entry = entry.strip()
                 if callback:
                     callback(entry)
+                if self.earliest_timestamp is None:
+                    self.earliest_timestamp = time
                 if self.min_timestamp <= time < self.max_timestamp:
                     self.items.append((time, entry))
         f.close()
@@ -280,6 +295,21 @@ class TimeWindow(object):
             print >> output, "END:VEVENT"
         print >> output, "END:VCALENDAR"
 
+    def to_csv(self, output, title_row=True):
+        """Export work entries to a CSV file.
+
+        The file has two columns: task title and time (in minutes).
+        """
+        writer = csv.writer(output)
+        if title_row:
+            writer.writerow(["task", "time (minutes)"])
+        work, slack = self.grouped_entries()
+        work = [(entry, as_minutes(duration))
+                for start, entry, duration in work
+                if duration] # skip empty "arrival" entries
+        work.sort()
+        writer.writerows(work)
+
     def daily_report(self, output, email, who):
         """Format a daily report.
 
@@ -389,6 +419,13 @@ class TimeLog(object):
     def window_for(self, min, max):
         """Return a TimeWindow for a specified time interval."""
         return TimeWindow(self.filename, min, max, self.virtual_midnight)
+
+    def whole_history(self):
+        """Return a TimeWindow for the whole history."""
+        # XXX I don't like this solution.  Better make the min/max filtering
+        # arguments optional in TimeWindow.reread
+        return self.window_for(self.window.earliest_timestamp,
+                               datetime.datetime.now())
 
     def raw_append(self, line):
         """Append a line to the time log file."""
@@ -535,6 +572,7 @@ class Settings(object):
 
     editor = 'gvim'
     mailer = 'x-terminal-emulator -e mutt -H %s'
+    spreadsheet = 'oocalc %s'
 
     enable_gtk_completion = True  # False enables gvim-style completion
 
@@ -551,6 +589,7 @@ class Settings(object):
         config.set('gtimelog', 'name', self.name)
         config.set('gtimelog', 'editor', self.editor)
         config.set('gtimelog', 'mailer', self.mailer)
+        config.set('gtimelog', 'spreadsheet', self.spreadsheet)
         config.set('gtimelog', 'gtk-completion',
                    str(self.enable_gtk_completion))
         config.set('gtimelog', 'hours', str(self.hours))
@@ -567,6 +606,7 @@ class Settings(object):
         self.name = config.get('gtimelog', 'name')
         self.editor = config.get('gtimelog', 'editor')
         self.mailer = config.get('gtimelog', 'mailer')
+        self.spreadsheet = config.get('gtimelog', 'spreadsheet')
         self.enable_gtk_completion = config.getboolean('gtimelog',
                                                        'gtk-completion')
         self.hours = config.getfloat('gtimelog', 'hours')
@@ -1024,6 +1064,14 @@ class MainWindow(object):
         if day:
             window = self.weekly_window(day=day)
             self.mail(window.weekly_report)
+
+    def on_open_in_spreadsheet_activate(self, widget):
+        """Report -> Open in Spreadsheet"""
+        tempfn = tempfile.mktemp(suffix='gtimelog.csv') # XXX unsafe!
+        f = open(tempfn, 'w')
+        self.timelog.whole_history().to_csv(f)
+        f.close()
+        self.spawn(self.settings.spreadsheet, tempfn)
 
     def on_edit_timelog_activate(self, widget):
         """File -> Edit timelog.txt"""
