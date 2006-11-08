@@ -89,6 +89,64 @@
 		  </child>
 
 		  <child>
+		    <widget class="GtkImageMenuItem" id="quit">
+		      <property name="visible">True</property>
+		      <property name="label">gtk-quit</property>
+		      <property name="use_stock">True</property>
+		      <signal name="activate" handler="on_quit_activate"/>
+		    </widget>
+		  </child>
+		</widget>
+	      </child>
+	    </widget>
+	  </child>
+
+	  <child>
+	    <widget class="GtkMenuItem" id="view1">
+	      <property name="visible">True</property>
+	      <property name="label" translatable="yes">_View</property>
+	      <property name="use_underline">True</property>
+
+	      <child>
+		<widget class="GtkMenu" id="view1_menu">
+
+		  <child>
+		    <widget class="GtkRadioMenuItem" id="chronological">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Chronological</property>
+		      <property name="use_underline">True</property>
+		      <property name="active">False</property>
+		      <signal name="activate" handler="on_chronological_activate"/>
+		      <accelerator key="1" modifiers="GDK_MOD1_MASK" signal="activate"/>
+		    </widget>
+		  </child>
+
+		  <child>
+		    <widget class="GtkRadioMenuItem" id="grouped">
+		      <property name="visible">True</property>
+		      <property name="label" translatable="yes">_Grouped</property>
+		      <property name="use_underline">True</property>
+		      <property name="active">True</property>
+		      <property name="group">chronological</property>
+		      <signal name="activate" handler="on_grouped_activate"/>
+		      <accelerator key="2" modifiers="GDK_MOD1_MASK" signal="activate"/>
+		    </widget>
+		  </child>
+		</widget>
+	      </child>
+	    </widget>
+	  </child>
+
+	  <child>
+	    <widget class="GtkMenuItem" id="menuitem2">
+	      <property name="visible">True</property>
+	      <property name="label" translatable="yes">_Report</property>
+	      <property name="use_underline">True</property>
+
+	      <child>
+		<widget class="GtkMenu" id="menuitem2_menu">
+
+		  <child>
 		    <widget class="GtkImageMenuItem" id="daily_report">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">_Daily Report</property>
@@ -212,51 +270,6 @@
 			  <property name="ypad">0</property>
 			</widget>
 		      </child>
-		    </widget>
-		  </child>
-
-		  <child>
-		    <widget class="GtkImageMenuItem" id="quit">
-		      <property name="visible">True</property>
-		      <property name="label">gtk-quit</property>
-		      <property name="use_stock">True</property>
-		      <signal name="activate" handler="on_quit_activate" last_modification_time="Wed, 01 Sep 2004 23:27:09 GMT"/>
-		    </widget>
-		  </child>
-		</widget>
-	      </child>
-	    </widget>
-	  </child>
-
-	  <child>
-	    <widget class="GtkMenuItem" id="view1">
-	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">_View</property>
-	      <property name="use_underline">True</property>
-
-	      <child>
-		<widget class="GtkMenu" id="view1_menu">
-
-		  <child>
-		    <widget class="GtkRadioMenuItem" id="chronological">
-		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">_Chronological</property>
-		      <property name="use_underline">True</property>
-		      <property name="active">True</property>
-		      <signal name="activate" handler="on_chronological_activate" last_modification_time="Fri, 03 Sep 2004 18:56:59 GMT"/>
-		      <accelerator key="1" modifiers="GDK_MOD1_MASK" signal="activate"/>
-		    </widget>
-		  </child>
-
-		  <child>
-		    <widget class="GtkRadioMenuItem" id="grouped">
-		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">_Grouped</property>
-		      <property name="use_underline">True</property>
-		      <property name="active">False</property>
-		      <property name="group">chronological</property>
-		      <signal name="activate" handler="on_grouped_activate" last_modification_time="Fri, 03 Sep 2004 18:56:59 GMT"/>
-		      <accelerator key="2" modifiers="GDK_MOD1_MASK" signal="activate"/>
 		    </widget>
 		  </child>
 		</widget>
@@ -621,7 +634,7 @@ GTimeLog is a time tracking application.
   <property name="decorated">True</property>
   <property name="skip_taskbar_hint">False</property>
   <property name="skip_pager_hint">False</property>
-  <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
+  <property name="type_hint">GDK_WINDOW_TYPE_HINT_DIALOG</property>
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
   <property name="focus_on_map">True</property>
   <property name="urgency_hint">False</property>
