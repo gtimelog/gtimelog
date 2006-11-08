@@ -20,9 +20,16 @@ import gtk.glade
 import pango
 
 
+# This is to let people run GTimeLog without having to install it
 resource_dir = os.path.dirname(os.path.realpath(__file__))
 ui_file = os.path.join(resource_dir, "gtimelog.glade")
 icon_file = os.path.join(resource_dir, "gtimelog-small.png")
+
+# This is for distribution packages
+if not os.path.exists(ui_file):
+    ui_file = "/usr/share/gtimelog/gtimelog.glade"
+if not os.path.exists(icon_file):
+    icon_file = "/usr/share/pixmaps/gtimelog-small.png"
 
 
 def as_minutes(duration):
