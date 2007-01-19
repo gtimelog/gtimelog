@@ -6,6 +6,7 @@ A Gtk+ application for keeping track of time.
 import re
 import os
 import csv
+import sys
 import sets
 import urllib
 import datetime
@@ -1095,6 +1096,7 @@ class MainWindow(object):
 
     def spawn(self, command, arg=None):
         """Spawn a process in background"""
+        # XXX shell-escape arg, please.
         if arg is not None:
             if '%s' in command:
                 command = command % arg
@@ -1235,6 +1237,12 @@ class MainWindow(object):
 
 def main():
     """Run the program."""
+    if sys.argv and sys.argv[1] == '--sample-config':
+        settings = Settings()
+        settings.save("gtimelogrc.sample")
+        print "Sample configuration file written to gtimelogrc.sample"
+        return
+
     configdir = os.path.expanduser('~/.gtimelog')
     try:
         os.makedirs(configdir) # create it if it doesn't exist
