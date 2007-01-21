@@ -1237,7 +1237,7 @@ class MainWindow(object):
 
 def main():
     """Run the program."""
-    if sys.argv and sys.argv[1] == '--sample-config':
+    if len(sys.argv) > 1 and sys.argv[1] == '--sample-config':
         settings = Settings()
         settings.save("gtimelogrc.sample")
         print "Sample configuration file written to gtimelogrc.sample"
