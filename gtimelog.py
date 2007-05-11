@@ -400,6 +400,67 @@ class TimeWindow(object):
         print >> output, ("Total work done this week: %s" %
                           format_duration_long(total_work))
 
+    def monthly_report(self, output, email, who):
+        """Format a monthly report.
+
+        Writes a monthly report template in RFC-822 format to output.
+        """
+
+        month = self.min_timestamp.strftime('%Y/%m')
+        print >> output, "To: %(email)s" % {'email': email}
+        print >> output, "Subject: Monthly report for %s (%s)" % (who, month)
+        print >> output
+
+        items = list(self.all_entries())
+        if not items:
+            print >> output, "No work done this month."
+            return
+
+        print >> output, " " * 46
+
+        work, slack = self.grouped_entries()
+        total_work, total_slacking = self.totals()
+        categories = {}
+
+        if work:
+            work = [(entry, duration) for start, entry, duration in work]
+            work.sort()
+            for entry, duration in work:
+                if not duration:
+                    continue # skip empty "arrival" entries
+
+                if ': ' in entry:
+                    cat, task = entry.split(': ', 1)
+                    categories[cat] = categories.get(
+                        cat, datetime.timedelta(0)) + duration
+                else:
+                    categories[None] = categories.get(
+                        None, datetime.timedelta(0)) + duration
+
+                entry = entry[:1].upper() + entry[1:]
+                print >> output, (u"%-62s  %s" %
+                    (entry, format_duration_long(duration)))
+            print >> output
+
+        print >> output, ("Total work done this month: %s" %
+                          format_duration_long(total_work))
+
+        if categories:
+            print >> output
+            print >> output, "By category:"
+            print >> output
+
+            for cat, duration in categories.iteritems():
+                if not cat:
+                    continue
+
+                print >> output, u"%-62s  %s" % (
+                    cat, format_duration_long(duration))
+
+            print >> output, u"%-62s  %s" % (
+                '(none)', format_duration_long(categories[None]))
+            print >> output
+
 
 class TimeLog(object):
     """Time log.
@@ -1072,6 +1133,37 @@ class MainWindow(object):
         if day:
             window = self.weekly_window(day=day)
             self.mail(window.weekly_report)
+
+    def monthly_window(self, day=None):
+        if not day:
+            day = self.timelog.day
+        first = day - datetime.timedelta(day.day - 1)
+        days = (
+            first.replace(month=(day.month + 1) % 12) -
+            datetime.timedelta(1)).day
+        min = datetime.datetime.combine(first,
+                        self.timelog.virtual_midnight)
+        max = min + datetime.timedelta(days)
+        window = self.timelog.window_for(min, max)
+        return window
+
+    def on_previous_month_report_activate(self, widget):
+        """File -> Monthly Report for a Previous Month"""
+        day = self.choose_date()
+        if day:
+            window = self.monthly_window(day=day)
+            self.mail(window.monthly_report)
+
+    def on_last_month_report_activate(self, widget):
+        """File -> Monthly Report for Last Month"""
+        day = self.timelog.day - datetime.timedelta(self.timelog.day.day)
+        window = self.monthly_window(day=day)
+        self.mail(window.monthly_report)
+
+    def on_monthly_report_activate(self, widget):
+        """File -> Monthly Report"""
+        window = self.monthly_window()
+        self.mail(window.monthly_report)
 
     def on_open_in_spreadsheet_activate(self, widget):
         """Report -> Open in Spreadsheet"""
