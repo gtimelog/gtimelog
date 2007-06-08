@@ -452,7 +452,9 @@ class TimeWindow(object):
             print >> output, "By category:"
             print >> output
 
-            for cat, duration in categories.iteritems():
+            items = categories.items()
+            items.sort()
+            for cat, duration in items:
                 if not cat:
                     continue
 
