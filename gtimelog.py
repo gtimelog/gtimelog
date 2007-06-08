@@ -1,6 +1,8 @@
 #!/usr/bin/python
 """
 A Gtk+ application for keeping track of time.
+
+$Id$
 """
 
 import re
@@ -457,8 +459,9 @@ class TimeWindow(object):
                 print >> output, u"%-62s  %s" % (
                     cat, format_duration_long(duration))
 
-            print >> output, u"%-62s  %s" % (
-                '(none)', format_duration_long(categories[None]))
+            if None in categories:
+                print >> output, u"%-62s  %s" % (
+                    '(none)', format_duration_long(categories[None]))
             print >> output
 
 
