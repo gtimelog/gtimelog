@@ -35,7 +35,6 @@ def doctest_format_short():
 
     """
 
-
 def doctest_format_duration_long():
     """Tests for format_duration_long.
 
@@ -138,6 +137,57 @@ def doctest_uniq():
         ['a']
         >>> uniq([])
         []
+
+    """
+
+def doctest_TimeWindow_monthly_report():
+    r"""Tests for TimeWindow.monthly_report
+
+        >>> import sys
+
+        >>> from datetime import datetime, time
+        >>> from tempfile import NamedTemporaryFile
+        >>> from gtimelog import TimeWindow
+
+        >>> vm = time(2, 0)
+        >>> min = datetime(2007, 9, 1)
+        >>> max = datetime(2007, 10, 1)
+        >>> fh = NamedTemporaryFile()
+
+        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window.monthly_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        To: foo@bar.com
+        Subject: Monthly report for Bob Jones (2007/09)
+        <BLANKLINE>
+        No work done this month.
+
+        >>> _ = [fh.write(s + '\n') for s in [
+        ...    '2007-09-30 09:00: start',
+        ...    '2007-09-30 09:23: Bing: stuff',
+        ...    '2007-09-30 12:54: Bong: other stuff',
+        ...    '2007-09-30 13:32: lunch **',
+        ...    '2007-09-30 15:46: misc',
+        ...    '']]
+        >>> fh.flush()
+
+        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window.monthly_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        To: foo@bar.com
+        Subject: Monthly report for Bob Jones (2007/09)
+        <BLANKLINE>
+        <BLANKLINE>
+        Bing: stuff                                                     23 min
+        Bong: other stuff                                               3 hours 31 min
+        Misc                                                            2 hours 14 min
+        <BLANKLINE>
+        Total work done this month: 6 hours 8 min
+        <BLANKLINE>
+        By category:
+        <BLANKLINE>
+        Bing                                                            23 min
+        Bong                                                            3 hours 31 min
+        (none)                                                          2 hours 14 min
+        <BLANKLINE>
 
     """
 
