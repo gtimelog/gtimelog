@@ -127,6 +127,77 @@ def doctest_different_days():
 
     """
 
+def doctest_first_of_month():
+    """Tests for first_of_month
+
+        >>> from gtimelog import first_of_month
+        >>> from datetime import date, timedelta
+
+        >>> first_of_month(date(2007, 1, 1))
+        datetime.date(2007, 1, 1)
+
+        >>> first_of_month(date(2007, 1, 7))
+        datetime.date(2007, 1, 1)
+
+        >>> first_of_month(date(2007, 1, 31))
+        datetime.date(2007, 1, 1)
+
+        >>> first_of_month(date(2007, 2, 1))
+        datetime.date(2007, 2, 1)
+
+        >>> first_of_month(date(2007, 2, 28))
+        datetime.date(2007, 2, 1)
+
+        >>> first_of_month(date(2007, 3, 1))
+        datetime.date(2007, 3, 1)
+
+    Why not test extensively?
+
+        >>> d = date(2000, 1, 1)
+        >>> while d < date(2005, 1, 1):
+        ...     f = first_of_month(d)
+        ...     if (f.year, f.month, f.day) != (d.year, d.month, 1):
+        ...         print "WRONG: first_of_month(%r) returned %r" % (d, f)
+        ...     d += timedelta(1)
+
+    """
+
+def doctest_next_month():
+    """Tests for next_month
+
+        >>> from gtimelog import next_month
+        >>> from datetime import date, timedelta
+
+        >>> next_month(date(2007, 1, 1))
+        datetime.date(2007, 2, 1)
+
+        >>> next_month(date(2007, 1, 7))
+        datetime.date(2007, 2, 1)
+
+        >>> next_month(date(2007, 1, 31))
+        datetime.date(2007, 2, 1)
+
+        >>> next_month(date(2007, 2, 1))
+        datetime.date(2007, 3, 1)
+
+        >>> next_month(date(2007, 2, 28))
+        datetime.date(2007, 3, 1)
+
+        >>> next_month(date(2007, 3, 1))
+        datetime.date(2007, 4, 1)
+
+    Why not test extensively?
+
+        >>> d = date(2000, 1, 1)
+        >>> while d < date(2005, 1, 1):
+        ...     f = next_month(d)
+        ...     prev = f - timedelta(1)
+        ...     if f.day != 1 or (prev.year, prev.month) != (d.year, d.month):
+        ...         print "WRONG: next_month(%r) returned %r" % (d, f)
+        ...     d += timedelta(1)
+
+    """
+
 def doctest_uniq():
     """Tests for uniq
 
