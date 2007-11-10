@@ -101,6 +101,19 @@ def different_days(dt1, dt2, virtual_midnight):
                                                              virtual_midnight)
 
 
+def first_of_month(date):
+    """Return the first day of the month for a given date."""
+    return date.replace(day=1)
+
+
+def next_month(date):
+    """Return the first day of the next month."""
+    if date.month == 12:
+        return datetime.date(date.year + 1, 1, 1)
+    else:
+        return datetime.date(date.year, date.month + 1, 1)
+
+
 def uniq(l):
     """Return list with consecutive duplicates removed."""
     result = l[:1]
@@ -1142,13 +1155,12 @@ class MainWindow(object):
     def monthly_window(self, day=None):
         if not day:
             day = self.timelog.day
-        first = day - datetime.timedelta(day.day - 1)
-        days = (
-            first.replace(month=(day.month + 1) % 12) -
-            datetime.timedelta(1)).day
-        min = datetime.datetime.combine(first,
-                        self.timelog.virtual_midnight)
-        max = min + datetime.timedelta(days)
+        first_of_this_month = first_of_month(day)
+        first_of_next_month = next_month(day)
+        min = datetime.datetime.combine(first_of_this_month,
+                                        self.timelog.virtual_midnight)
+        max = datetime.datetime.combine(first_of_next_month,
+                                        self.timelog.virtual_midnight)
         window = self.timelog.window_for(min, max)
         return window
 
