@@ -24,4 +24,6 @@ setup(
     [console_scripts]
     gtimelog = gtimelog.gtimelog:main
     """,
+# This is true, but pointless, because easy_install PyGTK chokes and dies
+#   install_requires=['PyGTK'],
 )
