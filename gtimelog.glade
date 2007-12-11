@@ -73,6 +73,7 @@
 		      <property name="label" translatable="yes">_Edit timelog.txt</property>
 		      <property name="use_underline">True</property>
 		      <signal name="activate" handler="on_edit_timelog_activate" last_modification_time="Mon, 13 Sep 2004 17:40:33 GMT"/>
+		      <accelerator key="E" modifiers="GDK_CONTROL_MASK" signal="activate"/>
 
 		      <child internal-child="image">
 			<widget class="GtkImage" id="image24">
