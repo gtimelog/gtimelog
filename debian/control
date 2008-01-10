@@ -2,12 +2,13 @@ Source: gtimelog
 Section: admin
 Priority: optional
 XS-Python-Version: >= 2.3
-Maintainer: Utnubu Team <utnubu-maintainers@lists.alioth.debian.org>
-Uploaders: Gustavo Franco <stratus@debian.org>
+Maintainer: Simon McVittie <smcv@ianadd.pseudorandom.co.uk>
+Uploaders: Gustavo Franco <stratus@debian.org>, Dafydd Harries <daf@debian.org>
 Build-Depends: debhelper (>= 5.0.0), dpatch (>= 2.0.16), python, python-support (>= 0.5.3)
 Standards-Version: 3.7.3
 Homepage: http://mg.pov.lt/gtimelog/
-Vcs-Svn: svn://svn.debian.org/utnubu/packages/gtimelog
+Vcs-Bzr: http://bzr.debian.org/bzr/collab-maint/gtimelog
+XS-Dm-Upload-Allowed: yes
 
 Package: gtimelog
 Architecture: all
