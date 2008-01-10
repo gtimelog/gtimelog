@@ -1,10 +1,14 @@
 #!/usr/bin/python
 """
 A Gtk+ application for keeping track of time.
+
+$Id$
 """
 
 import re
 import os
+import csv
+import sys
 import sets
 import urllib
 import datetime
@@ -16,15 +20,29 @@ pygtk.require('2.0')
 import gobject
 import gtk
 import gtk.glade
+import pango
 
 
-ui_file = os.path.join(os.path.dirname(__file__), "gtimelog.glade")
-icon_file = os.path.join(os.path.dirname(__file__), "gtimelog-small.png")
+# This is to let people run GTimeLog without having to install it
+resource_dir = os.path.dirname(os.path.realpath(__file__))
+ui_file = os.path.join(resource_dir, "gtimelog.glade")
+icon_file = os.path.join(resource_dir, "gtimelog-small.png")
+
+# This is for distribution packages
+if not os.path.exists(ui_file):
+    ui_file = "/usr/share/gtimelog/gtimelog.glade"
+if not os.path.exists(icon_file):
+    icon_file = "/usr/share/pixmaps/gtimelog-small.png"
+
+
+def as_minutes(duration):
+    """Convert a datetime.timedelta to an integer number of minutes."""
+    return duration.days * 24 * 60 + duration.seconds // 60
 
 
 def format_duration(duration):
     """Format a datetime.timedelta with minute precision."""
-    h, m = divmod((duration.days * 24 * 60 + duration.seconds // 60), 60)
+    h, m = divmod(as_minutes(duration), 60)
     return '%d h %d min' % (h, m)
 
 
@@ -83,6 +101,19 @@ def different_days(dt1, dt2, virtual_midnight):
                                                              virtual_midnight)
 
 
+def first_of_month(date):
+    """Return the first day of the month for a given date."""
+    return date.replace(day=1)
+
+
+def next_month(date):
+    """Return the first day of the next month."""
+    if date.month == 12:
+        return datetime.date(date.year + 1, 1, 1)
+    else:
+        return datetime.date(date.year, date.month + 1, 1)
+
+
 def uniq(l):
     """Return list with consecutive duplicates removed."""
     result = l[:1]
@@ -109,6 +140,9 @@ class TimeWindow(object):
 
     Entries that span virtual midnight boundaries are also converted to
     "arrival" entries at their end point.
+
+    The earliest_timestamp attribute contains the first (which should be the
+    oldest) timestamp in the file.
     """
 
     def __init__(self, filename, min_timestamp, max_timestamp,
@@ -120,8 +154,12 @@ class TimeWindow(object):
         self.reread(callback)
 
     def reread(self, callback=None):
-        """Parse the time log file and update self.items."""
+        """Parse the time log file and update self.items.
+
+        Also updates self.earliest_timestamp.
+        """
         self.items = []
+        self.earliest_timestamp = None
         try:
             f = open(self.filename)
         except IOError:
@@ -139,6 +177,8 @@ class TimeWindow(object):
                 entry = entry.strip()
                 if callback:
                     callback(entry)
+                if self.earliest_timestamp is None:
+                    self.earliest_timestamp = time
                 if self.min_timestamp <= time < self.max_timestamp:
                     self.items.append((time, entry))
         f.close()
@@ -278,6 +318,21 @@ class TimeWindow(object):
             print >> output, "END:VEVENT"
         print >> output, "END:VCALENDAR"
 
+    def to_csv(self, output, title_row=True):
+        """Export work entries to a CSV file.
+
+        The file has two columns: task title and time (in minutes).
+        """
+        writer = csv.writer(output)
+        if title_row:
+            writer.writerow(["task", "time (minutes)"])
+        work, slack = self.grouped_entries()
+        work = [(entry, as_minutes(duration))
+                for start, entry, duration in work
+                if duration] # skip empty "arrival" entries
+        work.sort()
+        writer.writerows(work)
+
     def daily_report(self, output, email, who):
         """Format a daily report.
 
@@ -307,7 +362,7 @@ class TimeWindow(object):
         if work:
             for start, entry, duration in work:
                 entry = entry[:1].upper() + entry[1:]
-                print >> output, "%-62s  %s" % (entry,
+                print >> output, u"%-62s  %s" % (entry,
                                                 format_duration_long(duration))
             print >> output
         print >> output, ("Total work done: %s" %
@@ -316,7 +371,7 @@ class TimeWindow(object):
         if slack:
             for start, entry, duration in slack:
                 entry = entry[:1].upper() + entry[1:]
-                print >> output, "%-62s  %s" % (entry,
+                print >> output, u"%-62s  %s" % (entry,
                                                 format_duration_long(duration))
             print >> output
         print >> output, ("Time spent slacking: %s" %
@@ -351,14 +406,78 @@ class TimeWindow(object):
                     continue # skip empty "arrival" entries
                 entry = entry[:1].upper() + entry[1:]
                 if estimated_column:
-                    print >> output, ("%-46s  %-14s  %s" %
+                    print >> output, (u"%-46s  %-14s  %s" %
                                 (entry, '-', format_duration_long(duration)))
                 else:
-                    print >> output, ("%-62s  %s" %
+                    print >> output, (u"%-62s  %s" %
                                 (entry, format_duration_long(duration)))
             print >> output
         print >> output, ("Total work done this week: %s" %
                           format_duration_long(total_work))
+
+    def monthly_report(self, output, email, who):
+        """Format a monthly report.
+
+        Writes a monthly report template in RFC-822 format to output.
+        """
+
+        month = self.min_timestamp.strftime('%Y/%m')
+        print >> output, "To: %(email)s" % {'email': email}
+        print >> output, "Subject: Monthly report for %s (%s)" % (who, month)
+        print >> output
+
+        items = list(self.all_entries())
+        if not items:
+            print >> output, "No work done this month."
+            return
+
+        print >> output, " " * 46
+
+        work, slack = self.grouped_entries()
+        total_work, total_slacking = self.totals()
+        categories = {}
+
+        if work:
+            work = [(entry, duration) for start, entry, duration in work]
+            work.sort()
+            for entry, duration in work:
+                if not duration:
+                    continue # skip empty "arrival" entries
+
+                if ': ' in entry:
+                    cat, task = entry.split(': ', 1)
+                    categories[cat] = categories.get(
+                        cat, datetime.timedelta(0)) + duration
+                else:
+                    categories[None] = categories.get(
+                        None, datetime.timedelta(0)) + duration
+
+                entry = entry[:1].upper() + entry[1:]
+                print >> output, (u"%-62s  %s" %
+                    (entry, format_duration_long(duration)))
+            print >> output
+
+        print >> output, ("Total work done this month: %s" %
+                          format_duration_long(total_work))
+
+        if categories:
+            print >> output
+            print >> output, "By category:"
+            print >> output
+
+            items = categories.items()
+            items.sort()
+            for cat, duration in items:
+                if not cat:
+                    continue
+
+                print >> output, u"%-62s  %s" % (
+                    cat, format_duration_long(duration))
+
+            if None in categories:
+                print >> output, u"%-62s  %s" % (
+                    '(none)', format_duration_long(categories[None]))
+            print >> output
 
 
 class TimeLog(object):
@@ -387,6 +506,13 @@ class TimeLog(object):
     def window_for(self, min, max):
         """Return a TimeWindow for a specified time interval."""
         return TimeWindow(self.filename, min, max, self.virtual_midnight)
+
+    def whole_history(self):
+        """Return a TimeWindow for the whole history."""
+        # XXX I don't like this solution.  Better make the min/max filtering
+        # arguments optional in TimeWindow.reread
+        return self.window_for(self.window.earliest_timestamp,
+                               datetime.datetime.now())
 
     def raw_append(self, line):
         """Append a line to the time log file."""
@@ -533,6 +659,7 @@ class Settings(object):
 
     editor = 'gvim'
     mailer = 'x-terminal-emulator -e mutt -H %s'
+    spreadsheet = 'oocalc %s'
 
     enable_gtk_completion = True  # False enables gvim-style completion
 
@@ -549,6 +676,7 @@ class Settings(object):
         config.set('gtimelog', 'name', self.name)
         config.set('gtimelog', 'editor', self.editor)
         config.set('gtimelog', 'mailer', self.mailer)
+        config.set('gtimelog', 'spreadsheet', self.spreadsheet)
         config.set('gtimelog', 'gtk-completion',
                    str(self.enable_gtk_completion))
         config.set('gtimelog', 'hours', str(self.hours))
@@ -565,9 +693,10 @@ class Settings(object):
         self.name = config.get('gtimelog', 'name')
         self.editor = config.get('gtimelog', 'editor')
         self.mailer = config.get('gtimelog', 'mailer')
+        self.spreadsheet = config.get('gtimelog', 'spreadsheet')
         self.enable_gtk_completion = config.getboolean('gtimelog',
                                                        'gtk-completion')
-        self.hours = config.getint('gtimelog', 'hours')
+        self.hours = config.getfloat('gtimelog', 'hours')
         self.virtual_midnight = parse_time(config.get('gtimelog',
                                                       'virtual_midnight'))
         self.task_list_url = config.get('gtimelog', 'task_list_url')
@@ -703,6 +832,7 @@ class MainWindow(object):
         self.main_window = tree.get_widget("main_window")
         self.main_window.connect("delete_event", self.delete_event)
         self.log_view = tree.get_widget("log_view")
+        self.set_up_log_view_columns()
         self.task_pane_info_label = tree.get_widget("task_pane_info_label")
         tasks.loading_callback = self.task_list_loading
         tasks.loaded_callback = self.task_list_loaded
@@ -738,6 +868,15 @@ class MainWindow(object):
         self.populate_log()
         self.tick(True)
         gobject.timeout_add(1000, self.tick)
+
+    def set_up_log_view_columns(self):
+        """Set up tab stops in the log view."""
+        pango_context = self.log_view.get_pango_context()
+        em = pango_context.get_font_description().get_size()
+        tabs = pango.TabArray(2, False)
+        tabs.set_tab(0, pango.TAB_LEFT, 9 * em)
+        tabs.set_tab(1, pango.TAB_LEFT, 12 * em)
+        self.log_view.set_tabs(tabs)
 
     def w(self, text, tag=None):
         """Write some text at the end of the log buffer."""
@@ -951,8 +1090,15 @@ class MainWindow(object):
         window = self.timelog.window
         self.mail(window.daily_report)
 
-    def on_previous_day_report_activate(self, widget):
+    def on_yesterdays_report_activate(self, widget):
         """File -> Daily Report for Yesterday"""
+        max = self.timelog.window.min_timestamp
+        min = max - datetime.timedelta(1) 
+        window = self.timelog.window_for(min, max)
+        self.mail(window.daily_report)
+
+    def on_previous_day_report_activate(self, widget):
+        """File -> Daily Report for a Previous Day"""
         day = self.choose_date()
         if day:
             min = datetime.datetime.combine(day,
@@ -993,20 +1139,60 @@ class MainWindow(object):
         window = self.weekly_window()
         self.mail(window.weekly_report)
 
-    def on_previous_week_report_activate(self, widget):
+    def on_last_weeks_report_activate(self, widget):
         """File -> Weekly Report for Last Week"""
+        day = self.timelog.day - datetime.timedelta(7)
+        window = self.weekly_window(day=day)
+        self.mail(window.weekly_report)
+
+    def on_previous_week_report_activate(self, widget):
+        """File -> Weekly Report for a Previous Week"""
         day = self.choose_date()
         if day:
             window = self.weekly_window(day=day)
             self.mail(window.weekly_report)
 
+    def monthly_window(self, day=None):
+        if not day:
+            day = self.timelog.day
+        first_of_this_month = first_of_month(day)
+        first_of_next_month = next_month(day)
+        min = datetime.datetime.combine(first_of_this_month,
+                                        self.timelog.virtual_midnight)
+        max = datetime.datetime.combine(first_of_next_month,
+                                        self.timelog.virtual_midnight)
+        window = self.timelog.window_for(min, max)
+        return window
+
+    def on_previous_month_report_activate(self, widget):
+        """File -> Monthly Report for a Previous Month"""
+        day = self.choose_date()
+        if day:
+            window = self.monthly_window(day=day)
+            self.mail(window.monthly_report)
+
+    def on_last_month_report_activate(self, widget):
+        """File -> Monthly Report for Last Month"""
+        day = self.timelog.day - datetime.timedelta(self.timelog.day.day)
+        window = self.monthly_window(day=day)
+        self.mail(window.monthly_report)
+
+    def on_monthly_report_activate(self, widget):
+        """File -> Monthly Report"""
+        window = self.monthly_window()
+        self.mail(window.monthly_report)
+
+    def on_open_in_spreadsheet_activate(self, widget):
+        """Report -> Open in Spreadsheet"""
+        tempfn = tempfile.mktemp(suffix='gtimelog.csv') # XXX unsafe!
+        f = open(tempfn, 'w')
+        self.timelog.whole_history().to_csv(f)
+        f.close()
+        self.spawn(self.settings.spreadsheet, tempfn)
+
     def on_edit_timelog_activate(self, widget):
         """File -> Edit timelog.txt"""
         self.spawn(self.settings.editor, self.timelog.filename)
-
-    def on_edit_tasks_activate(self, widget):
-        """File -> Edit timelog.txt"""
-        self.spawn(self.settings.editor, self.tasks.filename)
 
     def mail(self, write_draft):
         """Send an email."""
@@ -1019,6 +1205,7 @@ class MainWindow(object):
 
     def spawn(self, command, arg=None):
         """Spawn a process in background"""
+        # XXX shell-escape arg, please.
         if arg is not None:
             if '%s' in command:
                 command = command % arg
@@ -1159,6 +1346,12 @@ class MainWindow(object):
 
 def main():
     """Run the program."""
+    if len(sys.argv) > 1 and sys.argv[1] == '--sample-config':
+        settings = Settings()
+        settings.save("gtimelogrc.sample")
+        print "Sample configuration file written to gtimelogrc.sample"
+        return
+
     configdir = os.path.expanduser('~/.gtimelog')
     try:
         os.makedirs(configdir) # create it if it doesn't exist

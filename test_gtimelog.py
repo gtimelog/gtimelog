@@ -35,7 +35,6 @@ def doctest_format_short():
 
     """
 
-
 def doctest_format_duration_long():
     """Tests for format_duration_long.
 
@@ -128,6 +127,77 @@ def doctest_different_days():
 
     """
 
+def doctest_first_of_month():
+    """Tests for first_of_month
+
+        >>> from gtimelog import first_of_month
+        >>> from datetime import date, timedelta
+
+        >>> first_of_month(date(2007, 1, 1))
+        datetime.date(2007, 1, 1)
+
+        >>> first_of_month(date(2007, 1, 7))
+        datetime.date(2007, 1, 1)
+
+        >>> first_of_month(date(2007, 1, 31))
+        datetime.date(2007, 1, 1)
+
+        >>> first_of_month(date(2007, 2, 1))
+        datetime.date(2007, 2, 1)
+
+        >>> first_of_month(date(2007, 2, 28))
+        datetime.date(2007, 2, 1)
+
+        >>> first_of_month(date(2007, 3, 1))
+        datetime.date(2007, 3, 1)
+
+    Why not test extensively?
+
+        >>> d = date(2000, 1, 1)
+        >>> while d < date(2005, 1, 1):
+        ...     f = first_of_month(d)
+        ...     if (f.year, f.month, f.day) != (d.year, d.month, 1):
+        ...         print "WRONG: first_of_month(%r) returned %r" % (d, f)
+        ...     d += timedelta(1)
+
+    """
+
+def doctest_next_month():
+    """Tests for next_month
+
+        >>> from gtimelog import next_month
+        >>> from datetime import date, timedelta
+
+        >>> next_month(date(2007, 1, 1))
+        datetime.date(2007, 2, 1)
+
+        >>> next_month(date(2007, 1, 7))
+        datetime.date(2007, 2, 1)
+
+        >>> next_month(date(2007, 1, 31))
+        datetime.date(2007, 2, 1)
+
+        >>> next_month(date(2007, 2, 1))
+        datetime.date(2007, 3, 1)
+
+        >>> next_month(date(2007, 2, 28))
+        datetime.date(2007, 3, 1)
+
+        >>> next_month(date(2007, 3, 1))
+        datetime.date(2007, 4, 1)
+
+    Why not test extensively?
+
+        >>> d = date(2000, 1, 1)
+        >>> while d < date(2005, 1, 1):
+        ...     f = next_month(d)
+        ...     prev = f - timedelta(1)
+        ...     if f.day != 1 or (prev.year, prev.month) != (d.year, d.month):
+        ...         print "WRONG: next_month(%r) returned %r" % (d, f)
+        ...     d += timedelta(1)
+
+    """
+
 def doctest_uniq():
     """Tests for uniq
 
@@ -138,6 +208,57 @@ def doctest_uniq():
         ['a']
         >>> uniq([])
         []
+
+    """
+
+def doctest_TimeWindow_monthly_report():
+    r"""Tests for TimeWindow.monthly_report
+
+        >>> import sys
+
+        >>> from datetime import datetime, time
+        >>> from tempfile import NamedTemporaryFile
+        >>> from gtimelog import TimeWindow
+
+        >>> vm = time(2, 0)
+        >>> min = datetime(2007, 9, 1)
+        >>> max = datetime(2007, 10, 1)
+        >>> fh = NamedTemporaryFile()
+
+        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window.monthly_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        To: foo@bar.com
+        Subject: Monthly report for Bob Jones (2007/09)
+        <BLANKLINE>
+        No work done this month.
+
+        >>> _ = [fh.write(s + '\n') for s in [
+        ...    '2007-09-30 09:00: start',
+        ...    '2007-09-30 09:23: Bing: stuff',
+        ...    '2007-09-30 12:54: Bong: other stuff',
+        ...    '2007-09-30 13:32: lunch **',
+        ...    '2007-09-30 15:46: misc',
+        ...    '']]
+        >>> fh.flush()
+
+        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window.monthly_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        To: foo@bar.com
+        Subject: Monthly report for Bob Jones (2007/09)
+        <BLANKLINE>
+        <BLANKLINE>
+        Bing: stuff                                                     23 min
+        Bong: other stuff                                               3 hours 31 min
+        Misc                                                            2 hours 14 min
+        <BLANKLINE>
+        Total work done this month: 6 hours 8 min
+        <BLANKLINE>
+        By category:
+        <BLANKLINE>
+        Bing                                                            23 min
+        Bong                                                            3 hours 31 min
+        (none)                                                          2 hours 14 min
+        <BLANKLINE>
 
     """
 

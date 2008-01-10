@@ -6,8 +6,8 @@ import sys
 import getopt
 import datetime
 
-def read_timelog():
-    return file('timelog.txt')
+def read_timelog(filename):
+    return file(filename)
 
 def todays_entries(today, lines):
     # assume "day turnover" at 2 am
@@ -92,7 +92,11 @@ def print_diffs(iter):
 
 
 def main(argv=sys.argv):
-    opts, args = getopt.getopt(argv[1:], 'h', ['help'])
+    filename = 'timelog.txt'
+    opts, args = getopt.getopt(argv[1:], 'hf:', ['help'])
+    for k, v in opts:
+        if k == '-f':
+            filename = v
     if len(args) > 1:
         print >> sys.stderr, "too many arguments"
     elif len(args) == 1:
@@ -109,7 +113,7 @@ def main(argv=sys.argv):
     title = "Today, %s" % today.strftime('%Y-%m-%d')
     print title
     print "-" * len(title)
-    chain = read_timelog()
+    chain = read_timelog(filename)
     chain = todays_entries(today, chain)
     chain = calculate_diffs(chain)
     first_time, last_time, total_time, total_slack = print_diffs(chain)

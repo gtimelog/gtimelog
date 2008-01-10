@@ -6,6 +6,14 @@ with a scrollbar, and add an entry for an existing activity.
 
 Midnight handling sometimes acts funny and you need to refresh the view.
 
+Tray icon is not transparent in KDE (reported by Felipe Rafael Prenholato).
+
+
+Planned refactorings
+--------------------
+
+Use GtkStatusIcon (available in gtk 2.10+) instead of EggTrayIcon
+
 
 Unimplemented features
 ----------------------
@@ -19,5 +27,9 @@ History browsing.
 Better integration with GNOME (gconf for options, use user's preferred editor
 and mailer).
 
-More options: "virtual midnight" (currently hardcoded at 2 am).
+Option to disable time display in tray icon, it doesn't look good on vertical
+panels (suggested by Felipe Rafael Prenholato).
 
+Monthly reports (Dafydd Harries sent a patch)
+
+Group items by category in weekly reports
