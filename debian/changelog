@@ -1,3 +1,20 @@
+gtimelog (0.0+svn88-0ubuntu1) hardy; urgency=low
+
+  * New svn snapshot (LP: #124911)
+    - add accelerator to the edit menu entry
+      (thanks to Kees Cook <kees@ubuntu.com>) (Closes: #455549)
+  * Add dpatch magic in debian/patches/01-glade.dpatch and refresh
+  * Drop debian/patches/02-gtimelog.dpatch: not needed any more
+  * Drop debian/patches/03-wrap_fix.dpatch: merged upstream
+  * debian/control:
+    - Bump Standards-Version
+    - Add Homepage field
+    - Add Vcs-Svn field
+    - Drop vim-gnome dependency to Suggests (Closes: #438858)
+  * Switch to dh_pysupport instead of dh_python
+
+ -- Laurent Bigonville <bigon@ubuntu.com>  Sun, 06 Jan 2008 22:34:47 +0100
+
 gtimelog (0.0+svn65-1debian2) unstable; urgency=low
 
   * debian/control:

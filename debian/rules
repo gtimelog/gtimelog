@@ -29,7 +29,7 @@ binary-indep: install
 	dh_installman debian/gtimelog.1
 	dh_installinit 
 	dh_compress
-	dh_python
+	dh_pysupport
 	dh_fixperms
 	dh_installdeb
 	dh_gencontrol

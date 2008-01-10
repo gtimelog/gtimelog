@@ -1,26 +1,14 @@
-#! /bin/sh -e
+#! /bin/sh /usr/share/dpatch/dpatch-run
 ## glade.dpatch
 ## Gustavo Franco <stratus@debian.org>
 ##
 ## All lines beginning with `## DP:' are a description of the patch.
 ## DP: Fixes gtimelog.png path in gtimelog.glade
 
-if [ $# -ne 1 ]; then
-    echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
-    exit 1
-fi
-case "$1" in
-    -patch) patch -f --no-backup-if-mismatch -p0 < $0;;
-    -unpatch) patch -f --no-backup-if-mismatch -R -p0 < $0;;
-    *)
-        echo >&2 "`basename $0`: script expects -patch|-unpatch as argument"
-        exit 1;;
-esac
-
-exit 0
-
---- gtimelog.glade	2006-02-02 12:20:54.000000000 -0200
-+++ gtimelog.glade	2006-02-02 12:21:10.000000000 -0200
+@DPATCH@
+diff -urNad gtimelog-0.0+svn88~/gtimelog.glade gtimelog-0.0+svn88/gtimelog.glade
+--- gtimelog-0.0+svn88~/gtimelog.glade	2008-01-03 23:21:37.000000000 +0100
++++ gtimelog-0.0+svn88/gtimelog.glade	2008-01-03 23:35:31.000000000 +0100
 @@ -13,7 +13,7 @@
    <property name="default_height">500</property>
    <property name="resizable">True</property>

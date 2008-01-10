@@ -1,16 +1,19 @@
 Source: gtimelog
 Section: admin
 Priority: optional
+XS-Python-Version: >= 2.3
 Maintainer: Utnubu Team <utnubu-maintainers@lists.alioth.debian.org>
 Uploaders: Gustavo Franco <stratus@debian.org>
-Build-Depends: debhelper (>= 5.0.0), dpatch (>= 2.0.16), python
-Standards-Version: 3.7.2
+Build-Depends: debhelper (>= 5.0.0), dpatch (>= 2.0.16), python, python-support (>= 0.5.3)
+Standards-Version: 3.7.3
+Homepage: http://mg.pov.lt/gtimelog/
+Vcs-Svn: svn://svn.debian.org/utnubu/packages/gtimelog
 
 Package: gtimelog
 Architecture: all
-Depends: ${python:Depends}, python-gtk2 (>= 1.99.14-1), python-glade2, vim-gnome
-Suggests: mutt
+Depends: ${python:Depends}, python-gtk2 (>= 1.99.14-1), python-glade2
+Suggests: mutt, vim-gnome
+XB-Python-Version: ${python:Versions}
 Description: minimal timelogging system
  gtimelog provides a time tracking application to allow the user to track what
  they work on during the day and how long they spend doing it.
-

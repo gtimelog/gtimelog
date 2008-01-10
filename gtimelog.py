@@ -2,7 +2,7 @@
 """
 A Gtk+ application for keeping track of time.
 
-$Id$
+$Id: gtimelog.py 85 2007-11-10 17:23:00Z mg $
 """
 
 import re
