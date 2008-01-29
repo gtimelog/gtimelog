@@ -5,6 +5,8 @@ gtimelog (0.0+svn88-1) UNRELEASED; urgency=low
   * Incorporate bigon's changes from Ubuntu into Debian, see below
     - Edit menu entry has an accelerator (closes: #455549)
     - No longer depends on vim-gnome (closes: #438858)
+  * Move python and python-support to Build-Depends-Indep (not needed for
+    clean)
   * Set XS-Dm-Upload-Allowed: yes so I can upload it
 
  -- Simon McVittie <smcv@ianadd.pseudorandom.co.uk>  Thu, 10 Jan 2008 09:22:39 +0000
