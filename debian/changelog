@@ -7,6 +7,7 @@ gtimelog (0.0+svn88-1) UNRELEASED; urgency=low
     - No longer depends on vim-gnome (closes: #438858)
   * Move python and python-support to Build-Depends-Indep (not needed for
     clean)
+  * Add debian/pyversions, which python-support wants for versioning (*sigh*)
   * Set XS-Dm-Upload-Allowed: yes so I can upload it
 
  -- Simon McVittie <smcv@ianadd.pseudorandom.co.uk>  Thu, 10 Jan 2008 09:22:39 +0000
