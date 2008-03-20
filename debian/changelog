@@ -1,4 +1,4 @@
-gtimelog (0.0+svn88-1) UNRELEASED; urgency=low
+gtimelog (0.0+svn88-1) unstable; urgency=low
 
   * New maintainers Simon McVittie and Dafydd Harries (closes: #459596)
   * New VCS (moved to collab-maint bzr)
