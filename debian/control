@@ -13,7 +13,8 @@ XS-Dm-Upload-Allowed: yes
 
 Package: gtimelog
 Architecture: all
-Depends: ${python:Depends}, python-gtk2 (>= 1.99.14-1), python-glade2
+Depends: ${python:Depends}, python-gtk2 (>= 1.99.14-1), python-glade2,
+         python-gnome2-extras
 Suggests: mutt, vim-gnome
 XB-Python-Version: ${python:Versions}
 Description: minimal timelogging system
