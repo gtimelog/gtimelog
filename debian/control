@@ -2,7 +2,7 @@ Source: gtimelog
 Section: admin
 Priority: optional
 XS-Python-Version: >= 2.3
-Maintainer: Simon McVittie <smcv@ianadd.pseudorandom.co.uk>
+Maintainer: Simon McVittie <smcv@debian.org>
 Uploaders: Gustavo Franco <stratus@debian.org>, Dafydd Harries <daf@debian.org>
 Build-Depends: debhelper (>= 5.0.0), dpatch (>= 2.0.16)
 Build-Depends-Indep: python, python-support (>= 0.5.3)
