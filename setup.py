@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='gtimelog',
-    version='0.0.85',
+    version='0.2.0',
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
     url='http://mg.pov.lt/gtimelog/',
@@ -17,8 +17,9 @@ setup(
     ],
 
     packages=['gtimelog'],
-    package_dir={'gtimelog': '.'},
+    package_dir={'gtimelog': 'src/gtimelog'},
     package_data={'gtimelog': ['*.glade', '*.png']},
+    test_suite='gtimelog.test_gtimelog',
     zip_safe=False,
     entry_points="""
     [console_scripts]

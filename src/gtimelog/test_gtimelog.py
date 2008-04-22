@@ -3,6 +3,10 @@
 Tests for gtimelog.py
 """
 
+import doctest
+import unittest
+
+
 def doctest_format_duration():
     """Tests for format_duration.
 
@@ -262,8 +266,10 @@ def doctest_TimeWindow_monthly_report():
 
     """
 
+
+def additional_tests(): # for setup.py
+    return doctest.DocTestSuite()
+
+
 if __name__ == '__main__':
-    import doctest
-    fail, total = doctest.testmod()
-    if not fail:
-        print "%d tests passed." % total
+    unittest.main(defaultTest='additional_tests')
