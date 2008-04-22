@@ -4,7 +4,11 @@ from setuptools import setup
 
 here = os.path.dirname(__file__)
 changes_file = os.path.join(here, 'NEWS.txt')
-changes_in_latest_version = file(changes_file).read().split('\n\n\n', 1)[0]
+changes = file(changes_file).read().split('\n\n\n')
+changes_in_latest_versions = '\n\n\n'.join(changes[:3])
+
+short_description = 'A Gtk+ time tracking application'
+long_description = short_description + '.' # for now
 
 setup(
     name='gtimelog',
@@ -12,8 +16,8 @@ setup(
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
     url='http://mg.pov.lt/gtimelog/',
-    description='A Gtk+ time tracking application',
-    long_description=changes_in_latest_version,
+    description=short_description,
+    long_description=long_description + '\n\n' + changes_in_latest_versions,
     license='GPL',
     classifiers = [
         'Development Status :: 3 - Alpha',
