@@ -1,0 +1,27 @@
+Changes in version 0.2.1
+========================
+
+* Entries with `***` are skipped from reports (bug 209750)
+* Help -> Online Documentation opens a browser with some help (bug 209754)
+* View -> Tasks allows you to hide the Tasks pane (bug 220773)
+
+
+Changes in version 0.2.0
+========================
+
+* Reorganize the source tree properly.
+* Bump intermediate revision number to celebrate.
+
+
+Changes in version 0.0.85
+=========================
+
+* First setuptools-based release (`easy_install gtimelog` now works).
+
+
+Changes in older versions
+=========================
+
+You'll have to dig through Subversion logs to discover those, if you're really
+that interested: http://mg.pov.lt/gtimelog/trac/log
+
