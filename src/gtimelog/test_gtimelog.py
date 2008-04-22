@@ -271,5 +271,9 @@ def additional_tests(): # for setup.py
     return doctest.DocTestSuite()
 
 
+def main():
+    unittest.TextTestRunner().run(additional_tests())
+
+
 if __name__ == '__main__':
-    unittest.main(defaultTest='additional_tests')
+    main()
