@@ -450,7 +450,7 @@
 
 GTimeLog is a time tracking application.
 
-&lt;small&gt;© 2004, 2005, 2006 Marius Gedminas&lt;/small&gt;</property>
+&lt;small&gt;© 2004–2008 Marius Gedminas&lt;/small&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="justify">GTK_JUSTIFY_CENTER</property>
               </widget>
