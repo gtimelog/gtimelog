@@ -805,13 +805,11 @@ class TrayIcon(object):
 class MainWindow(object):
     """Main application window."""
 
+    # Initial view mode
     chronological = True
-    footer_mark = None
+    show_tasks = True
 
-    # Try to prevent timer routines mucking with the buffer while we're
-    # mucking with the buffer.  Not sure if it is necessary.
-    lock = False
-
+    # URL to use for Help -> Online Documentation
     help_url = "http://mg.pov.lt/gtimelog"
 
     def __init__(self, timelog, settings, tasks):
@@ -820,9 +818,24 @@ class MainWindow(object):
         self.settings = settings
         self.tasks = tasks
         self.last_tick = None
+        self.footer_mark = None
+        # Try to prevent timer routines mucking with the buffer while we're
+        # mucking with the buffer.  Not sure if it is necessary.
+        self.lock = False
         self.entry_watchers = []
+        self._init_ui()
+
+    def _init_ui(self):
+        """Initialize the user interface."""
         tree = gtk.glade.XML(ui_file)
+        # Set initial state of menu items *before* we hook up signals
+        chronological_menu_item = tree.get_widget("chronological")
+        chronological_menu_item.set_active(self.chronological)
+        show_task_pane_item = tree.get_widget("show_task_pane")
+        show_task_pane_item.set_active(self.show_tasks)
+        # Now hook up signals
         tree.signal_autoconnect(self)
+        # Store references to UI elements we're going to need later
         self.tray_icon_popup_menu = tree.get_widget("tray_icon_popup_menu")
         self.tray_show = tree.get_widget("tray_show")
         self.tray_hide = tree.get_widget("tray_hide")
@@ -838,10 +851,12 @@ class MainWindow(object):
         self.log_view = tree.get_widget("log_view")
         self.set_up_log_view_columns()
         self.task_pane = tree.get_widget("task_list_pane")
+        if not self.show_tasks:
+            self.task_pane.hide()
         self.task_pane_info_label = tree.get_widget("task_pane_info_label")
-        tasks.loading_callback = self.task_list_loading
-        tasks.loaded_callback = self.task_list_loaded
-        tasks.error_callback = self.task_list_error
+        self.tasks.loading_callback = self.task_list_loading
+        self.tasks.loaded_callback = self.task_list_loaded
+        self.tasks.error_callback = self.task_list_error
         self.task_list = tree.get_widget("task_list")
         self.task_store = gtk.TreeStore(str, str)
         self.task_list.set_model(self.task_store)
