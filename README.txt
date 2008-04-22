@@ -70,6 +70,8 @@ weekly reports for past days and weeks).
 Other Tools
 -----------
 
+These can be found in scripts/
+
 timelog.py is an earlier, less powerful text-mode version of gtimelog.  You
 type in activity names, and timelog writes them down into timelog.txt with
 timestamps prepended.
