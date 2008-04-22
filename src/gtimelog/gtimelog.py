@@ -837,6 +837,7 @@ class MainWindow(object):
         self.main_window.connect("delete_event", self.delete_event)
         self.log_view = tree.get_widget("log_view")
         self.set_up_log_view_columns()
+        self.task_pane = tree.get_widget("task_list_pane")
         self.task_pane_info_label = tree.get_widget("task_pane_info_label")
         tasks.loading_callback = self.task_list_loading
         tasks.loaded_callback = self.task_list_loaded
@@ -1228,6 +1229,13 @@ class MainWindow(object):
         self.set_up_history()
         self.populate_log()
         self.tick(True)
+
+    def on_show_task_pane_toggled(self, event):
+        """View -> Tasks"""
+        if self.task_pane.get_property("visible"):
+            self.task_pane.hide()
+        else:
+            self.task_pane.show()
 
     def task_list_row_activated(self, treeview, path, view_column):
         """A task was selected in the task pane -- put it to the entry."""
