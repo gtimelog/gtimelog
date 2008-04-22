@@ -252,6 +252,8 @@ class TimeWindow(object):
             if skip_first:
                 skip_first = False
                 continue
+            if '***' in entry:
+                continue
             if '**' in entry:
                 entries = slack
             else:
