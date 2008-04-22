@@ -812,6 +812,8 @@ class MainWindow(object):
     # mucking with the buffer.  Not sure if it is necessary.
     lock = False
 
+    help_url = "http://mg.pov.lt/gtimelog"
+
     def __init__(self, timelog, settings, tasks):
         """Create the main window."""
         self.timelog = timelog
@@ -1076,6 +1078,11 @@ class MainWindow(object):
     def on_about_activate(self, widget):
         """Help -> About selected"""
         self.about_dialog.show()
+
+    def on_online_help_activate(self, widget):
+        """Help -> Online Documentation selected"""
+        import webbrowser
+        webbrowser.open(self.help_url)
 
     def on_chronological_activate(self, widget):
         """View -> Chronological"""
