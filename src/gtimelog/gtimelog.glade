@@ -268,10 +268,11 @@
                 <child>
                   <widget class="GtkMenu" id="menuitem4_menu">
                     <child>
-                      <widget class="GtkMenuItem" id="about">
+                      <widget class="GtkImageMenuItem" id="about">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">_About</property>
+                        <property name="label" translatable="yes">gtk-about</property>
                         <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
                         <signal name="activate" handler="on_about_activate"/>
                       </widget>
                     </child>
