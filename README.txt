@@ -68,7 +68,7 @@ weekly reports for past days and weeks).
 Bugs
 ----
 
-See http://launchpad.net/gtimelog/+bugs
+See http://bugs.launchpad.net/gtimelog/
 
 
 Other Tools
