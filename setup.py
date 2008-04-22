@@ -3,7 +3,7 @@ from setuptools import setup
 
 setup(
     name='gtimelog',
-    version='0.2.0',
+    version='0.2.1',
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
     url='http://mg.pov.lt/gtimelog/',
