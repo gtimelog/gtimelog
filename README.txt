@@ -65,6 +65,12 @@ Configuration dialog.  The ability to browse through history (view daily and
 weekly reports for past days and weeks).
 
 
+Bugs
+----
+
+See http://launchpad.net/gtimelog/+bugs
+
+
 Other Tools
 -----------
 
@@ -174,3 +180,8 @@ Icon
 gtimelog.png is really a renamed copy of gnome-set-time.png from
 /usr/share/pixmaps/
 
+
+Web
+---
+
+http://mg.pov.lt/gtimelog
