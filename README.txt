@@ -1,14 +1,7 @@
-Time Tracking Tools
--------------------
-
-This package contains a bunch of Python scripts that I use to keep track of
-my (working, mostly) time.
-
-
 GTimeLog
 --------
 
-The most interesting of those is GTimeLog, which is a Gtk+ application.  Here's
+GTimeLog is a graphical (Gtk+) application for keeping track of time.  Here's
 how it works: every day, when you arrive to work, start up gtimelog and type
 "arrived".  Then start doing some activity (e.g. reading mail, or working on
 a task).  Whenever you stop doing an activity (either when you have finished
@@ -33,6 +26,11 @@ which activities are not work related add two asterisks to the activity name:
   lunch **
   browsing slashdot **
   napping on the couch **
+
+If you want some activity (or non-activity) to be completely omitted from the
+reports, use three asterisks:
+
+  break ***
 
 GTimeLog displays all the things you've done today, and calculates the total
 time you spent working, and the total time you spent "slacking".  It also
