@@ -1042,6 +1042,7 @@ class MainWindow(object):
         if not self.have_completion:
             return
         seen = sets.Set()
+        self.completion_choices.clear()
         for entry in self.history:
             if entry not in seen:
                 seen.add(entry)
