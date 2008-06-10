@@ -982,6 +982,19 @@ class MainWindow(object):
             self.w(time_to_leave.strftime('%H:%M'), 'time')
             self.w(')')
 
+        self.w('\nAt office today: ')
+        hours = datetime.timedelta(hours=self.settings.hours)
+        total = total_slacking + total_work
+        self.w("%s " % format_duration(total), 'duration' )
+        self.w('(')
+        if total > hours:
+            self.w(format_duration(total - hours), 'duration')
+            self.w(' overtime')
+        else:
+            self.w(format_duration(hours - total), 'duration')
+            self.w(' left')
+        self.w(')')
+
     def time_left_at_work(self, total_work):
         """Calculate time left to work."""
         last_time = self.timelog.window.last_time()
