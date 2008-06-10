@@ -1,3 +1,10 @@
+Changes not yet released
+========================
+
+* Show time spent at the office
+  (https://bugs.launchpad.net/gtimelog/+bug/238515).
+
+
 Changes in version 0.2.3
 ========================
 
