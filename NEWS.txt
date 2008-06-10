@@ -1,3 +1,12 @@
+Changes in version 0.2.3
+========================
+
+* Fix duplicates in the completion popup after you reload the log file
+  (https://bugs.launchpad.net/gtimelog/+bug/238505).
+* Change status to Beta in setup.py -- while I still consider it to be
+  less polished than it should, there are people who find it useful already.
+
+
 Changes in version 0.2.2
 ========================
 

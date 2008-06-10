@@ -12,7 +12,7 @@ long_description = short_description + '.' # for now
 
 setup(
     name='gtimelog',
-    version='0.2.2',
+    version='0.2.3',
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
     url='http://mg.pov.lt/gtimelog/',
@@ -20,7 +20,7 @@ setup(
     long_description=long_description + '\n\n' + changes_in_latest_versions,
     license='GPL',
     classifiers = [
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Environment :: X11 Applications :: GTK',
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Topic :: Office/Business',
