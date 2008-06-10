@@ -172,6 +172,7 @@ Contributors
 Thom May
 Dafydd Harries
 Ignas Mikalajūnas
+Gaute Amundsen
 
 
 Icon
