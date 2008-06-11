@@ -745,6 +745,7 @@ class TrayIcon(object):
         self.eventbox.connect("button-release-event", self.on_release)
         gobject.timeout_add(1000, self.tick)
         self.gtimelog_window.entry_watchers.append(self.entry_added)
+        self.gtimelog_window.tray_icon = self
 
     def on_press(self, widget, event):
         """A mouse button was pressed on the tray icon label."""
@@ -817,6 +818,7 @@ class MainWindow(object):
         self.timelog = timelog
         self.settings = settings
         self.tasks = tasks
+        self.tray_icon = None
         self.last_tick = None
         self.footer_mark = None
         # Try to prevent timer routines mucking with the buffer while we're
@@ -1086,8 +1088,12 @@ class MainWindow(object):
 
     def delete_event(self, widget, data=None):
         """Try to close the window."""
-        self.main_window.hide()
-        return True
+        if self.tray_icon:
+            self.main_window.hide()
+            return True
+        else:
+            gtk.main_quit()
+            return False
 
     def close_about_dialog(self, widget):
         """Ok clicked in the about dialog."""
