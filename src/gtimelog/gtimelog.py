@@ -1086,8 +1086,8 @@ class MainWindow(object):
 
     def delete_event(self, widget, data=None):
         """Try to close the window."""
-        gtk.main_quit()
-        return False
+        self.main_window.hide()
+        return True
 
     def close_about_dialog(self, widget):
         """Ok clicked in the about dialog."""

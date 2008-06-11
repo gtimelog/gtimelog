@@ -3,6 +3,8 @@ Changes not yet released
 
 * Show time spent at the office
   (https://bugs.launchpad.net/gtimelog/+bug/238515).
+* Closing the main window minimizes GTimeLog to the system tray
+  (https://bugs.launchpad.net/gtimelog/+bug/239271)
 
 
 Changes in version 0.2.3
