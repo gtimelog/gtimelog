@@ -671,6 +671,8 @@ class Settings(object):
     task_list_url = ''
     edit_task_list_cmd = ''
 
+    show_office_hours = True
+
     def _config(self):
         config = ConfigParser.RawConfigParser()
         config.add_section('gtimelog')
@@ -686,6 +688,8 @@ class Settings(object):
                    self.virtual_midnight.strftime('%H:%M'))
         config.set('gtimelog', 'task_list_url', self.task_list_url)
         config.set('gtimelog', 'edit_task_list_cmd', self.edit_task_list_cmd)
+        config.set('gtimelog', 'show_office_hours',
+                   str(self.show_office_hours))
         return config
 
     def load(self, filename):
@@ -703,6 +707,8 @@ class Settings(object):
                                                       'virtual_midnight'))
         self.task_list_url = config.get('gtimelog', 'task_list_url')
         self.edit_task_list_cmd = config.get('gtimelog', 'edit_task_list_cmd')
+        self.show_office_hours = config.getboolean('gtimelog',
+                                                   'show_office_hours')
 
     def save(self, filename):
         config = self._config()
@@ -984,18 +990,19 @@ class MainWindow(object):
             self.w(time_to_leave.strftime('%H:%M'), 'time')
             self.w(')')
 
-        self.w('\nAt office today: ')
-        hours = datetime.timedelta(hours=self.settings.hours)
-        total = total_slacking + total_work
-        self.w("%s " % format_duration(total), 'duration' )
-        self.w('(')
-        if total > hours:
-            self.w(format_duration(total - hours), 'duration')
-            self.w(' overtime')
-        else:
-            self.w(format_duration(hours - total), 'duration')
-            self.w(' left')
-        self.w(')')
+        if self.settings.show_office_hours:
+            self.w('\nAt office today: ')
+            hours = datetime.timedelta(hours=self.settings.hours)
+            total = total_slacking + total_work
+            self.w("%s " % format_duration(total), 'duration' )
+            self.w('(')
+            if total > hours:
+                self.w(format_duration(total - hours), 'duration')
+                self.w(' overtime')
+            else:
+                self.w(format_duration(hours - total), 'duration')
+                self.w(' left')
+            self.w(')')
 
     def time_left_at_work(self, total_work):
         """Calculate time left to work."""
