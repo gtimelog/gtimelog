@@ -2,7 +2,7 @@ Source: gtimelog
 Section: admin
 Priority: optional
 XS-Python-Version: >= 2.3
-Maintainer: Simon McVittie <smcv@ianadd.pseudorandom.co.uk>
+Maintainer: Simon McVittie <smcv@debian.org>
 Uploaders: Gustavo Franco <stratus@debian.org>, Dafydd Harries <daf@debian.org>
 Build-Depends: debhelper (>= 5.0.0), dpatch (>= 2.0.16)
 Build-Depends-Indep: python, python-support (>= 0.5.3)
@@ -14,7 +14,7 @@ XS-Dm-Upload-Allowed: yes
 Package: gtimelog
 Architecture: all
 Depends: ${python:Depends}, python-gtk2 (>= 1.99.14-1), python-glade2,
-         python-gnome2-extras
+         python-eggtrayicon | python-gnome2-extras (<< 2.19.1-1)
 Suggests: mutt, vim-gnome
 XB-Python-Version: ${python:Versions}
 Description: minimal timelogging system
