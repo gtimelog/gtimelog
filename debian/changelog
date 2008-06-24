@@ -2,6 +2,7 @@ gtimelog (0.0+svn88-3) UNRELEASED; urgency=low
 
   * Use my debian.org address
   * Depend on python-eggtrayicon in preference to python-gnome2-extras
+    (closes: #485317, #418885)
 
  -- Simon McVittie <smcv@debian.org>  Tue, 24 Jun 2008 00:46:46 +0100
 
