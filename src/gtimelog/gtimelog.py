@@ -40,6 +40,11 @@ def as_minutes(duration):
     return duration.days * 24 * 60 + duration.seconds // 60
 
 
+def as_hours(duration):
+    """Convert a datetime.timedelta to a float number of hours."""
+    return duration.days * 24.0 + duration.seconds / (60.0 * 60.0)
+
+
 def format_duration(duration):
     """Format a datetime.timedelta with minute precision."""
     h, m = divmod(as_minutes(duration), 60)
@@ -161,7 +166,13 @@ class TimeWindow(object):
         self.items = []
         self.earliest_timestamp = None
         try:
-            f = open(self.filename)
+            # accept any file-like object
+            # this is a hook for unit tests, really
+            if hasattr(self.filename, 'read'):
+                f = self.filename
+                f.seek(0)
+            else:
+                f = open(self.filename)
         except IOError:
             return
         line = ''
@@ -181,6 +192,9 @@ class TimeWindow(object):
                     self.earliest_timestamp = time
                 if self.min_timestamp <= time < self.max_timestamp:
                     self.items.append((time, entry))
+        # The entries really should be already sorted in the file
+        # XXX: instead of quietly resorting them we should inform the user
+        self.items.sort() # there's code that relies on them being sorted
         f.close()
 
     def last_time(self):
@@ -320,7 +334,7 @@ class TimeWindow(object):
             print >> output, "END:VEVENT"
         print >> output, "END:VCALENDAR"
 
-    def to_csv(self, output, title_row=True):
+    def to_csv_complete(self, output, title_row=True):
         """Export work entries to a CSV file.
 
         The file has two columns: task title and time (in minutes).
@@ -334,6 +348,48 @@ class TimeWindow(object):
                 if duration] # skip empty "arrival" entries
         work.sort()
         writer.writerows(work)
+
+    def to_csv_daily(self, output, title_row=True):
+        """Export daily work, slacking, and arrival times to a CSV file.
+
+        The file has four columns: date, time from midnight til arrival at
+        work, slacking, and work (in decimal hours).
+        """
+        writer = csv.writer(output)
+        if title_row:
+            writer.writerow(["date", "day-start (hours)",
+                             "slacking (hours)", "work (hours)"])
+
+        # sum timedeltas per date
+        # timelog must be cronological for this to be dependable
+
+        d0 = datetime.timedelta(0)
+        days = {} # date -> [time_started, slacking, work]
+        dmin = None
+        for start, stop, duration, entry in self.all_entries():
+            if dmin is None:
+                dmin = start.date()
+            day = days.setdefault(start.date(),
+                                  [datetime.timedelta(minutes=start.minute,
+                                                      hours=start.hour),
+                                   d0, d0])
+            if '**' in entry:
+                day[1] += duration
+            else:
+                day[2] += duration
+
+        if dmin:
+            # fill in missing dates - aka. weekends
+            dmax = start.date()
+            while dmin <= dmax:
+                days.setdefault(dmin, [d0, d0, d0])
+                dmin += datetime.timedelta(days=1)
+
+        # convert to hours, and a sortable list
+        items = [(day, as_hours(start), as_hours(slacking), as_hours(work))
+                  for day, (start, slacking, work) in days.items()]
+        items.sort()
+        writer.writerows(items)
 
     def daily_report(self, output, email, who):
         """Format a daily report.
@@ -1234,11 +1290,19 @@ class MainWindow(object):
         window = self.monthly_window()
         self.mail(window.monthly_report)
 
-    def on_open_in_spreadsheet_activate(self, widget):
-        """Report -> Open in Spreadsheet"""
+    def on_open_complete_spreadsheet_activate(self, widget):
+        """Report -> Complete Report in Spreadsheet"""
         tempfn = tempfile.mktemp(suffix='gtimelog.csv') # XXX unsafe!
         f = open(tempfn, 'w')
-        self.timelog.whole_history().to_csv(f)
+        self.timelog.whole_history().to_csv_complete(f)
+        f.close()
+        self.spawn(self.settings.spreadsheet, tempfn)
+
+    def on_open_slack_spreadsheet_activate(self, widget):
+        """Report -> Work/_Slacking stats in Spreadsheet"""
+        tempfn = tempfile.mktemp(suffix='gtimelog.csv') # XXX unsafe!
+        f = open(tempfn, 'w')
+        self.timelog.whole_history().to_csv_daily(f)
         f.close()
         self.spawn(self.settings.spreadsheet, tempfn)
 

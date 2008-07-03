@@ -264,11 +264,33 @@
                       </widget>
                     </child>
                     <child>
-                      <widget class="GtkMenuItem" id="open_in_spreadsheet">
+                      <widget class="GtkImageMenuItem" id="open_complete_spreadsheet">
                         <property name="visible">True</property>
-                        <property name="label" translatable="yes">_Open in Spreadsheet</property>
+                        <property name="label" translatable="yes">_Complete Report in Spreadsheet</property>
                         <property name="use_underline">True</property>
-                        <signal name="activate" handler="on_open_in_spreadsheet_activate"/>
+                        <signal name="activate" handler="on_open_complete_spreadsheet_activate"/>
+                        <child internal-child="image">
+                          <widget class="GtkImage" id="image12">
+                            <property name="visible">True</property>
+                            <property name="stock">gtk-file</property>
+                            <property name="icon_size">1</property>
+                          </widget>
+                        </child>
+                      </widget>
+                    </child>
+                    <child>
+                      <widget class="GtkImageMenuItem" id="open_slack_spreadsheet">
+                        <property name="visible">True</property>
+                        <property name="label" translatable="yes">Work/_Slacking stats in Spreadsheet</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="on_open_slack_spreadsheet_activate"/>
+                        <child internal-child="image">
+                          <widget class="GtkImage" id="image13">
+                            <property name="visible">True</property>
+                            <property name="stock">gtk-file</property>
+                            <property name="icon_size">1</property>
+                          </widget>
+                        </child>
                       </widget>
                     </child>
                   </widget>

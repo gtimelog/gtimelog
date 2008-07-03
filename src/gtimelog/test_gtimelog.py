@@ -7,6 +7,22 @@ import doctest
 import unittest
 
 
+def doctest_as_hours():
+    """Tests for as_hours
+
+        >>> from gtimelog import as_hours
+        >>> from datetime import timedelta
+        >>> as_hours(timedelta(0))
+        0.0
+        >>> as_hours(timedelta(minutes=30))
+        0.5
+        >>> as_hours(timedelta(minutes=60))
+        1.0
+        >>> as_hours(timedelta(days=2))
+        48.0
+
+    """
+
 def doctest_format_duration():
     """Tests for format_duration.
 
@@ -266,9 +282,39 @@ def doctest_TimeWindow_monthly_report():
 
     """
 
+def doctest_TimeWindow_to_csv_daily():
+    r"""Tests for TimeWindow.to_csv_daily
+
+        >>> from datetime import datetime, time
+        >>> min = datetime(2008, 6, 1)
+        >>> max = datetime(2008, 7, 1)
+        >>> vm = time(2, 0)
+
+        >>> from StringIO import StringIO
+        >>> sampledata = StringIO('''
+        ... 2008-06-03 12:45: start
+        ... 2008-06-03 13:00: something
+        ... 2008-06-03 14:45: something else
+        ... 2008-06-03 15:45: etc
+        ... 2008-06-05 12:45: start
+        ... 2008-06-05 13:15: something
+        ... ''')
+
+        >>> from gtimelog import TimeWindow
+        >>> window = TimeWindow(sampledata, min, max, vm)
+
+        >>> import sys
+        >>> window.to_csv_daily(sys.stdout)
+        date,day-start (hours),slacking (hours),work (hours)
+        2008-06-03,12.75,0.0,3.0
+        2008-06-04,0.0,0.0,0.0
+        2008-06-05,12.75,0.0,0.5
+
+    """
+
 
 def additional_tests(): # for setup.py
-    return doctest.DocTestSuite()
+    return doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE)
 
 
 def main():
