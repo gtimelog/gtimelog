@@ -33,12 +33,14 @@ reports, use three asterisks:
   break ***
 
 GTimeLog displays all the things you've done today, and calculates the total
-time you spent working, and the total time you spent "slacking".  It also
-advises you how much time you still have to work today to get 8 hours of work
-done (the number of hours in a day is configurable in ~/.gtimelog/gtimelogrc).
-There are two basic views: one shows all the activities in chronological order,
-with starting and ending times; while another groups all entries with the same
-into one activity and just shows the total duration.
+time you spent working, the total time you spent "slacking", and the sum total
+for convenience. It also advises you how much time you still have to work today
+to get 8 hours of work done, and how much time is left just to have spent a
+workday at the office (the number of hours in a day is configurable in
+~/.gtimelog/gtimelogrc). There are two basic views: one shows all the
+activities in chronological order, with starting and ending times; while
+another groups all entries with the same into one activity and just shows the
+total duration.
 
 At the end of the day you can send off a daily report by choosing File -> Daily
 Report.  A mail program (Mutt in a terminal, unless you have changed it in
@@ -56,6 +58,13 @@ does not keep the log file open all the time.  You do have to worry about
 overwriting changes made by GTimeLog with your editor -- make sure you do not
 enter any activities in GTimeLog while you have timelog.txt open in a text
 editor.
+
+If you want a more visual idea of how you spend your time you can export the
+"Work/Slacking stats" to a spreadsheet and graph them. You get 4 values per
+line: the date, how long after midnight you started work, and how long you
+spent working and slacking that day, all times in fractional hours.  Starting
+from midnight makes it easy to read the graph scale as the time of day.  Try
+a bargraph with stacked values and both first row and column as labels.
 
 
 Future Plans
