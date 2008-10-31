@@ -5,6 +5,8 @@ Changes not yet released
   (https://bugs.launchpad.net/gtimelog/+bug/238515).
 * Closing the main window minimizes GTimeLog to the system tray
   (https://bugs.launchpad.net/gtimelog/+bug/239271)
+* Ability to time-offset new log item
+  (https://bugs.launchpad.net/bugs/291356)
 
 
 Changes in version 0.2.3
