@@ -581,9 +581,10 @@ class TimeLog(object):
         print >> f, line
         f.close()
 
-    def append(self, entry):
+    def append(self, entry, now=None):
         """Append a new entry to the time log."""
-        now = datetime.datetime.now().replace(second=0, microsecond=0)
+        if not now:
+            now = datetime.datetime.now().replace(second=0, microsecond=0)
         last = self.window.last_time()
         if last and different_days(now, last, self.virtual_midnight):
             # next day: reset self.window
@@ -591,6 +592,14 @@ class TimeLog(object):
         self.window.items.append((now, entry))
         line = '%s: %s' % (now.strftime("%Y-%m-%d %H:%M"), entry)
         self.raw_append(line)
+
+    def valid_time(self, time):
+        if time > datetime.datetime.now():
+            return False
+        last = self.window.last_time()
+        if last and time < last:
+            return False
+        return True
 
 
 class TaskList(object):
@@ -852,7 +861,7 @@ class TrayIcon(object):
     def tip(self):
         """Compute tooltip text."""
         current_task = self.gtimelog_window.task_entry.get_text()
-        if not current_task: 
+        if not current_task:
             current_task = "nothing"
         tip = "GTimeLog: working on %s" % current_task
         total_work, total_slacking = self.timelog.window.totals()
@@ -1201,7 +1210,7 @@ class MainWindow(object):
     def on_yesterdays_report_activate(self, widget):
         """File -> Daily Report for Yesterday"""
         max = self.timelog.window.min_timestamp
-        min = max - datetime.timedelta(1) 
+        min = max - datetime.timedelta(1)
         window = self.timelog.window_for(min, max)
         self.mail(window.daily_report)
 
@@ -1429,10 +1438,33 @@ class MainWindow(object):
     def add_entry(self, widget, data=None):
         """Add the task entry to the log."""
         entry = self.task_entry.get_text()
+
+        now = None
+        date_match = re.match(r'(\d\d):(\d\d)\s+', entry)
+        delta_match = re.match(r'-([1-9]\d?|1\d\d)\s+', entry)
+        if date_match:
+            h = int(date_match.group(1))
+            m = int(date_match.group(2))
+            if 0 <= h < 24 and 0 <= m <= 60:
+                now = datetime.datetime.now()
+                now = now.replace(hour=h, minute=m, second=0, microsecond=0)
+                if self.timelog.valid_time(now):
+                    entry = entry[date_match.end():]
+                else:
+                    now = None
+        if delta_match:
+            seconds = int(delta_match.group()) * 60
+            now = datetime.datetime.now().replace(second=0, microsecond=0)
+            now += datetime.timedelta(seconds=seconds)
+            if self.timelog.valid_time(now):
+                entry = entry[delta_match.end():]
+            else:
+                now = None
+
         if not entry:
             return
         self.add_history(entry)
-        self.timelog.append(entry)
+        self.timelog.append(entry, now)
         if self.chronological:
             self.delete_footer()
             self.write_item(self.timelog.window.last_entry())
@@ -1481,7 +1513,7 @@ def main():
     except OSError:
         pass
     settings = Settings()
-    settings_file = os.path.join(configdir, 'gtimelogrc') 
+    settings_file = os.path.join(configdir, 'gtimelogrc')
     if not os.path.exists(settings_file):
         settings.save(settings_file)
     else:
