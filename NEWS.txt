@@ -1,4 +1,4 @@
-Changes not yet released
+Changes in version 0.2.4
 ========================
 
 * Show time spent at the office
