@@ -12,7 +12,7 @@ long_description = short_description + '.' # for now
 
 setup(
     name='gtimelog',
-    version='0.2.4',
+    version='0.2.5dev',
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
     url='http://mg.pov.lt/gtimelog/',

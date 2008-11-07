@@ -1,3 +1,9 @@
+Changes not yet released
+========================
+
+* none yet
+
+
 Changes in version 0.2.4
 ========================
 
