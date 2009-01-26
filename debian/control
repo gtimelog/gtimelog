@@ -8,7 +8,7 @@ Build-Depends: debhelper (>= 5.0.0), dpatch (>= 2.0.16)
 Build-Depends-Indep: python, python-support (>= 0.5.3)
 Standards-Version: 3.7.3
 Homepage: http://mg.pov.lt/gtimelog/
-Vcs-Bzr: http://bzr.debian.org/bzr/collab-maint/gtimelog/unstable/
+Vcs-Git: git://git.debian.org/git/collab-maint/gtimelog.git
 XS-Dm-Upload-Allowed: yes
 
 Package: gtimelog
