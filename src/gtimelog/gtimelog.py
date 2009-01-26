@@ -2,7 +2,7 @@
 """
 A Gtk+ application for keeping track of time.
 
-$Id: gtimelog.py 85 2007-11-10 17:23:00Z mg $
+$Id$
 """
 
 import re
@@ -38,6 +38,11 @@ if not os.path.exists(icon_file):
 def as_minutes(duration):
     """Convert a datetime.timedelta to an integer number of minutes."""
     return duration.days * 24 * 60 + duration.seconds // 60
+
+
+def as_hours(duration):
+    """Convert a datetime.timedelta to a float number of hours."""
+    return duration.days * 24.0 + duration.seconds / (60.0 * 60.0)
 
 
 def format_duration(duration):
@@ -161,7 +166,13 @@ class TimeWindow(object):
         self.items = []
         self.earliest_timestamp = None
         try:
-            f = open(self.filename)
+            # accept any file-like object
+            # this is a hook for unit tests, really
+            if hasattr(self.filename, 'read'):
+                f = self.filename
+                f.seek(0)
+            else:
+                f = open(self.filename)
         except IOError:
             return
         line = ''
@@ -181,6 +192,9 @@ class TimeWindow(object):
                     self.earliest_timestamp = time
                 if self.min_timestamp <= time < self.max_timestamp:
                     self.items.append((time, entry))
+        # The entries really should be already sorted in the file
+        # XXX: instead of quietly resorting them we should inform the user
+        self.items.sort() # there's code that relies on them being sorted
         f.close()
 
     def last_time(self):
@@ -252,6 +266,8 @@ class TimeWindow(object):
             if skip_first:
                 skip_first = False
                 continue
+            if '***' in entry:
+                continue
             if '**' in entry:
                 entries = slack
             else:
@@ -318,7 +334,7 @@ class TimeWindow(object):
             print >> output, "END:VEVENT"
         print >> output, "END:VCALENDAR"
 
-    def to_csv(self, output, title_row=True):
+    def to_csv_complete(self, output, title_row=True):
         """Export work entries to a CSV file.
 
         The file has two columns: task title and time (in minutes).
@@ -332,6 +348,48 @@ class TimeWindow(object):
                 if duration] # skip empty "arrival" entries
         work.sort()
         writer.writerows(work)
+
+    def to_csv_daily(self, output, title_row=True):
+        """Export daily work, slacking, and arrival times to a CSV file.
+
+        The file has four columns: date, time from midnight til arrival at
+        work, slacking, and work (in decimal hours).
+        """
+        writer = csv.writer(output)
+        if title_row:
+            writer.writerow(["date", "day-start (hours)",
+                             "slacking (hours)", "work (hours)"])
+
+        # sum timedeltas per date
+        # timelog must be cronological for this to be dependable
+
+        d0 = datetime.timedelta(0)
+        days = {} # date -> [time_started, slacking, work]
+        dmin = None
+        for start, stop, duration, entry in self.all_entries():
+            if dmin is None:
+                dmin = start.date()
+            day = days.setdefault(start.date(),
+                                  [datetime.timedelta(minutes=start.minute,
+                                                      hours=start.hour),
+                                   d0, d0])
+            if '**' in entry:
+                day[1] += duration
+            else:
+                day[2] += duration
+
+        if dmin:
+            # fill in missing dates - aka. weekends
+            dmax = start.date()
+            while dmin <= dmax:
+                days.setdefault(dmin, [d0, d0, d0])
+                dmin += datetime.timedelta(days=1)
+
+        # convert to hours, and a sortable list
+        items = [(day, as_hours(start), as_hours(slacking), as_hours(work))
+                  for day, (start, slacking, work) in days.items()]
+        items.sort()
+        writer.writerows(items)
 
     def daily_report(self, output, email, who):
         """Format a daily report.
@@ -523,9 +581,10 @@ class TimeLog(object):
         print >> f, line
         f.close()
 
-    def append(self, entry):
+    def append(self, entry, now=None):
         """Append a new entry to the time log."""
-        now = datetime.datetime.now().replace(second=0, microsecond=0)
+        if not now:
+            now = datetime.datetime.now().replace(second=0, microsecond=0)
         last = self.window.last_time()
         if last and different_days(now, last, self.virtual_midnight):
             # next day: reset self.window
@@ -533,6 +592,14 @@ class TimeLog(object):
         self.window.items.append((now, entry))
         line = '%s: %s' % (now.strftime("%Y-%m-%d %H:%M"), entry)
         self.raw_append(line)
+
+    def valid_time(self, time):
+        if time > datetime.datetime.now():
+            return False
+        last = self.window.last_time()
+        if last and time < last:
+            return False
+        return True
 
 
 class TaskList(object):
@@ -669,6 +736,8 @@ class Settings(object):
     task_list_url = ''
     edit_task_list_cmd = ''
 
+    show_office_hours = True
+
     def _config(self):
         config = ConfigParser.RawConfigParser()
         config.add_section('gtimelog')
@@ -684,6 +753,8 @@ class Settings(object):
                    self.virtual_midnight.strftime('%H:%M'))
         config.set('gtimelog', 'task_list_url', self.task_list_url)
         config.set('gtimelog', 'edit_task_list_cmd', self.edit_task_list_cmd)
+        config.set('gtimelog', 'show_office_hours',
+                   str(self.show_office_hours))
         return config
 
     def load(self, filename):
@@ -701,6 +772,8 @@ class Settings(object):
                                                       'virtual_midnight'))
         self.task_list_url = config.get('gtimelog', 'task_list_url')
         self.edit_task_list_cmd = config.get('gtimelog', 'edit_task_list_cmd')
+        self.show_office_hours = config.getboolean('gtimelog',
+                                                   'show_office_hours')
 
     def save(self, filename):
         config = self._config()
@@ -743,6 +816,7 @@ class TrayIcon(object):
         self.eventbox.connect("button-release-event", self.on_release)
         gobject.timeout_add(1000, self.tick)
         self.gtimelog_window.entry_watchers.append(self.entry_added)
+        self.gtimelog_window.tray_icon = self
 
     def on_press(self, widget, event):
         """A mouse button was pressed on the tray icon label."""
@@ -787,7 +861,7 @@ class TrayIcon(object):
     def tip(self):
         """Compute tooltip text."""
         current_task = self.gtimelog_window.task_entry.get_text()
-        if not current_task: 
+        if not current_task:
             current_task = "nothing"
         tip = "GTimeLog: working on %s" % current_task
         total_work, total_slacking = self.timelog.window.totals()
@@ -803,22 +877,38 @@ class TrayIcon(object):
 class MainWindow(object):
     """Main application window."""
 
+    # Initial view mode
     chronological = True
-    footer_mark = None
+    show_tasks = True
 
-    # Try to prevent timer routines mucking with the buffer while we're
-    # mucking with the buffer.  Not sure if it is necessary.
-    lock = False
+    # URL to use for Help -> Online Documentation
+    help_url = "http://mg.pov.lt/gtimelog"
 
     def __init__(self, timelog, settings, tasks):
         """Create the main window."""
         self.timelog = timelog
         self.settings = settings
         self.tasks = tasks
+        self.tray_icon = None
         self.last_tick = None
+        self.footer_mark = None
+        # Try to prevent timer routines mucking with the buffer while we're
+        # mucking with the buffer.  Not sure if it is necessary.
+        self.lock = False
         self.entry_watchers = []
+        self._init_ui()
+
+    def _init_ui(self):
+        """Initialize the user interface."""
         tree = gtk.glade.XML(ui_file)
+        # Set initial state of menu items *before* we hook up signals
+        chronological_menu_item = tree.get_widget("chronological")
+        chronological_menu_item.set_active(self.chronological)
+        show_task_pane_item = tree.get_widget("show_task_pane")
+        show_task_pane_item.set_active(self.show_tasks)
+        # Now hook up signals
         tree.signal_autoconnect(self)
+        # Store references to UI elements we're going to need later
         self.tray_icon_popup_menu = tree.get_widget("tray_icon_popup_menu")
         self.tray_show = tree.get_widget("tray_show")
         self.tray_hide = tree.get_widget("tray_hide")
@@ -833,10 +923,13 @@ class MainWindow(object):
         self.main_window.connect("delete_event", self.delete_event)
         self.log_view = tree.get_widget("log_view")
         self.set_up_log_view_columns()
+        self.task_pane = tree.get_widget("task_list_pane")
+        if not self.show_tasks:
+            self.task_pane.hide()
         self.task_pane_info_label = tree.get_widget("task_pane_info_label")
-        tasks.loading_callback = self.task_list_loading
-        tasks.loaded_callback = self.task_list_loaded
-        tasks.error_callback = self.task_list_error
+        self.tasks.loading_callback = self.task_list_loading
+        self.tasks.loaded_callback = self.task_list_loaded
+        self.tasks.error_callback = self.task_list_error
         self.task_list = tree.get_widget("task_list")
         self.task_store = gtk.TreeStore(str, str)
         self.task_list.set_model(self.task_store)
@@ -962,6 +1055,20 @@ class MainWindow(object):
             self.w(time_to_leave.strftime('%H:%M'), 'time')
             self.w(')')
 
+        if self.settings.show_office_hours:
+            self.w('\nAt office today: ')
+            hours = datetime.timedelta(hours=self.settings.hours)
+            total = total_slacking + total_work
+            self.w("%s " % format_duration(total), 'duration' )
+            self.w('(')
+            if total > hours:
+                self.w(format_duration(total - hours), 'duration')
+                self.w(' overtime')
+            else:
+                self.w(format_duration(hours - total), 'duration')
+                self.w(' left')
+            self.w(')')
+
     def time_left_at_work(self, total_work):
         """Calculate time left to work."""
         last_time = self.timelog.window.last_time()
@@ -1022,6 +1129,7 @@ class MainWindow(object):
         if not self.have_completion:
             return
         seen = sets.Set()
+        self.completion_choices.clear()
         for entry in self.history:
             if entry not in seen:
                 seen.add(entry)
@@ -1052,8 +1160,12 @@ class MainWindow(object):
 
     def delete_event(self, widget, data=None):
         """Try to close the window."""
-        gtk.main_quit()
-        return False
+        if self.tray_icon:
+            self.main_window.hide()
+            return True
+        else:
+            gtk.main_quit()
+            return False
 
     def close_about_dialog(self, widget):
         """Ok clicked in the about dialog."""
@@ -1075,6 +1187,11 @@ class MainWindow(object):
         """Help -> About selected"""
         self.about_dialog.show()
 
+    def on_online_help_activate(self, widget):
+        """Help -> Online Documentation selected"""
+        import webbrowser
+        webbrowser.open(self.help_url)
+
     def on_chronological_activate(self, widget):
         """View -> Chronological"""
         self.chronological = True
@@ -1093,7 +1210,7 @@ class MainWindow(object):
     def on_yesterdays_report_activate(self, widget):
         """File -> Daily Report for Yesterday"""
         max = self.timelog.window.min_timestamp
-        min = max - datetime.timedelta(1) 
+        min = max - datetime.timedelta(1)
         window = self.timelog.window_for(min, max)
         self.mail(window.daily_report)
 
@@ -1182,11 +1299,19 @@ class MainWindow(object):
         window = self.monthly_window()
         self.mail(window.monthly_report)
 
-    def on_open_in_spreadsheet_activate(self, widget):
-        """Report -> Open in Spreadsheet"""
+    def on_open_complete_spreadsheet_activate(self, widget):
+        """Report -> Complete Report in Spreadsheet"""
         tempfn = tempfile.mktemp(suffix='gtimelog.csv') # XXX unsafe!
         f = open(tempfn, 'w')
-        self.timelog.whole_history().to_csv(f)
+        self.timelog.whole_history().to_csv_complete(f)
+        f.close()
+        self.spawn(self.settings.spreadsheet, tempfn)
+
+    def on_open_slack_spreadsheet_activate(self, widget):
+        """Report -> Work/_Slacking stats in Spreadsheet"""
+        tempfn = tempfile.mktemp(suffix='gtimelog.csv') # XXX unsafe!
+        f = open(tempfn, 'w')
+        self.timelog.whole_history().to_csv_daily(f)
         f.close()
         self.spawn(self.settings.spreadsheet, tempfn)
 
@@ -1219,6 +1344,13 @@ class MainWindow(object):
         self.set_up_history()
         self.populate_log()
         self.tick(True)
+
+    def on_show_task_pane_toggled(self, event):
+        """View -> Tasks"""
+        if self.task_pane.get_property("visible"):
+            self.task_pane.hide()
+        else:
+            self.task_pane.show()
 
     def task_list_row_activated(self, treeview, path, view_column):
         """A task was selected in the task pane -- put it to the entry."""
@@ -1306,10 +1438,33 @@ class MainWindow(object):
     def add_entry(self, widget, data=None):
         """Add the task entry to the log."""
         entry = self.task_entry.get_text()
+
+        now = None
+        date_match = re.match(r'(\d\d):(\d\d)\s+', entry)
+        delta_match = re.match(r'-([1-9]\d?|1\d\d)\s+', entry)
+        if date_match:
+            h = int(date_match.group(1))
+            m = int(date_match.group(2))
+            if 0 <= h < 24 and 0 <= m <= 60:
+                now = datetime.datetime.now()
+                now = now.replace(hour=h, minute=m, second=0, microsecond=0)
+                if self.timelog.valid_time(now):
+                    entry = entry[date_match.end():]
+                else:
+                    now = None
+        if delta_match:
+            seconds = int(delta_match.group()) * 60
+            now = datetime.datetime.now().replace(second=0, microsecond=0)
+            now += datetime.timedelta(seconds=seconds)
+            if self.timelog.valid_time(now):
+                entry = entry[delta_match.end():]
+            else:
+                now = None
+
         if not entry:
             return
         self.add_history(entry)
-        self.timelog.append(entry)
+        self.timelog.append(entry, now)
         if self.chronological:
             self.delete_footer()
             self.write_item(self.timelog.window.last_entry())
@@ -1358,7 +1513,7 @@ def main():
     except OSError:
         pass
     settings = Settings()
-    settings_file = os.path.join(configdir, 'gtimelogrc') 
+    settings_file = os.path.join(configdir, 'gtimelogrc')
     if not os.path.exists(settings_file):
         settings.save(settings_file)
     else:

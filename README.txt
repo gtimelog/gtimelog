@@ -1,14 +1,7 @@
-Time Tracking Tools
--------------------
-
-This package contains a bunch of Python scripts that I use to keep track of
-my (working, mostly) time.
-
-
 GTimeLog
 --------
 
-The most interesting of those is GTimeLog, which is a Gtk+ application.  Here's
+GTimeLog is a graphical (Gtk+) application for keeping track of time.  Here's
 how it works: every day, when you arrive to work, start up gtimelog and type
 "arrived".  Then start doing some activity (e.g. reading mail, or working on
 a task).  Whenever you stop doing an activity (either when you have finished
@@ -34,30 +27,49 @@ which activities are not work related add two asterisks to the activity name:
   browsing slashdot **
   napping on the couch **
 
+If you want some activity (or non-activity) to be completely omitted from the
+reports, use three asterisks:
+
+  break ***
+
 GTimeLog displays all the things you've done today, and calculates the total
-time you spent working, and the total time you spent "slacking".  It also
-advises you how much time you still have to work today to get 8 hours of work
-done (the number of hours in a day is configurable in ~/.gtimelog/gtimelogrc).
-There are two basic views: one shows all the activities in chronological order,
-with starting and ending times; while another groups all entries with the same
-into one activity and just shows the total duration.
+time you spent working, the total time you spent "slacking", and the sum total
+for convenience. It also advises you how much time you still have to work today
+to get 8 hours of work done, and how much time is left just to have spent a
+workday at the office (the number of hours in a day is configurable in
+~/.gtimelog/gtimelogrc). There are two basic views: one shows all the
+activities in chronological order, with starting and ending times; while
+another groups all entries with the same into one activity and just shows the
+total duration.
 
 At the end of the day you can send off a daily report by choosing File -> Daily
 Report.  A mail program (Mutt in a terminal, unless you have changed it in
 ~/.gtimelog/gtimelogrc) will be started with all the activities listed in it.
 My Mutt configuration lets me edit the report before sending it.
 
-If you make a mistake and type in the wrong activity name, or just forget to
-enter an activity, don't worry.  GTimeLog stores the time log in a simple plain
-text file ~/.gtimelog/timelog.txt.  Every line contains a timestamp and the
-name of the activity that was finished at the time.  All other lines are
-ignored, so you can add comments if you want to -- just make sure no comment
-begins with a timestamp.  You do not have to worry about GTimeLog overwriting
-your changes -- GTimeLog always appends entries at the end of the file, and
-does not keep the log file open all the time.  You do have to worry about
-overwriting changes made by GTimeLog with your editor -- make sure you do not
-enter any activities in GTimeLog while you have timelog.txt open in a text
-editor.
+If you forget to enter an activity, you can start your activity with a 24h
+time ("09:30 morning meeting") or a minute-offset ("-10 morning meeting").
+Note that the new activity must still be after the last entered event.  The
+time/offset will be removed from the description of the activity before it's
+entered.
+
+If you make a mistake and type in the wrong activity name, don't worry.
+GTimeLog stores the time log in a simple plain text file
+~/.gtimelog/timelog.txt.  Every line contains a timestamp and the name of the
+activity that was finished at the time.  All other lines are ignored, so you
+can add comments if you want to -- just make sure no comment begins with a
+timestamp.  You do not have to worry about GTimeLog overwriting your changes
+-- GTimeLog always appends entries at the end of the file, and does not keep
+the log file open all the time.  You do have to worry about overwriting
+changes made by GTimeLog with your editor -- make sure you do not enter any
+activities in GTimeLog while you have timelog.txt open in a text editor.
+
+If you want a more visual idea of how you spend your time you can export the
+"Work/Slacking stats" to a spreadsheet and graph them. You get 4 values per
+line: the date, how long after midnight you started work, and how long you
+spent working and slacking that day, all times in fractional hours.  Starting
+from midnight makes it easy to read the graph scale as the time of day.  Try
+a bargraph with stacked values and both first row and column as labels.
 
 
 Future Plans
@@ -67,8 +79,16 @@ Configuration dialog.  The ability to browse through history (view daily and
 weekly reports for past days and weeks).
 
 
+Bugs
+----
+
+See http://bugs.launchpad.net/gtimelog/
+
+
 Other Tools
 -----------
+
+These can be found in scripts/
 
 timelog.py is an earlier, less powerful text-mode version of gtimelog.  You
 type in activity names, and timelog writes them down into timelog.txt with
@@ -166,6 +186,8 @@ Contributors
 Thom May
 Dafydd Harries
 Ignas Mikalajūnas
+Gaute Amundsen
+Chris Beaven
 
 
 Icon
@@ -174,3 +196,8 @@ Icon
 gtimelog.png is really a renamed copy of gnome-set-time.png from
 /usr/share/pixmaps/
 
+
+Web
+---
+
+http://mg.pov.lt/gtimelog
