@@ -789,8 +789,83 @@ class Settings(object):
             f.close()
 
 
-class TrayIcon(object):
-    """Tray icon for gtimelog."""
+class SimpleStatusIcon(object):
+    """Status icon for gtimelog in the notification area."""
+
+    def __init__(self, gtimelog_window):
+        self.gtimelog_window = gtimelog_window
+        self.timelog = gtimelog_window.timelog
+        self.trayicon = None
+        if not hasattr(gtk, 'StatusIcon'):
+            # you must be using a very old PyGtk
+            return
+        self.icon = gtk.status_icon_new_from_file(icon_file)
+        self.last_tick = False
+        self.tick()
+        self.icon.connect("activate", self.on_activate)
+        self.icon.connect("popup-menu", self.on_popup_menu)
+        gobject.timeout_add(1000, self.tick)
+        self.gtimelog_window.entry_watchers.append(self.entry_added)
+        self.gtimelog_window.tray_icon = self
+
+    def available(self):
+        """Is the icon supported by this system?
+
+        SimpleStatusIcon needs PyGtk 2.10 or newer
+        """
+        return self.icon is not None
+
+    def on_activate(self, widget):
+        """The user clicked on the icon."""
+        main_window = self.gtimelog_window.main_window
+        if main_window.get_property("visible"):
+           main_window.hide()
+        else:
+           main_window.present()
+
+    def on_popup_menu(self, widget, button, activate_time):
+        """The user clicked on the icon."""
+        main_window = self.gtimelog_window.main_window
+        if main_window.get_property("visible"):
+            self.gtimelog_window.tray_show.hide()
+            self.gtimelog_window.tray_hide.show()
+        else:
+            self.gtimelog_window.tray_show.show()
+            self.gtimelog_window.tray_hide.hide()
+        tray_icon_popup_menu = self.gtimelog_window.tray_icon_popup_menu
+        tray_icon_popup_menu.popup(None, None, gtk.status_icon_position_menu,
+                                   button, activate_time, self.icon)
+
+    def entry_added(self, entry):
+        """An entry has been added."""
+        self.tick()
+
+    def tick(self):
+        """Tick every second."""
+        self.icon.set_tooltip(self.tip())
+        return True
+
+    def tip(self):
+        """Compute tooltip text."""
+        current_task = self.gtimelog_window.task_entry.get_text()
+        if not current_task:
+            current_task = "nothing"
+        tip = "GTimeLog: working on %s" % current_task
+        total_work, total_slacking = self.timelog.window.totals()
+        tip += "\nWork done today: %s" % format_duration(total_work)
+        time_left = self.gtimelog_window.time_left_at_work(total_work)
+        if time_left is not None:
+            if time_left < datetime.timedelta(0):
+                time_left = datetime.timedelta(0)
+            tip += "\nTime left at work: %s" % format_duration(time_left)
+        return tip
+
+
+class OldTrayIcon(object):
+    """Old tray icon for gtimelog, shows a ticking clock.
+    
+    Uses the old and deprecated egg.trayicon module.
+    """
 
     def __init__(self, gtimelog_window):
         self.gtimelog_window = gtimelog_window
@@ -822,6 +897,14 @@ class TrayIcon(object):
         gobject.timeout_add(1000, self.tick)
         self.gtimelog_window.entry_watchers.append(self.entry_added)
         self.gtimelog_window.tray_icon = self
+
+    def available(self):
+        """Is the icon supported by this system?
+
+        OldTrayIcon needs egg.trayicon, which is now deprecated and likely
+        no longer available in modern Linux distributions.
+        """
+        return self.trayicon is not None
 
     def on_press(self, widget, event):
         """A mouse button was pressed on the tray icon label."""
@@ -1531,7 +1614,9 @@ def main():
     else:
         tasks = TaskList(os.path.join(configdir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
-    tray_icon = TrayIcon(main_window)
+    tray_icon = OldTrayIcon(main_window)
+    if not tray_icon.available():
+        tray_icon = SimpleStatusIcon(main_window)
     try:
         gtk.main()
     except KeyboardInterrupt:

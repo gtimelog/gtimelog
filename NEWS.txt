@@ -3,6 +3,9 @@ Changes not yet released
 
 * Fix DeprecationWarning: the sets module is deprecated.
 
+* Use gtk.StatusIcon if egg.trayicon is not available
+  (https://bugs.launchpad.net/gtimelog/+bug/209798).
+
 
 Changes in version 0.2.5
 ========================
