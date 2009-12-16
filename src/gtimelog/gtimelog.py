@@ -9,7 +9,6 @@ import re
 import os
 import csv
 import sys
-import sets
 import urllib
 import datetime
 import tempfile
@@ -21,6 +20,12 @@ import gobject
 import gtk
 import gtk.glade
 import pango
+
+# support very old Python versions that nobody probably uses any more
+try:
+    set
+except NameError:
+    from sets import Set as set
 
 
 # This is to let people run GTimeLog without having to install it
@@ -1128,7 +1133,7 @@ class MainWindow(object):
         self.history_undo = ''
         if not self.have_completion:
             return
-        seen = sets.Set()
+        seen = set()
         self.completion_choices.clear()
         for entry in self.history:
             if entry not in seen:

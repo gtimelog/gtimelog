@@ -1,7 +1,7 @@
 Changes not yet released
 ========================
 
-* none yet
+* Fix DeprecationWarning: the sets module is deprecated.
 
 
 Changes in version 0.2.5
