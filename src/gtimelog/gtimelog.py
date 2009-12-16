@@ -743,6 +743,7 @@ class Settings(object):
 
     show_office_hours = True
     show_tray_icon = True
+    prefer_old_tray_icon = True
 
     def _config(self):
         config = ConfigParser.RawConfigParser()
@@ -762,6 +763,7 @@ class Settings(object):
         config.set('gtimelog', 'show_office_hours',
                    str(self.show_office_hours))
         config.set('gtimelog', 'show_tray_icon', str(self.show_tray_icon))
+        config.set('gtimelog', 'prefer_old_tray_icon', str(self.prefer_old_tray_icon))
         return config
 
     def load(self, filename):
@@ -782,6 +784,8 @@ class Settings(object):
         self.show_office_hours = config.getboolean('gtimelog',
                                                    'show_office_hours')
         self.show_tray_icon = config.getboolean('gtimelog', 'show_tray_icon')
+        self.prefer_old_tray_icon = config.getboolean('gtimelog',
+                                                      'prefer_old_tray_icon')
 
     def save(self, filename):
         config = self._config()
@@ -1618,9 +1622,14 @@ def main():
         tasks = TaskList(os.path.join(configdir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
     if settings.show_tray_icon:
-        tray_icon = OldTrayIcon(main_window)
-        if not tray_icon.available():
-            tray_icon = SimpleStatusIcon(main_window)
+        if settings.prefer_old_tray_icon:
+            icons = [OldTrayIcon, SimpleStatusIcon]
+        else:
+            icons = [SimpleStatusIcon, OldTrayIcon]
+        for icon_class in icons:
+            tray_icon = icon_class(main_window)
+            if tray_icon.available():
+                break # found one that works
     try:
         gtk.main()
     except KeyboardInterrupt:
