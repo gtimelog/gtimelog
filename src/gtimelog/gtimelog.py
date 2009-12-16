@@ -742,6 +742,7 @@ class Settings(object):
     edit_task_list_cmd = ''
 
     show_office_hours = True
+    show_tray_icon = True
 
     def _config(self):
         config = ConfigParser.RawConfigParser()
@@ -760,6 +761,7 @@ class Settings(object):
         config.set('gtimelog', 'edit_task_list_cmd', self.edit_task_list_cmd)
         config.set('gtimelog', 'show_office_hours',
                    str(self.show_office_hours))
+        config.set('gtimelog', 'show_tray_icon', str(self.show_tray_icon))
         return config
 
     def load(self, filename):
@@ -779,6 +781,7 @@ class Settings(object):
         self.edit_task_list_cmd = config.get('gtimelog', 'edit_task_list_cmd')
         self.show_office_hours = config.getboolean('gtimelog',
                                                    'show_office_hours')
+        self.show_tray_icon = config.getboolean('gtimelog', 'show_tray_icon')
 
     def save(self, filename):
         config = self._config()
@@ -1614,9 +1617,10 @@ def main():
     else:
         tasks = TaskList(os.path.join(configdir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
-    tray_icon = OldTrayIcon(main_window)
-    if not tray_icon.available():
-        tray_icon = SimpleStatusIcon(main_window)
+    if settings.show_tray_icon:
+        tray_icon = OldTrayIcon(main_window)
+        if not tray_icon.available():
+            tray_icon = SimpleStatusIcon(main_window)
     try:
         gtk.main()
     except KeyboardInterrupt:

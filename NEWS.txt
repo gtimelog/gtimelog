@@ -5,6 +5,8 @@ Changes not yet released
 
 * Use gtk.StatusIcon if egg.trayicon is not available
   (https://bugs.launchpad.net/gtimelog/+bug/209798).
+* Option to disable the tray icon altogether by adding 'show_tray_icon = no' to
+  ~/.gtimelog/gtimelogrc (https://bugs.launchpad.net/gtimelog/+bug/255618).
 
 
 Changes in version 0.2.5
