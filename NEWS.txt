@@ -4,6 +4,14 @@ Changes not yet released
 * none yet
 
 
+Changes in version 0.2.5
+========================
+
+* Don't open a console window on Windows.
+
+* Moved the primary GTimeLog source repository to Bazaar hosted on Launchpad.
+
+
 Changes in version 0.2.4
 ========================
 
