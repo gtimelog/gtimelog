@@ -188,6 +188,8 @@ Dafydd Harries
 Ignas Mikalajūnas
 Gaute Amundsen
 Chris Beaven
+Harald Friessnegger
+Rodrigo Daunoravicius
 
 
 Icon
