@@ -56,14 +56,19 @@ releasechecklist:
 	        echo "NEWS.txt has no entry for $$ver_and_date"; exit 1; }
 	# Bit of a chicken-and-egg here, but if the tree is unclean, make
 	# distcheck will fail.  Thankfully bzr lets me uncommit.
-	test -z "`bzr status 2>&1`" || { echo; echo "Your working tree is not clean" 1>&2; bzr status; exit 1; }
+	@test -z "`bzr status 2>&1`" || { echo; echo "Your working tree is not clean" 1>&2; bzr status; exit 1; }
 	make distcheck
 
 .PHONY: release
 release: releasechecklist
 	# I'm chicken so I won't actually do these things yet
-	@echo Please run $(PYTHON) setup.py sdist register upload
-	@echo Please run bzr tag `$(PYTHON) setup.py --version`
-	@echo Please increment the version number in src/gtimelog/__init__.py
-	@echo Please add a new empty entry in NEWS.txt
+	@echo "Please run"
+	@echo
+	@echo "  $(PYTHON) setup.py sdist register upload && bzr tag `$(PYTHON) setup.py --version`"
+	@echo
+	@echo "Please increment the version number in src/gtimelog/__init__.py"
+	@echo "and add a new empty entry at the top of NEWS.txt, then"
+	@echo
+	@echo '  bzr ci -m "Post-release version bump" && bzr push'
+	@echo
 
