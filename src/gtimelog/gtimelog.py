@@ -1412,7 +1412,7 @@ class MainWindow(object):
 
     def on_edit_timelog_activate(self, widget):
         """File -> Edit timelog.txt"""
-        self.spawn(self.settings.editor, self.timelog.filename)
+        self.spawn(self.settings.editor, '"%s"' % self.timelog.filename)
 
     def mail(self, write_draft):
         """Send an email."""
