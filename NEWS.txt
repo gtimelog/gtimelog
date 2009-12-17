@@ -1,7 +1,6 @@
 Changes not yet released
 ========================
 
-* Drop compatibility with Python 2.4 and older.
 * Fix DeprecationWarning: the sets module is deprecated.
 * Use gtk.StatusIcon if egg.trayicon is not available
   (https://bugs.launchpad.net/gtimelog/+bug/209798).

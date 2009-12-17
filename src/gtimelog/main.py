@@ -5,10 +5,6 @@ A Gtk+ application for keeping track of time.
 $Id$
 """
 
-# Need this to be able to import the gtimelog package (as opposed to the
-# gtimelog.gtimelog module) with 'improt gtimelog'.
-from __future__ import absolute_import
-
 import re
 import os
 import csv
@@ -26,6 +22,13 @@ import gtk.glade
 import pango
 
 from gtimelog import __version__
+
+
+# support very old Python versions that nobody probably uses any more
+try:
+    set
+except NameError:
+    from sets import Set as set
 
 
 # This is to let people run GTimeLog without having to install it

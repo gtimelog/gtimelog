@@ -8,5 +8,5 @@ import sys
 pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
 
-from gtimelog.gtimelog import main
+from gtimelog.main import main
 main()
