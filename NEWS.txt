@@ -1,5 +1,5 @@
-Changes not yet released
-========================
+Changes in version 0.3 (released 2009-12-17)
+============================================
 
 * Fix DeprecationWarning: the sets module is deprecated.
 * Use gtk.StatusIcon if egg.trayicon is not available
@@ -12,6 +12,10 @@ Changes not yet released
   (https://bugs.launchpad.net/gtimelog/+bug/328118).
 * Show version number in the About dialog
   (https://bugs.launchpad.net/gtimelog/+bug/308750).
+
+Packagers take note: the main module was renamed from gtimelog.gtimelog to
+gtimelog.main.  If you have wrapper scripts that used to import 'main'
+from gtimelog.gtimelog, you'll have to change them.
 
 
 Changes in version 0.2.5
