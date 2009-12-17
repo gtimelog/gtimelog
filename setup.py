@@ -39,7 +39,7 @@ setup(
     zip_safe=False,
     entry_points="""
     [gui_scripts]
-    gtimelog = gtimelog.gtimelog:main
+    gtimelog = gtimelog.main:main
     """,
 # This is true, but pointless, because easy_install PyGTK chokes and dies
 #   install_requires=['PyGTK'],

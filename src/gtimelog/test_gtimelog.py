@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """
-Tests for gtimelog.py
+Tests for gtimelog/main.py
 """
 
 import doctest
@@ -10,7 +10,7 @@ import unittest
 def doctest_as_hours():
     """Tests for as_hours
 
-        >>> from gtimelog import as_hours
+        >>> from gtimelog.main import as_hours
         >>> from datetime import timedelta
         >>> as_hours(timedelta(0))
         0.0
@@ -26,7 +26,7 @@ def doctest_as_hours():
 def doctest_format_duration():
     """Tests for format_duration.
 
-        >>> from gtimelog import format_duration
+        >>> from gtimelog.main import format_duration
         >>> from datetime import timedelta
         >>> format_duration(timedelta(0))
         '0 h 0 min'
@@ -40,7 +40,7 @@ def doctest_format_duration():
 def doctest_format_short():
     """Tests for format_duration_short.
 
-        >>> from gtimelog import format_duration_short
+        >>> from gtimelog.main import format_duration_short
         >>> from datetime import timedelta
         >>> format_duration_short(timedelta(0))
         '0:00'
@@ -58,7 +58,7 @@ def doctest_format_short():
 def doctest_format_duration_long():
     """Tests for format_duration_long.
 
-        >>> from gtimelog import format_duration_long
+        >>> from gtimelog.main import format_duration_long
         >>> from datetime import timedelta
         >>> format_duration_long(timedelta(0))
         '0 min'
@@ -78,7 +78,7 @@ def doctest_format_duration_long():
 def doctest_parse_datetime():
     """Tests for parse_datetime
 
-        >>> from gtimelog import parse_datetime
+        >>> from gtimelog.main import parse_datetime
         >>> parse_datetime('2005-02-03 02:13')
         datetime.datetime(2005, 2, 3, 2, 13)
         >>> parse_datetime('xyzzy')
@@ -91,7 +91,7 @@ def doctest_parse_datetime():
 def doctest_parse_time():
     """Tests for parse_time
 
-        >>> from gtimelog import parse_time
+        >>> from gtimelog.main import parse_time
         >>> parse_time('02:13')
         datetime.time(2, 13)
         >>> parse_time('xyzzy')
@@ -105,7 +105,7 @@ def doctest_virtual_day():
     """Tests for virtual_day
 
         >>> from datetime import datetime, time
-        >>> from gtimelog import virtual_day
+        >>> from gtimelog.main import virtual_day
 
     Virtual midnight
 
@@ -130,7 +130,7 @@ def doctest_different_days():
     """Tests for different_days
 
         >>> from datetime import datetime, time
-        >>> from gtimelog import different_days
+        >>> from gtimelog.main import different_days
 
     Virtual midnight
 
@@ -150,7 +150,7 @@ def doctest_different_days():
 def doctest_first_of_month():
     """Tests for first_of_month
 
-        >>> from gtimelog import first_of_month
+        >>> from gtimelog.main import first_of_month
         >>> from datetime import date, timedelta
 
         >>> first_of_month(date(2007, 1, 1))
@@ -185,7 +185,7 @@ def doctest_first_of_month():
 def doctest_next_month():
     """Tests for next_month
 
-        >>> from gtimelog import next_month
+        >>> from gtimelog.main import next_month
         >>> from datetime import date, timedelta
 
         >>> next_month(date(2007, 1, 1))
@@ -221,7 +221,7 @@ def doctest_next_month():
 def doctest_uniq():
     """Tests for uniq
 
-        >>> from gtimelog import uniq
+        >>> from gtimelog.main import uniq
         >>> uniq(['a', 'b', 'b', 'c', 'd', 'b', 'd'])
         ['a', 'b', 'c', 'd', 'b', 'd']
         >>> uniq(['a'])
@@ -238,7 +238,7 @@ def doctest_TimeWindow_monthly_report():
 
         >>> from datetime import datetime, time
         >>> from tempfile import NamedTemporaryFile
-        >>> from gtimelog import TimeWindow
+        >>> from gtimelog.main import TimeWindow
 
         >>> vm = time(2, 0)
         >>> min = datetime(2007, 9, 1)
@@ -300,7 +300,7 @@ def doctest_TimeWindow_to_csv_daily():
         ... 2008-06-05 13:15: something
         ... ''')
 
-        >>> from gtimelog import TimeWindow
+        >>> from gtimelog.main import TimeWindow
         >>> window = TimeWindow(sampledata, min, max, vm)
 
         >>> import sys
