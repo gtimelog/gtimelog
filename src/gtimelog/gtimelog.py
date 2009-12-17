@@ -5,6 +5,10 @@ A Gtk+ application for keeping track of time.
 $Id$
 """
 
+# Need this to be able to import the gtimelog package (as opposed to the
+# gtimelog.gtimelog module) with 'improt gtimelog'.
+from __future__ import absolute_import
+
 import re
 import os
 import csv
@@ -21,11 +25,7 @@ import gtk
 import gtk.glade
 import pango
 
-# support very old Python versions that nobody probably uses any more
-try:
-    set
-except NameError:
-    from sets import Set as set
+from gtimelog import __version__
 
 
 # This is to let people run GTimeLog without having to install it
@@ -1010,6 +1010,9 @@ class MainWindow(object):
         self.about_dialog = tree.get_widget("about_dialog")
         self.about_dialog_ok_btn = tree.get_widget("ok_button")
         self.about_dialog_ok_btn.connect("clicked", self.close_about_dialog)
+        self.about_text = tree.get_widget("about_text")
+        self.about_text.set_markup(self.about_text.get_label() %
+                                   dict(version=__version__))
         self.calendar_dialog = tree.get_widget("calendar_dialog")
         self.calendar = tree.get_widget("calendar")
         self.calendar.connect("day_selected_double_click",

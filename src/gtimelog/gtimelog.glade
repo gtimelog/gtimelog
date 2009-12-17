@@ -491,13 +491,13 @@
             <property name="visible">True</property>
             <property name="border_width">16</property>
             <child>
-              <widget class="GtkLabel" id="label2">
+              <widget class="GtkLabel" id="about_text">
                 <property name="visible">True</property>
-                <property name="label" translatable="yes">&lt;span weight="bold" size="xx-large"&gt;TimeLog&lt;/span&gt;
+                <property name="label" translatable="yes">&lt;span weight="bold" size="xx-large"&gt;GTimeLog v%(version)s&lt;/span&gt;
 
 GTimeLog is a time tracking application.
 
-&lt;small&gt;© 2004–2008 Marius Gedminas&lt;/small&gt;</property>
+&lt;small&gt;&#xA9; 2004&#x2013;2009 Marius Gedminas&lt;/small&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="justify">GTK_JUSTIFY_CENTER</property>
               </widget>
