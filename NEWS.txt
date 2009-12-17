@@ -9,6 +9,8 @@ Changes not yet released
   'prefer_old_tray_icon' in ~/.gtimelog/gtimelogrc
 * Option to disable the tray icon altogether by adding 'show_tray_icon = no' to
   ~/.gtimelog/gtimelogrc (https://bugs.launchpad.net/gtimelog/+bug/255618).
+* Handle directory names with spaces
+  (https://bugs.launchpad.net/gtimelog/+bug/328118).
 
 
 Changes in version 0.2.5
