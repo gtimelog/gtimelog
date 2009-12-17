@@ -3,6 +3,12 @@ import os
 from setuptools import setup
 
 here = os.path.dirname(__file__)
+
+version_file = os.path.join(here, 'src/gtimelog/__init__.py')
+d = {}
+execfile(version_file, d)
+version = d['__version__']
+
 changes_file = os.path.join(here, 'NEWS.txt')
 changes = file(changes_file).read().split('\n\n\n')
 changes_in_latest_versions = '\n\n\n'.join(changes[:3])
@@ -12,7 +18,7 @@ long_description = short_description + '.' # for now
 
 setup(
     name='gtimelog',
-    version='0.2.6dev',
+    version=version,
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
     url='http://mg.pov.lt/gtimelog/',
