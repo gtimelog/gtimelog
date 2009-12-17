@@ -1,8 +1,8 @@
 Changes not yet released
 ========================
 
+* Drop compatibility with Python 2.4 and older.
 * Fix DeprecationWarning: the sets module is deprecated.
-
 * Use gtk.StatusIcon if egg.trayicon is not available
   (https://bugs.launchpad.net/gtimelog/+bug/209798).
 * Option to select between old-style and new-style the tray icons:
@@ -11,6 +11,8 @@ Changes not yet released
   ~/.gtimelog/gtimelogrc (https://bugs.launchpad.net/gtimelog/+bug/255618).
 * Handle directory names with spaces
   (https://bugs.launchpad.net/gtimelog/+bug/328118).
+* Show version number in the About dialog
+  (https://bugs.launchpad.net/gtimelog/+bug/308750).
 
 
 Changes in version 0.2.5
