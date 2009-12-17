@@ -14,7 +14,17 @@ changes = file(changes_file).read().split('\n\n\n')
 changes_in_latest_versions = '\n\n\n'.join(changes[:3])
 
 short_description = 'A Gtk+ time tracking application'
-long_description = short_description + '.' # for now
+long_description = '''
+Simple and unintrusive time-tracking application.
+
+There are screenshots at http://mg.pov.lt/gtimelog.
+
+Mailing list: http://groups.google.com/group/gtimelog
+
+Bugs: http://bugs.launchpad.net/gtimelog/
+
+Source code: http://code.launchpad.net/gtimelog/
+'''
 
 setup(
     name='gtimelog',

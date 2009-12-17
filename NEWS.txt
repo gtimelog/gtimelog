@@ -1,6 +1,9 @@
-Changes not yet released
-========================
+Changes in version 0.3.1 (released 2009-12-18)
+==============================================
 
+* Fixed broken sdist (by adding MANIFEST.in, since setuptools doesn't
+  understand bzr by default).
+* Added Makefile for convenience (make distcheck, make release).
 
 
 Changes in version 0.3 (released 2009-12-17)

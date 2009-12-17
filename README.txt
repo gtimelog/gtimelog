@@ -190,6 +190,7 @@ Gaute Amundsen
 Chris Beaven
 Harald Friessnegger
 Rodrigo Daunoravicius
+a few others (check bzr log)
 
 
 Icon
@@ -203,3 +204,11 @@ Web
 ---
 
 http://mg.pov.lt/gtimelog
+
+
+Mailing list
+------------
+
+gtimelog@googlegroups.com
+http://groups.google.com/group/gtimelog
+
