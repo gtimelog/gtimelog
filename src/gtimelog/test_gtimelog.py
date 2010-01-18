@@ -231,6 +231,35 @@ def doctest_uniq():
 
     """
 
+def doctest_TimeWindow_report_categories():
+    r"""Tests for TimeWindow.report_categories
+
+        >>> import sys
+
+        >>> from datetime import datetime, time, timedelta
+        >>> from tempfile import NamedTemporaryFile
+        >>> from gtimelog.main import TimeWindow
+
+        >>> vm = time(2, 0)
+        >>> min = datetime(2010, 1, 25)
+        >>> max = datetime(2010, 1, 31)
+        >>> fh = NamedTemporaryFile()
+
+        >>> categories = {
+        ...    'Bing': timedelta(2),
+        ...    None: timedelta(1)}
+
+        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window.report_categories(sys.stdout, categories)
+        <BLANKLINE>
+        By category:
+        <BLANKLINE>
+        Bing                                                            48 hours
+        (none)                                                          24 hours
+        <BLANKLINE>
+
+    """
+
 def doctest_TimeWindow_weekly_report():
     r"""Tests for TimeWindow.weekly_report
 
