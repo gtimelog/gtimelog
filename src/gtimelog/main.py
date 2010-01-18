@@ -464,12 +464,22 @@ class TimeWindow(object):
             print >> output, "                time"
         work, slack = self.grouped_entries()
         total_work, total_slacking = self.totals()
+        categories = {}
         if work:
             work = [(entry, duration) for start, entry, duration in work]
             work.sort()
             for entry, duration in work:
                 if not duration:
                     continue # skip empty "arrival" entries
+
+                if ': ' in entry:
+                    cat, task = entry.split(': ', 1)
+                    categories[cat] = categories.get(
+                        cat, datetime.timedelta(0)) + duration
+                else:
+                    categories[None] = categories.get(
+                        None, datetime.timedelta(0)) + duration
+
                 entry = entry[:1].upper() + entry[1:]
                 if estimated_column:
                     print >> output, (u"%-46s  %-14s  %s" %
@@ -480,6 +490,25 @@ class TimeWindow(object):
             print >> output
         print >> output, ("Total work done this week: %s" %
                           format_duration_long(total_work))
+
+        if categories:
+            print >> output
+            print >> output, "By category:"
+            print >> output
+
+            items = categories.items()
+            items.sort()
+            for cat, duration in items:
+                if not cat:
+                    continue
+
+                print >> output, u"%-62s  %s" % (
+                    cat, format_duration_long(duration))
+
+            if None in categories:
+                print >> output, u"%-62s  %s" % (
+                    '(none)', format_duration_long(categories[None]))
+            print >> output
 
     def monthly_report(self, output, email, who):
         """Format a monthly report.
