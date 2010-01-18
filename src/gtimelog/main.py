@@ -399,6 +399,35 @@ class TimeWindow(object):
         items.sort()
         writer.writerows(items)
 
+    def report_categories(self, output, categories):
+        """A helper method that lists time spent per category.
+
+        Use this to add a section in a report looks similar to this:
+
+        Administration:  2 hours 1 min
+        Coding:          18 hours 45 min
+        Learning:        3 hours
+
+        category is a dict of entries (<category name>: <duration>).
+        """
+        print >> output
+        print >> output, "By category:"
+        print >> output
+
+        items = categories.items()
+        items.sort()
+        for cat, duration in items:
+            if not cat:
+                continue
+
+            print >> output, u"%-62s  %s" % (
+                cat, format_duration_long(duration))
+
+        if None in categories:
+            print >> output, u"%-62s  %s" % (
+                '(none)', format_duration_long(categories[None]))
+        print >> output
+
     def daily_report(self, output, email, who):
         """Format a daily report.
 
@@ -492,23 +521,7 @@ class TimeWindow(object):
                           format_duration_long(total_work))
 
         if categories:
-            print >> output
-            print >> output, "By category:"
-            print >> output
-
-            items = categories.items()
-            items.sort()
-            for cat, duration in items:
-                if not cat:
-                    continue
-
-                print >> output, u"%-62s  %s" % (
-                    cat, format_duration_long(duration))
-
-            if None in categories:
-                print >> output, u"%-62s  %s" % (
-                    '(none)', format_duration_long(categories[None]))
-            print >> output
+            self.report_categories(output, categories)
 
     def monthly_report(self, output, email, who):
         """Format a monthly report.
@@ -556,23 +569,7 @@ class TimeWindow(object):
                           format_duration_long(total_work))
 
         if categories:
-            print >> output
-            print >> output, "By category:"
-            print >> output
-
-            items = categories.items()
-            items.sort()
-            for cat, duration in items:
-                if not cat:
-                    continue
-
-                print >> output, u"%-62s  %s" % (
-                    cat, format_duration_long(duration))
-
-            if None in categories:
-                print >> output, u"%-62s  %s" % (
-                    '(none)', format_duration_long(categories[None]))
-            print >> output
+            self.report_categories(output, categories)
 
 
 class TimeLog(object):
