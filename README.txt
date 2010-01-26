@@ -190,6 +190,7 @@ Gaute Amundsen
 Chris Beaven
 Harald Friessnegger
 Rodrigo Daunoravicius
+Laurynas Speičys
 a few others (check bzr log)
 
 
