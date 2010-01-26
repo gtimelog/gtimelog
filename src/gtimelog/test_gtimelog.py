@@ -231,6 +231,86 @@ def doctest_uniq():
 
     """
 
+def doctest_TimeWindow_report_categories():
+    r"""Tests for TimeWindow.report_categories
+
+        >>> import sys
+
+        >>> from datetime import datetime, time, timedelta
+        >>> from tempfile import NamedTemporaryFile
+        >>> from gtimelog.main import TimeWindow
+
+        >>> vm = time(2, 0)
+        >>> min = datetime(2010, 1, 25)
+        >>> max = datetime(2010, 1, 31)
+        >>> fh = NamedTemporaryFile()
+
+        >>> categories = {
+        ...    'Bing': timedelta(2),
+        ...    None: timedelta(1)}
+
+        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window.report_categories(sys.stdout, categories)
+        <BLANKLINE>
+        By category:
+        <BLANKLINE>
+        Bing                                                            48 hours
+        (none)                                                          24 hours
+        <BLANKLINE>
+
+    """
+
+def doctest_TimeWindow_weekly_report():
+    r"""Tests for TimeWindow.weekly_report
+
+        >>> import sys
+
+        >>> from datetime import datetime, time
+        >>> from tempfile import NamedTemporaryFile
+        >>> from gtimelog.main import TimeWindow
+
+        >>> vm = time(2, 0)
+        >>> min = datetime(2010, 1, 25)
+        >>> max = datetime(2010, 1, 31)
+        >>> fh = NamedTemporaryFile()
+
+        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window.weekly_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        To: foo@bar.com
+        Subject: Weekly report for Bob Jones (week 04)
+        <BLANKLINE>
+        No work done this week.
+
+        >>> _ = [fh.write(s + '\n') for s in [
+        ...    '2010-01-30 09:00: start',
+        ...    '2010-01-30 09:23: Bing: stuff',
+        ...    '2010-01-30 12:54: Bong: other stuff',
+        ...    '2010-01-30 13:32: lunch **',
+        ...    '2010-01-30 15:46: misc',
+        ...    '']]
+        >>> fh.flush()
+
+        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window.weekly_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        To: foo@bar.com
+        Subject: Weekly report for Bob Jones (week 04)
+        <BLANKLINE>
+                                                                        time
+        Bing: stuff                                                     23 min
+        Bong: other stuff                                               3 hours 31 min
+        Misc                                                            2 hours 14 min
+        <BLANKLINE>
+        Total work done this week: 6 hours 8 min
+        <BLANKLINE>
+        By category:
+        <BLANKLINE>
+        Bing                                                            23 min
+        Bong                                                            3 hours 31 min
+        (none)                                                          2 hours 14 min
+        <BLANKLINE>
+
+    """
+
 def doctest_TimeWindow_monthly_report():
     r"""Tests for TimeWindow.monthly_report
 
