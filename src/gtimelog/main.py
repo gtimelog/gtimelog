@@ -897,9 +897,39 @@ class SimpleStatusIcon(object):
         return tip
 
 
+class AppIndicator(object):
+    """Ubuntu's application indicator for gtimelog."""
+
+    icon_name = "task-due"
+    # XXX: there's no appropriate standard icon
+    # (http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html#names)
+
+    def __init__(self, gtimelog_window):
+        self.gtimelog_window = gtimelog_window
+        self.timelog = gtimelog_window.timelog
+        self.indicator = None
+        try:
+            import appindicator
+        except ImportError:
+            return # nothing to do here, move along
+                   # or install python-appindicator
+        self.indicator = appindicator.Indicator("gtimelog", self.icon_name,
+                                    appindicator.CATEGORY_APPLICATION_STATUS)
+        self.indicator.set_status(appindicator.STATUS_ACTIVE)
+        self.indicator.set_menu(gtimelog_window.tray_icon_popup_menu)
+        self.gtimelog_window.tray_icon = self
+
+    def available(self):
+        """Is the icon supported by this system?
+
+        AppIndicator needs python-appindicator
+        """
+        return self.indicator is not None
+
+
 class OldTrayIcon(object):
     """Old tray icon for gtimelog, shows a ticking clock.
-    
+
     Uses the old and deprecated egg.trayicon module.
     """
 
@@ -1655,9 +1685,9 @@ def main():
     main_window = MainWindow(timelog, settings, tasks)
     if settings.show_tray_icon:
         if settings.prefer_old_tray_icon:
-            icons = [OldTrayIcon, SimpleStatusIcon]
+            icons = [OldTrayIcon, SimpleStatusIcon, AppIndicator]
         else:
-            icons = [SimpleStatusIcon, OldTrayIcon]
+            icons = [AppIndicator, SimpleStatusIcon, OldTrayIcon]
         for icon_class in icons:
             tray_icon = icon_class(main_window)
             if tray_icon.available():
