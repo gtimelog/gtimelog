@@ -1484,9 +1484,14 @@ class MainWindow(object):
         model = treeview.get_model()
         task = model[path][1]
         self.task_entry.set_text(task)
-        self.task_entry.grab_focus()
-        self.task_entry.set_position(-1)
-        # XXX: how does this integrate with history?
+        def grab_focus():
+            self.task_entry.grab_focus()
+            self.task_entry.set_position(-1)
+        # There's a race here: sometimes the GDK_2BUTTON_PRESS signal is handled
+        # _after_ row-activated, which makes the tree control steal the focus
+        # back from the task entry.  To avoid this, wait until all the events
+        # have been handled.
+        gobject.idle_add(grab_focus)
 
     def task_list_button_press(self, menu, event):
         if event.button == 3:
