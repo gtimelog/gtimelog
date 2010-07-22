@@ -759,7 +759,7 @@ class Settings(object):
     name = 'Anonymous'
 
     editor = 'gvim'
-    mailer = 'x-terminal-emulator -e mutt -H %s'
+    mailer = 'x-terminal-emulator -e "mutt -H %s"'
     spreadsheet = 'oocalc %s'
 
     enable_gtk_completion = True  # False enables gvim-style completion

@@ -8,6 +8,18 @@ Changes in version 0.3.2 (not released yet)
 * Double-clicking a category in task list tries hard to focus the input box
   (fixes: https://bugs.launchpad.net/gtimelog/+bug/608734).
 
+* Change default mailer to quote the command passed to x-terminal-emulator -e;
+  this makes it work with Terminator (also tested with xterm and
+  gnome-terminal).  Fixes https://bugs.launchpad.net/gtimelog/+bug/592552.
+  Note: if you've used gtimelog before, you'll have to manually edit
+  ~/.gtimelog/gtimelogrc and change the mailer line from
+
+    mailer = x-terminal-emulator -e mutt -H %s
+
+  to
+
+    mailer = x-terminal-emulator -e "mutt -H %s"
+
 
 Changes in version 0.3.1 (released 2009-12-18)
 ==============================================
