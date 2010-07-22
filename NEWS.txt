@@ -2,8 +2,8 @@ Changes not yet released
 ========================
 
 
-Changes in version 0.3.2 (not released yet)
-===========================================
+Changes in version 0.3.2 (released 2010-07-22)
+==============================================
 
 * Double-clicking a category in task list tries hard to focus the input box
   (fixes: https://bugs.launchpad.net/gtimelog/+bug/608734).
