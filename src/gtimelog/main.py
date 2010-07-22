@@ -758,9 +758,9 @@ class Settings(object):
     email = 'activity-list@example.com'
     name = 'Anonymous'
 
-    editor = 'gvim'
+    editor = 'xdg-open'
     mailer = 'x-terminal-emulator -e "mutt -H %s"'
-    spreadsheet = 'oocalc %s'
+    spreadsheet = 'xdg-open %s'
 
     enable_gtk_completion = True  # False enables gvim-style completion
 

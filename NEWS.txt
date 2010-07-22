@@ -11,6 +11,7 @@ Changes in version 0.3.2 (not released yet)
 * Change default mailer to quote the command passed to x-terminal-emulator -e;
   this makes it work with Terminator (also tested with xterm and
   gnome-terminal).  Fixes https://bugs.launchpad.net/gtimelog/+bug/592552.
+
   Note: if you've used gtimelog before, you'll have to manually edit
   ~/.gtimelog/gtimelogrc and change the mailer line from
 
@@ -19,6 +20,20 @@ Changes in version 0.3.2 (not released yet)
   to
 
     mailer = x-terminal-emulator -e "mutt -H %s"
+
+* Use xdg-open by default for editing timelog.txt and opening spreadsheets.
+  Fixes https://bugs.launchpad.net/gtimelog/+bug/592560.
+
+  Note: if you've used gtimelog before, you'll have to manually edit
+  ~/.gtimelog/gtimelogrc and change
+
+    editor = gvim
+    spreadhsheet = oocalc %s
+
+  to
+
+    editor = xdg-open
+    spreadsheet = xdg-open %s
 
 
 Changes in version 0.3.1 (released 2009-12-18)
