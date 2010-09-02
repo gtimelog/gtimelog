@@ -1643,7 +1643,8 @@ def main():
         print "Sample configuration file written to gtimelogrc.sample"
         return
 
-    configdir = os.path.expanduser('~/.gtimelog')
+    configdir = os.path.expanduser(
+        os.environ.get('GTIMELOG_HOME') or '~/.gtimelog')
     try:
         os.makedirs(configdir) # create it if it doesn't exist
     except OSError:
