@@ -761,6 +761,7 @@ class Settings(object):
     editor = 'xdg-open'
     mailer = 'x-terminal-emulator -e "mutt -H %s"'
     spreadsheet = 'xdg-open %s'
+    chronological = True
 
     enable_gtk_completion = True  # False enables gvim-style completion
 
@@ -782,6 +783,7 @@ class Settings(object):
         config.set('gtimelog', 'editor', self.editor)
         config.set('gtimelog', 'mailer', self.mailer)
         config.set('gtimelog', 'spreadsheet', self.spreadsheet)
+        config.set('gtimelog', 'chronological', str(self.chronological))
         config.set('gtimelog', 'gtk-completion',
                    str(self.enable_gtk_completion))
         config.set('gtimelog', 'hours', str(self.hours))
@@ -803,6 +805,7 @@ class Settings(object):
         self.editor = config.get('gtimelog', 'editor')
         self.mailer = config.get('gtimelog', 'mailer')
         self.spreadsheet = config.get('gtimelog', 'spreadsheet')
+        self.chronological = config.getboolean('gtimelog', 'chronological')
         self.enable_gtk_completion = config.getboolean('gtimelog',
                                                        'gtk-completion')
         self.hours = config.getfloat('gtimelog', 'hours')
@@ -1019,6 +1022,7 @@ class MainWindow(object):
         # Try to prevent timer routines mucking with the buffer while we're
         # mucking with the buffer.  Not sure if it is necessary.
         self.lock = False
+        self.chronological = settings.chronological
         self.entry_watchers = []
         self._init_ui()
 
