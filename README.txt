@@ -71,6 +71,10 @@ spent working and slacking that day, all times in fractional hours.  Starting
 from midnight makes it easy to read the graph scale as the time of day.  Try
 a bargraph with stacked values and both first row and column as labels.
 
+You can change the configuration directory (by default, ~/.gtimelog) by
+setting the environment variable $GTIMELOG_HOME to a non-empty string naming
+the directory you want to use.
+
 
 Future Plans
 ------------

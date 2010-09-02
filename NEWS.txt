@@ -9,6 +9,10 @@ Changes in version 0.3.3 (not released yet)
   either Chronological (True) or Grouped (False).  Contributed by Barry Warsaw
   <barry@python.org> (LP: #628876)
 
+* Recognize $GTIMELOG_HOME environment variable to use something other than
+  ~/.gtimelog as the configuration directory.  Contributed by Barry Warsaw
+  <barry@python.org> (LP: #628873)
+
 
 Changes in version 0.3.2 (released 2010-07-22)
 ==============================================
