@@ -761,7 +761,7 @@ class Settings(object):
     editor = 'xdg-open'
     mailer = 'x-terminal-emulator -e "mutt -H %s"'
     spreadsheet = 'xdg-open %s'
-    chronological = True
+    chronological = False
 
     enable_gtk_completion = True  # False enables gvim-style completion
 
@@ -773,7 +773,7 @@ class Settings(object):
 
     show_office_hours = True
     show_tray_icon = True
-    prefer_old_tray_icon = True
+    prefer_old_tray_icon = False
 
     def _config(self):
         config = ConfigParser.RawConfigParser()
