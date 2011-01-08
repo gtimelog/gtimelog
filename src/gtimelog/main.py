@@ -861,13 +861,6 @@ class SimpleStatusIcon(object):
 
     def on_popup_menu(self, widget, button, activate_time):
         """The user clicked on the icon."""
-        main_window = self.gtimelog_window.main_window
-        if main_window.get_property("visible"):
-            self.gtimelog_window.tray_show.hide()
-            self.gtimelog_window.tray_hide.show()
-        else:
-            self.gtimelog_window.tray_show.show()
-            self.gtimelog_window.tray_hide.hide()
         tray_icon_popup_menu = self.gtimelog_window.tray_icon_popup_menu
         tray_icon_popup_menu.popup(None, None, gtk.status_icon_position_menu,
                                    button, activate_time, self.icon)
@@ -1064,6 +1057,7 @@ class MainWindow(object):
         self.tray_icon_popup_menu = tree.get_widget("tray_icon_popup_menu")
         self.tray_show = tree.get_widget("tray_show")
         self.tray_hide = tree.get_widget("tray_hide")
+        self.tray_show.hide()
         self.about_dialog = tree.get_widget("about_dialog")
         self.about_dialog_ok_btn = tree.get_widget("ok_button")
         self.about_dialog_ok_btn.connect("clicked", self.close_about_dialog)
@@ -1329,10 +1323,14 @@ class MainWindow(object):
     def on_show_activate(self, widget):
         """Tray icon menu -> Show selected"""
         self.main_window.present()
+        self.tray_show.hide()
+        self.tray_hide.show()
 
     def on_hide_activate(self, widget):
         """Tray icon menu -> Hide selected"""
         self.main_window.hide()
+        self.tray_hide.hide()
+        self.tray_show.show()
 
     def on_quit_activate(self, widget):
         """File -> Quit selected"""
