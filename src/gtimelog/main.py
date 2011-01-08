@@ -914,7 +914,6 @@ class OldTrayIcon(object):
         except ImportError:
             return # nothing to do here, move along
                    # or install python-gnome2-extras
-        self.tooltips = gtk.Tooltips()
         self.eventbox = gtk.EventBox()
         hbox = gtk.HBox()
         icon = gtk.Image()
@@ -981,7 +980,7 @@ class OldTrayIcon(object):
                 self.time_label.set_text(now.strftime("%H:%M"))
             else:
                 self.time_label.set_text(format_duration_short(now - last_time))
-        self.tooltips.set_tip(self.trayicon, self.tip())
+        self.trayicon.set_tooltip_text(self.tip())
         return True
 
     def tip(self):
