@@ -33,13 +33,16 @@ except NameError:
 # This is to let people run GTimeLog without having to install it
 resource_dir = os.path.dirname(os.path.realpath(__file__))
 ui_file = os.path.join(resource_dir, "gtimelog.ui")
-icon_file = os.path.join(resource_dir, "gtimelog-small.png")
+icon_file_bright = os.path.join(resource_dir, "gtimelog-small-bright.png")
+icon_file_dark = os.path.join(resource_dir, "gtimelog-small.png")
 
 # This is for distribution packages
 if not os.path.exists(ui_file):
     ui_file = "/usr/share/gtimelog/gtimelog.ui"
-if not os.path.exists(icon_file):
-    icon_file = "/usr/share/pixmaps/gtimelog-small.png"
+if not os.path.exists(icon_file_dark):
+    icon_file_dark = "/usr/share/pixmaps/gtimelog-small.png"
+if not os.path.exists(icon_file_bright):
+    icon_file_bright = "/usr/share/pixmaps/gtimelog-small-bright.png"
 
 
 def as_minutes(duration):
@@ -831,7 +834,21 @@ class Settings(object):
             f.close()
 
 
-class SimpleStatusIcon(object):
+class IconChooser(object):
+
+    @property
+    def icon_name(self):
+        # XXX assumes the panel's color matches a menu bar's color, which is
+        # not necessarily the case!  this logic works for, say,
+        # Ambiance/Radiance, but it gets New Wave and Dark Room wrong.
+        menu_text_color = gtk.MenuBar().rc_get_style().text[gtk.STATE_NORMAL]
+        if menu_text_color.value >= 0.5:
+            return icon_file_bright
+        else:
+            return icon_file_dark
+
+
+class SimpleStatusIcon(IconChooser):
     """Status icon for gtimelog in the notification area."""
 
     def __init__(self, gtimelog_window):
@@ -841,11 +858,12 @@ class SimpleStatusIcon(object):
         if not hasattr(gtk, 'StatusIcon'):
             # you must be using a very old PyGtk
             return
-        self.icon = gtk.status_icon_new_from_file(icon_file)
+        self.icon = gtk.status_icon_new_from_file(self.icon_name)
         self.last_tick = False
         self.tick()
         self.icon.connect("activate", self.on_activate)
         self.icon.connect("popup-menu", self.on_popup_menu)
+        self.gtimelog_window.main_window.connect("style-set", self.on_style_set)
         gobject.timeout_add(1000, self.tick)
         self.gtimelog_window.entry_watchers.append(self.entry_added)
         self.gtimelog_window.tray_icon = self
@@ -856,6 +874,10 @@ class SimpleStatusIcon(object):
         SimpleStatusIcon needs PyGtk 2.10 or newer
         """
         return self.icon is not None
+
+    def on_style_set(self, *args):
+        """The user chose a different theme."""
+        self.icon.set_from_file(self.icon_name)
 
     def on_activate(self, widget):
         """The user clicked on the icon."""
@@ -892,10 +914,8 @@ class SimpleStatusIcon(object):
         return tip
 
 
-class AppIndicator(object):
+class AppIndicator(IconChooser):
     """Ubuntu's application indicator for gtimelog."""
-
-    icon_name = icon_file
 
     def __init__(self, gtimelog_window):
         self.gtimelog_window = gtimelog_window
@@ -911,6 +931,7 @@ class AppIndicator(object):
         self.indicator.set_status(appindicator.STATUS_ACTIVE)
         self.indicator.set_menu(gtimelog_window.tray_icon_popup_menu)
         self.gtimelog_window.tray_icon = self
+        self.gtimelog_window.main_window.connect("style-set", self.on_style_set)
 
     def available(self):
         """Is the icon supported by this system?
@@ -919,8 +940,12 @@ class AppIndicator(object):
         """
         return self.indicator is not None
 
+    def on_style_set(self, *args):
+        """The user chose a different theme."""
+        self.indicator.set_icon(self.icon_name)
 
-class OldTrayIcon(object):
+
+class OldTrayIcon(IconChooser):
     """Old tray icon for gtimelog, shows a ticking clock.
 
     Uses the old and deprecated egg.trayicon module.
@@ -938,9 +963,9 @@ class OldTrayIcon(object):
                    # which was later renamed to python-eggtrayicon
         self.eventbox = gtk.EventBox()
         hbox = gtk.HBox()
-        icon = gtk.Image()
-        icon.set_from_file(icon_file)
-        hbox.add(icon)
+        self.icon = gtk.Image()
+        self.icon.set_from_file(self.icon_name)
+        hbox.add(self.icon)
         self.time_label = gtk.Label()
         hbox.add(self.time_label)
         self.eventbox.add(hbox)
@@ -949,6 +974,7 @@ class OldTrayIcon(object):
         self.last_tick = False
         self.tick(force_update=True)
         self.trayicon.show_all()
+        self.gtimelog_window.main_window.connect("style-set", self.on_style_set)
         tray_icon_popup_menu = gtimelog_window.tray_icon_popup_menu
         self.eventbox.connect_object("button-press-event", self.on_press,
                                      tray_icon_popup_menu)
@@ -964,6 +990,10 @@ class OldTrayIcon(object):
         no longer available in modern Linux distributions.
         """
         return self.trayicon is not None
+
+    def on_style_set(self, *args):
+        """The user chose a different theme."""
+        self.icon.set_from_file(self.icon_name)
 
     def on_press(self, widget, event):
         """A mouse button was pressed on the tray icon label."""
