@@ -784,6 +784,7 @@ class Settings(object):
     show_tray_icon = True
     prefer_app_indicator = True
     prefer_old_tray_icon = False
+    start_in_tray = False
 
     def _config(self):
         config = ConfigParser.RawConfigParser()
@@ -806,6 +807,7 @@ class Settings(object):
         config.set('gtimelog', 'show_tray_icon', str(self.show_tray_icon))
         config.set('gtimelog', 'prefer_app_indicator', str(self.prefer_app_indicator))
         config.set('gtimelog', 'prefer_old_tray_icon', str(self.prefer_old_tray_icon))
+        config.set('gtimelog', 'start_in_tray', str(self.start_in_tray))
         return config
 
     def load(self, filename):
@@ -831,6 +833,7 @@ class Settings(object):
                                                       'prefer_app_indicator')
         self.prefer_old_tray_icon = config.getboolean('gtimelog',
                                                       'prefer_old_tray_icon')
+        self.start_in_tray = config.getboolean('gtimelog', 'start_in_tray')
 
     def save(self, filename):
         config = self._config()
@@ -1749,6 +1752,8 @@ def main():
             if '--toggle' in sys.argv:
                 dbus_service.ToggleFocus()
                 print "Already running, toggling visibility"
+            elif '--tray' in sys.argv:
+                print "Already running, not doing anything"
             else:
                 dbus_service.Present()
                 print "Already running, presenting main window"
@@ -1776,6 +1781,7 @@ def main():
     else:
         tasks = TaskList(os.path.join(configdir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
+    start_in_tray = False
     if settings.show_tray_icon:
         if settings.prefer_app_indicator:
             icons = [AppIndicator, SimpleStatusIcon, OldTrayIcon]
@@ -1786,7 +1792,10 @@ def main():
         for icon_class in icons:
             tray_icon = icon_class(main_window)
             if tray_icon.available():
+                start_in_tray = settings.start_in_tray or ('--tray' in sys.argv)
                 break # found one that works
+    if not start_in_tray:
+        main_window.on_show_activate()
     if dbus:
         service = Service(main_window)
     try:
