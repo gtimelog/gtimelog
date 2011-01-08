@@ -859,11 +859,7 @@ class SimpleStatusIcon(object):
 
     def on_activate(self, widget):
         """The user clicked on the icon."""
-        main_window = self.gtimelog_window.main_window
-        if main_window.get_property("visible"):
-           main_window.hide()
-        else:
-           main_window.present()
+        self.gtimelog_window.toggle_visible()
 
     def on_popup_menu(self, widget, button, activate_time):
         """The user clicked on the icon."""
@@ -986,11 +982,7 @@ class OldTrayIcon(object):
         """A mouse button was released on the tray icon label."""
         if event.button != 1:
             return
-        main_window = self.gtimelog_window.main_window
-        if main_window.get_property("visible"):
-           main_window.hide()
-        else:
-           main_window.present()
+        self.gtimelog_window.toggle_visible()
 
     def entry_added(self, entry):
         """An entry has been added."""
@@ -1318,7 +1310,7 @@ class MainWindow(object):
     def delete_event(self, widget, data=None):
         """Try to close the window."""
         if self.tray_icon:
-            self.main_window.hide()
+            self.on_hide_activate()
             return True
         else:
             gtk.main_quit()
@@ -1328,17 +1320,24 @@ class MainWindow(object):
         """Ok clicked in the about dialog."""
         self.about_dialog.hide()
 
-    def on_show_activate(self, widget):
+    def on_show_activate(self, widget=None):
         """Tray icon menu -> Show selected"""
         self.main_window.present()
         self.tray_show.hide()
         self.tray_hide.show()
 
-    def on_hide_activate(self, widget):
+    def on_hide_activate(self, widget=None):
         """Tray icon menu -> Hide selected"""
         self.main_window.hide()
         self.tray_hide.hide()
         self.tray_show.show()
+
+    def toggle_visible(self):
+        """Toggle main window visibility."""
+        if self.main_window.get_property("visible"):
+            self.on_hide_activate()
+        else:
+            self.on_show_activate()
 
     def on_quit_activate(self, widget):
         """File -> Quit selected"""
