@@ -18,7 +18,6 @@ import pygtk
 pygtk.require('2.0')
 import gobject
 import gtk
-import gtk.glade
 import pango
 
 from gtimelog import __version__
@@ -33,12 +32,12 @@ except NameError:
 
 # This is to let people run GTimeLog without having to install it
 resource_dir = os.path.dirname(os.path.realpath(__file__))
-ui_file = os.path.join(resource_dir, "gtimelog.glade")
+ui_file = os.path.join(resource_dir, "gtimelog.ui")
 icon_file = os.path.join(resource_dir, "gtimelog-small.png")
 
 # This is for distribution packages
 if not os.path.exists(ui_file):
-    ui_file = "/usr/share/gtimelog/gtimelog.glade"
+    ui_file = "/usr/share/gtimelog/gtimelog.ui"
 if not os.path.exists(icon_file):
     icon_file = "/usr/share/pixmaps/gtimelog-small.png"
 
@@ -1028,57 +1027,58 @@ class MainWindow(object):
 
     def _init_ui(self):
         """Initialize the user interface."""
-        tree = gtk.glade.XML(ui_file)
+        builder = gtk.Builder()
+        builder.add_from_file(ui_file)
         # Set initial state of menu items *before* we hook up signals
-        chronological_menu_item = tree.get_widget("chronological")
+        chronological_menu_item = builder.get_object("chronological")
         chronological_menu_item.set_active(self.chronological)
-        show_task_pane_item = tree.get_widget("show_task_pane")
+        show_task_pane_item = builder.get_object("show_task_pane")
         show_task_pane_item.set_active(self.show_tasks)
         # Now hook up signals
-        tree.signal_autoconnect(self)
+        builder.connect_signals(self)
         # Store references to UI elements we're going to need later
-        self.tray_icon_popup_menu = tree.get_widget("tray_icon_popup_menu")
-        self.tray_show = tree.get_widget("tray_show")
-        self.tray_hide = tree.get_widget("tray_hide")
-        self.about_dialog = tree.get_widget("about_dialog")
-        self.about_dialog_ok_btn = tree.get_widget("ok_button")
+        self.tray_icon_popup_menu = builder.get_object("tray_icon_popup_menu")
+        self.tray_show = builder.get_object("tray_show")
+        self.tray_hide = builder.get_object("tray_hide")
+        self.about_dialog = builder.get_object("about_dialog")
+        self.about_dialog_ok_btn = builder.get_object("ok_button")
         self.about_dialog_ok_btn.connect("clicked", self.close_about_dialog)
-        self.about_text = tree.get_widget("about_text")
+        self.about_text = builder.get_object("about_text")
         self.about_text.set_markup(self.about_text.get_label() %
                                    dict(version=__version__))
-        self.calendar_dialog = tree.get_widget("calendar_dialog")
-        self.calendar = tree.get_widget("calendar")
+        self.calendar_dialog = builder.get_object("calendar_dialog")
+        self.calendar = builder.get_object("calendar")
         self.calendar.connect("day_selected_double_click",
                               self.on_calendar_day_selected_double_click)
-        self.main_window = tree.get_widget("main_window")
+        self.main_window = builder.get_object("main_window")
         self.main_window.connect("delete_event", self.delete_event)
-        self.log_view = tree.get_widget("log_view")
+        self.log_view = builder.get_object("log_view")
         self.set_up_log_view_columns()
-        self.task_pane = tree.get_widget("task_list_pane")
+        self.task_pane = builder.get_object("task_list_pane")
         if not self.show_tasks:
             self.task_pane.hide()
-        self.task_pane_info_label = tree.get_widget("task_pane_info_label")
+        self.task_pane_info_label = builder.get_object("task_pane_info_label")
         self.tasks.loading_callback = self.task_list_loading
         self.tasks.loaded_callback = self.task_list_loaded
         self.tasks.error_callback = self.task_list_error
-        self.task_list = tree.get_widget("task_list")
+        self.task_list = builder.get_object("task_list")
         self.task_store = gtk.TreeStore(str, str)
         self.task_list.set_model(self.task_store)
         column = gtk.TreeViewColumn("Task", gtk.CellRendererText(), text=0)
         self.task_list.append_column(column)
         self.task_list.connect("row_activated", self.task_list_row_activated)
-        self.task_list_popup_menu = tree.get_widget("task_list_popup_menu")
+        self.task_list_popup_menu = builder.get_object("task_list_popup_menu")
         self.task_list.connect_object("button_press_event",
                                       self.task_list_button_press,
                                       self.task_list_popup_menu)
-        task_list_edit_menu_item = tree.get_widget("task_list_edit")
+        task_list_edit_menu_item = builder.get_object("task_list_edit")
         if not self.settings.edit_task_list_cmd:
             task_list_edit_menu_item.set_sensitive(False)
-        self.time_label = tree.get_widget("time_label")
-        self.task_entry = tree.get_widget("task_entry")
+        self.time_label = builder.get_object("time_label")
+        self.task_entry = builder.get_object("task_entry")
         self.task_entry.connect("changed", self.task_entry_changed)
         self.task_entry.connect("key_press_event", self.task_entry_key_press)
-        self.add_button = tree.get_widget("add_button")
+        self.add_button = builder.get_object("add_button")
         self.add_button.connect("clicked", self.add_entry)
         buffer = self.log_view.get_buffer()
         self.log_buffer = buffer
