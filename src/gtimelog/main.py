@@ -901,7 +901,7 @@ class SimpleStatusIcon(object):
 
 class OldTrayIcon(object):
     """Old tray icon for gtimelog, shows a ticking clock.
-    
+
     Uses the old and deprecated egg.trayicon module.
     """
 
@@ -914,6 +914,7 @@ class OldTrayIcon(object):
         except ImportError:
             return # nothing to do here, move along
                    # or install python-gnome2-extras
+                   # which was later renamed to python-eggtrayicon
         self.eventbox = gtk.EventBox()
         hbox = gtk.HBox()
         icon = gtk.Image()
