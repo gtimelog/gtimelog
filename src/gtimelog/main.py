@@ -900,9 +900,7 @@ class SimpleStatusIcon(object):
 class AppIndicator(object):
     """Ubuntu's application indicator for gtimelog."""
 
-    icon_name = "task-due"
-    # XXX: there's no appropriate standard icon
-    # (http://standards.freedesktop.org/icon-naming-spec/icon-naming-spec-latest.html#names)
+    icon_name = icon_file
 
     def __init__(self, gtimelog_window):
         self.gtimelog_window = gtimelog_window
