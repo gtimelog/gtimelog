@@ -20,6 +20,13 @@ import gobject
 import gtk
 import pango
 
+try:
+    import dbus
+    import dbus.service
+    import dbus.mainloop.glib
+except ImportError:
+    dbus = None
+
 from gtimelog import __version__
 
 
@@ -1694,6 +1701,30 @@ class MainWindow(object):
         return True
 
 
+if dbus:
+    INTERFACE = "lt.pov.mg.gtimelog.Service"
+    OBJECT_PATH = "/lt/pov/mg/gtimelog/Service"
+    SERVICE = "lt.pov.mg.gtimelog.GTimeLog"
+
+    class Service(dbus.service.Object):
+        """Our DBus service, used to communicate with the main instance."""
+
+        def __init__(self, main_window):
+            session_bus = dbus.SessionBus()
+            connection = dbus.service.BusName(SERVICE, session_bus)
+            dbus.service.Object.__init__(self, connection, OBJECT_PATH)
+
+            self.main_window = main_window
+
+        @dbus.service.method(INTERFACE)
+        def ToggleFocus(self):
+            self.main_window.toggle_visible()
+
+        @dbus.service.method(INTERFACE)
+        def Present(self):
+            self.main_window.on_show_activate()
+
+
 def main():
     """Run the program."""
     if len(sys.argv) > 1 and sys.argv[1] == '--sample-config':
@@ -1701,6 +1732,29 @@ def main():
         settings.save("gtimelogrc.sample")
         print "Sample configuration file written to gtimelogrc.sample"
         return
+
+    if '--ignore-dbus' in sys.argv:
+        global dbus
+        dbus = None
+
+    # Let's check if there is already an instance of GTimeLog running
+    # and if it is make it present itself or when it is already presented
+    # hide it and then quit.
+    if dbus:
+        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+
+        try:
+            session_bus = dbus.SessionBus()
+            dbus_service = session_bus.get_object(SERVICE, OBJECT_PATH)
+            if '--toggle' in sys.argv:
+                dbus_service.ToggleFocus()
+                print "Already running, toggling visibility"
+            else:
+                dbus_service.Present()
+                print "Already running, presenting main window"
+            sys.exit()
+        except dbus.DBusException:
+            pass
 
     configdir = os.path.expanduser(
         os.environ.get('GTIMELOG_HOME') or '~/.gtimelog')
@@ -1733,6 +1787,8 @@ def main():
             tray_icon = icon_class(main_window)
             if tray_icon.available():
                 break # found one that works
+    if dbus:
+        service = Service(main_window)
     try:
         gtk.main()
     except KeyboardInterrupt:
