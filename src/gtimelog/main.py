@@ -772,6 +772,7 @@ class Settings(object):
 
     show_office_hours = True
     show_tray_icon = True
+    prefer_app_indicator = True
     prefer_old_tray_icon = True
 
     def _config(self):
@@ -792,6 +793,7 @@ class Settings(object):
         config.set('gtimelog', 'show_office_hours',
                    str(self.show_office_hours))
         config.set('gtimelog', 'show_tray_icon', str(self.show_tray_icon))
+        config.set('gtimelog', 'prefer_app_indicator', str(self.prefer_app_indicator))
         config.set('gtimelog', 'prefer_old_tray_icon', str(self.prefer_old_tray_icon))
         return config
 
@@ -813,6 +815,8 @@ class Settings(object):
         self.show_office_hours = config.getboolean('gtimelog',
                                                    'show_office_hours')
         self.show_tray_icon = config.getboolean('gtimelog', 'show_tray_icon')
+        self.prefer_app_indicator = config.getboolean('gtimelog',
+                                                      'prefer_app_indicator')
         self.prefer_old_tray_icon = config.getboolean('gtimelog',
                                                       'prefer_old_tray_icon')
 
@@ -1680,10 +1684,12 @@ def main():
         tasks = TaskList(os.path.join(configdir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
     if settings.show_tray_icon:
-        if settings.prefer_old_tray_icon:
+        if settings.prefer_app_indicator:
+            icons = [AppIndicator, SimpleStatusIcon, OldTrayIcon]
+        elif settings.prefer_old_tray_icon:
             icons = [OldTrayIcon, SimpleStatusIcon, AppIndicator]
         else:
-            icons = [AppIndicator, SimpleStatusIcon, OldTrayIcon]
+            icons = [SimpleStatusIcon, OldTrayIcon, AppIndicator]
         for icon_class in icons:
             tray_icon = icon_class(main_window)
             if tray_icon.available():
