@@ -772,7 +772,7 @@ class Settings(object):
 
     show_office_hours = True
     show_tray_icon = True
-    prefer_old_tray_icon = True
+    prefer_old_tray_icon = False
 
     def _config(self):
         config = ConfigParser.RawConfigParser()
