@@ -1,7 +1,7 @@
 Changes in version 0.4.1 (unreleased)
 ==============================================
 
-*
+* Switch from Glade to GtkBuilder.  Fixes strange theme problems (LP: #644393)
 
 
 Changes in version 0.4.0 (released 2010-09-03)
