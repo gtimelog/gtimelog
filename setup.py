@@ -44,7 +44,7 @@ setup(
 
     packages=['gtimelog'],
     package_dir={'gtimelog': 'src/gtimelog'},
-    package_data={'gtimelog': ['*.glade', '*.png']},
+    package_data={'gtimelog': ['*.ui', '*.png']},
     test_suite='gtimelog.test_gtimelog',
     zip_safe=False,
     entry_points="""

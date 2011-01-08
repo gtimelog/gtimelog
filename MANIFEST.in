@@ -5,4 +5,4 @@ include gtimelog.desktop
 include gtimelogrc.example
 include runtests
 include scripts/*.py
-recursive-include src *.png *.glade
+recursive-include src *.png *.ui
