@@ -3,6 +3,23 @@ Changes in version 0.4.1 (unreleased)
 
 * Switch from Glade to GtkBuilder.  Fixes strange theme problems (LP: #644393)
 
+* Made GTimeLog a single instance application.  Requires python-dbus.
+  The following command line options are supported::
+
+    gtimelog --ignore-dbus
+        always launch a new application instance, do not start the DBus service
+
+    gtimelog --toggle
+        if GtimeLog already running, show or hide the GTimeLog window,
+        otherwise launch a new application instance
+
+    gtimelog
+        if GtimeLog already running, bring the GTimeLog window to the front,
+        otherwise launch a new application instance
+
+  Contributed by Bruce van der Kooij (https://launchpad.net/~brucevdk),
+  Fixes LP: #356495.
+
 
 Changes in version 0.4.0 (released 2010-09-03)
 ==============================================
