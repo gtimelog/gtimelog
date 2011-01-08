@@ -772,6 +772,7 @@ class Settings(object):
 
     show_office_hours = True
     show_tray_icon = True
+    prefer_app_indicator = True
     prefer_old_tray_icon = False
 
     def _config(self):
@@ -793,6 +794,7 @@ class Settings(object):
         config.set('gtimelog', 'show_office_hours',
                    str(self.show_office_hours))
         config.set('gtimelog', 'show_tray_icon', str(self.show_tray_icon))
+        config.set('gtimelog', 'prefer_app_indicator', str(self.prefer_app_indicator))
         config.set('gtimelog', 'prefer_old_tray_icon', str(self.prefer_old_tray_icon))
         return config
 
@@ -815,6 +817,8 @@ class Settings(object):
         self.show_office_hours = config.getboolean('gtimelog',
                                                    'show_office_hours')
         self.show_tray_icon = config.getboolean('gtimelog', 'show_tray_icon')
+        self.prefer_app_indicator = config.getboolean('gtimelog',
+                                                      'prefer_app_indicator')
         self.prefer_old_tray_icon = config.getboolean('gtimelog',
                                                       'prefer_old_tray_icon')
 
@@ -863,13 +867,6 @@ class SimpleStatusIcon(object):
 
     def on_popup_menu(self, widget, button, activate_time):
         """The user clicked on the icon."""
-        main_window = self.gtimelog_window.main_window
-        if main_window.get_property("visible"):
-            self.gtimelog_window.tray_show.hide()
-            self.gtimelog_window.tray_hide.show()
-        else:
-            self.gtimelog_window.tray_show.show()
-            self.gtimelog_window.tray_hide.hide()
         tray_icon_popup_menu = self.gtimelog_window.tray_icon_popup_menu
         tray_icon_popup_menu.popup(None, None, gtk.status_icon_position_menu,
                                    button, activate_time, self.icon)
@@ -897,6 +894,34 @@ class SimpleStatusIcon(object):
                 time_left = datetime.timedelta(0)
             tip += "\nTime left at work: %s" % format_duration(time_left)
         return tip
+
+
+class AppIndicator(object):
+    """Ubuntu's application indicator for gtimelog."""
+
+    icon_name = icon_file
+
+    def __init__(self, gtimelog_window):
+        self.gtimelog_window = gtimelog_window
+        self.timelog = gtimelog_window.timelog
+        self.indicator = None
+        try:
+            import appindicator
+        except ImportError:
+            return # nothing to do here, move along
+                   # or install python-appindicator
+        self.indicator = appindicator.Indicator("gtimelog", self.icon_name,
+                                    appindicator.CATEGORY_APPLICATION_STATUS)
+        self.indicator.set_status(appindicator.STATUS_ACTIVE)
+        self.indicator.set_menu(gtimelog_window.tray_icon_popup_menu)
+        self.gtimelog_window.tray_icon = self
+
+    def available(self):
+        """Is the icon supported by this system?
+
+        AppIndicator needs python-appindicator
+        """
+        return self.indicator is not None
 
 
 class OldTrayIcon(object):
@@ -1040,6 +1065,7 @@ class MainWindow(object):
         self.tray_icon_popup_menu = builder.get_object("tray_icon_popup_menu")
         self.tray_show = builder.get_object("tray_show")
         self.tray_hide = builder.get_object("tray_hide")
+        self.tray_show.hide()
         self.about_dialog = builder.get_object("about_dialog")
         self.about_dialog_ok_btn = builder.get_object("ok_button")
         self.about_dialog_ok_btn.connect("clicked", self.close_about_dialog)
@@ -1305,10 +1331,14 @@ class MainWindow(object):
     def on_show_activate(self, widget):
         """Tray icon menu -> Show selected"""
         self.main_window.present()
+        self.tray_show.hide()
+        self.tray_hide.show()
 
     def on_hide_activate(self, widget):
         """Tray icon menu -> Hide selected"""
         self.main_window.hide()
+        self.tray_hide.hide()
+        self.tray_show.show()
 
     def on_quit_activate(self, widget):
         """File -> Quit selected"""
@@ -1664,10 +1694,12 @@ def main():
         tasks = TaskList(os.path.join(configdir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
     if settings.show_tray_icon:
-        if settings.prefer_old_tray_icon:
-            icons = [OldTrayIcon, SimpleStatusIcon]
+        if settings.prefer_app_indicator:
+            icons = [AppIndicator, SimpleStatusIcon, OldTrayIcon]
+        elif settings.prefer_old_tray_icon:
+            icons = [OldTrayIcon, SimpleStatusIcon, AppIndicator]
         else:
-            icons = [SimpleStatusIcon, OldTrayIcon]
+            icons = [SimpleStatusIcon, OldTrayIcon, AppIndicator]
         for icon_class in icons:
             tray_icon = icon_class(main_window)
             if tray_icon.available():
