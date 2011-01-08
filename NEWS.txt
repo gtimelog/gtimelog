@@ -20,6 +20,12 @@ Changes in version 0.4.1 (unreleased)
   Contributed by Bruce van der Kooij (https://launchpad.net/~brucevdk),
   Fixes LP: #356495.
 
+* New option: start_in_tray.  Defaults to false.  Contributed by Bruce van der
+  Kooij (https://launchpad.net/~brucevdk), as part of his patch for LP:
+  #356495.
+
+* New command-line option: --tray.
+
 
 Changes in version 0.4.0 (released 2010-09-03)
 ==============================================

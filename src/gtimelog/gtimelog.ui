@@ -3,7 +3,7 @@
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy toplevel-contextual -->
   <object class="GtkWindow" id="main_window">
-    <property name="visible">True</property>
+    <property name="visible">False</property>
     <property name="title" translatable="yes">Time Log</property>
     <property name="window_position">center</property>
     <property name="default_width">800</property>
