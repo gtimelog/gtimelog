@@ -46,6 +46,9 @@ Changes in version 0.5.0 (unreleased)
 
 * Added some documentation for contributors: HACKING.txt.
 
+* Daily reports include totals by category.  Contributed by Laurynas Speičys
+  <laurynas@pov.lt>.
+
 
 Changes in version 0.4.0 (released 2010-09-03)
 ==============================================
