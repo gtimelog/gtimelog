@@ -455,14 +455,28 @@ class TimeWindow(object):
         work, slack = self.grouped_entries()
         total_work, total_slacking = self.totals()
         if work:
+            categories = {}
             for start, entry, duration in work:
                 entry = entry[:1].upper() + entry[1:]
                 print >> output, u"%-62s  %s" % (entry,
                                                 format_duration_long(duration))
+                if ': ' in entry:
+                    cat, task = entry.split(': ', 1)
+                    categories[cat] = categories.get(
+                        cat, datetime.timedelta(0)) + duration
+                else:
+                    categories[None] = categories.get(
+                        None, datetime.timedelta(0)) + duration
+
             print >> output
         print >> output, ("Total work done: %s" %
                           format_duration_long(total_work))
-        print >> output
+
+        if categories:
+            self.report_categories(output, categories)
+
+        print >> output, 'Slacking:\n'
+
         if slack:
             for start, entry, duration in slack:
                 entry = entry[:1].upper() + entry[1:]
