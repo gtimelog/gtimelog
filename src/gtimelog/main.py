@@ -291,6 +291,37 @@ class TimeWindow(object):
         slack.sort()
         return work, slack
 
+    def categorized_work_entries(self, skip_first=True):
+        """Return consolidated work entries grouped by category.
+
+        Category is a string preceding the first ':' in the entry.
+
+        Return two dicts:
+          - {<category>: <entry list>}, where <category> is a category string
+            and <entry list> is a sorted list that contains tuples (start,
+            entry, duration); entry is stripped of its category prefix.
+          - {<category>: <total duration>}, where <total duration> is the
+            total duration of work in the <category>.
+        """
+
+        work, slack = self.grouped_entries(skip_first=skip_first)
+        entries = {}
+        totals = {}
+        for start, entry, duration in work:
+            if ': ' in entry:
+                cat, clipped_entry = entry.split(': ', 1)
+                entry_list = entries.get(cat, [])
+                entry_list.append((start, clipped_entry, duration))
+                entries[cat] = entry_list
+                totals[cat] = totals.get(cat, datetime.timedelta(0)) + duration
+            else:
+                entry_list = entries.get(None, [])
+                entry_list.append((start, entry, duration))
+                entries[None] = entry_list
+                totals[None] = totals.get(
+                    None, datetime.timedelta(0)) + duration
+        return entries, totals
+
     def totals(self):
         """Calculate total time of work and slacking entries.
 
@@ -485,6 +516,82 @@ class TimeWindow(object):
             print >> output
         print >> output, ("Time spent slacking: %s" %
                           format_duration_long(total_slacking))
+
+    def weekly_report_new_style(self, output, email, who, estimated_column=False):
+        """Format a weekly report in a new style.
+
+        Writes a weekly report template in RFC-822 format to output.
+
+        The new form looks like
+        |                            time
+        | Overhead:
+        |   Status meeting              43
+        |   Mail                      1:50
+        | --------------------------------
+        |                             2:33
+        |
+        | Compass:
+        |   Compass: hotpatch         2:13
+        |   Call with a client          30
+        | --------------------------------
+        |                             3:43
+        |
+        | SAT roundup 1:00
+        |
+        | Total work done this week: 6:26
+
+        """
+        week = self.min_timestamp.strftime('%V')
+        print >> output, "To: %(email)s" % {'email': email}
+        print >> output, "Subject: Weekly report for %s (week %s)" % (who,
+                                                                      week)
+        print >> output
+        items = list(self.all_entries())
+        if not items:
+            print >> output, "No work done this week."
+            return
+        print >> output, " " * 46,
+        if estimated_column:
+            print >> output, "estimated       actual"
+        else:
+            print >> output, "                time"
+
+        total_work, total_slacking = self.totals()
+        entries, totals = self.categorized_work_entries()
+        if entries:
+            categories = entries.keys()
+            categories.sort()
+            if categories[0] == None:
+                categories = categories[1:]
+                categories.append('No category')
+                e = entries.pop(None)
+                entries['No category'] = e
+                t = totals.pop(None)
+                totals['No category'] = t
+            for cat in categories:
+                print >> output, '%s:\n' % cat
+
+                work = [(entry, duration)
+                        for start, entry, duration in entries[cat]]
+                work.sort()
+                for entry, duration in work:
+                    if not duration:
+                        continue # skip empty "arrival" entries
+
+                    entry = entry[:1].upper() + entry[1:]
+                    if estimated_column:
+                        print >> output, (u"%-46s  %-14s  %s" %
+                                    (entry, '-', format_duration_short(duration)))
+                    else:
+                        print >> output, (u"%-61s  %+5s" %
+                                    (entry, format_duration_short(duration)))
+
+                print >> output, '-' * 68
+                print >> output, (u"%+68s" %
+                                  format_duration_short(totals[cat]))
+                print >> output
+        print >> output, ("Total work done this week: %s" %
+                          format_duration_short(total_work))
 
     def weekly_report(self, output, email, who, estimated_column=False):
         """Format a weekly report.
@@ -1399,20 +1506,20 @@ class MainWindow(object):
     def on_weekly_report_activate(self, widget):
         """File -> Weekly Report"""
         window = self.weekly_window()
-        self.mail(window.weekly_report)
+        self.mail(window.weekly_report_new_style)
 
     def on_last_weeks_report_activate(self, widget):
         """File -> Weekly Report for Last Week"""
         day = self.timelog.day - datetime.timedelta(7)
         window = self.weekly_window(day=day)
-        self.mail(window.weekly_report)
+        self.mail(window.weekly_report_new_style)
 
     def on_previous_week_report_activate(self, widget):
         """File -> Weekly Report for a Previous Week"""
         day = self.choose_date()
         if day:
             window = self.weekly_window(day=day)
-            self.mail(window.weekly_report)
+            self.mail(window.weekly_report_new_style)
 
     def monthly_window(self, day=None):
         if not day:

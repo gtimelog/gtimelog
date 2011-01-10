@@ -316,6 +316,64 @@ def doctest_TimeWindow_daily_report():
 
     """
 
+def doctest_TimeWindow_weekly_report_new_style():
+    r"""Tests for TimeWindow.weekly_report_new_style
+
+        >>> import sys
+
+        >>> from datetime import datetime, time
+        >>> from tempfile import NamedTemporaryFile
+        >>> from gtimelog.main import TimeWindow
+
+        >>> vm = time(2, 0)
+        >>> min = datetime(2010, 1, 25)
+        >>> max = datetime(2010, 1, 31)
+        >>> fh = NamedTemporaryFile()
+
+        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window.weekly_report_new_style(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        To: foo@bar.com
+        Subject: Weekly report for Bob Jones (week 04)
+        <BLANKLINE>
+        No work done this week.
+
+        >>> _ = [fh.write(s + '\n') for s in [
+        ...    '2010-01-30 09:00: start',
+        ...    '2010-01-30 09:23: Bing: stuff',
+        ...    '2010-01-30 12:54: Bong: other stuff',
+        ...    '2010-01-30 13:32: lunch **',
+        ...    '2010-01-30 23:46: misc',
+        ...    '']]
+        >>> fh.flush()
+
+        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window.weekly_report_new_style(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        To: foo@bar.com
+        Subject: Weekly report for Bob Jones (week 04)
+        <BLANKLINE>
+                                                                       time
+        Bing:
+        <BLANKLINE>
+        Stuff                                                           0:23
+        --------------------------------------------------------------------
+                                                                        0:23
+        <BLANKLINE>
+        Bong:
+        <BLANKLINE>
+        Other stuff                                                     3:31
+        --------------------------------------------------------------------
+                                                                        3:31
+        <BLANKLINE>
+        No category:
+        <BLANKLINE>
+        Misc                                                           10:14
+        --------------------------------------------------------------------
+                                                                       10:14
+        <BLANKLINE>
+        Total work done this week: 14:08
+
+    """
+
 def doctest_TimeWindow_weekly_report():
     r"""Tests for TimeWindow.weekly_report
 
