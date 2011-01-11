@@ -912,6 +912,8 @@ class Settings(object):
     show_tray_icon = True
     prefer_old_tray_icon = True
 
+    report_style = 'plain'
+
     def _config(self):
         config = ConfigParser.RawConfigParser()
         config.add_section('gtimelog')
@@ -932,6 +934,7 @@ class Settings(object):
                    str(self.show_office_hours))
         config.set('gtimelog', 'show_tray_icon', str(self.show_tray_icon))
         config.set('gtimelog', 'prefer_old_tray_icon', str(self.prefer_old_tray_icon))
+        config.set('gtimelog', 'report_style', str(self.report_style))
         return config
 
     def load(self, filename):
@@ -955,6 +958,7 @@ class Settings(object):
         self.show_tray_icon = config.getboolean('gtimelog', 'show_tray_icon')
         self.prefer_old_tray_icon = config.getboolean('gtimelog',
                                                       'prefer_old_tray_icon')
+        self.report_style = config.get('gtimelog', 'report_style')
 
     def save(self, filename):
         config = self._config()
@@ -1523,20 +1527,38 @@ class MainWindow(object):
         """File -> Weekly Report"""
         day = self.timelog.day
         reports = Reports(self.weekly_window(day=day))
-        self.mail(reports.weekly_report_categorized)
+        if self.settings.report_style == 'plain':
+            report = reports.weekly_report_plain
+        elif self.settings.report_style == 'categorized':
+            report = reports.weekly_report_categorized
+        else:
+            report = reports.weekly_report_plain
+        self.mail(report)
 
     def on_last_weeks_report_activate(self, widget):
         """File -> Weekly Report for Last Week"""
         day = self.timelog.day - datetime.timedelta(7)
         reports = Reports(self.weekly_window(day=day))
-        self.mail(reports.weekly_report_categorized)
+        if self.settings.report_style == 'plain':
+            report = reports.weekly_report_plain
+        elif self.settings.report_style == 'categorized':
+            report = reports.weekly_report_categorized
+        else:
+            report = reports.weekly_report_plain
+        self.mail(report)
 
     def on_previous_week_report_activate(self, widget):
         """File -> Weekly Report for a Previous Week"""
         day = self.choose_date()
         if day:
             reports = Reports(self.weekly_window(day=day))
-            self.mail(reports.weekly_report_categorized)
+            if self.settings.report_style == 'plain':
+                report = reports.weekly_report_plain
+            elif self.settings.report_style == 'categorized':
+                report = reports.weekly_report_categorized
+            else:
+                report = reports.weekly_report_plain
+            self.mail(report)
 
     def monthly_window(self, day=None):
         if not day:
@@ -1555,18 +1577,36 @@ class MainWindow(object):
         day = self.choose_date()
         if day:
             reports = Reports(self.monthly_window(day=day))
-            self.mail(reports.monthly_report_categorized)
+            if self.settings.report_style == 'plain':
+                report = reports.monthly_report_plain
+            elif self.settings.report_style == 'categorized':
+                report = reports.monthly_report_categorized
+            else:
+                report = reports.monthly_report_plain
+            self.mail(report)
 
     def on_last_month_report_activate(self, widget):
         """File -> Monthly Report for Last Month"""
         day = self.timelog.day - datetime.timedelta(self.timelog.day.day)
         reports = Reports(self.monthly_window(day=day))
-        self.mail(reports.monthly_report_categorized)
+        if self.settings.report_style == 'plain':
+            report = reports.monthly_report_plain
+        elif self.settings.report_style == 'categorized':
+            report = reports.monthly_report_categorized
+        else:
+            report = reports.monthly_report_plain
+        self.mail(report)
 
     def on_monthly_report_activate(self, widget):
         """File -> Monthly Report"""
         reports = Reports(self.monthly_window())
-        self.mail(reports.monthly_report_categorized)
+        if self.settings.report_style == 'plain':
+            report = reports.monthly_report_plain
+        elif self.settings.report_style == 'categorized':
+            report = reports.monthly_report_categorized
+        else:
+            report = reports.monthly_report_plain
+        self.mail(report)
 
     def on_open_complete_spreadsheet_activate(self, widget):
         """Report -> Complete Report in Spreadsheet"""
