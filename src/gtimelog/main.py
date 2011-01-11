@@ -1521,8 +1521,9 @@ class MainWindow(object):
 
     def on_weekly_report_activate(self, widget):
         """File -> Weekly Report"""
-        report = Report(self.weekly_window())
-        self.mail(report.weekly_report_categorized)
+        day = self.timelog.day
+        reports = Reports(self.weekly_window(day=day))
+        self.mail(reports.weekly_report_categorized)
 
     def on_last_weeks_report_activate(self, widget):
         """File -> Weekly Report for Last Week"""
