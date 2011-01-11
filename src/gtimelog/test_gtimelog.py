@@ -231,6 +231,36 @@ def doctest_uniq():
 
     """
 
+def doctest_TimeWindow_to_csv_daily():
+    r"""Tests for TimeWindow.to_csv_daily
+
+        >>> from datetime import datetime, time
+        >>> min = datetime(2008, 6, 1)
+        >>> max = datetime(2008, 7, 1)
+        >>> vm = time(2, 0)
+
+        >>> from StringIO import StringIO
+        >>> sampledata = StringIO('''
+        ... 2008-06-03 12:45: start
+        ... 2008-06-03 13:00: something
+        ... 2008-06-03 14:45: something else
+        ... 2008-06-03 15:45: etc
+        ... 2008-06-05 12:45: start
+        ... 2008-06-05 13:15: something
+        ... ''')
+
+        >>> from gtimelog.main import TimeWindow
+        >>> window = TimeWindow(sampledata, min, max, vm)
+
+        >>> import sys
+        >>> window.to_csv_daily(sys.stdout)
+        date,day-start (hours),slacking (hours),work (hours)
+        2008-06-03,12.75,0.0,3.0
+        2008-06-04,0.0,0.0,0.0
+        2008-06-05,12.75,0.0,0.5
+
+    """
+
 def doctest_Report_weekly_report_categorized():
     r"""Tests for Report.weekly_report_categorized
 
@@ -364,14 +394,14 @@ def doctest_Report_monthly_report_categorized():
 
     """
 
-def doctest_TimeWindow_report_categories():
-    r"""Tests for TimeWindow.report_categories
+def doctest_Reports_report_categories():
+    r"""Tests for Reports._report_categories
 
         >>> import sys
 
         >>> from datetime import datetime, time, timedelta
         >>> from tempfile import NamedTemporaryFile
-        >>> from gtimelog.main import TimeWindow
+        >>> from gtimelog.main import TimeWindow, Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
@@ -383,7 +413,8 @@ def doctest_TimeWindow_report_categories():
         ...    None: timedelta(1)}
 
         >>> window = TimeWindow(fh.name, min, max, vm)
-        >>> window.report_categories(sys.stdout, categories)
+        >>> reports = Reports(window)
+        >>> reports._report_categories(sys.stdout, categories)
         <BLANKLINE>
         By category:
         <BLANKLINE>
@@ -393,13 +424,13 @@ def doctest_TimeWindow_report_categories():
 
     """
 
-def doctest_TimeWindow_daily_report():
-    r"""Tests for TimeWindow.daily_report
+def doctest_Reports_daily_report():
+    r"""Tests for Reports.daily_report
         >>> import sys
 
         >>> from datetime import datetime, time
         >>> from tempfile import NamedTemporaryFile
-        >>> from gtimelog.main import TimeWindow
+        >>> from gtimelog.main import TimeWindow, Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 30)
@@ -407,7 +438,8 @@ def doctest_TimeWindow_daily_report():
         >>> fh = NamedTemporaryFile()
 
         >>> window = TimeWindow(fh.name, min, max, vm)
-        >>> window.daily_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        >>> reports = Reports(window)
+        >>> reports.daily_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
         Subject: 2010-01-30 report for Bob Jones (Sat, week 04)
         <BLANKLINE>
@@ -423,7 +455,8 @@ def doctest_TimeWindow_daily_report():
         >>> fh.flush()
 
         >>> window = TimeWindow(fh.name, min, max, vm)
-        >>> window.daily_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        >>> reports = Reports(window)
+        >>> reports.daily_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
         Subject: 2010-01-30 report for Bob Jones (Sat, week 04)
         <BLANKLINE>
@@ -449,14 +482,14 @@ def doctest_TimeWindow_daily_report():
 
     """
 
-def doctest_TimeWindow_weekly_report():
-    r"""Tests for TimeWindow.weekly_report
+def doctest_Reports_weekly_report_plain():
+    r"""Tests for Reports.weekly_report_plain
 
         >>> import sys
 
         >>> from datetime import datetime, time
         >>> from tempfile import NamedTemporaryFile
-        >>> from gtimelog.main import TimeWindow
+        >>> from gtimelog.main import TimeWindow, Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
@@ -464,7 +497,8 @@ def doctest_TimeWindow_weekly_report():
         >>> fh = NamedTemporaryFile()
 
         >>> window = TimeWindow(fh.name, min, max, vm)
-        >>> window.weekly_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        >>> reports = Reports(window)
+        >>> reports.weekly_report_plain(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
         Subject: Weekly report for Bob Jones (week 04)
         <BLANKLINE>
@@ -480,7 +514,8 @@ def doctest_TimeWindow_weekly_report():
         >>> fh.flush()
 
         >>> window = TimeWindow(fh.name, min, max, vm)
-        >>> window.weekly_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        >>> reports = Reports(window)
+        >>> reports.weekly_report_plain(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
         Subject: Weekly report for Bob Jones (week 04)
         <BLANKLINE>
@@ -500,14 +535,14 @@ def doctest_TimeWindow_weekly_report():
 
     """
 
-def doctest_TimeWindow_monthly_report():
-    r"""Tests for TimeWindow.monthly_report
+def doctest_Reports_monthly_report_plain():
+    r"""Tests for Reports.monthly_report_plain
 
         >>> import sys
 
         >>> from datetime import datetime, time
         >>> from tempfile import NamedTemporaryFile
-        >>> from gtimelog.main import TimeWindow
+        >>> from gtimelog.main import TimeWindow, Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2007, 9, 1)
@@ -515,7 +550,8 @@ def doctest_TimeWindow_monthly_report():
         >>> fh = NamedTemporaryFile()
 
         >>> window = TimeWindow(fh.name, min, max, vm)
-        >>> window.monthly_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        >>> reports = Reports(window)
+        >>> reports.monthly_report_plain(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
         Subject: Monthly report for Bob Jones (2007/09)
         <BLANKLINE>
@@ -531,11 +567,12 @@ def doctest_TimeWindow_monthly_report():
         >>> fh.flush()
 
         >>> window = TimeWindow(fh.name, min, max, vm)
-        >>> window.monthly_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
+        >>> reports = Reports(window)
+        >>> reports.monthly_report_plain(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
         Subject: Monthly report for Bob Jones (2007/09)
         <BLANKLINE>
-        <BLANKLINE>
+                                                                       time
         Bing: stuff                                                     23 min
         Bong: other stuff                                               3 hours 31 min
         Misc                                                            2 hours 14 min
@@ -548,36 +585,6 @@ def doctest_TimeWindow_monthly_report():
         Bong                                                            3 hours 31 min
         (none)                                                          2 hours 14 min
         <BLANKLINE>
-
-    """
-
-def doctest_TimeWindow_to_csv_daily():
-    r"""Tests for TimeWindow.to_csv_daily
-
-        >>> from datetime import datetime, time
-        >>> min = datetime(2008, 6, 1)
-        >>> max = datetime(2008, 7, 1)
-        >>> vm = time(2, 0)
-
-        >>> from StringIO import StringIO
-        >>> sampledata = StringIO('''
-        ... 2008-06-03 12:45: start
-        ... 2008-06-03 13:00: something
-        ... 2008-06-03 14:45: something else
-        ... 2008-06-03 15:45: etc
-        ... 2008-06-05 12:45: start
-        ... 2008-06-05 13:15: something
-        ... ''')
-
-        >>> from gtimelog.main import TimeWindow
-        >>> window = TimeWindow(sampledata, min, max, vm)
-
-        >>> import sys
-        >>> window.to_csv_daily(sys.stdout)
-        date,day-start (hours),slacking (hours),work (hours)
-        2008-06-03,12.75,0.0,3.0
-        2008-06-04,0.0,0.0,0.0
-        2008-06-05,12.75,0.0,0.5
 
     """
 
