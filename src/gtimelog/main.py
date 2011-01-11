@@ -516,7 +516,7 @@ class Reports(object):
                         print >> output, (u"  %-61s  %+5s" %
                                     (entry, format_duration_short(duration)))
 
-                print >> output, '-' * 68
+                print >> output, '-' * 70
                 print >> output, (u"%+70s" %
                                   format_duration_short(totals[cat]))
                 print >> output
