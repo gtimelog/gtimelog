@@ -517,7 +517,8 @@ class TimeWindow(object):
         print >> output, ("Time spent slacking: %s" %
                           format_duration_long(total_slacking))
 
-    def weekly_report_new_style(self, output, email, who, estimated_column=False):
+    def weekly_report_new_style(self, output, email, who,
+                                estimated_column=False):
         """Format a weekly report in a new style.
 
         Writes a weekly report template in RFC-822 format to output.
@@ -569,7 +570,7 @@ class TimeWindow(object):
                 t = totals.pop(None)
                 totals['No category'] = t
             for cat in categories:
-                print >> output, '%s:\n' % cat
+                print >> output, '%s:' % cat
 
                 work = [(entry, duration)
                         for start, entry, duration in entries[cat]]
@@ -580,18 +581,29 @@ class TimeWindow(object):
 
                     entry = entry[:1].upper() + entry[1:]
                     if estimated_column:
-                        print >> output, (u"%-46s  %-14s  %s" %
+                        print >> output, (u"  %-46s  %-14s  %s" %
                                     (entry, '-', format_duration_short(duration)))
                     else:
-                        print >> output, (u"%-61s  %+5s" %
+                        print >> output, (u"  %-61s  %+5s" %
                                     (entry, format_duration_short(duration)))
 
                 print >> output, '-' * 68
-                print >> output, (u"%+68s" %
+                print >> output, (u"%+70s" %
                                   format_duration_short(totals[cat]))
                 print >> output
         print >> output, ("Total work done this week: %s" %
                           format_duration_short(total_work))
+
+        print >> output
+
+        ordered_by_time = [(time, cat) for cat, time in totals.items()]
+        ordered_by_time.sort(reverse=True)
+        max_cat_length = max([len(cat) for cat in totals.keys()])
+        line_format = '%-' + str(max_cat_length + 4) + 's %+5s'
+        print >> output, 'Categories by time spent:'
+        print >> output
+        for time, cat in ordered_by_time:
+            print >> output, line_format % (cat, format_duration_short(time))
 
     def weekly_report(self, output, email, who, estimated_column=False):
         """Format a weekly report.

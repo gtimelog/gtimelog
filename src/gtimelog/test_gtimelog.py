@@ -371,6 +371,12 @@ def doctest_TimeWindow_weekly_report_new_style():
                                                                        10:14
         <BLANKLINE>
         Total work done this week: 14:08
+        <BLANKLINE>
+        Categories by time spent:
+        <BLANKLINE>
+        No category     10:14
+        Bong             3:31
+        Bing             0:23
 
     """
 
