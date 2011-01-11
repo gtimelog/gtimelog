@@ -1476,15 +1476,15 @@ class MainWindow(object):
 
     def on_daily_report_activate(self, widget):
         """File -> Daily Report"""
-        window = self.timelog.window
-        self.mail(window.daily_report)
+        reports = Reports(self.timelog.window)
+        self.mail(reports.daily_report)
 
     def on_yesterdays_report_activate(self, widget):
         """File -> Daily Report for Yesterday"""
         max = self.timelog.window.min_timestamp
         min = max - datetime.timedelta(1)
-        window = self.timelog.window_for(min, max)
-        self.mail(window.daily_report)
+        reports = Reports(self.timelog.window_for(min, max))
+        self.mail(reports.daily_report)
 
     def on_previous_day_report_activate(self, widget):
         """File -> Daily Report for a Previous Day"""
@@ -1493,8 +1493,8 @@ class MainWindow(object):
             min = datetime.datetime.combine(day,
                             self.timelog.virtual_midnight)
             max = min + datetime.timedelta(1)
-            window = self.timelog.window_for(min, max)
-            self.mail(window.daily_report)
+            reports = Reports(self.timelog.window_for(min, max))
+            self.mail(reports.daily_report)
 
     def choose_date(self):
         """Pop up a calendar dialog.
