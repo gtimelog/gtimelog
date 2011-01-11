@@ -322,10 +322,9 @@ def doctest_Report_weekly_report_categorized():
         Total work done this week: 14:08
         <BLANKLINE>
         Categories by time spent:
-        <BLANKLINE>
-        No category     10:14
-        Bong             3:31
-        Bing             0:23
+          No category     10:14
+          Bong             3:31
+          Bing             0:23
 
     """
 

@@ -528,9 +528,8 @@ class Reports(object):
         ordered_by_time = [(time, cat) for cat, time in totals.items()]
         ordered_by_time.sort(reverse=True)
         max_cat_length = max([len(cat) for cat in totals.keys()])
-        line_format = '%-' + str(max_cat_length + 4) + 's %+5s'
+        line_format = '  %-' + str(max_cat_length + 4) + 's %+5s'
         print >> output, 'Categories by time spent:'
-        print >> output
         for time, cat in ordered_by_time:
             print >> output, line_format % (cat, format_duration_short(time))
 
