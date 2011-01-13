@@ -543,6 +543,7 @@ GTimeLog is a time tracking application.
           <object class="GtkCalendar" id="calendar">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="show_week_numbers">True</property>
           </object>
           <packing>
             <property name="position">2</property>
