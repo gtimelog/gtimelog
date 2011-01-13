@@ -129,7 +129,7 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="previous_day_report">
-                        <property name="label">Daily Report for a _Previous Day</property>
+                        <property name="label">Daily Report for a _Previous Day...</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
@@ -156,7 +156,7 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="previous_week_report">
-                        <property name="label">Weekly Report for a Pre_vious Week</property>
+                        <property name="label">Weekly Report for a Pre_vious Week...</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
@@ -183,7 +183,7 @@
                     </child>
                     <child>
                       <object class="GtkImageMenuItem" id="previous_month_report">
-                        <property name="label">Monthly Report for a Previous Month</property>
+                        <property name="label">Monthly Report for a Previous Month...</property>
                         <property name="visible">True</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
