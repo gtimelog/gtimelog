@@ -486,7 +486,7 @@
 
 GTimeLog is a time tracking application.
 
-&lt;small&gt;© 2004–2011 Marius Gedminas&lt;/small&gt;</property>
+&lt;small&gt;© 2004–2011 Marius Gedminas and contributors&lt;/small&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="justify">center</property>
               </object>
