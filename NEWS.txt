@@ -49,6 +49,8 @@ Changes in version 0.5.0 (unreleased)
 * Daily reports include totals by category.  Contributed by Laurynas Speičys
   <laurynas@pov.lt>.
 
+* The tasks pane can be toggled by pressing F9 and has a close button.
+
 
 Changes in version 0.4.0 (released 2010-09-03)
 ==============================================
