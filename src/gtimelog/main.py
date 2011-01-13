@@ -1566,6 +1566,10 @@ class MainWindow(object):
         else:
             self.task_pane.show()
 
+    def on_task_pane_close_button_activate(self, event, data=None):
+        """The close button next to the task pane title"""
+        self.task_pane.hide()
+
     def task_list_row_activated(self, treeview, path, view_column):
         """A task was selected in the task pane -- put it to the entry."""
         model = treeview.get_model()

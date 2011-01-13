@@ -3,7 +3,6 @@
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy toplevel-contextual -->
   <object class="GtkWindow" id="main_window">
-    <property name="visible">False</property>
     <property name="title" translatable="yes">Time Log</property>
     <property name="window_position">center</property>
     <property name="default_width">800</property>
@@ -94,6 +93,7 @@
                         <property name="label" translatable="yes">_Tasks</property>
                         <property name="use_underline">True</property>
                         <property name="active">True</property>
+                        <accelerator key="F9" signal="activate"/>
                         <signal name="toggled" handler="on_show_task_pane_toggled"/>
                       </object>
                     </child>
@@ -287,14 +287,11 @@
                 <property name="visible">True</property>
                 <property name="spacing">6</property>
                 <child>
-                  <object class="GtkLabel" id="label3">
+                  <object class="GtkHBox" id="task_list_pane_hack_hbox">
                     <property name="visible">True</property>
-                    <property name="xalign">0</property>
-                    <property name="xpad">2</property>
-                    <property name="label" translatable="yes">&lt;b&gt;_Tasks&lt;/b&gt;</property>
-                    <property name="use_markup">True</property>
-                    <property name="use_underline">True</property>
-                    <property name="mnemonic_widget">task_list</property>
+                    <child>
+                      <placeholder/>
+                    </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -303,32 +300,106 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkScrolledWindow" id="scrolledwindow2">
+                  <object class="GtkHBox" id="task_pane_hbox">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
-                    <property name="hscrollbar_policy">automatic</property>
-                    <property name="vscrollbar_policy">automatic</property>
-                    <property name="shadow_type">in</property>
+                    <property name="spacing">6</property>
                     <child>
-                      <object class="GtkTreeView" id="task_list">
+                      <object class="GtkVBox" id="task_list_pane_vbox">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="headers_visible">False</property>
+                        <property name="spacing">6</property>
+                        <child>
+                          <object class="GtkHBox" id="task_list_pane_heading">
+                            <property name="visible">True</property>
+                            <child>
+                              <object class="GtkLabel" id="task_pane_title_label">
+                                <property name="visible">True</property>
+                                <property name="xalign">0</property>
+                                <property name="xpad">2</property>
+                                <property name="label" translatable="yes">&lt;b&gt;_Tasks&lt;/b&gt;</property>
+                                <property name="use_markup">True</property>
+                                <property name="use_underline">True</property>
+                                <property name="mnemonic_widget">task_list</property>
+                              </object>
+                              <packing>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="task_pane_close_button">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">True</property>
+                                <property name="relief">none</property>
+                                <signal name="clicked" handler="on_task_pane_close_button_activate"/>
+                                <child>
+                                  <object class="GtkImage" id="task_pane_close_button_image">
+                                    <property name="visible">True</property>
+                                    <property name="stock">gtk-close</property>
+                                    <property name="icon-size">1</property>
+                                  </object>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkScrolledWindow" id="scrolledwindow2">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="hscrollbar_policy">automatic</property>
+                            <property name="vscrollbar_policy">automatic</property>
+                            <property name="shadow_type">in</property>
+                            <child>
+                              <object class="GtkTreeView" id="task_list">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="headers_visible">False</property>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="task_pane_info_label">
+                            <property name="label" translatable="yes">Downloading tasks...</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
                       </object>
+                      <packing>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkVBox" id="task_list_pane_hack_vbox">
+                        <property name="visible">True</property>
+                        <child>
+                          <placeholder/>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">False</property>
+                        <property name="position">1</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
                     <property name="position">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <object class="GtkLabel" id="task_pane_info_label">
-                    <property name="label" translatable="yes">Downloading tasks...</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">False</property>
-                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>
