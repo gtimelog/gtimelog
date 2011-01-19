@@ -261,8 +261,8 @@ def doctest_TimeWindow_to_csv_daily():
 
     """
 
-def doctest_Report_weekly_report_categorized():
-    r"""Tests for Report.weekly_report_categorized
+def doctest_Reports_weekly_report_categorized():
+    r"""Tests for Reports.weekly_report_categorized
 
         >>> import sys
 
@@ -328,8 +328,8 @@ def doctest_Report_weekly_report_categorized():
 
     """
 
-def doctest_Report_monthly_report_categorized():
-    r"""Tests for Report.monthly_report_categorized
+def doctest_Reports_monthly_report_categorized():
+    r"""Tests for Reports.monthly_report_categorized
 
         >>> import sys
 
