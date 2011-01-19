@@ -18,8 +18,14 @@ import pygtk
 pygtk.require('2.0')
 import gobject
 import gtk
-import gtk.glade
 import pango
+
+try:
+    import dbus
+    import dbus.service
+    import dbus.mainloop.glib
+except ImportError:
+    dbus = None
 
 from gtimelog import __version__
 
@@ -33,14 +39,17 @@ except NameError:
 
 # This is to let people run GTimeLog without having to install it
 resource_dir = os.path.dirname(os.path.realpath(__file__))
-ui_file = os.path.join(resource_dir, "gtimelog.glade")
-icon_file = os.path.join(resource_dir, "gtimelog-small.png")
+ui_file = os.path.join(resource_dir, "gtimelog.ui")
+icon_file_bright = os.path.join(resource_dir, "gtimelog-small-bright.png")
+icon_file_dark = os.path.join(resource_dir, "gtimelog-small.png")
 
 # This is for distribution packages
 if not os.path.exists(ui_file):
-    ui_file = "/usr/share/gtimelog/gtimelog.glade"
-if not os.path.exists(icon_file):
-    icon_file = "/usr/share/pixmaps/gtimelog-small.png"
+    ui_file = "/usr/share/gtimelog/gtimelog.ui"
+if not os.path.exists(icon_file_dark):
+    icon_file_dark = "/usr/share/pixmaps/gtimelog-small.png"
+if not os.path.exists(icon_file_bright):
+    icon_file_bright = "/usr/share/pixmaps/gtimelog-small-bright.png"
 
 
 def as_minutes(duration):
@@ -910,7 +919,9 @@ class Settings(object):
 
     show_office_hours = True
     show_tray_icon = True
-    prefer_old_tray_icon = True
+    prefer_app_indicator = True
+    prefer_old_tray_icon = False
+    start_in_tray = False
 
     report_style = 'plain'
 
@@ -933,8 +944,10 @@ class Settings(object):
         config.set('gtimelog', 'show_office_hours',
                    str(self.show_office_hours))
         config.set('gtimelog', 'show_tray_icon', str(self.show_tray_icon))
+        config.set('gtimelog', 'prefer_app_indicator', str(self.prefer_app_indicator))
         config.set('gtimelog', 'prefer_old_tray_icon', str(self.prefer_old_tray_icon))
         config.set('gtimelog', 'report_style', str(self.report_style))
+        config.set('gtimelog', 'start_in_tray', str(self.start_in_tray))
         return config
 
     def load(self, filename):
@@ -956,9 +969,12 @@ class Settings(object):
         self.show_office_hours = config.getboolean('gtimelog',
                                                    'show_office_hours')
         self.show_tray_icon = config.getboolean('gtimelog', 'show_tray_icon')
+        self.prefer_app_indicator = config.getboolean('gtimelog',
+                                                      'prefer_app_indicator')
         self.prefer_old_tray_icon = config.getboolean('gtimelog',
                                                       'prefer_old_tray_icon')
         self.report_style = config.get('gtimelog', 'report_style')
+        self.start_in_tray = config.getboolean('gtimelog', 'start_in_tray')
 
     def save(self, filename):
         config = self._config()
@@ -969,7 +985,21 @@ class Settings(object):
             f.close()
 
 
-class SimpleStatusIcon(object):
+class IconChooser(object):
+
+    @property
+    def icon_name(self):
+        # XXX assumes the panel's color matches a menu bar's color, which is
+        # not necessarily the case!  this logic works for, say,
+        # Ambiance/Radiance, but it gets New Wave and Dark Room wrong.
+        menu_text_color = gtk.MenuBar().rc_get_style().text[gtk.STATE_NORMAL]
+        if menu_text_color.value >= 0.5:
+            return icon_file_bright
+        else:
+            return icon_file_dark
+
+
+class SimpleStatusIcon(IconChooser):
     """Status icon for gtimelog in the notification area."""
 
     def __init__(self, gtimelog_window):
@@ -979,11 +1009,12 @@ class SimpleStatusIcon(object):
         if not hasattr(gtk, 'StatusIcon'):
             # you must be using a very old PyGtk
             return
-        self.icon = gtk.status_icon_new_from_file(icon_file)
+        self.icon = gtk.status_icon_new_from_file(self.icon_name)
         self.last_tick = False
         self.tick()
         self.icon.connect("activate", self.on_activate)
         self.icon.connect("popup-menu", self.on_popup_menu)
+        self.gtimelog_window.main_window.connect("style-set", self.on_style_set)
         gobject.timeout_add(1000, self.tick)
         self.gtimelog_window.entry_watchers.append(self.entry_added)
         self.gtimelog_window.tray_icon = self
@@ -995,23 +1026,16 @@ class SimpleStatusIcon(object):
         """
         return self.icon is not None
 
+    def on_style_set(self, *args):
+        """The user chose a different theme."""
+        self.icon.set_from_file(self.icon_name)
+
     def on_activate(self, widget):
         """The user clicked on the icon."""
-        main_window = self.gtimelog_window.main_window
-        if main_window.get_property("visible"):
-           main_window.hide()
-        else:
-           main_window.present()
+        self.gtimelog_window.toggle_visible()
 
     def on_popup_menu(self, widget, button, activate_time):
         """The user clicked on the icon."""
-        main_window = self.gtimelog_window.main_window
-        if main_window.get_property("visible"):
-            self.gtimelog_window.tray_show.hide()
-            self.gtimelog_window.tray_hide.show()
-        else:
-            self.gtimelog_window.tray_show.show()
-            self.gtimelog_window.tray_hide.hide()
         tray_icon_popup_menu = self.gtimelog_window.tray_icon_popup_menu
         tray_icon_popup_menu.popup(None, None, gtk.status_icon_position_menu,
                                    button, activate_time, self.icon)
@@ -1041,9 +1065,40 @@ class SimpleStatusIcon(object):
         return tip
 
 
-class OldTrayIcon(object):
+class AppIndicator(IconChooser):
+    """Ubuntu's application indicator for gtimelog."""
+
+    def __init__(self, gtimelog_window):
+        self.gtimelog_window = gtimelog_window
+        self.timelog = gtimelog_window.timelog
+        self.indicator = None
+        try:
+            import appindicator
+        except ImportError:
+            return # nothing to do here, move along
+                   # or install python-appindicator
+        self.indicator = appindicator.Indicator("gtimelog", self.icon_name,
+                                    appindicator.CATEGORY_APPLICATION_STATUS)
+        self.indicator.set_status(appindicator.STATUS_ACTIVE)
+        self.indicator.set_menu(gtimelog_window.tray_icon_popup_menu)
+        self.gtimelog_window.tray_icon = self
+        self.gtimelog_window.main_window.connect("style-set", self.on_style_set)
+
+    def available(self):
+        """Is the icon supported by this system?
+
+        AppIndicator needs python-appindicator
+        """
+        return self.indicator is not None
+
+    def on_style_set(self, *args):
+        """The user chose a different theme."""
+        self.indicator.set_icon(self.icon_name)
+
+
+class OldTrayIcon(IconChooser):
     """Old tray icon for gtimelog, shows a ticking clock.
-    
+
     Uses the old and deprecated egg.trayicon module.
     """
 
@@ -1056,12 +1111,12 @@ class OldTrayIcon(object):
         except ImportError:
             return # nothing to do here, move along
                    # or install python-gnome2-extras
-        self.tooltips = gtk.Tooltips()
+                   # which was later renamed to python-eggtrayicon
         self.eventbox = gtk.EventBox()
         hbox = gtk.HBox()
-        icon = gtk.Image()
-        icon.set_from_file(icon_file)
-        hbox.add(icon)
+        self.icon = gtk.Image()
+        self.icon.set_from_file(self.icon_name)
+        hbox.add(self.icon)
         self.time_label = gtk.Label()
         hbox.add(self.time_label)
         self.eventbox.add(hbox)
@@ -1070,6 +1125,7 @@ class OldTrayIcon(object):
         self.last_tick = False
         self.tick(force_update=True)
         self.trayicon.show_all()
+        self.gtimelog_window.main_window.connect("style-set", self.on_style_set)
         tray_icon_popup_menu = gtimelog_window.tray_icon_popup_menu
         self.eventbox.connect_object("button-press-event", self.on_press,
                                      tray_icon_popup_menu)
@@ -1085,6 +1141,10 @@ class OldTrayIcon(object):
         no longer available in modern Linux distributions.
         """
         return self.trayicon is not None
+
+    def on_style_set(self, *args):
+        """The user chose a different theme."""
+        self.icon.set_from_file(self.icon_name)
 
     def on_press(self, widget, event):
         """A mouse button was pressed on the tray icon label."""
@@ -1103,11 +1163,7 @@ class OldTrayIcon(object):
         """A mouse button was released on the tray icon label."""
         if event.button != 1:
             return
-        main_window = self.gtimelog_window.main_window
-        if main_window.get_property("visible"):
-           main_window.hide()
-        else:
-           main_window.present()
+        self.gtimelog_window.toggle_visible()
 
     def entry_added(self, entry):
         """An entry has been added."""
@@ -1123,7 +1179,7 @@ class OldTrayIcon(object):
                 self.time_label.set_text(now.strftime("%H:%M"))
             else:
                 self.time_label.set_text(format_duration_short(now - last_time))
-        self.tooltips.set_tip(self.trayicon, self.tip())
+        self.trayicon.set_tooltip_text(self.tip())
         return True
 
     def tip(self):
@@ -1169,57 +1225,59 @@ class MainWindow(object):
 
     def _init_ui(self):
         """Initialize the user interface."""
-        tree = gtk.glade.XML(ui_file)
+        builder = gtk.Builder()
+        builder.add_from_file(ui_file)
         # Set initial state of menu items *before* we hook up signals
-        chronological_menu_item = tree.get_widget("chronological")
+        chronological_menu_item = builder.get_object("chronological")
         chronological_menu_item.set_active(self.chronological)
-        show_task_pane_item = tree.get_widget("show_task_pane")
+        show_task_pane_item = builder.get_object("show_task_pane")
         show_task_pane_item.set_active(self.show_tasks)
         # Now hook up signals
-        tree.signal_autoconnect(self)
+        builder.connect_signals(self)
         # Store references to UI elements we're going to need later
-        self.tray_icon_popup_menu = tree.get_widget("tray_icon_popup_menu")
-        self.tray_show = tree.get_widget("tray_show")
-        self.tray_hide = tree.get_widget("tray_hide")
-        self.about_dialog = tree.get_widget("about_dialog")
-        self.about_dialog_ok_btn = tree.get_widget("ok_button")
+        self.tray_icon_popup_menu = builder.get_object("tray_icon_popup_menu")
+        self.tray_show = builder.get_object("tray_show")
+        self.tray_hide = builder.get_object("tray_hide")
+        self.tray_show.hide()
+        self.about_dialog = builder.get_object("about_dialog")
+        self.about_dialog_ok_btn = builder.get_object("ok_button")
         self.about_dialog_ok_btn.connect("clicked", self.close_about_dialog)
-        self.about_text = tree.get_widget("about_text")
+        self.about_text = builder.get_object("about_text")
         self.about_text.set_markup(self.about_text.get_label() %
                                    dict(version=__version__))
-        self.calendar_dialog = tree.get_widget("calendar_dialog")
-        self.calendar = tree.get_widget("calendar")
+        self.calendar_dialog = builder.get_object("calendar_dialog")
+        self.calendar = builder.get_object("calendar")
         self.calendar.connect("day_selected_double_click",
                               self.on_calendar_day_selected_double_click)
-        self.main_window = tree.get_widget("main_window")
+        self.main_window = builder.get_object("main_window")
         self.main_window.connect("delete_event", self.delete_event)
-        self.log_view = tree.get_widget("log_view")
+        self.log_view = builder.get_object("log_view")
         self.set_up_log_view_columns()
-        self.task_pane = tree.get_widget("task_list_pane")
+        self.task_pane = builder.get_object("task_list_pane")
         if not self.show_tasks:
             self.task_pane.hide()
-        self.task_pane_info_label = tree.get_widget("task_pane_info_label")
+        self.task_pane_info_label = builder.get_object("task_pane_info_label")
         self.tasks.loading_callback = self.task_list_loading
         self.tasks.loaded_callback = self.task_list_loaded
         self.tasks.error_callback = self.task_list_error
-        self.task_list = tree.get_widget("task_list")
+        self.task_list = builder.get_object("task_list")
         self.task_store = gtk.TreeStore(str, str)
         self.task_list.set_model(self.task_store)
         column = gtk.TreeViewColumn("Task", gtk.CellRendererText(), text=0)
         self.task_list.append_column(column)
         self.task_list.connect("row_activated", self.task_list_row_activated)
-        self.task_list_popup_menu = tree.get_widget("task_list_popup_menu")
+        self.task_list_popup_menu = builder.get_object("task_list_popup_menu")
         self.task_list.connect_object("button_press_event",
                                       self.task_list_button_press,
                                       self.task_list_popup_menu)
-        task_list_edit_menu_item = tree.get_widget("task_list_edit")
+        task_list_edit_menu_item = builder.get_object("task_list_edit")
         if not self.settings.edit_task_list_cmd:
             task_list_edit_menu_item.set_sensitive(False)
-        self.time_label = tree.get_widget("time_label")
-        self.task_entry = tree.get_widget("task_entry")
+        self.time_label = builder.get_object("time_label")
+        self.task_entry = builder.get_object("task_entry")
         self.task_entry.connect("changed", self.task_entry_changed)
         self.task_entry.connect("key_press_event", self.task_entry_key_press)
-        self.add_button = tree.get_widget("add_button")
+        self.add_button = builder.get_object("add_button")
         self.add_button.connect("clicked", self.add_entry)
         buffer = self.log_view.get_buffer()
         self.log_buffer = buffer
@@ -1433,7 +1491,7 @@ class MainWindow(object):
     def delete_event(self, widget, data=None):
         """Try to close the window."""
         if self.tray_icon:
-            self.main_window.hide()
+            self.on_hide_activate()
             return True
         else:
             gtk.main_quit()
@@ -1443,13 +1501,24 @@ class MainWindow(object):
         """Ok clicked in the about dialog."""
         self.about_dialog.hide()
 
-    def on_show_activate(self, widget):
+    def on_show_activate(self, widget=None):
         """Tray icon menu -> Show selected"""
         self.main_window.present()
+        self.tray_show.hide()
+        self.tray_hide.show()
 
-    def on_hide_activate(self, widget):
+    def on_hide_activate(self, widget=None):
         """Tray icon menu -> Hide selected"""
         self.main_window.hide()
+        self.tray_hide.hide()
+        self.tray_show.show()
+
+    def toggle_visible(self):
+        """Toggle main window visibility."""
+        if self.main_window.get_property("visible"):
+            self.on_hide_activate()
+        else:
+            self.on_show_activate()
 
     def on_quit_activate(self, widget):
         """File -> Quit selected"""
@@ -1813,6 +1882,30 @@ class MainWindow(object):
         return True
 
 
+if dbus:
+    INTERFACE = "lt.pov.mg.gtimelog.Service"
+    OBJECT_PATH = "/lt/pov/mg/gtimelog/Service"
+    SERVICE = "lt.pov.mg.gtimelog.GTimeLog"
+
+    class Service(dbus.service.Object):
+        """Our DBus service, used to communicate with the main instance."""
+
+        def __init__(self, main_window):
+            session_bus = dbus.SessionBus()
+            connection = dbus.service.BusName(SERVICE, session_bus)
+            dbus.service.Object.__init__(self, connection, OBJECT_PATH)
+
+            self.main_window = main_window
+
+        @dbus.service.method(INTERFACE)
+        def ToggleFocus(self):
+            self.main_window.toggle_visible()
+
+        @dbus.service.method(INTERFACE)
+        def Present(self):
+            self.main_window.on_show_activate()
+
+
 def main():
     """Run the program."""
     if len(sys.argv) > 1 and sys.argv[1] == '--sample-config':
@@ -1820,6 +1913,31 @@ def main():
         settings.save("gtimelogrc.sample")
         print "Sample configuration file written to gtimelogrc.sample"
         return
+
+    if '--ignore-dbus' in sys.argv:
+        global dbus
+        dbus = None
+
+    # Let's check if there is already an instance of GTimeLog running
+    # and if it is make it present itself or when it is already presented
+    # hide it and then quit.
+    if dbus:
+        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
+
+        try:
+            session_bus = dbus.SessionBus()
+            dbus_service = session_bus.get_object(SERVICE, OBJECT_PATH)
+            if '--toggle' in sys.argv:
+                dbus_service.ToggleFocus()
+                print "Already running, toggling visibility"
+            elif '--tray' in sys.argv:
+                print "Already running, not doing anything"
+            else:
+                dbus_service.Present()
+                print "Already running, presenting main window"
+            sys.exit()
+        except dbus.DBusException:
+            pass
 
     configdir = os.path.expanduser(
         os.environ.get('GTIMELOG_HOME') or '~/.gtimelog')
@@ -1841,15 +1959,23 @@ def main():
     else:
         tasks = TaskList(os.path.join(configdir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
+    start_in_tray = False
     if settings.show_tray_icon:
-        if settings.prefer_old_tray_icon:
-            icons = [OldTrayIcon, SimpleStatusIcon]
+        if settings.prefer_app_indicator:
+            icons = [AppIndicator, SimpleStatusIcon, OldTrayIcon]
+        elif settings.prefer_old_tray_icon:
+            icons = [OldTrayIcon, SimpleStatusIcon, AppIndicator]
         else:
-            icons = [SimpleStatusIcon, OldTrayIcon]
+            icons = [SimpleStatusIcon, OldTrayIcon, AppIndicator]
         for icon_class in icons:
             tray_icon = icon_class(main_window)
             if tray_icon.available():
+                start_in_tray = settings.start_in_tray or ('--tray' in sys.argv)
                 break # found one that works
+    if not start_in_tray:
+        main_window.on_show_activate()
+    if dbus:
+        service = Service(main_window)
     try:
         gtk.main()
     except KeyboardInterrupt:

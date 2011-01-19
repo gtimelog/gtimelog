@@ -1,0 +1,58 @@
+Contributing to GTimeLog
+========================
+
+Contributions are welcome, and not just code patches.  I'd love to see
+
+* user interface design sketches
+* icons
+* documentation
+* translations (this would need some coding to enable translation first)
+* installers for Mac OS X and Windows
+
+
+Reporting bugs and wishes
+-------------------------
+
+Please `use Launchpad <https://bugs.launchpad.net/gtimelog/>`_ to
+report bugs or feature requests.
+
+If you don't want to create a Launchpad account for some reason, feel free to
+send me an email at <marius@gedmin.as>.
+
+
+Creating a patch
+----------------
+
+Here's how you can create and send me a a patch.  You'll need the `Bazaar
+<http://bazaar.canonical.com/en/>`_ version control system installed on your
+computer, as well as the usual stuff needed to run GTimeLog (`Python
+<http://python.org/>`_, `PyGtk <http://pygtk.org/>`_).
+
+First, get a copy of the source code::
+
+    bzr branch lp:gtimelog
+
+You can run it without installing::
+
+    cd gtimelog
+    ./gtimelog
+
+Change the code in ``src/gtimelog/*.py``, play around, run the test suite ::
+
+    ./runtests
+
+When you're happy with the results, describe your change in ``NEWS.txt`` and
+commit ::
+
+    bzr commit
+
+`Publish your branch <https://help.launchpad.net/Code/UploadingABranch>`_ on Launchpad with ::
+
+    bzr push lp:~userid/gtimelog/branch-name
+
+and create a merge request through the Launchpad web interface
+(``https://code.launchpad.net/~userid/gtimelog/branch-name/+register-merge``),
+or with ::
+
+    bzr lp-submit
+
