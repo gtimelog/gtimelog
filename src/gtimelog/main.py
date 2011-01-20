@@ -300,6 +300,37 @@ class TimeWindow(object):
         slack.sort()
         return work, slack
 
+    def categorized_work_entries(self, skip_first=True):
+        """Return consolidated work entries grouped by category.
+
+        Category is a string preceding the first ':' in the entry.
+
+        Return two dicts:
+          - {<category>: <entry list>}, where <category> is a category string
+            and <entry list> is a sorted list that contains tuples (start,
+            entry, duration); entry is stripped of its category prefix.
+          - {<category>: <total duration>}, where <total duration> is the
+            total duration of work in the <category>.
+        """
+
+        work, slack = self.grouped_entries(skip_first=skip_first)
+        entries = {}
+        totals = {}
+        for start, entry, duration in work:
+            if ': ' in entry:
+                cat, clipped_entry = entry.split(': ', 1)
+                entry_list = entries.get(cat, [])
+                entry_list.append((start, clipped_entry, duration))
+                entries[cat] = entry_list
+                totals[cat] = totals.get(cat, datetime.timedelta(0)) + duration
+            else:
+                entry_list = entries.get(None, [])
+                entry_list.append((start, entry, duration))
+                entries[None] = entry_list
+                totals[None] = totals.get(
+                    None, datetime.timedelta(0)) + duration
+        return entries, totals
+
     def totals(self):
         """Calculate total time of work and slacking entries.
 
@@ -408,7 +439,110 @@ class TimeWindow(object):
         items.sort()
         writer.writerows(items)
 
-    def report_categories(self, output, categories):
+
+class Reports(object):
+    """Generation of reports."""
+
+    def __init__(self, window):
+        self.window = window
+
+    def _categorizing_report(self, output, email, who, subject, period_name,
+                             estimated_column=False):
+        """A report that displays entries by category.
+
+        Writes a report template in RFC-822 format to output.
+
+        The report looks like
+        |                             time
+        | Overhead:
+        |   Status meeting              43
+        |   Mail                      1:50
+        | --------------------------------
+        |                             2:33
+        |
+        | Compass:
+        |   Compass: hotpatch         2:13
+        |   Call with a client          30
+        | --------------------------------
+        |                             3:43
+        |
+        | No category:
+        |   SAT roundup               1:00
+        | --------------------------------
+        |                             1:00
+        |
+        | Total work done this week: 6:26
+        |
+        | Categories by time spent:
+        |
+        | Compass       3:43
+        | Overhead      2:33
+        | No category   1:00
+
+        """
+        window = self.window
+
+        print >> output, "To: %(email)s" % {'email': email}
+        print >> output, "Subject: %s" % subject
+        print >> output
+        items = list(window.all_entries())
+        if not items:
+            print >> output, "No work done this %s." % period_name
+            return
+        print >> output, " " * 46,
+        if estimated_column:
+            print >> output, "estimated        actual"
+        else:
+            print >> output, "                   time"
+
+        total_work, total_slacking = window.totals()
+        entries, totals = window.categorized_work_entries()
+        if entries:
+            categories = entries.keys()
+            categories.sort()
+            if categories[0] == None:
+                categories = categories[1:]
+                categories.append('No category')
+                e = entries.pop(None)
+                entries['No category'] = e
+                t = totals.pop(None)
+                totals['No category'] = t
+            for cat in categories:
+                print >> output, '%s:' % cat
+
+                work = [(entry, duration)
+                        for start, entry, duration in entries[cat]]
+                work.sort()
+                for entry, duration in work:
+                    if not duration:
+                        continue # skip empty "arrival" entries
+
+                    entry = entry[:1].upper() + entry[1:]
+                    if estimated_column:
+                        print >> output, (u"  %-46s  %-14s  %s" %
+                                    (entry, '-', format_duration_short(duration)))
+                    else:
+                        print >> output, (u"  %-61s  %+5s" %
+                                    (entry, format_duration_short(duration)))
+
+                print >> output, '-' * 70
+                print >> output, (u"%+70s" %
+                                  format_duration_short(totals[cat]))
+                print >> output
+        print >> output, ("Total work done this %s: %s" %
+                          (period_name, format_duration_short(total_work)))
+
+        print >> output
+
+        ordered_by_time = [(time, cat) for cat, time in totals.items()]
+        ordered_by_time.sort(reverse=True)
+        max_cat_length = max([len(cat) for cat in totals.keys()])
+        line_format = '  %-' + str(max_cat_length + 4) + 's %+5s'
+        print >> output, 'Categories by time spent:'
+        for time, cat in ordered_by_time:
+            print >> output, line_format % (cat, format_duration_short(time))
+
+    def _report_categories(self, output, categories):
         """A helper method that lists time spent per category.
 
         Use this to add a section in a report looks similar to this:
@@ -437,85 +571,28 @@ class TimeWindow(object):
                 '(none)', format_duration_long(categories[None]))
         print >> output
 
-    def daily_report(self, output, email, who):
-        """Format a daily report.
+    def _plain_report(self, output, email, who, subject, period_name,
+                      estimated_column=False):
+        """Format a report that does not categorize entries.
 
-        Writes a daily report template in RFC-822 format to output.
+        Writes a report template in RFC-822 format to output.
         """
-        # Locale is set as a side effect of 'import gtk', so strftime('%a')
-        # would give us translated names
-        weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        weekday = weekday_names[self.min_timestamp.weekday()]
-        week = self.min_timestamp.strftime('%V')
+        window = self.window
+
         print >> output, "To: %(email)s" % {'email': email}
-        print >> output, ("Subject: %(date)s report for %(who)s"
-                          " (%(weekday)s, week %(week)s)"
-                          % {'date': self.min_timestamp.strftime('%Y-%m-%d'),
-                             'weekday': weekday, 'week': week, 'who': who})
+        print >> output, 'Subject: %s' % subject
         print >> output
-        items = list(self.all_entries())
+        items = list(window.all_entries())
         if not items:
-            print >> output, "No work done today."
-            return
-        start, stop, duration, entry = items[0]
-        entry = entry[:1].upper() + entry[1:]
-        print >> output, "%s at %s" % (entry, start.strftime('%H:%M'))
-        print >> output
-        work, slack = self.grouped_entries()
-        total_work, total_slacking = self.totals()
-        if work:
-            categories = {}
-            for start, entry, duration in work:
-                entry = entry[:1].upper() + entry[1:]
-                print >> output, u"%-62s  %s" % (entry,
-                                                format_duration_long(duration))
-                if ': ' in entry:
-                    cat, task = entry.split(': ', 1)
-                    categories[cat] = categories.get(
-                        cat, datetime.timedelta(0)) + duration
-                else:
-                    categories[None] = categories.get(
-                        None, datetime.timedelta(0)) + duration
-
-            print >> output
-        print >> output, ("Total work done: %s" %
-                          format_duration_long(total_work))
-
-        if categories:
-            self.report_categories(output, categories)
-
-        print >> output, 'Slacking:\n'
-
-        if slack:
-            for start, entry, duration in slack:
-                entry = entry[:1].upper() + entry[1:]
-                print >> output, u"%-62s  %s" % (entry,
-                                                format_duration_long(duration))
-            print >> output
-        print >> output, ("Time spent slacking: %s" %
-                          format_duration_long(total_slacking))
-
-    def weekly_report(self, output, email, who, estimated_column=False):
-        """Format a weekly report.
-
-        Writes a weekly report template in RFC-822 format to output.
-        """
-        week = self.min_timestamp.strftime('%V')
-        print >> output, "To: %(email)s" % {'email': email}
-        print >> output, "Subject: Weekly report for %s (week %s)" % (who,
-                                                                      week)
-        print >> output
-        items = list(self.all_entries())
-        if not items:
-            print >> output, "No work done this week."
+            print >> output, "No work done this %s." % period_name
             return
         print >> output, " " * 46,
         if estimated_column:
             print >> output, "estimated       actual"
         else:
             print >> output, "                time"
-        work, slack = self.grouped_entries()
-        total_work, total_slacking = self.totals()
+        work, slack = window.grouped_entries()
+        total_work, total_slacking = window.totals()
         categories = {}
         if work:
             work = [(entry, duration) for start, entry, duration in work]
@@ -540,41 +617,80 @@ class TimeWindow(object):
                     print >> output, (u"%-62s  %s" %
                                 (entry, format_duration_long(duration)))
             print >> output
-        print >> output, ("Total work done this week: %s" %
-                          format_duration_long(total_work))
+        print >> output, ("Total work done this %s: %s" %
+                          (period_name, format_duration_long(total_work)))
 
         if categories:
-            self.report_categories(output, categories)
+            self._report_categories(output, categories)
 
-    def monthly_report(self, output, email, who):
-        """Format a monthly report.
+    def weekly_report_categorized(self, output, email, who,
+                                  estimated_column=False):
+        """Format a weekly report with entries displayed  under categories."""
+        week = self.window.min_timestamp.strftime('%V')
+        subject = 'Weekly report for %s (week %s)' % (who, week)
+        return self._categorizing_report(output, email, who, subject,
+                                         period_name='week',
+                                         estimated_column=estimated_column)
 
-        Writes a monthly report template in RFC-822 format to output.
+    def monthly_report_categorized(self, output, email, who,
+                                  estimated_column=False):
+        """Format a monthly report with entries displayed  under categories."""
+        month = self.window.min_timestamp.strftime('%Y/%m')
+        subject = 'Monthly report for %s (%s)' % (who, month)
+        return self._categorizing_report(output, email, who, subject,
+                                         period_name='month',
+                                         estimated_column=estimated_column)
+
+    def weekly_report_plain(self, output, email, who, estimated_column=False):
+        """Format a weekly report ."""
+        week = self.window.min_timestamp.strftime('%V')
+        subject = 'Weekly report for %s (week %s)' % (who, week)
+        return self._plain_report(output, email, who, subject,
+                                  period_name='week',
+                                  estimated_column=estimated_column)
+
+    def monthly_report_plain(self, output, email, who, estimated_column=False):
+        """Format a monthly report ."""
+        month = self.window.min_timestamp.strftime('%Y/%m')
+        subject = 'Monthly report for %s (%s)' % (who, month)
+        return self._plain_report(output, email, who, subject,
+                                  period_name='month',
+                                  estimated_column=estimated_column)
+
+    def daily_report(self, output, email, who):
+        """Format a daily report.
+
+        Writes a daily report template in RFC-822 format to output.
         """
+        window = self.window
 
-        month = self.min_timestamp.strftime('%Y/%m')
+        # Locale is set as a side effect of 'import gtk', so strftime('%a')
+        # would give us translated names
+        weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        weekday = weekday_names[window.min_timestamp.weekday()]
+        week = window.min_timestamp.strftime('%V')
         print >> output, "To: %(email)s" % {'email': email}
-        print >> output, "Subject: Monthly report for %s (%s)" % (who, month)
+        print >> output, ("Subject: %(date)s report for %(who)s"
+                          " (%(weekday)s, week %(week)s)"
+                          % {'date': window.min_timestamp.strftime('%Y-%m-%d'),
+                             'weekday': weekday, 'week': week, 'who': who})
         print >> output
-
-        items = list(self.all_entries())
+        items = list(window.all_entries())
         if not items:
-            print >> output, "No work done this month."
+            print >> output, "No work done today."
             return
-
-        print >> output, " " * 46
-
-        work, slack = self.grouped_entries()
-        total_work, total_slacking = self.totals()
-        categories = {}
-
+        start, stop, duration, entry = items[0]
+        entry = entry[:1].upper() + entry[1:]
+        print >> output, "%s at %s" % (entry, start.strftime('%H:%M'))
+        print >> output
+        work, slack = window.grouped_entries()
+        total_work, total_slacking = window.totals()
         if work:
-            work = [(entry, duration) for start, entry, duration in work]
-            work.sort()
-            for entry, duration in work:
-                if not duration:
-                    continue # skip empty "arrival" entries
-
+            categories = {}
+            for start, entry, duration in work:
+                entry = entry[:1].upper() + entry[1:]
+                print >> output, u"%-62s  %s" % (entry,
+                                                format_duration_long(duration))
                 if ': ' in entry:
                     cat, task = entry.split(': ', 1)
                     categories[cat] = categories.get(
@@ -583,16 +699,23 @@ class TimeWindow(object):
                     categories[None] = categories.get(
                         None, datetime.timedelta(0)) + duration
 
-                entry = entry[:1].upper() + entry[1:]
-                print >> output, (u"%-62s  %s" %
-                    (entry, format_duration_long(duration)))
             print >> output
-
-        print >> output, ("Total work done this month: %s" %
+        print >> output, ("Total work done: %s" %
                           format_duration_long(total_work))
 
         if categories:
-            self.report_categories(output, categories)
+            self._report_categories(output, categories)
+
+        print >> output, 'Slacking:\n'
+
+        if slack:
+            for start, entry, duration in slack:
+                entry = entry[:1].upper() + entry[1:]
+                print >> output, u"%-62s  %s" % (entry,
+                                                format_duration_long(duration))
+            print >> output
+        print >> output, ("Time spent slacking: %s" %
+                          format_duration_long(total_slacking))
 
 
 class TimeLog(object):
@@ -800,6 +923,8 @@ class Settings(object):
     prefer_old_tray_icon = False
     start_in_tray = False
 
+    report_style = 'plain'
+
     def _config(self):
         config = ConfigParser.RawConfigParser()
         config.add_section('gtimelog')
@@ -821,6 +946,7 @@ class Settings(object):
         config.set('gtimelog', 'show_tray_icon', str(self.show_tray_icon))
         config.set('gtimelog', 'prefer_app_indicator', str(self.prefer_app_indicator))
         config.set('gtimelog', 'prefer_old_tray_icon', str(self.prefer_old_tray_icon))
+        config.set('gtimelog', 'report_style', str(self.report_style))
         config.set('gtimelog', 'start_in_tray', str(self.start_in_tray))
         return config
 
@@ -847,6 +973,7 @@ class Settings(object):
                                                       'prefer_app_indicator')
         self.prefer_old_tray_icon = config.getboolean('gtimelog',
                                                       'prefer_old_tray_icon')
+        self.report_style = config.get('gtimelog', 'report_style')
         self.start_in_tray = config.getboolean('gtimelog', 'start_in_tray')
 
     def save(self, filename):
@@ -1418,15 +1545,15 @@ class MainWindow(object):
 
     def on_daily_report_activate(self, widget):
         """File -> Daily Report"""
-        window = self.timelog.window
-        self.mail(window.daily_report)
+        reports = Reports(self.timelog.window)
+        self.mail(reports.daily_report)
 
     def on_yesterdays_report_activate(self, widget):
         """File -> Daily Report for Yesterday"""
         max = self.timelog.window.min_timestamp
         min = max - datetime.timedelta(1)
-        window = self.timelog.window_for(min, max)
-        self.mail(window.daily_report)
+        reports = Reports(self.timelog.window_for(min, max))
+        self.mail(reports.daily_report)
 
     def on_previous_day_report_activate(self, widget):
         """File -> Daily Report for a Previous Day"""
@@ -1435,8 +1562,8 @@ class MainWindow(object):
             min = datetime.datetime.combine(day,
                             self.timelog.virtual_midnight)
             max = min + datetime.timedelta(1)
-            window = self.timelog.window_for(min, max)
-            self.mail(window.daily_report)
+            reports = Reports(self.timelog.window_for(min, max))
+            self.mail(reports.daily_report)
 
     def choose_date(self):
         """Pop up a calendar dialog.
@@ -1467,21 +1594,40 @@ class MainWindow(object):
 
     def on_weekly_report_activate(self, widget):
         """File -> Weekly Report"""
-        window = self.weekly_window()
-        self.mail(window.weekly_report)
+        day = self.timelog.day
+        reports = Reports(self.weekly_window(day=day))
+        if self.settings.report_style == 'plain':
+            report = reports.weekly_report_plain
+        elif self.settings.report_style == 'categorized':
+            report = reports.weekly_report_categorized
+        else:
+            report = reports.weekly_report_plain
+        self.mail(report)
 
     def on_last_weeks_report_activate(self, widget):
         """File -> Weekly Report for Last Week"""
         day = self.timelog.day - datetime.timedelta(7)
-        window = self.weekly_window(day=day)
-        self.mail(window.weekly_report)
+        reports = Reports(self.weekly_window(day=day))
+        if self.settings.report_style == 'plain':
+            report = reports.weekly_report_plain
+        elif self.settings.report_style == 'categorized':
+            report = reports.weekly_report_categorized
+        else:
+            report = reports.weekly_report_plain
+        self.mail(report)
 
     def on_previous_week_report_activate(self, widget):
         """File -> Weekly Report for a Previous Week"""
         day = self.choose_date()
         if day:
-            window = self.weekly_window(day=day)
-            self.mail(window.weekly_report)
+            reports = Reports(self.weekly_window(day=day))
+            if self.settings.report_style == 'plain':
+                report = reports.weekly_report_plain
+            elif self.settings.report_style == 'categorized':
+                report = reports.weekly_report_categorized
+            else:
+                report = reports.weekly_report_plain
+            self.mail(report)
 
     def monthly_window(self, day=None):
         if not day:
@@ -1499,19 +1645,37 @@ class MainWindow(object):
         """File -> Monthly Report for a Previous Month"""
         day = self.choose_date()
         if day:
-            window = self.monthly_window(day=day)
-            self.mail(window.monthly_report)
+            reports = Reports(self.monthly_window(day=day))
+            if self.settings.report_style == 'plain':
+                report = reports.monthly_report_plain
+            elif self.settings.report_style == 'categorized':
+                report = reports.monthly_report_categorized
+            else:
+                report = reports.monthly_report_plain
+            self.mail(report)
 
     def on_last_month_report_activate(self, widget):
         """File -> Monthly Report for Last Month"""
         day = self.timelog.day - datetime.timedelta(self.timelog.day.day)
-        window = self.monthly_window(day=day)
-        self.mail(window.monthly_report)
+        reports = Reports(self.monthly_window(day=day))
+        if self.settings.report_style == 'plain':
+            report = reports.monthly_report_plain
+        elif self.settings.report_style == 'categorized':
+            report = reports.monthly_report_categorized
+        else:
+            report = reports.monthly_report_plain
+        self.mail(report)
 
     def on_monthly_report_activate(self, widget):
         """File -> Monthly Report"""
-        window = self.monthly_window()
-        self.mail(window.monthly_report)
+        reports = Reports(self.monthly_window())
+        if self.settings.report_style == 'plain':
+            report = reports.monthly_report_plain
+        elif self.settings.report_style == 'categorized':
+            report = reports.monthly_report_categorized
+        else:
+            report = reports.monthly_report_plain
+        self.mail(report)
 
     def on_open_complete_spreadsheet_activate(self, widget):
         """Report -> Complete Report in Spreadsheet"""

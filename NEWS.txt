@@ -51,6 +51,10 @@ Changes in version 0.5.0 (unreleased)
 
 * The tasks pane can be toggled by pressing F9 and has a close button.
 
+* Alternative weekly and monthly report style, can be chosen by adding
+  ``report_style = categorized`` to ~/.gtimelog/gtimelogrc.
+  Contributed by Laurynas Speičys <laurynas@pov.lt>.
+
 
 Changes in version 0.4.0 (released 2010-09-03)
 ==============================================
