@@ -14,11 +14,11 @@ import datetime
 import tempfile
 import ConfigParser
 
-import pygtk
-pygtk.require('2.0')
 import gobject
-import gtk
-import pango
+from gi.repository import Gdk
+from gi.repository import Gtk
+#Gtk.require_version('2.0')
+from gi.repository import Pango
 
 try:
     import dbus
@@ -992,8 +992,10 @@ class IconChooser(object):
         # XXX assumes the panel's color matches a menu bar's color, which is
         # not necessarily the case!  this logic works for, say,
         # Ambiance/Radiance, but it gets New Wave and Dark Room wrong.
-        menu_text_color = gtk.MenuBar().rc_get_style().text[gtk.STATE_NORMAL]
-        if menu_text_color.value >= 0.5:
+        #menu_text_color = Gtk.MenuBar().get_style().text[Gtk.StateType.NORMAL]
+        #if menu_text_color.value >= 0.5:
+        # XXX: need to figure out how to do that with gi
+        if True:
             return icon_file_bright
         else:
             return icon_file_dark
@@ -1006,10 +1008,7 @@ class SimpleStatusIcon(IconChooser):
         self.gtimelog_window = gtimelog_window
         self.timelog = gtimelog_window.timelog
         self.trayicon = None
-        if not hasattr(gtk, 'StatusIcon'):
-            # you must be using a very old PyGtk
-            return
-        self.icon = gtk.status_icon_new_from_file(self.icon_name)
+        self.icon = Gtk.StatusIcon.new_from_file(self.icon_name)
         self.last_tick = False
         self.tick()
         self.icon.connect("activate", self.on_activate)
@@ -1037,7 +1036,7 @@ class SimpleStatusIcon(IconChooser):
     def on_popup_menu(self, widget, button, activate_time):
         """The user clicked on the icon."""
         tray_icon_popup_menu = self.gtimelog_window.tray_icon_popup_menu
-        tray_icon_popup_menu.popup(None, None, gtk.status_icon_position_menu,
+        tray_icon_popup_menu.popup(None, None, Gtk.status_icon_position_menu,
                                    button, activate_time, self.icon)
 
     def entry_added(self, entry):
@@ -1046,7 +1045,7 @@ class SimpleStatusIcon(IconChooser):
 
     def tick(self):
         """Tick every second."""
-        self.icon.set_tooltip(self.tip())
+        self.icon.set_tooltip_text(self.tip())
         return True
 
     def tip(self):
@@ -1073,13 +1072,13 @@ class AppIndicator(IconChooser):
         self.timelog = gtimelog_window.timelog
         self.indicator = None
         try:
-            import appindicator
-        except ImportError:
+            from gi.repository import AppIndicator
+            self.indicator = AppIndicator.Indicator.new("gtimelog", self.icon_name,
+                                        AppIndicator.IndicatorCategory.APPLICATION_STATUS)
+        except:
             return # nothing to do here, move along
                    # or install python-appindicator
-        self.indicator = appindicator.Indicator("gtimelog", self.icon_name,
-                                    appindicator.CATEGORY_APPLICATION_STATUS)
-        self.indicator.set_status(appindicator.STATUS_ACTIVE)
+        self.indicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
         self.indicator.set_menu(gtimelog_window.tray_icon_popup_menu)
         self.gtimelog_window.tray_icon = self
         self.gtimelog_window.main_window.connect("style-set", self.on_style_set)
@@ -1112,12 +1111,12 @@ class OldTrayIcon(IconChooser):
             return # nothing to do here, move along
                    # or install python-gnome2-extras
                    # which was later renamed to python-eggtrayicon
-        self.eventbox = gtk.EventBox()
-        hbox = gtk.HBox()
-        self.icon = gtk.Image()
+        self.eventbox = Gtk.EventBox()
+        hbox = Gtk.HBox()
+        self.icon = Gtk.Image()
         self.icon.set_from_file(self.icon_name)
         hbox.add(self.icon)
-        self.time_label = gtk.Label()
+        self.time_label = Gtk.Label()
         hbox.add(self.time_label)
         self.eventbox.add(hbox)
         self.trayicon = egg.trayicon.TrayIcon("GTimeLog")
@@ -1225,7 +1224,7 @@ class MainWindow(object):
 
     def _init_ui(self):
         """Initialize the user interface."""
-        builder = gtk.Builder()
+        builder = Gtk.Builder()
         builder.add_from_file(ui_file)
         # Set initial state of menu items *before* we hook up signals
         chronological_menu_item = builder.get_object("chronological")
@@ -1261,9 +1260,9 @@ class MainWindow(object):
         self.tasks.loaded_callback = self.task_list_loaded
         self.tasks.error_callback = self.task_list_error
         self.task_list = builder.get_object("task_list")
-        self.task_store = gtk.TreeStore(str, str)
+        self.task_store = Gtk.TreeStore(str, str)
         self.task_list.set_model(self.task_store)
-        column = gtk.TreeViewColumn("Task", gtk.CellRendererText(), text=0)
+        column = Gtk.TreeViewColumn("Task", Gtk.CellRendererText(), text=0)
         self.task_list.append_column(column)
         self.task_list.connect("row_activated", self.task_list_row_activated)
         self.task_list_popup_menu = builder.get_object("task_list_popup_menu")
@@ -1296,16 +1295,16 @@ class MainWindow(object):
         """Set up tab stops in the log view."""
         pango_context = self.log_view.get_pango_context()
         em = pango_context.get_font_description().get_size()
-        tabs = pango.TabArray(2, False)
-        tabs.set_tab(0, pango.TAB_LEFT, 9 * em)
-        tabs.set_tab(1, pango.TAB_LEFT, 12 * em)
+        tabs = Pango.TabArray.new(2, False)
+        tabs.set_tab(0, Pango.TabAlign.LEFT, 9 * em)
+        tabs.set_tab(1, Pango.TabAlign.LEFT, 12 * em)
         self.log_view.set_tabs(tabs)
 
     def w(self, text, tag=None):
         """Write some text at the end of the log buffer."""
         buffer = self.log_buffer
         if tag:
-            buffer.insert_with_tags_by_name(buffer.get_end_iter(), text, tag)
+            buffer.insert_with_tags(buffer.get_end_iter(), text, tag)
         else:
             buffer.insert(buffer.get_end_iter(), text)
 
@@ -1434,7 +1433,7 @@ class MainWindow(object):
     def scroll_to_end(self):
         buffer = self.log_view.get_buffer()
         end_mark = buffer.create_mark('end', buffer.get_end_iter())
-        self.log_view.scroll_to_mark(end_mark, 0)
+        self.log_view.scroll_to_mark(end_mark, 0, False, 0, 0)
         buffer.delete_mark(end_mark)
 
     def set_up_task_list(self):
@@ -1470,11 +1469,11 @@ class MainWindow(object):
         if not self.settings.enable_gtk_completion:
             self.have_completion = False
             return
-        self.have_completion = hasattr(gtk, 'EntryCompletion')
+        self.have_completion = hasattr(Gtk, 'EntryCompletion')
         if not self.have_completion:
             return
-        self.completion_choices = gtk.ListStore(str)
-        completion = gtk.EntryCompletion()
+        self.completion_choices = Gtk.ListStore(str)
+        completion = Gtk.EntryCompletion()
         completion.set_model(self.completion_choices)
         completion.set_text_column(0)
         self.task_entry.set_completion(completion)
@@ -1494,7 +1493,7 @@ class MainWindow(object):
             self.on_hide_activate()
             return True
         else:
-            gtk.main_quit()
+            Gtk.main_quit()
             return False
 
     def close_about_dialog(self, widget):
@@ -1522,7 +1521,7 @@ class MainWindow(object):
 
     def on_quit_activate(self, widget):
         """File -> Quit selected"""
-        gtk.main_quit()
+        Gtk.main_quit()
 
     def on_about_activate(self, widget):
         """Help -> About selected"""
@@ -1570,7 +1569,7 @@ class MainWindow(object):
 
         Returns either a datetime.date, or one.
         """
-        if self.calendar_dialog.run() == gtk.RESPONSE_OK:
+        if self.calendar_dialog.run() == Gtk.ResponseType.OK:
             y, m1, d = self.calendar.get_date()
             day = datetime.date(y, m1+1, d)
         else:
@@ -1580,7 +1579,7 @@ class MainWindow(object):
 
     def on_calendar_day_selected_double_click(self, widget):
         """Double-click on a calendar day: close the dialog."""
-        self.calendar_dialog.response(gtk.RESPONSE_OK)
+        self.calendar_dialog.response(Gtk.ResponseType.OK)
 
     def weekly_window(self, day=None):
         if not day:
@@ -1767,8 +1766,8 @@ class MainWindow(object):
         self.task_pane_info_label.set_text("Loading...")
         self.task_pane_info_label.show()
         # let the ui update become visible
-        while gtk.events_pending():
-            gtk.main_iteration()
+        while Gtk.events_pending():
+            Gtk.main_iteration()
 
     def task_list_error(self):
         self.task_list_loading_failed = True
@@ -1785,20 +1784,20 @@ class MainWindow(object):
 
     def task_entry_key_press(self, widget, event):
         """Handle key presses in task entry."""
-        if event.keyval == gtk.gdk.keyval_from_name('Prior'):
+        if event.keyval == Gdk.keyval_from_name('Prior'):
             self._do_history(1)
             return True
-        if event.keyval == gtk.gdk.keyval_from_name('Next'):
+        if event.keyval == Gdk.keyval_from_name('Next'):
             self._do_history(-1)
             return True
         # XXX This interferes with the completion box.  How do I determine
         # whether the completion box is visible or not?
         if self.have_completion:
             return False
-        if event.keyval == gtk.gdk.keyval_from_name('Up'):
+        if event.keyval == Gdk.keyval_from_name('Up'):
             self._do_history(1)
             return True
-        if event.keyval == gtk.gdk.keyval_from_name('Down'):
+        if event.keyval == Gdk.keyval_from_name('Down'):
             self._do_history(-1)
             return True
         return False
@@ -1981,7 +1980,7 @@ def main():
     if dbus:
         service = Service(main_window)
     try:
-        gtk.main()
+        Gtk.main()
     except KeyboardInterrupt:
         pass
 
