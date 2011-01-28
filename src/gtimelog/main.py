@@ -18,7 +18,6 @@ import gobject
 
 # first, try GI, fall back to pgtk
 try:
-    raise ImportError, 'testing'
     from gi.repository import Gdk as gdk
     from gi.repository import Gtk as gtk
     gtk.require_version('2.0')
