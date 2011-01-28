@@ -1304,7 +1304,7 @@ class MainWindow(object):
         """Write some text at the end of the log buffer."""
         buffer = self.log_buffer
         if tag:
-            buffer.insert_with_tags(buffer.get_end_iter(), text, tag)
+            buffer.insert_with_tags_by_name(buffer.get_end_iter(), text, tag)
         else:
             buffer.insert(buffer.get_end_iter(), text)
 
