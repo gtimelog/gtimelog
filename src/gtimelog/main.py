@@ -24,8 +24,11 @@ try:
     from gi.repository import Pango as pango
     pygtk = False
 
+    # these are hacks until we fully switch to GI
     pango_align_left = pango.TabAlign.LEFT
     gtk_response_ok = gtk.ResponseType.OK
+    gtk_status_icon_new = gtk.StatusIcon.new_from_file
+    pango_tabarray_new = pango.TabArray.new
 except ImportError:
     import pygtk
     pygtk.require('2.0')
@@ -36,6 +39,8 @@ except ImportError:
 
     pango_align_left = pango.TAB_LEFT
     gtk_response_ok = gtk.RESPONSE_OK
+    gtk_status_icon_new = gtk.status_icon_new_from_file
+    pango_tabarray_new = pango.TabArray
 
 try:
     import dbus
@@ -1030,10 +1035,7 @@ class SimpleStatusIcon(IconChooser):
         if not hasattr(gtk, 'StatusIcon'):
             # you must be using a very old PyGtk
             return
-        if pygtk:
-            self.icon = gtk.status_icon_new_from_file(self.icon_name)
-        else:
-            self.icon = gtk.StatusIcon.new_from_file(self.icon_name)
+        self.icon = gtk_status_icon_new(self.icon_name)
         self.last_tick = False
         self.tick()
         self.icon.connect("activate", self.on_activate)
@@ -1330,10 +1332,7 @@ class MainWindow(object):
         """Set up tab stops in the log view."""
         pango_context = self.log_view.get_pango_context()
         em = pango_context.get_font_description().get_size()
-        if pygtk:
-            tabs = pango.TabArray(2, False)
-        else:
-            tabs = pango.TabArray.new(2, False)
+        tabs = pango_tabarray_new(2, False)
         tabs.set_tab(0, pango_align_left, 9 * em)
         tabs.set_tab(1, pango_align_left, 12 * em)
         self.log_view.set_tabs(tabs)
