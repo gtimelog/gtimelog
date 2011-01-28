@@ -1,4 +1,4 @@
-Changes in version 0.5.0 (unreleased)
+Changes in version 0.5.0 (released 2011-01-28)
 ==============================================
 
 * Switched from Glade to GtkBuilder.  This fixes those strange theme problems
