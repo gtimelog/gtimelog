@@ -55,6 +55,9 @@ Changes in version 0.5.0 (unreleased)
   ``report_style = categorized`` to ~/.gtimelog/gtimelogrc.
   Contributed by Laurynas Speičys <laurynas@pov.lt>.
 
+* Bugfix: always preserve the order of entries, even when they have the same
+  timestamp (LP: #708825).
+
 
 Changes in version 0.4.0 (released 2010-09-03)
 ==============================================

@@ -13,6 +13,7 @@ import urllib
 import datetime
 import tempfile
 import ConfigParser
+from operator import itemgetter
 
 import pygtk
 pygtk.require('2.0')
@@ -211,7 +212,9 @@ class TimeWindow(object):
                     self.items.append((time, entry))
         # The entries really should be already sorted in the file
         # XXX: instead of quietly resorting them we should inform the user
-        self.items.sort() # there's code that relies on them being sorted
+        # Note that we must preserve the relative order of entries with
+        # the same timestamp: https://bugs.launchpad.net/gtimelog/+bug/708825
+        self.items.sort(key=itemgetter(0)) # there's code that relies on them being sorted
         f.close()
 
     def last_time(self):
