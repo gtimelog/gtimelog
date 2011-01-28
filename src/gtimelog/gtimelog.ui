@@ -644,4 +644,14 @@ GTimeLog is a time tracking application.
       </object>
     </child>
   </object>
+  <object class="GtkMenu" id="app_indicator_menu">
+    <child>
+      <object class="GtkCheckMenuItem" id="appind_show">
+        <property name="visible">True</property>
+        <property name="label" translatable="yes">_Show GTimeLog</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="on_toggle_visible"/>
+      </object>
+    </child>
+  </object>
 </interface>
