@@ -25,8 +25,8 @@ try:
     pygtk = False
 
     # these are hacks until we fully switch to GI
-    pango_align_left = pango.TabAlign.LEFT
-    gtk_response_ok = gtk.ResponseType.OK
+    PANGO_ALIGN_LEFT = pango.TabAlign.LEFT
+    GTK_RESPONSE_OK = gtk.ResponseType.OK
     gtk_status_icon_new = gtk.StatusIcon.new_from_file
     pango_tabarray_new = pango.TabArray.new
 except ImportError:
@@ -37,8 +37,8 @@ except ImportError:
     import pango
     pygtk = True
 
-    pango_align_left = pango.TAB_LEFT
-    gtk_response_ok = gtk.RESPONSE_OK
+    PANGO_ALIGN_LEFT = pango.TAB_LEFT
+    GTK_RESPONSE_OK = gtk.RESPONSE_OK
     gtk_status_icon_new = gtk.status_icon_new_from_file
     pango_tabarray_new = pango.TabArray
 
@@ -1333,8 +1333,8 @@ class MainWindow(object):
         pango_context = self.log_view.get_pango_context()
         em = pango_context.get_font_description().get_size()
         tabs = pango_tabarray_new(2, False)
-        tabs.set_tab(0, pango_align_left, 9 * em)
-        tabs.set_tab(1, pango_align_left, 12 * em)
+        tabs.set_tab(0, PANGO_ALIGN_LEFT, 9 * em)
+        tabs.set_tab(1, PANGO_ALIGN_LEFT, 12 * em)
         self.log_view.set_tabs(tabs)
 
     def w(self, text, tag=None):
@@ -1606,7 +1606,7 @@ class MainWindow(object):
 
         Returns either a datetime.date, or one.
         """
-        if self.calendar_dialog.run() == gtk_response_ok:
+        if self.calendar_dialog.run() == GTK_RESPONSE_OK:
             y, m1, d = self.calendar.get_date()
             day = datetime.date(y, m1+1, d)
         else:
@@ -1616,7 +1616,7 @@ class MainWindow(object):
 
     def on_calendar_day_selected_double_click(self, widget):
         """Double-click on a calendar day: close the dialog."""
-        self.calendar_dialog.response(gtk_response_ok)
+        self.calendar_dialog.response(GTK_RESPONSE_OK)
 
     def weekly_window(self, day=None):
         if not day:
