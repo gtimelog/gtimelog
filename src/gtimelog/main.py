@@ -13,6 +13,7 @@ import urllib
 import datetime
 import tempfile
 import ConfigParser
+from operator import itemgetter
 
 import gobject
 
@@ -233,7 +234,9 @@ class TimeWindow(object):
                     self.items.append((time, entry))
         # The entries really should be already sorted in the file
         # XXX: instead of quietly resorting them we should inform the user
-        self.items.sort() # there's code that relies on them being sorted
+        # Note that we must preserve the relative order of entries with
+        # the same timestamp: https://bugs.launchpad.net/gtimelog/+bug/708825
+        self.items.sort(key=itemgetter(0)) # there's code that relies on them being sorted
         f.close()
 
     def last_time(self):
@@ -1116,7 +1119,7 @@ class AppIndicator(IconChooser):
             except:
                 return
 
-        self.indicator.set_menu(gtimelog_window.tray_icon_popup_menu)
+        self.indicator.set_menu(gtimelog_window.app_indicator_menu)
         self.gtimelog_window.tray_icon = self
         self.gtimelog_window.main_window.connect("style-set", self.on_style_set)
 
@@ -1187,6 +1190,8 @@ class OldTrayIcon(IconChooser):
         if event.button != 3:
             return
         main_window = self.gtimelog_window.main_window
+        # This should be unnecessary, as we now show/hide menu items
+        # immediatelly after showing/hiding the main window
         if main_window.get_property("visible"):
             self.gtimelog_window.tray_show.hide()
             self.gtimelog_window.tray_hide.show()
@@ -1271,6 +1276,8 @@ class MainWindow(object):
         # Now hook up signals
         builder.connect_signals(self)
         # Store references to UI elements we're going to need later
+        self.app_indicator_menu = builder.get_object("app_indicator_menu")
+        self.appind_show = builder.get_object("appind_show")
         self.tray_icon_popup_menu = builder.get_object("tray_icon_popup_menu")
         self.tray_show = builder.get_object("tray_show")
         self.tray_hide = builder.get_object("tray_hide")
@@ -1325,6 +1332,7 @@ class MainWindow(object):
         self.set_up_completion()
         self.set_up_history()
         self.populate_log()
+        self.update_show_checkbox()
         self.tick(True)
         gobject.timeout_add(1000, self.tick)
 
@@ -1542,12 +1550,27 @@ class MainWindow(object):
         self.main_window.present()
         self.tray_show.hide()
         self.tray_hide.show()
+        self.update_show_checkbox()
 
     def on_hide_activate(self, widget=None):
         """Tray icon menu -> Hide selected"""
         self.main_window.hide()
         self.tray_hide.hide()
         self.tray_show.show()
+        self.update_show_checkbox()
+
+    def update_show_checkbox(self):
+        self.ignore_on_toggle_visible = True
+        # This next line triggers both 'activate' and 'toggled' signals
+        self.appind_show.set_active(self.main_window.get_property("visible"))
+        self.ignore_on_toggle_visible = False
+
+    ignore_on_toggle_visible = False
+
+    def on_toggle_visible(self, widget=None):
+        """Application indicator menu -> Show GTimeLog"""
+        if not self.ignore_on_toggle_visible:
+            self.toggle_visible()
 
     def toggle_visible(self):
         """Toggle main window visibility."""

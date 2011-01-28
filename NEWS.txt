@@ -1,4 +1,8 @@
-Changes in version 0.5.0 (unreleased)
+Changes in version 0.5.1 (not released yet)
+==============================================
+
+
+Changes in version 0.5.0 (released 2011-01-28)
 ==============================================
 
 * Switched from Glade to GtkBuilder.  This fixes those strange theme problems
@@ -62,6 +66,9 @@ Changes in version 0.5.0 (unreleased)
 * Alternative weekly and monthly report style, can be chosen by adding
   ``report_style = categorized`` to ~/.gtimelog/gtimelogrc.
   Contributed by Laurynas Speičys <laurynas@pov.lt>.
+
+* Bugfix: always preserve the order of entries, even when they have the same
+  timestamp (LP: #708825).
 
 
 Changes in version 0.4.0 (released 2010-09-03)
