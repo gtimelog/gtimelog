@@ -31,6 +31,7 @@ try:
     gtk_status_icon_new = gtk.status_icon_new_from_file
     pango_tabarray_new = pango.TabArray
 except ImportError:
+    import gi
     from gi.repository import Gdk as gdk
     from gi.repository import Gtk as gtk
     gtk.require_version('2.0')
@@ -1116,7 +1117,7 @@ class AppIndicator(IconChooser):
                 self.indicator = AppIndicator.Indicator.new("gtimelog", self.icon_name,
                 AppIndicator.IndicatorCategory.APPLICATION_STATUS)
                 self.indicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
-            except:
+            except (ImportError, gi._gi.RepositoryError):
                 return
 
         self.indicator.set_menu(gtimelog_window.app_indicator_menu)
