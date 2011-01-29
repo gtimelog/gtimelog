@@ -17,8 +17,20 @@ from operator import itemgetter
 
 import gobject
 
-# first, try GI, fall back to pgtk
+# we have to try pygtk first, then fall back to GI; if we have a too old GI
+# (without require_version()), we can't import pygtk on top of gi.repo.Gtk.
 try:
+    import pygtk
+    pygtk.require('2.0')
+    import gtk
+    from gtk import gdk as gdk
+    import pango
+
+    PANGO_ALIGN_LEFT = pango.TAB_LEFT
+    GTK_RESPONSE_OK = gtk.RESPONSE_OK
+    gtk_status_icon_new = gtk.status_icon_new_from_file
+    pango_tabarray_new = pango.TabArray
+except ImportError:
     from gi.repository import Gdk as gdk
     from gi.repository import Gtk as gtk
     gtk.require_version('2.0')
@@ -30,17 +42,6 @@ try:
     GTK_RESPONSE_OK = gtk.ResponseType.OK
     gtk_status_icon_new = gtk.StatusIcon.new_from_file
     pango_tabarray_new = pango.TabArray.new
-except ImportError:
-    import pygtk
-    pygtk.require('2.0')
-    import gtk
-    from gtk import gdk as gdk
-    import pango
-
-    PANGO_ALIGN_LEFT = pango.TAB_LEFT
-    GTK_RESPONSE_OK = gtk.RESPONSE_OK
-    gtk_status_icon_new = gtk.status_icon_new_from_file
-    pango_tabarray_new = pango.TabArray
 
 try:
     import dbus
