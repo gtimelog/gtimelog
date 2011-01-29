@@ -23,7 +23,7 @@ try:
     from gi.repository import Gtk as gtk
     gtk.require_version('2.0')
     from gi.repository import Pango as pango
-    pygtk = False
+    pygtk = None
 
     # these are hacks until we fully switch to GI
     PANGO_ALIGN_LEFT = pango.TabAlign.LEFT
@@ -36,7 +36,6 @@ except ImportError:
     import gtk
     from gtk import gdk as gdk
     import pango
-    pygtk = True
 
     PANGO_ALIGN_LEFT = pango.TAB_LEFT
     GTK_RESPONSE_OK = gtk.RESPONSE_OK
