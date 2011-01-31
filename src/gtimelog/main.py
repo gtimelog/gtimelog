@@ -30,6 +30,16 @@ try:
     GTK_RESPONSE_OK = gtk.RESPONSE_OK
     gtk_status_icon_new = gtk.status_icon_new_from_file
     pango_tabarray_new = pango.TabArray
+
+    try:
+        import appindicator
+        new_app_indicator = appindicator.Indicator
+        APPINDICATOR_CATEGORY = appindicator.CATEGORY_APPLICATION_STATUS
+        APPINDICATOR_ACTIVE = appindicator.STATUS_ACTIVE
+    except ImportError:
+        # apt-get install python-appindicator on Ubuntu
+        appindicator = None
+
 except ImportError:
     import gi
     from gi.repository import Gdk as gdk
@@ -43,6 +53,14 @@ except ImportError:
     GTK_RESPONSE_OK = gtk.ResponseType.OK
     gtk_status_icon_new = gtk.StatusIcon.new_from_file
     pango_tabarray_new = pango.TabArray.new
+
+    try:
+        from gi.repository import AppIndicator
+        new_app_indicator = AppIndicator.Indicator.new
+        APPINDICATOR_CATEGORY = AppIndicator.IndicatorCategory.APPLICATION_STATUS
+        APPINDICATOR_ACTIVE = AppIndicator.IndicatorStatus.ACTIVE
+    except (ImportError, gi._gi.RepositoryError):
+        appindicator = None
 
 try:
     import dbus
@@ -1102,24 +1120,11 @@ class AppIndicator(IconChooser):
         self.gtimelog_window = gtimelog_window
         self.timelog = gtimelog_window.timelog
         self.indicator = None
-        if pygtk:
-            try:
-                import appindicator
-                self.indicator = appindicator.Indicator("gtimelog", self.icon_name,
-                                            appindicator.CATEGORY_APPLICATION_STATUS)
-                self.indicator.set_status(appindicator.STATUS_ACTIVE)
-            except ImportError:
-                return # nothing to do here, move along
-                   # or install python-appindicator
-        else:
-            try:
-                from gi.repository import AppIndicator
-                self.indicator = AppIndicator.Indicator.new("gtimelog", self.icon_name,
-                AppIndicator.IndicatorCategory.APPLICATION_STATUS)
-                self.indicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
-            except (ImportError, gi._gi.RepositoryError):
-                return
-
+        if appindicator is None:
+            return
+        self.indicator = new_app_indicator("gtimelog", self.icon_name,
+                                           APPINDICATOR_CATEGORY)
+        self.indicator.set_status(APPINDICATOR_ACTIVE)
         self.indicator.set_menu(gtimelog_window.app_indicator_menu)
         self.gtimelog_window.tray_icon = self
         self.gtimelog_window.main_window.connect("style-set", self.on_style_set)
