@@ -653,5 +653,19 @@ GTimeLog is a time tracking application.
         <signal name="activate" handler="on_toggle_visible"/>
       </object>
     </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="appind_separator1">
+        <property name="visible">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="appind_quit">
+        <property name="label">gtk-quit</property>
+        <property name="visible">True</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+        <signal name="activate" handler="on_quit_activate"/>
+      </object>
+    </child>
   </object>
 </interface>
