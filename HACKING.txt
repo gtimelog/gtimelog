@@ -26,7 +26,8 @@ Creating a patch
 Here's how you can create and send me a a patch.  You'll need the `Bazaar
 <http://bazaar.canonical.com/en/>`_ version control system installed on your
 computer, as well as the usual stuff needed to run GTimeLog (`Python
-<http://python.org/>`_, `PyGtk <http://pygtk.org/>`_).
+<http://python.org/>`_, and `PyGtk <http://pygtk.org/>`_ or the GTK and Pango
+gobject-introspection typelibs).
 
 First, get a copy of the source code::
 
