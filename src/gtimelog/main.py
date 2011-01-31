@@ -15,11 +15,34 @@ import tempfile
 import ConfigParser
 from operator import itemgetter
 
-import pygtk
-pygtk.require('2.0')
 import gobject
-import gtk
-import pango
+
+# we have to try pygtk first, then fall back to GI; if we have a too old GI
+# (without require_version()), we can't import pygtk on top of gi.repo.Gtk.
+try:
+    import pygtk
+    pygtk.require('2.0')
+    import gtk
+    from gtk import gdk as gdk
+    import pango
+
+    PANGO_ALIGN_LEFT = pango.TAB_LEFT
+    GTK_RESPONSE_OK = gtk.RESPONSE_OK
+    gtk_status_icon_new = gtk.status_icon_new_from_file
+    pango_tabarray_new = pango.TabArray
+except ImportError:
+    import gi
+    from gi.repository import Gdk as gdk
+    from gi.repository import Gtk as gtk
+    gtk.require_version('2.0')
+    from gi.repository import Pango as pango
+    pygtk = None
+
+    # these are hacks until we fully switch to GI
+    PANGO_ALIGN_LEFT = pango.TabAlign.LEFT
+    GTK_RESPONSE_OK = gtk.ResponseType.OK
+    gtk_status_icon_new = gtk.StatusIcon.new_from_file
+    pango_tabarray_new = pango.TabArray.new
 
 try:
     import dbus
@@ -995,6 +1018,10 @@ class IconChooser(object):
         # XXX assumes the panel's color matches a menu bar's color, which is
         # not necessarily the case!  this logic works for, say,
         # Ambiance/Radiance, but it gets New Wave and Dark Room wrong.
+        if not pygtk:
+            # XXX: need to figure out how to do that with gi
+            return icon_file_bright
+
         menu_text_color = gtk.MenuBar().rc_get_style().text[gtk.STATE_NORMAL]
         if menu_text_color.value >= 0.5:
             return icon_file_bright
@@ -1012,7 +1039,7 @@ class SimpleStatusIcon(IconChooser):
         if not hasattr(gtk, 'StatusIcon'):
             # you must be using a very old PyGtk
             return
-        self.icon = gtk.status_icon_new_from_file(self.icon_name)
+        self.icon = gtk_status_icon_new(self.icon_name)
         self.last_tick = False
         self.tick()
         self.icon.connect("activate", self.on_activate)
@@ -1049,7 +1076,7 @@ class SimpleStatusIcon(IconChooser):
 
     def tick(self):
         """Tick every second."""
-        self.icon.set_tooltip(self.tip())
+        self.icon.set_tooltip_text(self.tip())
         return True
 
     def tip(self):
@@ -1075,14 +1102,24 @@ class AppIndicator(IconChooser):
         self.gtimelog_window = gtimelog_window
         self.timelog = gtimelog_window.timelog
         self.indicator = None
-        try:
-            import appindicator
-        except ImportError:
-            return # nothing to do here, move along
+        if pygtk:
+            try:
+                import appindicator
+                self.indicator = appindicator.Indicator("gtimelog", self.icon_name,
+                                            appindicator.CATEGORY_APPLICATION_STATUS)
+                self.indicator.set_status(appindicator.STATUS_ACTIVE)
+            except ImportError:
+                return # nothing to do here, move along
                    # or install python-appindicator
-        self.indicator = appindicator.Indicator("gtimelog", self.icon_name,
-                                    appindicator.CATEGORY_APPLICATION_STATUS)
-        self.indicator.set_status(appindicator.STATUS_ACTIVE)
+        else:
+            try:
+                from gi.repository import AppIndicator
+                self.indicator = AppIndicator.Indicator.new("gtimelog", self.icon_name,
+                AppIndicator.IndicatorCategory.APPLICATION_STATUS)
+                self.indicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
+            except (ImportError, gi._gi.RepositoryError):
+                return
+
         self.indicator.set_menu(gtimelog_window.app_indicator_menu)
         self.gtimelog_window.tray_icon = self
         self.gtimelog_window.main_window.connect("style-set", self.on_style_set)
@@ -1304,9 +1341,9 @@ class MainWindow(object):
         """Set up tab stops in the log view."""
         pango_context = self.log_view.get_pango_context()
         em = pango_context.get_font_description().get_size()
-        tabs = pango.TabArray(2, False)
-        tabs.set_tab(0, pango.TAB_LEFT, 9 * em)
-        tabs.set_tab(1, pango.TAB_LEFT, 12 * em)
+        tabs = pango_tabarray_new(2, False)
+        tabs.set_tab(0, PANGO_ALIGN_LEFT, 9 * em)
+        tabs.set_tab(1, PANGO_ALIGN_LEFT, 12 * em)
         self.log_view.set_tabs(tabs)
 
     def w(self, text, tag=None):
@@ -1442,7 +1479,7 @@ class MainWindow(object):
     def scroll_to_end(self):
         buffer = self.log_view.get_buffer()
         end_mark = buffer.create_mark('end', buffer.get_end_iter())
-        self.log_view.scroll_to_mark(end_mark, 0)
+        self.log_view.scroll_to_mark(end_mark, 0, False, 0, 0)
         buffer.delete_mark(end_mark)
 
     def set_up_task_list(self):
@@ -1593,7 +1630,7 @@ class MainWindow(object):
 
         Returns either a datetime.date, or one.
         """
-        if self.calendar_dialog.run() == gtk.RESPONSE_OK:
+        if self.calendar_dialog.run() == GTK_RESPONSE_OK:
             y, m1, d = self.calendar.get_date()
             day = datetime.date(y, m1+1, d)
         else:
@@ -1603,7 +1640,7 @@ class MainWindow(object):
 
     def on_calendar_day_selected_double_click(self, widget):
         """Double-click on a calendar day: close the dialog."""
-        self.calendar_dialog.response(gtk.RESPONSE_OK)
+        self.calendar_dialog.response(GTK_RESPONSE_OK)
 
     def weekly_window(self, day=None):
         if not day:
@@ -1808,20 +1845,20 @@ class MainWindow(object):
 
     def task_entry_key_press(self, widget, event):
         """Handle key presses in task entry."""
-        if event.keyval == gtk.gdk.keyval_from_name('Prior'):
+        if event.keyval == gdk.keyval_from_name('Prior'):
             self._do_history(1)
             return True
-        if event.keyval == gtk.gdk.keyval_from_name('Next'):
+        if event.keyval == gdk.keyval_from_name('Next'):
             self._do_history(-1)
             return True
         # XXX This interferes with the completion box.  How do I determine
         # whether the completion box is visible or not?
         if self.have_completion:
             return False
-        if event.keyval == gtk.gdk.keyval_from_name('Up'):
+        if event.keyval == gdk.keyval_from_name('Up'):
             self._do_history(1)
             return True
-        if event.keyval == gtk.gdk.keyval_from_name('Down'):
+        if event.keyval == gdk.keyval_from_name('Down'):
             self._do_history(-1)
             return True
         return False

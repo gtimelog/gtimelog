@@ -12,6 +12,16 @@ Changes in version 0.5.0 (released 2011-01-28)
   src/gtimelog/gtimelog.ui.  It needs to be installed into
   /usr/share/gtimelog/.
 
+* Ported from PyGTK to GI. This supports GTK 2 and GTK 3 with GI now, but still
+  works with PyGTK.
+
+  Packager's note: If you want to use GI, you need to change the package's
+  dependencies from pygtk to the package that provides the GTK and Pango
+  typelibs (e. g. gir1.2-gtk-2.0 and gir1.2-pango-1.0 on Debian/Ubuntu). It
+  also requires pygobject >= 2.27.1.
+
+  Contributed by Martin Pitt <martin.pitt@ubuntu.com>.
+
 * GTimeLog now supports Ubuntu's application indicators.  There's a new
   configuration option, ``prefer_app_indicator``, defaulting to true.
   Fixes LP: #523461.
