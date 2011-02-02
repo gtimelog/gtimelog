@@ -38,7 +38,7 @@ try:
         APPINDICATOR_ACTIVE = appindicator.STATUS_ACTIVE
     except ImportError:
         # apt-get install python-appindicator on Ubuntu
-        appindicator = None
+        new_app_indicator = None
 
 except ImportError:
     import gi
@@ -60,7 +60,7 @@ except ImportError:
         APPINDICATOR_CATEGORY = AppIndicator.IndicatorCategory.APPLICATION_STATUS
         APPINDICATOR_ACTIVE = AppIndicator.IndicatorStatus.ACTIVE
     except (ImportError, gi._gi.RepositoryError):
-        appindicator = None
+        new_app_indicator = None
 
 try:
     import dbus
@@ -1120,7 +1120,7 @@ class AppIndicator(IconChooser):
         self.gtimelog_window = gtimelog_window
         self.timelog = gtimelog_window.timelog
         self.indicator = None
-        if appindicator is None:
+        if new_app_indicator is None:
             return
         self.indicator = new_app_indicator("gtimelog", self.icon_name,
                                            APPINDICATOR_CATEGORY)
