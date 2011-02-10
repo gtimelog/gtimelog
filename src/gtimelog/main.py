@@ -1850,6 +1850,9 @@ class MainWindow(object):
 
     def task_entry_key_press(self, widget, event):
         """Handle key presses in task entry."""
+        if event.keyval == gdk.keyval_from_name('Escape'):
+            self.on_hide_activate()
+            return True
         if event.keyval == gdk.keyval_from_name('Prior'):
             self._do_history(1)
             return True
