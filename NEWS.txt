@@ -11,6 +11,10 @@ Changes in version 0.6.0 (not released yet)
 
   Contributed by Martin Pitt <martin.pitt@ubuntu.com>.
 
+* Hide the main window on Esc.  Fixes LP: #716257.
+
+  Contributed by Vladislav Naumov (https://launchpad.net/~vnaum).
+
 
 Changes in version 0.5.0 (released 2011-01-28)
 ==============================================
