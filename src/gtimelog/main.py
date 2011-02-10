@@ -1850,7 +1850,7 @@ class MainWindow(object):
 
     def task_entry_key_press(self, widget, event):
         """Handle key presses in task entry."""
-        if event.keyval == gdk.keyval_from_name('Escape'):
+        if event.keyval == gdk.keyval_from_name('Escape') and self.tray_icon:
             self.on_hide_activate()
             return True
         if event.keyval == gdk.keyval_from_name('Prior'):
