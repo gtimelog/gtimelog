@@ -42,9 +42,10 @@ try:
 
 except ImportError:
     import gi
+    gi.require_version('Gdk', '2.0')
+    gi.require_version('Gtk', '2.0')
     from gi.repository import Gdk as gdk
     from gi.repository import Gtk as gtk
-    gtk.require_version('2.0')
     from gi.repository import Pango as pango
     pygtk = None
 
