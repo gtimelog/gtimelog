@@ -15,13 +15,13 @@ import tempfile
 import ConfigParser
 from operator import itemgetter
 
-import gobject
 
-# we have to try pygtk first, then fall back to GI; if we have a too old GI
-# (without require_version()), we can't import pygtk on top of gi.repo.Gtk.
+# we have to try pygtk first, then fall back to GI; if we have a too old GI, we
+# can't import pygtk on top of gi.repo.Gtk.
 try:
     import pygtk
     pygtk.require('2.0')
+    import gobject
     import gtk
     from gtk import gdk as gdk
     import pango
@@ -41,22 +41,23 @@ try:
         new_app_indicator = None
 
 except ImportError:
-    import gi
-    gi.require_version('Gdk', '2.0')
-    gi.require_version('Gtk', '2.0')
+    from gi.repository import GObject as gobject
     from gi.repository import Gdk as gdk
     from gi.repository import Gtk as gtk
     from gi.repository import Pango as pango
     pygtk = None
 
     # these are hacks until we fully switch to GI
-    PANGO_ALIGN_LEFT = pango.TabAlign.LEFT
+    PANGO_ALIGN_LEFT = pango.TabAlign.TAB_LEFT
     GTK_RESPONSE_OK = gtk.ResponseType.OK
     gtk_status_icon_new = gtk.StatusIcon.new_from_file
     pango_tabarray_new = pango.TabArray.new
 
     try:
-        from gi.repository import AppIndicator
+        if gtk._version.startswith('2'):
+            from gi.repository import AppIndicator
+        else:
+            from gi.repository import AppIndicator3 as AppIndicator
         new_app_indicator = AppIndicator.Indicator.new
         APPINDICATOR_CATEGORY = AppIndicator.IndicatorCategory.APPLICATION_STATUS
         APPINDICATOR_ACTIVE = AppIndicator.IndicatorStatus.ACTIVE
@@ -1345,6 +1346,9 @@ class MainWindow(object):
 
     def set_up_log_view_columns(self):
         """Set up tab stops in the log view."""
+        # we can't get a Pango context for unrealized widgets
+        if not self.log_view.get_realized():
+            self.log_view.realize()
         pango_context = self.log_view.get_pango_context()
         em = pango_context.get_font_description().get_size()
         tabs = pango_tabarray_new(2, False)
