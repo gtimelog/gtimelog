@@ -15,13 +15,13 @@ import tempfile
 import ConfigParser
 from operator import itemgetter
 
-import gobject
 
 # we have to try pygtk first, then fall back to GI; if we have a too old GI, we
 # can't import pygtk on top of gi.repo.Gtk.
 try:
     import pygtk
     pygtk.require('2.0')
+    import gobject
     import gtk
     from gtk import gdk as gdk
     import pango
@@ -41,6 +41,7 @@ try:
         new_app_indicator = None
 
 except ImportError:
+    from gi.repository import GObject as gobject
     from gi.repository import Gdk as gdk
     from gi.repository import Gtk as gtk
     from gi.repository import Pango as pango
