@@ -1,6 +1,8 @@
 Changes in version 0.6.0 (not released yet)
 ==============================================
 
+* Fixed UnboundLocalError.  (LP: #778285)  Given by Jeroen Langeveld.
+
 * Ported from PyGTK to GI. This supports GTK 2 and GTK 3 with GI now, but still
   works with PyGTK.
 
