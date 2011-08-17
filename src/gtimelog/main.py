@@ -731,8 +731,8 @@ class Reports(object):
         print >> output
         work, slack = window.grouped_entries()
         total_work, total_slacking = window.totals()
+        categories = {}
         if work:
-            categories = {}
             for start, entry, duration in work:
                 entry = entry[:1].upper() + entry[1:]
                 print >> output, u"%-62s  %s" % (entry,
@@ -749,7 +749,7 @@ class Reports(object):
         print >> output, ("Total work done: %s" %
                           format_duration_long(total_work))
 
-        if categories:
+        if len(categories) > 0:
             self._report_categories(output, categories)
 
         print >> output, 'Slacking:\n'
