@@ -1,4 +1,4 @@
-Changes in version 0.6.0 (not released yet)
+Changes in version 0.6.0 (released 2011-08-23)
 ==============================================
 
 * Ctrl-Q now quits.  (LP: #750092)
