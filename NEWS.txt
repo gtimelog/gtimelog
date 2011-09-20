@@ -1,3 +1,9 @@
+Changes in version 0.6.1 (released 201X-XX-XX)
+==============================================
+
+* Fix two crashes when using GI.  Given by Martin Pitt.
+
+
 Changes in version 0.6.0 (released 2011-08-23)
 ==============================================
 
