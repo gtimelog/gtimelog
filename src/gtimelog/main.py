@@ -41,6 +41,7 @@ try:
         new_app_indicator = None
 
 except ImportError:
+    import gi
     from gi.repository import GObject as gobject
     from gi.repository import Gdk as gdk
     from gi.repository import Gtk as gtk
@@ -48,7 +49,11 @@ except ImportError:
     pygtk = None
 
     # these are hacks until we fully switch to GI
-    PANGO_ALIGN_LEFT = pango.TabAlign.TAB_LEFT
+    try:
+        PANGO_ALIGN_LEFT = pango.TabAlign.LEFT
+    except AttributeError:
+        # backwards compat for older Pango versions with broken GIR
+        PANGO_ALIGN_LEFT = pango.TabAlign.TAB_LEFT
     GTK_RESPONSE_OK = gtk.ResponseType.OK
     gtk_status_icon_new = gtk.StatusIcon.new_from_file
     pango_tabarray_new = pango.TabArray.new
