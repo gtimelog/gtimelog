@@ -41,6 +41,7 @@ try:
         new_app_indicator = None
 
 except ImportError:
+    import gi
     from gi.repository import GObject as gobject
     from gi.repository import Gdk as gdk
     from gi.repository import Gtk as gtk
