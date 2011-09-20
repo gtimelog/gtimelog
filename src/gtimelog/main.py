@@ -48,7 +48,7 @@ except ImportError:
     pygtk = None
 
     # these are hacks until we fully switch to GI
-    PANGO_ALIGN_LEFT = pango.TabAlign.TAB_LEFT
+    PANGO_ALIGN_LEFT = pango.TabAlign.LEFT
     GTK_RESPONSE_OK = gtk.ResponseType.OK
     gtk_status_icon_new = gtk.StatusIcon.new_from_file
     pango_tabarray_new = pango.TabArray.new
