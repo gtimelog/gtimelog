@@ -2,7 +2,7 @@
 """An application for keeping track of your time."""
 
 # Default to new-style classes.
-__metadata__ = type
+__metaclass__ = type
 
 import os
 import re
