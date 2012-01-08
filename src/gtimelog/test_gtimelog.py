@@ -1,7 +1,6 @@
-#!/usr/bin/python
-"""
-Tests for gtimelog/main.py
-"""
+#!/usr/bin/env python
+
+"""Tests for gtimelog/main.py"""
 
 import doctest
 import unittest
