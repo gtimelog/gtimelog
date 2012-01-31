@@ -9,6 +9,7 @@ import re
 import csv
 import sys
 import errno
+import codecs
 import signal
 import urllib
 import datetime
@@ -239,7 +240,7 @@ class TimeWindow(object):
                 f = self.filename
                 f.seek(0)
             else:
-                f = open(self.filename)
+                f = codecs.open(self.filename, encoding='UTF-8')
         except IOError:
             return
         line = ''
@@ -443,7 +444,7 @@ class TimeWindow(object):
         if title_row:
             writer.writerow(["task", "time (minutes)"])
         work, slack = self.grouped_entries()
-        work = [(entry, as_minutes(duration))
+        work = [(entry.encode('UTF-8'), as_minutes(duration))
                 for start, entry, duration in work
                 if duration] # skip empty "arrival" entries
         work.sort()
@@ -806,7 +807,7 @@ class TimeLog(object):
 
     def raw_append(self, line):
         """Append a line to the time log file."""
-        f = open(self.filename, "a")
+        f = codecs.open(self.filename, "a", encoding='UTF-8')
         if self.need_space:
             self.need_space = False
             print >> f
@@ -1792,7 +1793,7 @@ class MainWindow:
     def mail(self, write_draft):
         """Send an email."""
         draftfn = tempfile.mktemp(suffix='gtimelog') # XXX unsafe!
-        with open(draftfn, 'w') as draft:
+        with codecs.open(draftfn, 'w', encoding='UTF-8') as draft:
             write_draft(draft, self.settings.email, self.settings.name)
         self.spawn(self.settings.mailer, draftfn)
         # XXX rm draftfn when done -- but how?
@@ -1919,6 +1920,8 @@ class MainWindow:
     def add_entry(self, widget, data=None):
         """Add the task entry to the log."""
         entry = self.task_entry.get_text()
+        if not isinstance(entry, unicode):
+            entry = unicode(entry, 'UTF-8')
 
         now = None
         date_match = re.match(r'(\d\d):(\d\d)\s+', entry)
