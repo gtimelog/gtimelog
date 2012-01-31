@@ -1,5 +1,6 @@
-0.7.2 (unreleased)
+0.8.0 (unreleased)
 ==================
+* History browsing (LP: #220778).
 
 
 0.7.1 (2012-02-01)
