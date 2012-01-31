@@ -1045,11 +1045,14 @@ class IconChooser:
         # not necessarily the case!  this logic works for, say,
         # Ambiance/Radiance, but it gets New Wave and Dark Room wrong.
         if toolkit == 'gi':
-            # XXX: need to figure out how to do that with gi
-            return icon_file_bright
-
-        menu_text_color = gtk.MenuBar().rc_get_style().text[gtk.STATE_NORMAL]
-        if menu_text_color.value >= 0.5:
+            style = gtk.MenuBar().get_style_context()
+            color = style.get_color(gtk.StateFlags.NORMAL)
+            value = (color.red + color.green + color.blue) / 3
+        else:
+            style = gtk.MenuBar().rc_get_style()
+            color = style.text[gtk.STATE_NORMAL]
+            value = color.value
+        if value >= 0.5:
             return icon_file_bright
         else:
             return icon_file_dark
