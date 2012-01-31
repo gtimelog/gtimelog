@@ -1334,6 +1334,7 @@ class MainWindow:
             self.on_calendar_day_selected_double_click)
         self.main_window = builder.get_object('main_window')
         self.main_window.connect('delete_event', self.delete_event)
+        self.current_view_label = builder.get_object('current_view_label')
         self.log_view = builder.get_object('log_view')
         self.set_up_log_view_columns()
         self.task_pane = builder.get_object('task_list_pane')
@@ -1408,7 +1409,7 @@ class MainWindow:
         today = virtual_day(
             datetime.datetime.now(), self.timelog.virtual_midnight)
         today = today.strftime('%A, %Y-%m-%d (week %V)')
-        self.w(today + '\n\n', 'today')
+        self.current_view_label.set_text(today)
         if self.chronological:
             for item in self.timelog.window.all_entries():
                 self.write_item(item)
