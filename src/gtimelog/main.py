@@ -989,6 +989,7 @@ class Settings(object):
     mailer = 'x-terminal-emulator -e "mutt -H %s"'
     spreadsheet = 'xdg-open %s'
     chronological = True
+    show_tasks = True
 
     enable_gtk_completion = True  # False enables gvim-style completion
 
@@ -1022,6 +1023,7 @@ class Settings(object):
         config.set('gtimelog', 'mailer', self.mailer)
         config.set('gtimelog', 'spreadsheet', self.spreadsheet)
         config.set('gtimelog', 'chronological', str(self.chronological))
+        config.set('gtimelog', 'show_tasks', str(self.show_tasks))
         config.set('gtimelog', 'gtk-completion',
                    str(self.enable_gtk_completion))
         config.set('gtimelog', 'hours', str(self.hours))
@@ -1047,6 +1049,7 @@ class Settings(object):
         self.mailer = config.get('gtimelog', 'mailer')
         self.spreadsheet = config.get('gtimelog', 'spreadsheet')
         self.chronological = config.getboolean('gtimelog', 'chronological')
+        self.show_tasks = config.getboolean('gtimelog', 'show_tasks')
         self.enable_gtk_completion = config.getboolean('gtimelog',
                                                        'gtk-completion')
         self.hours = config.getfloat('gtimelog', 'hours')
@@ -1308,10 +1311,6 @@ class OldTrayIcon(IconChooser):
 class MainWindow:
     """Main application window."""
 
-    # Initial view mode.
-    chronological = True
-    show_tasks = True
-
     # URL to use for Help -> Online Documentation.
     help_url = "http://mg.pov.lt/gtimelog"
 
@@ -1327,6 +1326,7 @@ class MainWindow:
         # mucking with the buffer.  Not sure if it is necessary.
         self.lock = False
         self.chronological = settings.chronological
+        self.show_tasks = settings.show_tasks
         self.looking_at_date = None
         self.entry_watchers = []
         self._init_ui()
