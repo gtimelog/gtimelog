@@ -798,10 +798,18 @@ class TimeLog(object):
                                  self.virtual_midnight,
                                  callback=self.history.append)
         self.need_space = not self.window.items
+        self._cache = {(min, max): self.window}
 
     def window_for(self, min, max):
         """Return a TimeWindow for a specified time interval."""
-        return TimeWindow(self.filename, min, max, self.virtual_midnight)
+        try:
+            return self._cache[min, max]
+        except KeyError:
+            window = TimeWindow(self.filename, min, max, self.virtual_midnight)
+            if len(self._cache) > 1000:
+                self._cache.clear()
+            self._cache[min, max] = window
+            return window
 
     def window_for_day(self, date):
         """Return a TimeWindow for the specified day."""
