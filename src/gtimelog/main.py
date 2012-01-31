@@ -788,8 +788,28 @@ class TimeLog(object):
         """Return today's date, adjusted for virtual midnight."""
         return virtual_day(datetime.datetime.now(), self.virtual_midnight)
 
+    def check_reload(self):
+        """Look at the mtime of timelog.txt, and reload it if necessary.
+
+        Returns True if the file was reloaded.
+        """
+        mtime = self.get_mtime()
+        if mtime != self.last_mtime:
+            self.reread()
+            return True
+        else:
+            return False
+
+    def get_mtime(self):
+        """Return the mtime of self.filename, or None if the file doesn't exist."""
+        try:
+            return os.stat(self.filename).st_mtime
+        except OSError:
+            return None
+
     def reread(self):
         """Reload today's log."""
+        self.last_mtime = self.get_mtime()
         self.day = self.virtual_today()
         min = datetime.datetime.combine(self.day, self.virtual_midnight)
         max = min + datetime.timedelta(1)
@@ -2041,6 +2061,9 @@ class MainWindow:
 
     def tick(self, force_update=False):
         """Tick every second."""
+        if self.timelog.check_reload():
+            self.populate_log()
+            self.set_up_history()
         if self.tasks.check_reload():
             self.set_up_task_list()
         now = datetime.datetime.now().replace(second=0, microsecond=0)
