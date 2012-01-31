@@ -1,4 +1,4 @@
-0.7.1 (unreleased)
+0.7.1 (2012-02-01)
 ==================
 * Fix reporting problems with non-ASCII characters when using
   gobject-introspection (LP: #785578).
