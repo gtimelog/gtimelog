@@ -1,5 +1,7 @@
 0.7.1 (unreleased)
 ==================
+* Fix reporting problems with non-ASCII characters when using
+  gobject-introspection (LP: #785578).
 * Fix ^C not exiting the app when using gobject-introspection.
 * Implement panel icon color autodetection logic that was missing in the
   gobject-introspection case (LP: #924390).
