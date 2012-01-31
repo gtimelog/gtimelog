@@ -1614,11 +1614,16 @@ class MainWindow:
         if entry not in [row[0] for row in self.completion_choices]:
             self.completion_choices.append([entry])
 
-    def jump_to_today(self):
-        if self.looking_at_date is None:
+    def jump_to_date(self, date):
+        """Switch to looking at a given date"""
+        if self.looking_at_date == date:
             return
-        self.looking_at_date = None
+        self.looking_at_date = date
         self.populate_log()
+
+    def jump_to_today(self):
+        """Switch to looking at today"""
+        self.jump_to_date(None)
 
     def delete_event(self, widget, data=None):
         """Try to close the window."""
@@ -1666,6 +1671,24 @@ class MainWindow:
             self.on_hide_activate()
         else:
             self.on_show_activate()
+
+    def on_today_toolbutton_clicked(self, widget=None):
+        """Toolbar: Back"""
+        self.jump_to_today()
+
+    def on_back_toolbutton_clicked(self, widget=None):
+        """Toolbar: Back"""
+        day = (self.looking_at_date or self.timelog.day)
+        self.jump_to_date(day - datetime.timedelta(1))
+
+    def on_forward_toolbutton_clicked(self, widget=None):
+        """Toolbar: Forward"""
+        day = (self.looking_at_date or self.timelog.day)
+        day += datetime.timedelta(1)
+        if day >= self.timelog.virtual_today():
+            self.jump_to_today()
+        else:
+            self.jump_to_date(day)
 
     def on_quit_activate(self, widget):
         """File -> Quit selected"""
