@@ -1074,7 +1074,9 @@ class SimpleStatusIcon(IconChooser):
         self.icon.connect('activate', self.on_activate)
         self.icon.connect('popup-menu', self.on_popup_menu)
         self.gtimelog_window.main_window.connect(
-            'style-set', self.on_style_set)
+            'style-set', self.on_style_set) # Gtk+ 2
+        self.gtimelog_window.main_window.connect(
+            'style-updated', self.on_style_set) # Gtk+ 3
         gobject.timeout_add(1000, self.tick)
         self.gtimelog_window.entry_watchers.append(self.entry_added)
         self.gtimelog_window.tray_icon = self
@@ -1142,7 +1144,9 @@ class AppIndicator(IconChooser):
         self.indicator.set_menu(gtimelog_window.app_indicator_menu)
         self.gtimelog_window.tray_icon = self
         self.gtimelog_window.main_window.connect(
-            'style-set', self.on_style_set)
+            'style-set', self.on_style_set) # Gtk+ 2
+        self.gtimelog_window.main_window.connect(
+            'style-updated', self.on_style_set) # Gtk+ 3
 
     def available(self):
         """Is the icon supported by this system?
@@ -1186,7 +1190,9 @@ class OldTrayIcon(IconChooser):
         self.tick(force_update=True)
         self.trayicon.show_all()
         self.gtimelog_window.main_window.connect(
-            'style-set', self.on_style_set)
+            'style-set', self.on_style_set) # Gtk+ 2
+        self.gtimelog_window.main_window.connect(
+            'style-updated', self.on_style_set) # Gtk+ 3
         tray_icon_popup_menu = gtimelog_window.tray_icon_popup_menu
         self.eventbox.connect_object(
             'button-press-event', self.on_press, tray_icon_popup_menu)
