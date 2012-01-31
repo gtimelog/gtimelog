@@ -1913,6 +1913,8 @@ class MainWindow:
             self.task_pane.hide()
         else:
             self.task_pane.show()
+            if self.tasks.check_reload():
+                self.set_up_task_list()
 
     def on_task_pane_close_button_activate(self, event, data=None):
         """The close button next to the task pane title"""
@@ -2064,11 +2066,13 @@ class MainWindow:
         if self.timelog.check_reload():
             self.populate_log()
             self.set_up_history()
-        if self.tasks.check_reload():
-            self.set_up_task_list()
+        if self.task_pane.get_property('visible'):
+            if self.tasks.check_reload():
+                self.set_up_task_list()
         now = datetime.datetime.now().replace(second=0, microsecond=0)
         if now == self.last_tick and not force_update:
-            # Do not eat CPU unnecessarily.
+            # Do not eat CPU unnecessarily: update the time ticker only when
+            # the minute changes.
             return True
         self.last_tick = now
         last_time = self.timelog.window.last_time()
