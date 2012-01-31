@@ -784,9 +784,13 @@ class TimeLog(object):
         self.virtual_midnight = virtual_midnight
         self.reread()
 
+    def virtual_today(self):
+        """Return today's date, adjusted for virtual midnight."""
+        return virtual_day(datetime.datetime.now(), self.virtual_midnight)
+
     def reread(self):
         """Reload today's log."""
-        self.day = virtual_day(datetime.datetime.now(), self.virtual_midnight)
+        self.day = self.virtual_today()
         min = datetime.datetime.combine(self.day, self.virtual_midnight)
         max = min + datetime.timedelta(1)
         self.history = []
@@ -798,6 +802,29 @@ class TimeLog(object):
     def window_for(self, min, max):
         """Return a TimeWindow for a specified time interval."""
         return TimeWindow(self.filename, min, max, self.virtual_midnight)
+
+    def window_for_day(self, date):
+        """Return a TimeWindow for the specified day."""
+        min = datetime.datetime.combine(date, self.virtual_midnight)
+        max = min + datetime.timedelta(1)
+        return self.window_for(min, max)
+
+    def window_for_week(self, date):
+        """Return a TimeWindow for the week that contains date."""
+        monday = date - datetime.timedelta(date.weekday())
+        min = datetime.datetime.combine(monday, self.virtual_midnight)
+        max = min + datetime.timedelta(7)
+        return self.window_for(min, max)
+
+    def window_for_month(self, date):
+        """Return a TimeWindow for the month that contains date."""
+        first_of_this_month = first_of_month(date)
+        first_of_next_month = next_month(date)
+        min = datetime.datetime.combine(
+            first_of_this_month, self.virtual_midnight)
+        max = datetime.datetime.combine(
+            first_of_next_month, self.virtual_midnight)
+        return self.window_for(min, max)
 
     def whole_history(self):
         """Return a TimeWindow for the whole history."""
@@ -1300,6 +1327,7 @@ class MainWindow:
         # mucking with the buffer.  Not sure if it is necessary.
         self.lock = False
         self.chronological = settings.chronological
+        self.looking_at_date = None
         self.entry_watchers = []
         self._init_ui()
 
@@ -1334,6 +1362,7 @@ class MainWindow:
             self.on_calendar_day_selected_double_click)
         self.main_window = builder.get_object('main_window')
         self.main_window.connect('delete_event', self.delete_event)
+        self.current_view_label = builder.get_object('current_view_label')
         self.log_view = builder.get_object('log_view')
         self.set_up_log_view_columns()
         self.task_pane = builder.get_object('task_list_pane')
@@ -1405,15 +1434,19 @@ class MainWindow:
         if self.footer_mark is not None:
             buffer.delete_mark(self.footer_mark)
             self.footer_mark = None
-        today = virtual_day(
-            datetime.datetime.now(), self.timelog.virtual_midnight)
+        if self.looking_at_date is None:
+            today = self.timelog.day
+            window = self.timelog.window
+        else:
+            today = self.looking_at_date
+            window = self.timelog.window_for_day(today)
         today = today.strftime('%A, %Y-%m-%d (week %V)')
-        self.w(today + '\n\n', 'today')
+        self.current_view_label.set_text(today)
         if self.chronological:
-            for item in self.timelog.window.all_entries():
+            for item in window.all_entries():
                 self.write_item(item)
         else:
-            work, slack = self.timelog.window.grouped_entries()
+            work, slack = window.grouped_entries()
             for start, entry, duration in work + slack:
                 self.write_group(entry, duration)
             where = buffer.get_end_iter()
@@ -1434,8 +1467,9 @@ class MainWindow:
         buffer = self.log_buffer
         self.footer_mark = buffer.create_mark(
             'footer', buffer.get_end_iter(), True)
-        total_work, total_slacking = self.timelog.window.totals()
-        weekly_window = self.weekly_window()
+        window = self.daily_window(self.looking_at_date)
+        total_work, total_slacking = window.totals()
+        weekly_window = self.weekly_window(self.looking_at_date)
         week_total_work, week_total_slacking = weekly_window.totals()
         work_days_this_week = weekly_window.count_days()
 
@@ -1462,7 +1496,11 @@ class MainWindow:
             self.w(format_duration(per_diem), 'duration')
             self.w(' per day')
         self.w(')\n')
-        time_left = self.time_left_at_work(total_work)
+
+        if self.looking_at_date is None:
+            time_left = self.time_left_at_work(total_work)
+        else:
+            time_left = None
         if time_left is not None:
             time_to_leave = datetime.datetime.now() + time_left
             if time_left < datetime.timedelta(0):
@@ -1473,7 +1511,7 @@ class MainWindow:
             self.w(time_to_leave.strftime('%H:%M'), 'time')
             self.w(')')
 
-        if self.settings.show_office_hours:
+        if self.settings.show_office_hours and self.looking_at_date is None:
             self.w('\nAt office today: ')
             hours = datetime.timedelta(hours=self.settings.hours)
             total = total_slacking + total_work
@@ -1576,6 +1614,17 @@ class MainWindow:
         if entry not in [row[0] for row in self.completion_choices]:
             self.completion_choices.append([entry])
 
+    def jump_to_date(self, date):
+        """Switch to looking at a given date"""
+        if self.looking_at_date == date:
+            return
+        self.looking_at_date = date
+        self.populate_log()
+
+    def jump_to_today(self):
+        """Switch to looking at today"""
+        self.jump_to_date(None)
+
     def delete_event(self, widget, data=None):
         """Try to close the window."""
         if self.tray_icon:
@@ -1623,6 +1672,24 @@ class MainWindow:
         else:
             self.on_show_activate()
 
+    def on_today_toolbutton_clicked(self, widget=None):
+        """Toolbar: Back"""
+        self.jump_to_today()
+
+    def on_back_toolbutton_clicked(self, widget=None):
+        """Toolbar: Back"""
+        day = (self.looking_at_date or self.timelog.day)
+        self.jump_to_date(day - datetime.timedelta(1))
+
+    def on_forward_toolbutton_clicked(self, widget=None):
+        """Toolbar: Forward"""
+        day = (self.looking_at_date or self.timelog.day)
+        day += datetime.timedelta(1)
+        if day >= self.timelog.virtual_today():
+            self.jump_to_today()
+        else:
+            self.jump_to_date(day)
+
     def on_quit_activate(self, widget):
         """File -> Quit selected"""
         gtk.main_quit()
@@ -1646,6 +1713,11 @@ class MainWindow:
         self.chronological = False
         self.populate_log()
 
+    def daily_window(self, day=None):
+        if not day:
+            day = self.timelog.day
+        return self.timelog.window_for_day(day)
+
     def on_daily_report_activate(self, widget):
         """File -> Daily Report"""
         reports = Reports(self.timelog.window)
@@ -1653,19 +1725,15 @@ class MainWindow:
 
     def on_yesterdays_report_activate(self, widget):
         """File -> Daily Report for Yesterday"""
-        max = self.timelog.window.min_timestamp
-        min = max - datetime.timedelta(1)
-        reports = Reports(self.timelog.window_for(min, max))
+        day = self.timelog.day - datetime.timedelta(1)
+        reports = Reports(self.timelog.window_for_day(day))
         self.mail(reports.daily_report)
 
     def on_previous_day_report_activate(self, widget):
         """File -> Daily Report for a Previous Day"""
         day = self.choose_date()
         if day:
-            min = datetime.datetime.combine(
-                day, self.timelog.virtual_midnight)
-            max = min + datetime.timedelta(1)
-            reports = Reports(self.timelog.window_for(min, max))
+            reports = Reports(self.timelog.window_for_day(day))
             self.mail(reports.daily_report)
 
     def choose_date(self):
@@ -1688,12 +1756,7 @@ class MainWindow:
     def weekly_window(self, day=None):
         if not day:
             day = self.timelog.day
-        monday = day - datetime.timedelta(day.weekday())
-        min = datetime.datetime.combine(monday,
-                        self.timelog.virtual_midnight)
-        max = min + datetime.timedelta(7)
-        window = self.timelog.window_for(min, max)
-        return window
+        return self.timelog.window_for_week(day)
 
     def on_weekly_report_activate(self, widget):
         """File -> Weekly Report"""
@@ -1735,14 +1798,7 @@ class MainWindow:
     def monthly_window(self, day=None):
         if not day:
             day = self.timelog.day
-        first_of_this_month = first_of_month(day)
-        first_of_next_month = next_month(day)
-        min = datetime.datetime.combine(
-            first_of_this_month, self.timelog.virtual_midnight)
-        max = datetime.datetime.combine(
-            first_of_next_month, self.timelog.virtual_midnight)
-        window = self.timelog.window_for(min, max)
-        return window
+        return self.timelog.window_for_month(day)
 
     def on_previous_month_report_activate(self, widget):
         """File -> Monthly Report for a Previous Month"""
@@ -1927,6 +1983,9 @@ class MainWindow:
 
     def add_entry(self, widget, data=None):
         """Add the task entry to the log."""
+        if self.looking_at_date is not None:
+            self.jump_to_today()
+
         entry = self.task_entry.get_text()
         if not isinstance(entry, unicode):
             entry = unicode(entry, 'UTF-8')
@@ -1956,8 +2015,10 @@ class MainWindow:
         if not entry:
             return
         self.add_history(entry)
+        previous_day = self.timelog.day
         self.timelog.append(entry, now)
-        if self.chronological:
+        same_day = self.timelog.day == previous_day
+        if self.chronological and same_day:
             self.delete_footer()
             self.write_item(self.timelog.window.last_entry())
             self.add_footer()
@@ -1985,7 +2046,7 @@ class MainWindow:
         else:
             self.time_label.set_text(format_duration(now - last_time))
             # Update "time left to work"
-            if not self.lock:
+            if not self.lock and self.looking_at_date is None:
                 self.delete_footer()
                 self.add_footer()
         return True
