@@ -1144,7 +1144,7 @@ class SimpleStatusIcon(IconChooser):
             'style-set', self.on_style_set) # Gtk+ 2
         self.gtimelog_window.main_window.connect(
             'style-updated', self.on_style_set) # Gtk+ 3
-        gobject.timeout_add(1000, self.tick)
+        gobject.timeout_add_seconds(1000, self.tick)
         self.gtimelog_window.entry_watchers.append(self.entry_added)
         self.gtimelog_window.tray_icon = self
 
@@ -1264,7 +1264,7 @@ class OldTrayIcon(IconChooser):
         self.eventbox.connect_object(
             'button-press-event', self.on_press, tray_icon_popup_menu)
         self.eventbox.connect('button-release-event', self.on_release)
-        gobject.timeout_add(1000, self.tick)
+        gobject.timeout_add_seconds(1000, self.tick)
         self.gtimelog_window.entry_watchers.append(self.entry_added)
         self.gtimelog_window.tray_icon = self
 
@@ -1432,7 +1432,7 @@ class MainWindow:
         self.populate_log()
         self.update_show_checkbox()
         self.tick(True)
-        gobject.timeout_add(1000, self.tick)
+        gobject.timeout_add_seconds(1000, self.tick)
 
     def set_up_log_view_columns(self):
         """Set up tab stops in the log view."""
