@@ -5,6 +5,7 @@
 * Fix ^C not exiting the app when using gobject-introspection.
 * Implement panel icon color autodetection logic that was missing in the
   gobject-introspection case (LP: #924390).
+* New command-line option: --help.
 
 
 0.7.0 (2011-09-21)

@@ -13,6 +13,7 @@ import codecs
 import signal
 import urllib
 import datetime
+import optparse
 import tempfile
 import ConfigParser
 
@@ -977,6 +978,13 @@ class Settings(object):
     start_in_tray = False
 
     report_style = 'plain'
+
+    def get_config_dir(self):
+        envar_home = os.environ.get('GTIMELOG_HOME')
+        return os.path.expanduser(envar_home if envar_home else default_home)
+
+    def get_config_file(self):
+        return os.path.join(self.get_config_dir(), 'gtimelogrc')
 
     def _config(self):
         config = ConfigParser.RawConfigParser()
@@ -2009,14 +2017,26 @@ if dbus:
 
 def main():
     """Run the program."""
-    # XXX convert argument parsing to argparse.
-    if len(sys.argv) > 1 and sys.argv[1] == '--sample-config':
+    parser = optparse.OptionParser(usage='%prog [options]')
+    parser.add_option('--sample-config', action='store_true',
+        help="write a sample configuration file to 'gtimelogrc.sample'")
+    parser.add_option('--ignore-dbus', action='store_true',
+        help="do not check if GTimeLog is already running")
+    parser.add_option('--toggle', action='store_true',
+        help="show/hide the GTimeLog window if already running")
+    parser.add_option('--tray', action='store_true',
+        help="start minimized")
+
+    opts, args = parser.parse_args()
+
+    if opts.sample_config:
         settings = Settings()
         settings.save("gtimelogrc.sample")
         print "Sample configuration file written to gtimelogrc.sample"
+        print "Edit it and save as %s" % settings.get_config_file()
         return
 
-    if '--ignore-dbus' in sys.argv:
+    if opts.ignore_dbus:
         global dbus
         dbus = None
 
@@ -2029,10 +2049,10 @@ def main():
         try:
             session_bus = dbus.SessionBus()
             dbus_service = session_bus.get_object(SERVICE, OBJECT_PATH)
-            if '--toggle' in sys.argv:
+            if opts.toggle:
                 dbus_service.ToggleFocus()
                 print 'Already running, toggling visibility'
-            elif '--tray' in sys.argv:
+            elif opts.tray:
                 print 'Already running, not doing anything'
             else:
                 dbus_service.Present()
@@ -2041,16 +2061,16 @@ def main():
         except dbus.DBusException:
             pass
 
-    envar_home = os.environ.get('GTIMELOG_HOME')
-    configdir = os.path.expanduser(envar_home if envar_home else default_home)
+    settings = Settings()
+    configdir = settings.get_config_dir()
     try:
         # Create it if it doesn't exist.
         os.makedirs(configdir)
     except OSError as error:
         if error.errno != errno.EEXIST:
+            # XXX: not the most friendly way of error reporting for a GUI app
             raise
-    settings = Settings()
-    settings_file = os.path.join(configdir, 'gtimelogrc')
+    settings_file = settings.get_config_file()
     if not os.path.exists(settings_file):
         settings.save(settings_file)
     else:
@@ -2076,7 +2096,7 @@ def main():
             if tray_icon.available():
                 start_in_tray = (settings.start_in_tray
                                  if settings.start_in_tray
-                                 else ('--tray' in sys.argv))
+                                 else opts.tray)
                 break # found one that works
     if not start_in_tray:
         main_window.on_show_activate()
