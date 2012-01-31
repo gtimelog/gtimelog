@@ -16,6 +16,11 @@ all:
 check test:
 	./runtests
 
+.PHONY: clean
+clean:
+	rm -rf temp tmp build gtimelog.egg-info
+	find -name '*.pyc' -delete
+
 .PHONY: dist
 dist:
 	$(PYTHON) setup.py sdist
