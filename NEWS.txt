@@ -6,6 +6,12 @@
 * Implement panel icon color autodetection logic that was missing in the
   gobject-introspection case (LP: #924390).
 * New command-line option: --help.
+* New command-line option: --replace.  Requires that the running version
+  support the new DBus method 'Quit', which was also added in this version.
+* Messages printed to stdout are prefixed by "gtimelog" (GUI app output often
+  ends up in ~/.xsession-errors, it's polite to identify yourself when writing
+  there).
+* DBus errors do not pass silently.
 
 
 0.7.0 (2011-09-21)
