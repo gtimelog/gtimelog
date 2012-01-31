@@ -2014,6 +2014,10 @@ if dbus:
         def Present(self):
             self.main_window.on_show_activate()
 
+        @dbus.service.method(INTERFACE)
+        def Quit(self):
+            gtk.main_quit()
+
 
 def main():
     """Run the program."""
@@ -2022,6 +2026,8 @@ def main():
         help="write a sample configuration file to 'gtimelogrc.sample'")
     parser.add_option('--ignore-dbus', action='store_true',
         help="do not check if GTimeLog is already running")
+    parser.add_option('--replace', action='store_true',
+        help="replace the already running GTimeLog instance")
     parser.add_option('--toggle', action='store_true',
         help="show/hide the GTimeLog window if already running")
     parser.add_option('--tray', action='store_true',
@@ -2049,17 +2055,26 @@ def main():
         try:
             session_bus = dbus.SessionBus()
             dbus_service = session_bus.get_object(SERVICE, OBJECT_PATH)
-            if opts.toggle:
+            if opts.replace:
+                print 'gtimelog: Telling the already-running instance to quit'
+                dbus_service.Quit()
+            elif opts.toggle:
                 dbus_service.ToggleFocus()
-                print 'Already running, toggling visibility'
+                print 'gtimelog: Already running, toggling visibility'
+                sys.exit()
             elif opts.tray:
-                print 'Already running, not doing anything'
+                print 'gtimelog: Already running, not doing anything'
+                sys.exit()
             else:
                 dbus_service.Present()
-                print 'Already running, presenting main window'
-            sys.exit()
-        except dbus.DBusException:
-            pass
+                print 'gtimelog: Already running, presenting main window'
+                sys.exit()
+        except dbus.DBusException, e:
+            if e.get_dbus_name() == 'org.freedesktop.DBus.Error.ServiceUnknown':
+                # gtimelog is not running: that's fine and not an error at all
+                pass
+            else:
+                sys.exit('gtimelog: %s' % e)
 
     settings = Settings()
     configdir = settings.get_config_dir()
