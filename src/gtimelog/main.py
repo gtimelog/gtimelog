@@ -9,6 +9,7 @@ import re
 import csv
 import sys
 import errno
+import signal
 import urllib
 import datetime
 import tempfile
@@ -2069,6 +2070,9 @@ def main():
         main_window.on_show_activate()
     if dbus:
         service = Service(main_window)
+    # This is needed to make ^C terminate gtimelog when we're using
+    # gobject-introspection.
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
     try:
         gtk.main()
     except KeyboardInterrupt:
