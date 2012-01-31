@@ -421,8 +421,10 @@ def doctest_Reports_report_categories():
 
     """
 
+
 def doctest_Reports_daily_report():
     r"""Tests for Reports.daily_report
+
         >>> import sys
 
         >>> from datetime import datetime, time
