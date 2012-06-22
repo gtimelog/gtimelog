@@ -1112,7 +1112,9 @@ class IconChooser:
         # not necessarily the case!  this logic works for, say,
         # Ambiance/Radiance, but it gets New Wave and Dark Room wrong.
         if toolkit == 'gi':
-            style = gtk.MenuBar().get_style_context()
+            menu_bar = gtk.MenuBar()
+            # need to hold a reference to menu_bar to avoid LP#1016212
+            style = menu_bar.get_style_context()
             color = style.get_color(gtk.StateFlags.NORMAL)
             value = (color.red + color.green + color.blue) / 3
         else:
