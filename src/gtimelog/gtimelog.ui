@@ -52,7 +52,7 @@
 
 GTimeLog is a time tracking application.
 
-&lt;small&gt;© 2004–2011 Marius Gedminas and contributors&lt;/small&gt;</property>
+&lt;small&gt;© 2004–2012 Marius Gedminas and contributors&lt;/small&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="justify">center</property>
               </object>
@@ -277,6 +277,18 @@ GTimeLog is a time tracking application.
                         <property name="group">chronological</property>
                         <accelerator key="2" signal="activate" modifiers="GDK_MOD1_MASK"/>
                         <signal name="activate" handler="on_grouped_activate" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkRadioMenuItem" id="summary">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="label" translatable="yes">_Summary</property>
+                        <property name="use_underline">True</property>
+                        <property name="group">chronological</property>
+                        <accelerator key="3" signal="activate" modifiers="GDK_MOD1_MASK"/>
+                        <signal name="activate" handler="on_summary_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>

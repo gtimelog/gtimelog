@@ -3,6 +3,7 @@
 * History browsing (LP: #220778).
 * New setting to hide the tasks pane on startup (LP: #767096).
 * Reload timelog.txt automatically when it changes (LP: #220775).
+* Summary view (Alt-3) that shows total work in each category.
 
 
 0.7.1 (2012-02-01)
