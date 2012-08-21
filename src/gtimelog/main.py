@@ -1017,6 +1017,7 @@ class Settings(object):
     mailer = 'x-terminal-emulator -e "mutt -H %s"'
     spreadsheet = 'xdg-open %s'
     chronological = True
+    summary_view = False
     show_tasks = True
 
     enable_gtk_completion = True  # False enables gvim-style completion
@@ -1051,6 +1052,7 @@ class Settings(object):
         config.set('gtimelog', 'mailer', self.mailer)
         config.set('gtimelog', 'spreadsheet', self.spreadsheet)
         config.set('gtimelog', 'chronological', str(self.chronological))
+        config.set('gtimelog', 'summary_view', str(self.summary_view))
         config.set('gtimelog', 'show_tasks', str(self.show_tasks))
         config.set('gtimelog', 'gtk-completion',
                    str(self.enable_gtk_completion))
@@ -1077,6 +1079,7 @@ class Settings(object):
         self.mailer = config.get('gtimelog', 'mailer')
         self.spreadsheet = config.get('gtimelog', 'spreadsheet')
         self.chronological = config.getboolean('gtimelog', 'chronological')
+        self.summary_view = config.getboolean('gtimelog', 'summary_view')
         self.show_tasks = config.getboolean('gtimelog', 'show_tasks')
         self.enable_gtk_completion = config.getboolean('gtimelog',
                                                        'gtk-completion')
@@ -1355,7 +1358,8 @@ class MainWindow:
         # Try to prevent timer routines mucking with the buffer while we're
         # mucking with the buffer.  Not sure if it is necessary.
         self.lock = False
-        self.chronological = settings.chronological
+        self.chronological = settings.chronological and not settings.summary_view
+        self.summary_view = settings.summary_view
         self.show_tasks = settings.show_tasks
         self.looking_at_date = None
         self.entry_watchers = []
@@ -1368,6 +1372,8 @@ class MainWindow:
         # Set initial state of menu items *before* we hook up signals
         chronological_menu_item = builder.get_object('chronological')
         chronological_menu_item.set_active(self.chronological)
+        summary_menu_item = builder.get_object('summary')
+        summary_menu_item.set_active(self.summary_view)
         show_task_pane_item = builder.get_object('show_task_pane')
         show_task_pane_item.set_active(self.show_tasks)
         # Now hook up signals.
@@ -1475,6 +1481,13 @@ class MainWindow:
         if self.chronological:
             for item in window.all_entries():
                 self.write_item(item)
+        elif self.summary_view:
+            entries, totals = window.categorized_work_entries()
+            for category, duration in sorted(totals.items()):
+                self.write_group(category or 'no category', duration)
+            where = buffer.get_end_iter()
+            where.backward_cursor_position()
+            buffer.place_cursor(where)
         else:
             work, slack = window.grouped_entries()
             for start, entry, duration in work + slack:
@@ -1736,11 +1749,19 @@ class MainWindow:
     def on_chronological_activate(self, widget):
         """View -> Chronological"""
         self.chronological = True
+        self.summary_view = False
         self.populate_log()
 
     def on_grouped_activate(self, widget):
         """View -> Grouped"""
         self.chronological = False
+        self.summary_view = False
+        self.populate_log()
+
+    def on_summary_activate(self, widget):
+        """View -> Summary"""
+        self.chronological = False
+        self.summary_view = True
         self.populate_log()
 
     def daily_window(self, day=None):
