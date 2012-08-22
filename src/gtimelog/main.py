@@ -2207,7 +2207,6 @@ def main():
     else:
         log.setLevel(logging.INFO)
 
-
     if opts.sample_config:
         settings = Settings()
         settings.save("gtimelogrc.sample")
