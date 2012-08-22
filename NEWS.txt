@@ -9,6 +9,7 @@
 * New command-line option: --prefer-pygtk.  Only useful for testing against the
   deprecated PyGtk bindings instead of the modern pygobject-introspection.
 * New command-line option: --quit.
+* Fix popup menu of the tray icon (LP: #1039977).
 
 
 0.7.1 (2012-02-01)
