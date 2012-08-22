@@ -12,6 +12,7 @@ import errno
 import codecs
 import signal
 import urllib
+import logging
 import datetime
 import optparse
 import tempfile
@@ -19,6 +20,8 @@ import ConfigParser
 from operator import itemgetter
 
 import gtimelog
+
+log = logging.getLogger('gtimelog')
 
 # Which Gnome toolkit should we use?  Prior to 0.7, pygtk was the default with
 # a fallback to gi (gobject introspection), except on Ubuntu where gi was
@@ -1141,10 +1144,10 @@ class IconChooser:
             style = gtk.MenuBar().rc_get_style()
             color = style.text[gtk.STATE_NORMAL]
             value = color.value
-        if value >= 0.5:
-            return icon_file_bright
-        else:
-            return icon_file_dark
+        filename = icon_file_bright if value >= 0.5 else icon_file_dark
+        log.debug('Menu bar color: (%g, %g, %g), averages to %g; picking %s',
+                  color.red, color.green, color.blue, value, filename)
+        return filename
 
 
 class SimpleStatusIcon(IconChooser):
@@ -2197,6 +2200,13 @@ def main():
     parser.add_option_group(debug_options)
 
     opts, args = parser.parse_args()
+
+    log.addHandler(logging.StreamHandler(sys.stdout))
+    if opts.debug:
+        log.setLevel(logging.DEBUG)
+    else:
+        log.setLevel(logging.INFO)
+
 
     if opts.sample_config:
         settings = Settings()
