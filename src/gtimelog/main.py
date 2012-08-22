@@ -1473,8 +1473,7 @@ class MainWindow:
     def set_up_log_view_columns(self):
         """Set up tab stops in the log view."""
         # we can't get a Pango context for unrealized widgets
-        if not self.log_view.get_realized():
-            self.log_view.realize()
+        self.log_view.realize()
         pango_context = self.log_view.get_pango_context()
         em = pango_context.get_font_description().get_size()
         tabs = pango_tabarray_new(2, False)
