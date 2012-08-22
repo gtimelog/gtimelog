@@ -1986,7 +1986,10 @@ class MainWindow:
 
     def task_list_button_press(self, menu, event):
         if event.button == 3:
-            menu.popup(None, None, None, None, event.button, event.time)
+            if toolkit == "gi":
+                menu.popup(None, None, None, None, event.button, event.time)
+            else:
+                menu.popup(None, None, None, event.button, event.time)
             return True
         else:
             return False
