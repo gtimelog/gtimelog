@@ -4,6 +4,7 @@
 * New setting to hide the tasks pane on startup (LP: #767096).
 * Reload timelog.txt automatically when it changes (LP: #220775).
 * Summary view (Alt-3) that shows total work in each category.
+* Fix popup menu on the task pane (LP: #1040031).
 * New command-line option: --quit.
 
 
