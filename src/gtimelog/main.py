@@ -23,12 +23,22 @@ from operator import itemgetter
 # a fallback to gi (gobject introspection), except on Ubuntu where gi was
 # forced.  With 0.7, gi was made the default in upstream, so the Ubuntu
 # specific patch isn't necessary.
-try:
-    import gi
-    toolkit = 'gi'
-except ImportError:
-    import pygtk
-    toolkit = 'pygtk'
+
+if '--prefer-pygtk' in sys.argv:
+    sys.argv.remove('--prefer-pygtk')
+    try:
+        import pygtk
+        toolkit = 'pygtk'
+    except ImportError:
+        import gi
+        toolkit = 'gi'
+else:
+    try:
+        import gi
+        toolkit = 'gi'
+    except ImportError:
+        import pygtk
+        toolkit = 'pygtk'
 
 
 if toolkit == 'gi':
