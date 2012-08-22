@@ -16,8 +16,9 @@ import datetime
 import optparse
 import tempfile
 import ConfigParser
-
 from operator import itemgetter
+
+import gtimelog
 
 # Which Gnome toolkit should we use?  Prior to 0.7, pygtk was the default with
 # a fallback to gi (gobject introspection), except on Ubuntu where gi was
@@ -2170,7 +2171,8 @@ if dbus:
 
 def main():
     """Run the program."""
-    parser = optparse.OptionParser(usage='%prog [options]')
+    parser = optparse.OptionParser(usage='%prog [options]',
+                                   version=gtimelog.__version__)
     parser.add_option('--tray', action='store_true',
         help="start minimized")
     parser.add_option('--sample-config', action='store_true',
@@ -2207,10 +2209,11 @@ def main():
     global dbus
 
     if opts.debug:
+        print 'GTimeLog version: %s' % gtimelog.__version__
         print 'Toolkit: %s' % toolkit
         print 'Gtk+ version: %s' % gtk_version
         print 'D-Bus available: %s' % ('yes' if dbus else 'no')
-        print 'Config file: %s' % Settings().get_config_file()
+        print 'GTimeLog directory: %s' % Settings().get_config_dir()
 
     if opts.ignore_dbus:
         dbus = None
@@ -2263,15 +2266,27 @@ def main():
             raise
     settings_file = settings.get_config_file()
     if not os.path.exists(settings_file):
+        if opts.debug:
+            print 'Saving settings to %s' % settings_file
         settings.save(settings_file)
     else:
+        if opts.debug:
+            print 'Loading settings from %s' % settings_file
         settings.load(settings_file)
+    if opts.debug:
+        print 'Loading time log from %s' % os.path.join(configdir, 'timelog.txt')
+        print 'Assuming date changes at %s' % settings.virtual_midnight
     timelog = TimeLog(os.path.join(configdir, 'timelog.txt'),
                       settings.virtual_midnight)
     if settings.task_list_url:
+        if opts.debug:
+            print 'Loading cached remote tasks from %s' % (
+                               os.path.join(configdir, 'remote-tasks.txt'))
         tasks = RemoteTaskList(settings.task_list_url,
                                os.path.join(configdir, 'remote-tasks.txt'))
     else:
+        if opts.debug:
+            print 'Loading tasks from %s' % os.path.join(configdir, 'tasks.txt')
         tasks = TaskList(os.path.join(configdir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
     start_in_tray = False
@@ -2282,15 +2297,26 @@ def main():
             icons = [OldTrayIcon, SimpleStatusIcon, AppIndicator]
         else:
             icons = [SimpleStatusIcon, OldTrayIcon, AppIndicator]
+        if opts.debug:
+            print 'Tray icon preference: %s' % ', '.join(icon_class.__name__
+                                                         for icon_class in icons)
         for icon_class in icons:
             tray_icon = icon_class(main_window)
             if tray_icon.available():
+                if opts.debug:
+                    print 'Tray icon: %s' % icon_class.__name__
                 start_in_tray = (settings.start_in_tray
                                  if settings.start_in_tray
                                  else opts.tray)
                 break # found one that works
+            else:
+                if opts.debug:
+                    print '%s not available' % icon_class.__name__
     if not start_in_tray:
         main_window.on_show_activate()
+    else:
+        if opts.debug:
+            print 'Starting minimized'
     if dbus:
         service = Service(main_window)
     # This is needed to make ^C terminate gtimelog when we're using
