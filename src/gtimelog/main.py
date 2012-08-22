@@ -1171,9 +1171,14 @@ class SimpleStatusIcon(IconChooser):
     def on_popup_menu(self, widget, button, activate_time):
         """The user clicked on the icon."""
         tray_icon_popup_menu = self.gtimelog_window.tray_icon_popup_menu
-        tray_icon_popup_menu.popup(
-            None, None, gtk.status_icon_position_menu,
-            button, activate_time, self.icon)
+        if toolkit == "gi":
+            tray_icon_popup_menu.popup(
+                None, None, gtk.StatusIcon.position_menu,
+                self.icon, button, activate_time)
+        else:
+            tray_icon_popup_menu.popup(
+                None, None, gtk.status_icon_position_menu,
+                button, activate_time, self.icon)
 
     def entry_added(self, entry):
         """An entry has been added."""
