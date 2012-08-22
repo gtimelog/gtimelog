@@ -3,8 +3,11 @@
 * History browsing (LP: #220778).
 * New setting to hide the tasks pane on startup (LP: #767096).
 * Reload timelog.txt automatically when it changes (LP: #220775).
+* Fix segfault on startup (LP: #1016212).
 * Summary view (Alt-3) that shows total work in each category.
 * Fix popup menu on the task pane (LP: #1040031).
+* New command-line option: --prefer-pygtk.  Only useful for testing against the
+  deprecated PyGtk bindings instead of the modern pygobject-introspection.
 * New command-line option: --quit.
 
 
