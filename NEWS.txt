@@ -10,6 +10,7 @@
   deprecated PyGtk bindings instead of the modern pygobject-introspection.
 * New command-line option: --quit.
 * Fix popup menu of the tray icon (LP: #1039977).
+* Fix crash on exit when using Gtk+ 2 (LP: #1040088).
 
 
 0.7.1 (2012-02-01)
