@@ -2171,18 +2171,29 @@ if dbus:
 def main():
     """Run the program."""
     parser = optparse.OptionParser(usage='%prog [options]')
-    parser.add_option('--sample-config', action='store_true',
-        help="write a sample configuration file to 'gtimelogrc.sample'")
-    parser.add_option('--ignore-dbus', action='store_true',
-        help="do not check if GTimeLog is already running")
-    parser.add_option('--replace', action='store_true',
-        help="replace the already running GTimeLog instance")
-    parser.add_option('--quit', action='store_true',
-        help="tell an already-running GTimeLog instance to quit")
-    parser.add_option('--toggle', action='store_true',
-        help="show/hide the GTimeLog window if already running")
     parser.add_option('--tray', action='store_true',
         help="start minimized")
+    parser.add_option('--sample-config', action='store_true',
+        help="write a sample configuration file to 'gtimelogrc.sample'")
+
+    dbus_options = optparse.OptionGroup(parser, "Single-Instance Options")
+    dbus_options.add_option('--replace', action='store_true',
+        help="replace the already running GTimeLog instance")
+    dbus_options.add_option('--quit', action='store_true',
+        help="tell an already-running GTimeLog instance to quit")
+    dbus_options.add_option('--toggle', action='store_true',
+        help="show/hide the GTimeLog window if already running")
+    dbus_options.add_option('--ignore-dbus', action='store_true',
+        help="do not check if GTimeLog is already running"
+             " (allows you to have multiple instances running)")
+    parser.add_option_group(dbus_options)
+
+    debug_options = optparse.OptionGroup(parser, "Debugging Options")
+    debug_options.add_option('--debug', action='store_true',
+        help="show debug information")
+    debug_options.add_option('--prefer-pygtk', action='store_true',
+        help="try to use the (obsolete) pygtk library instead of pygi")
+    parser.add_option_group(debug_options)
 
     opts, args = parser.parse_args()
 
@@ -2193,8 +2204,15 @@ def main():
         print "Edit it and save as %s" % settings.get_config_file()
         return
 
+    global dbus
+
+    if opts.debug:
+        print 'Toolkit: %s' % toolkit
+        print 'Gtk+ version: %s' % gtk_version
+        print 'D-Bus available: %s' % ('yes' if dbus else 'no')
+        print 'Config file: %s' % Settings().get_config_file()
+
     if opts.ignore_dbus:
-        global dbus
         dbus = None
 
     # Let's check if there is already an instance of GTimeLog running
