@@ -2157,6 +2157,8 @@ def main():
         help="do not check if GTimeLog is already running")
     parser.add_option('--replace', action='store_true',
         help="replace the already running GTimeLog instance")
+    parser.add_option('--quit', action='store_true',
+        help="tell an already-running GTimeLog instance to quit")
     parser.add_option('--toggle', action='store_true',
         help="show/hide the GTimeLog window if already running")
     parser.add_option('--tray', action='store_true',
@@ -2184,9 +2186,11 @@ def main():
         try:
             session_bus = dbus.SessionBus()
             dbus_service = session_bus.get_object(SERVICE, OBJECT_PATH)
-            if opts.replace:
+            if opts.replace or opts.quit:
                 print 'gtimelog: Telling the already-running instance to quit'
                 dbus_service.Quit()
+                if opts.quit:
+                    sys.exit()
             elif opts.toggle:
                 dbus_service.ToggleFocus()
                 print 'gtimelog: Already running, toggling visibility'
@@ -2201,9 +2205,14 @@ def main():
         except dbus.DBusException, e:
             if e.get_dbus_name() == 'org.freedesktop.DBus.Error.ServiceUnknown':
                 # gtimelog is not running: that's fine and not an error at all
-                pass
+                if opts.quit:
+                    print 'gtimelog is not running'
+                    sys.exit()
             else:
                 sys.exit('gtimelog: %s' % e)
+    else: # not dbus
+        if opts.quit or opts.replace or opts.toggle:
+            sys.exit("gtimelog: dbus not available")
 
     settings = Settings()
     configdir = settings.get_config_dir()
