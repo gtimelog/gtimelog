@@ -521,6 +521,7 @@ GTimeLog is a time tracking application.
                         <property name="label" translatable="yes">Back</property>
                         <property name="use_underline">True</property>
                         <property name="stock_id">gtk-go-back</property>
+                        <accelerator key="Left" signal="clicked" modifiers="GDK_MOD1_MASK"/>
                         <signal name="clicked" handler="on_back_toolbutton_clicked" swapped="no"/>
                       </object>
                       <packing>
@@ -555,6 +556,7 @@ GTimeLog is a time tracking application.
                         <property name="label" translatable="yes">Forward</property>
                         <property name="use_underline">True</property>
                         <property name="stock_id">gtk-go-forward</property>
+                        <accelerator key="Right" signal="clicked" modifiers="GDK_MOD1_MASK"/>
                         <signal name="clicked" handler="on_forward_toolbutton_clicked" swapped="no"/>
                       </object>
                       <packing>
@@ -571,6 +573,7 @@ GTimeLog is a time tracking application.
                         <property name="label" translatable="yes">toolbutton2</property>
                         <property name="use_underline">True</property>
                         <property name="stock_id">gtk-goto-last</property>
+                        <accelerator key="Home" signal="clicked" modifiers="GDK_MOD1_MASK"/>
                         <signal name="clicked" handler="on_today_toolbutton_clicked" swapped="no"/>
                       </object>
                       <packing>
