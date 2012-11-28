@@ -35,7 +35,7 @@ setup(
     description=short_description,
     long_description=long_description + '\n\n' + changes_in_latest_versions,
     license='GPL',
-    classifiers = [
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: X11 Applications :: GTK',
         'License :: OSI Approved :: GNU General Public License (GPL)',

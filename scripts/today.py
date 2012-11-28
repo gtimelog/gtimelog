@@ -6,8 +6,10 @@ import sys
 import getopt
 import datetime
 
+
 def read_timelog(filename):
     return file(filename)
+
 
 def todays_entries(today, lines):
     # assume "day turnover" at 2 am
@@ -23,6 +25,7 @@ def todays_entries(today, lines):
             if min <= time < max:
                 yield line
 
+
 def parse_date(dt):
     m = re.match(r'^(\d+)-(\d+)-(\d+)$', dt)
     if not m:
@@ -30,12 +33,14 @@ def parse_date(dt):
     year, month, day = map(int, m.groups())
     return datetime.date(year, month, day)
 
+
 def parse_datetime(dt):
     m = re.match(r'^(\d+)-(\d+)-(\d+) (\d+):(\d+)$', dt)
     if not m:
         raise ValueError('bad date time: ', dt)
     year, month, day, hour, min = map(int, m.groups())
     return datetime.datetime(year, month, day, hour, min)
+
 
 def calculate_diffs(lines):
     last_time = None
@@ -49,6 +54,7 @@ def calculate_diffs(lines):
         yield last_time, time, delta, action.strip()
         last_time = time
 
+
 def format_time(t):
     h, m = divmod(t, 60)
     if h and m:
@@ -57,6 +63,7 @@ def format_time(t):
         return '%d hour%s' % (h, h != 1 and "s" or "")
     else:
         return '%d min' % m
+
 
 def print_diff(last_time, time, delta, action):
     time = time.strftime('%H:%M')
@@ -74,6 +81,7 @@ def print_diff(last_time, time, delta, action):
         print "%s at %s\n" % (action, time)
     else:
         print "%-62s  %s" % (action, delta)
+
 
 def print_diffs(iter):
     first_time = None

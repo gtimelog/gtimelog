@@ -281,11 +281,14 @@ class TimeWindow(object):
                     self.earliest_timestamp = time
                 if self.min_timestamp <= time < self.max_timestamp:
                     self.items.append((time, entry))
-        # The entries really should be already sorted in the file
-        # XXX: instead of quietly resorting them we should inform the user
+        # There's code that relies on entries being sorted.  The entries really
+        # should be already sorted in the file, but sometimes the user edits
+        # timelog.txt directly and introduces errors.
+        # XXX: instead of quietly resorting them we should inform the user if
+        # there are errors
         # Note that we must preserve the relative order of entries with
         # the same timestamp: https://bugs.launchpad.net/gtimelog/+bug/708825
-        self.items.sort(key=itemgetter(0)) # there's code that relies on them being sorted
+        self.items.sort(key=itemgetter(0))
         f.close()
 
     def last_time(self):
@@ -574,7 +577,7 @@ class Reports(object):
         if entries:
             categories = entries.keys()
             categories.sort()
-            if categories[0] == None:
+            if categories[0] is None:
                 categories = categories[1:]
                 categories.append('No category')
                 e = entries.pop(None)
@@ -594,7 +597,8 @@ class Reports(object):
                     entry = entry[:1].upper() + entry[1:]
                     if estimated_column:
                         print >> output, (u"  %-46s  %-14s  %s" %
-                                    (entry, '-', format_duration_short(duration)))
+                                    (entry, '-',
+                                     format_duration_short(duration)))
                     else:
                         print >> output, (u"  %-61s  %+5s" %
                                     (entry, format_duration_short(duration)))
@@ -821,7 +825,10 @@ class TimeLog(object):
             return False
 
     def get_mtime(self):
-        """Return the mtime of self.filename, or None if the file doesn't exist."""
+        """Return the mtime of self.filename, if it exists.
+
+        Returns None if the file doesn't exist.
+        """
         try:
             return os.stat(self.filename).st_mtime
         except OSError:
@@ -952,7 +959,10 @@ class TaskList(object):
             return False
 
     def get_mtime(self):
-        """Return the mtime of self.filename, or None if the file doesn't exist."""
+        """Return the mtime of self.filename, if it exists.
+
+        Returns None if the file doesn't exist.
+        """
         try:
             return os.stat(self.filename).st_mtime
         except OSError:
@@ -1084,8 +1094,10 @@ class Settings(object):
         config.set('gtimelog', 'show_office_hours',
                    str(self.show_office_hours))
         config.set('gtimelog', 'show_tray_icon', str(self.show_tray_icon))
-        config.set('gtimelog', 'prefer_app_indicator', str(self.prefer_app_indicator))
-        config.set('gtimelog', 'prefer_old_tray_icon', str(self.prefer_old_tray_icon))
+        config.set('gtimelog', 'prefer_app_indicator',
+                   str(self.prefer_app_indicator))
+        config.set('gtimelog', 'prefer_old_tray_icon',
+                   str(self.prefer_old_tray_icon))
         config.set('gtimelog', 'report_style', str(self.report_style))
         config.set('gtimelog', 'start_in_tray', str(self.start_in_tray))
         return config
@@ -1395,7 +1407,10 @@ class MainWindow:
         # Try to prevent timer routines mucking with the buffer while we're
         # mucking with the buffer.  Not sure if it is necessary.
         self.lock = False
-        self.chronological = settings.chronological and not settings.summary_view
+        # I'm representing a tristate with two booleans (for config file
+        # backwards compat), let's normalize nonsensical states.
+        self.chronological = (settings.chronological
+                              and not settings.summary_view)
         self.summary_view = settings.summary_view
         self.show_tasks = settings.show_tasks
         self.looking_at_date = None
@@ -1594,7 +1609,7 @@ class MainWindow:
             self.w('\nAt office today: ')
             hours = datetime.timedelta(hours=self.settings.hours)
             total = total_slacking + total_work
-            self.w("%s " % format_duration(total), 'duration' )
+            self.w("%s " % format_duration(total), 'duration')
             self.w('(')
             if total > hours:
                 self.w(format_duration(total - hours), 'duration')
@@ -1830,7 +1845,7 @@ class MainWindow:
         """
         if self.calendar_dialog.run() == GTK_RESPONSE_OK:
             y, m1, d = self.calendar.get_date()
-            day = datetime.date(y, m1+1, d)
+            day = datetime.date(y, m1 + 1, d)
         else:
             day = None
         self.calendar_dialog.hide()
