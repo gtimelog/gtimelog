@@ -1,9 +1,11 @@
 #!/usr/bin/python
 import readline
 
+
 def parse_time(s):
     h, m = map(int, s.strip().split(':'))
     return h * 60 + m
+
 
 def fmt_delta(mins):
     sign = mins < 0 and "-" or ""
@@ -14,6 +16,7 @@ def fmt_delta(mins):
         return "%s%d min (%d hr, %d min)" % (sign, mins, h, m)
     else:
         return "%s%d min" % (sign, mins)
+
 
 while True:
     try:
@@ -29,4 +32,3 @@ while True:
         print fmt_delta(t2 - t1)
     except ValueError:
         print eval(what)
-

@@ -13,7 +13,7 @@ outputfile = 'calendar.ics'
 
 settings = gtimelog.Settings()
 configdir = os.path.expanduser('~/.gtimelog')
-settings_file = os.path.join(configdir, 'gtimelogrc') 
+settings_file = os.path.join(configdir, 'gtimelogrc')
 if os.path.exists(settings_file):
     settings.load(settings_file)
 timelog = gtimelog.TimeLog(os.path.join(configdir, 'timelog.txt'),
