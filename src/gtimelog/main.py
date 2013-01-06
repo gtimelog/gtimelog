@@ -704,8 +704,8 @@ class Reports(object):
     def weekly_report_categorized(self, output, email, who,
                                   estimated_column=False):
         """Format a weekly report with entries displayed  under categories."""
-        week = self.window.min_timestamp.strftime('%V')
-        subject = 'Weekly report for %s (week %s)' % (who, week)
+        week = self.window.min_timestamp.isocalendar()[1]
+        subject = 'Weekly report for {} (week {:0>2})'.format(who, week)
         return self._categorizing_report(output, email, who, subject,
                                          period_name='week',
                                          estimated_column=estimated_column)
@@ -721,8 +721,8 @@ class Reports(object):
 
     def weekly_report_plain(self, output, email, who, estimated_column=False):
         """Format a weekly report ."""
-        week = self.window.min_timestamp.strftime('%V')
-        subject = 'Weekly report for %s (week %s)' % (who, week)
+        week = self.window.min_timestamp.isocalendar()[1]
+        subject = 'Weekly report for {} (week {:0>2})'.format(who, week)
         return self._plain_report(output, email, who, subject,
                                   period_name='week',
                                   estimated_column=estimated_column)
@@ -746,12 +746,12 @@ class Reports(object):
         # would give us translated names
         weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         weekday = weekday_names[window.min_timestamp.weekday()]
-        week = window.min_timestamp.strftime('%V')
-        print >> output, "To: %(email)s" % {'email': email}
-        print >> output, ("Subject: %(date)s report for %(who)s"
-                          " (%(weekday)s, week %(week)s)"
-                          % {'date': window.min_timestamp.strftime('%Y-%m-%d'),
-                             'weekday': weekday, 'week': week, 'who': who})
+        week = window.min_timestamp.isocalendar()[1]
+        print >> output, "To: {email}".format(email=email)
+        print >> output, ("Subject: {:%Y-%m-%d} report for {who}"
+                          " ({weekday}, week {week:0>2})".format(
+                          window.min_timestamp, who=who,
+                          weekday=weekday, week=week))
         print >> output
         items = list(window.all_entries())
         if not items:
@@ -1527,7 +1527,8 @@ class MainWindow:
         else:
             today = self.looking_at_date
             window = self.timelog.window_for_day(today)
-        today = today.strftime('%A, %Y-%m-%d (week %V)')
+        today = ("{:%A, %Y-%m-%d} (week {:0>2})"
+        .format(today, today.isocalendar()[1]))
         self.current_view_label.set_text(today)
         if self.chronological:
             for item in window.all_entries():
