@@ -1,7 +1,7 @@
 0.8.1 (unreleased)
 ==================
 * Fix STRF formatting problem on windows (LP: #1096489).
-
+* Use XDG Base Directory Specification for config and data files.
 
 0.8.0 (2012-08-24)
 ==================
