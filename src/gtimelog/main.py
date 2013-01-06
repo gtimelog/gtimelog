@@ -113,7 +113,7 @@ resource_dir = os.path.dirname(os.path.realpath(__file__))
 ui_file = os.path.join(resource_dir, "gtimelog.ui")
 icon_file_bright = os.path.join(resource_dir, "gtimelog-small-bright.png")
 icon_file_dark = os.path.join(resource_dir, "gtimelog-small.png")
-default_home = '~/.gtimelog'
+legacy_default_home = '~/.gtimelog'
 
 # This is for distribution packages
 if not os.path.exists(ui_file):
@@ -1066,13 +1066,39 @@ class Settings(object):
 
     report_style = 'plain'
 
-    def get_config_dir(self):
+    def check_legacy_config(self):
         envar_home = os.environ.get('GTIMELOG_HOME')
-        return os.path.expanduser(envar_home if envar_home else default_home)
+        if envar_home is not None:
+            return os.path.expanduser(envar_home)
+        if os.path.isdir(os.path.expanduser(legacy_default_home)):
+            return os.path.expanduser(legacy_default_home)
+
+    def get_config_dir(self):
+         legacy = self.check_legacy_config()
+         if legacy is not None: return legacy
+         #http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
+         xdg =  os.environ.get('XDG_CONFIG_HOME')
+         if xdg is not None:
+             return os.path.expanduser(xdg)
+         else:
+              return os.path.expanduser("~/.config/gtimelog")
+
+    def get_data_dir(self):
+         legacy = self.check_legacy_config()
+         if legacy is not None: return legacy
+
+         xdg =  os.environ.get('XDG_DATA_HOME')
+         if xdg is not None:
+              return os.path.expanduser(xdg)
+         else:
+              return os.path.expanduser("~/.local/share/gtimelog")
 
     def get_config_file(self):
         return os.path.join(self.get_config_dir(), 'gtimelogrc')
 
+    def get_timelog_file(self):
+        return os.path.join(self.get_data_dir(), 'timelog.txt')
+    
     def _config(self):
         config = ConfigParser.RawConfigParser()
         config.add_section('gtimelog')
@@ -2287,13 +2313,21 @@ def main():
 
     settings = Settings()
     configdir = settings.get_config_dir()
+    datadir = settings.get_data_dir()
     try:
-        # Create it if it doesn't exist.
+        # Create configdir if it doesn't exist.
         os.makedirs(configdir)
     except OSError as error:
         if error.errno != errno.EEXIST:
             # XXX: not the most friendly way of error reporting for a GUI app
             raise
+    try:
+        # Create datadir if it doesn't exist.
+        os.makedirs(datadir)
+    except OSError as error:
+        if error.errno != errno.EEXIST:
+            raise
+
     settings_file = settings.get_config_file()
     if not os.path.exists(settings_file):
         if opts.debug:
@@ -2304,20 +2338,20 @@ def main():
             print 'Loading settings from %s' % settings_file
         settings.load(settings_file)
     if opts.debug:
-        print 'Loading time log from %s' % os.path.join(configdir, 'timelog.txt')
+        print 'Loading time log from %s' % settings.get_timelog_file()
         print 'Assuming date changes at %s' % settings.virtual_midnight
-    timelog = TimeLog(os.path.join(configdir, 'timelog.txt'),
+    timelog = TimeLog(settings.get_timelog_file(),
                       settings.virtual_midnight)
     if settings.task_list_url:
         if opts.debug:
             print 'Loading cached remote tasks from %s' % (
-                               os.path.join(configdir, 'remote-tasks.txt'))
+                               os.path.join(datadir, 'remote-tasks.txt'))
         tasks = RemoteTaskList(settings.task_list_url,
-                               os.path.join(configdir, 'remote-tasks.txt'))
+                               os.path.join(datadir, 'remote-tasks.txt'))
     else:
         if opts.debug:
-            print 'Loading tasks from %s' % os.path.join(configdir, 'tasks.txt')
-        tasks = TaskList(os.path.join(configdir, 'tasks.txt'))
+            print 'Loading tasks from %s' % os.path.join(datadir, 'tasks.txt')
+        tasks = TaskList(os.path.join(datadir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
     start_in_tray = False
     if settings.show_tray_icon:
