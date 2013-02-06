@@ -711,7 +711,7 @@ class Reports(object):
                                          estimated_column=estimated_column)
 
     def monthly_report_categorized(self, output, email, who,
-                                  estimated_column=False):
+                                   estimated_column=False):
         """Format a monthly report with entries displayed  under categories."""
         month = self.window.min_timestamp.strftime('%Y/%m')
         subject = 'Monthly report for %s (%s)' % (who, month)
@@ -1072,33 +1072,36 @@ class Settings(object):
             return os.path.expanduser(envar_home)
         if os.path.isdir(os.path.expanduser(legacy_default_home)):
             return os.path.expanduser(legacy_default_home)
+        return None
 
     def get_config_dir(self):
-         legacy = self.check_legacy_config()
-         if legacy is not None: return legacy
-         #http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
-         xdg =  os.environ.get('XDG_CONFIG_HOME')
-         if xdg is not None:
-             return os.path.expanduser(xdg)
-         else:
-              return os.path.expanduser("~/.config/gtimelog")
+        legacy = self.check_legacy_config()
+        if legacy is not None:
+            return legacy
+        # http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
+        xdg = os.environ.get('XDG_CONFIG_HOME')
+        if xdg is not None:
+            return os.path.expanduser(xdg)
+        else:
+            return os.path.expanduser("~/.config/gtimelog")
 
     def get_data_dir(self):
-         legacy = self.check_legacy_config()
-         if legacy is not None: return legacy
+        legacy = self.check_legacy_config()
+        if legacy is not None:
+            return legacy
 
-         xdg =  os.environ.get('XDG_DATA_HOME')
-         if xdg is not None:
-              return os.path.expanduser(xdg)
-         else:
-              return os.path.expanduser("~/.local/share/gtimelog")
+        xdg = os.environ.get('XDG_DATA_HOME')
+        if xdg is not None:
+            return os.path.expanduser(xdg)
+        else:
+            return os.path.expanduser("~/.local/share/gtimelog")
 
     def get_config_file(self):
         return os.path.join(self.get_config_dir(), 'gtimelogrc')
 
     def get_timelog_file(self):
         return os.path.join(self.get_data_dir(), 'timelog.txt')
-    
+
     def _config(self):
         config = ConfigParser.RawConfigParser()
         config.add_section('gtimelog')
