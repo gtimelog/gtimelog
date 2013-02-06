@@ -108,12 +108,14 @@ except ImportError:
 from gtimelog import __version__
 
 
+legacy_default_home = '~/.gtimelog'
+
+
 # This is to let people run GTimeLog without having to install it
 resource_dir = os.path.dirname(os.path.realpath(__file__))
 ui_file = os.path.join(resource_dir, "gtimelog.ui")
 icon_file_bright = os.path.join(resource_dir, "gtimelog-small-bright.png")
 icon_file_dark = os.path.join(resource_dir, "gtimelog-small.png")
-legacy_default_home = '~/.gtimelog'
 
 # This is for distribution packages
 if not os.path.exists(ui_file):
@@ -1074,27 +1076,21 @@ class Settings(object):
             return os.path.expanduser(legacy_default_home)
         return None
 
+    # http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
+
     def get_config_dir(self):
         legacy = self.check_legacy_config()
-        if legacy is not None:
+        if legacy:
             return legacy
-        # http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
-        xdg = os.environ.get('XDG_CONFIG_HOME')
-        if xdg is not None:
-            return os.path.expanduser(xdg)
-        else:
-            return os.path.expanduser("~/.config/gtimelog")
+        xdg = os.environ.get('XDG_CONFIG_HOME') or '~/.config'
+        return os.path.join(os.path.expanduser(xdg), 'gtimelog')
 
     def get_data_dir(self):
         legacy = self.check_legacy_config()
-        if legacy is not None:
+        if legacy:
             return legacy
-
-        xdg = os.environ.get('XDG_DATA_HOME')
-        if xdg is not None:
-            return os.path.expanduser(xdg)
-        else:
-            return os.path.expanduser("~/.local/share/gtimelog")
+        xdg = os.environ.get('XDG_DATA_HOME') or '~/.local/share'
+        return os.path.join(os.path.expanduser(xdg), 'gtimelog')
 
     def get_config_file(self):
         return os.path.join(self.get_config_dir(), 'gtimelogrc')
@@ -2272,7 +2268,8 @@ def main():
         print 'Toolkit: %s' % toolkit
         print 'Gtk+ version: %s' % gtk_version
         print 'D-Bus available: %s' % ('yes' if dbus else 'no')
-        print 'GTimeLog directory: %s' % Settings().get_config_dir()
+        print 'Config directory: %s' % Settings().get_config_dir()
+        print 'Data directory: %s' % Settings().get_data_dir()
 
     if opts.ignore_dbus:
         dbus = None

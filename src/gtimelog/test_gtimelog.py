@@ -4,6 +4,7 @@
 
 import doctest
 import unittest
+import os
 
 
 def doctest_as_hours():
@@ -421,7 +422,6 @@ def doctest_Reports_report_categories():
 
     """
 
-
 def doctest_Reports_daily_report():
     r"""Tests for Reports.daily_report
 
@@ -584,6 +584,84 @@ def doctest_Reports_monthly_report_plain():
         Bong                                                            3 hours 31 min
         (none)                                                          2 hours 14 min
         <BLANKLINE>
+
+    """
+
+def doctest_Settings_get_config_dir():
+    """Test for Settings.get_config_dir
+
+        >>> from gtimelog.main import Settings
+        >>> settings = Settings()
+        >>> real_isdir = os.path.isdir
+
+    Case 1: GTIMELOG_HOME is present in the environment
+
+        >>> os.environ['HOME'] = '/tmp/home'
+        >>> os.environ['GTIMELOG_HOME'] = '~/.gt'
+        >>> settings.get_config_dir()
+        '/tmp/home/.gt'
+
+    Case 2: ~/.gtimelog exists
+
+        >>> del os.environ['GTIMELOG_HOME']
+        >>> os.path.isdir = lambda dir: True
+        >>> settings.get_config_dir()
+        '/tmp/home/.gtimelog'
+
+    Case 3: ~/.gtimelog does not exist, so we use XDG
+
+        >>> os.path.isdir = lambda dir: False
+        >>> settings.get_config_dir()
+        '/tmp/home/.config/gtimelog'
+
+    Case 4: XDG_CONFIG_HOME is present in the environment
+
+        >>> os.environ['XDG_CONFIG_HOME'] = '~/.conf'
+        >>> settings.get_config_dir()
+        '/tmp/home/.conf/gtimelog'
+
+    Cleanup
+
+        >>> os.path.isdir = real_isdir
+
+    """
+
+def doctest_Settings_get_data_dir():
+    """Test for Settings.get_data_dir
+
+        >>> from gtimelog.main import Settings
+        >>> settings = Settings()
+        >>> real_isdir = os.path.isdir
+
+    Case 1: GTIMELOG_HOME is present in the environment
+
+        >>> os.environ['HOME'] = '/tmp/home'
+        >>> os.environ['GTIMELOG_HOME'] = '~/.gt'
+        >>> settings.get_data_dir()
+        '/tmp/home/.gt'
+
+    Case 2: ~/.gtimelog exists
+
+        >>> del os.environ['GTIMELOG_HOME']
+        >>> os.path.isdir = lambda dir: True
+        >>> settings.get_data_dir()
+        '/tmp/home/.gtimelog'
+
+    Case 3: ~/.gtimelog does not exist, so we use XDG
+
+        >>> os.path.isdir = lambda dir: False
+        >>> settings.get_data_dir()
+        '/tmp/home/.local/share/gtimelog'
+
+    Case 4: XDG_CONFIG_HOME is present in the environment
+
+        >>> os.environ['XDG_DATA_HOME'] = '~/.data'
+        >>> settings.get_data_dir()
+        '/tmp/home/.data/gtimelog'
+
+    Cleanup
+
+        >>> os.path.isdir = real_isdir
 
     """
 
