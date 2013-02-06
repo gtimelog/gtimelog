@@ -12,11 +12,12 @@ d2 = datetime.datetime.now()
 outputfile = 'calendar.ics'
 
 settings = gtimelog.Settings()
-configdir = os.path.expanduser('~/.gtimelog')
-settings_file = os.path.join(configdir, 'gtimelogrc')
+configdir = settings.get_config_dir()
+datadir = settings.get_data_dir()
+settings_file = settings.get_config_file()
 if os.path.exists(settings_file):
     settings.load(settings_file)
-timelog = gtimelog.TimeLog(os.path.join(configdir, 'timelog.txt'),
+timelog = gtimelog.TimeLog(settings.get_timelog_file(),
                            settings.virtual_midnight)
 window = timelog.window_for(d1, d2)
 window.icalendar(open(outputfile, 'w'))
