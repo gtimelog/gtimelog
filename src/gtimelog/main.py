@@ -1552,8 +1552,8 @@ class MainWindow:
         else:
             today = self.looking_at_date
             window = self.timelog.window_for_day(today)
-        today = ("{:%A, %Y-%m-%d} (week {:0>2})"
-        .format(today, today.isocalendar()[1]))
+        today = "{:%A, %Y-%m-%d} (week {:0>2})".format(today,
+                                                       today.isocalendar()[1])
         self.current_view_label.set_text(today)
         if self.chronological:
             for item in window.all_entries():
