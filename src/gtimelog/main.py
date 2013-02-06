@@ -113,7 +113,7 @@ resource_dir = os.path.dirname(os.path.realpath(__file__))
 ui_file = os.path.join(resource_dir, "gtimelog.ui")
 icon_file_bright = os.path.join(resource_dir, "gtimelog-small-bright.png")
 icon_file_dark = os.path.join(resource_dir, "gtimelog-small.png")
-default_home = '~/.gtimelog'
+legacy_default_home = '~/.gtimelog'
 
 # This is for distribution packages
 if not os.path.exists(ui_file):
@@ -704,8 +704,8 @@ class Reports(object):
     def weekly_report_categorized(self, output, email, who,
                                   estimated_column=False):
         """Format a weekly report with entries displayed  under categories."""
-        week = self.window.min_timestamp.strftime('%V')
-        subject = 'Weekly report for %s (week %s)' % (who, week)
+        week = self.window.min_timestamp.isocalendar()[1]
+        subject = 'Weekly report for {} (week {:0>2})'.format(who, week)
         return self._categorizing_report(output, email, who, subject,
                                          period_name='week',
                                          estimated_column=estimated_column)
@@ -721,8 +721,8 @@ class Reports(object):
 
     def weekly_report_plain(self, output, email, who, estimated_column=False):
         """Format a weekly report ."""
-        week = self.window.min_timestamp.strftime('%V')
-        subject = 'Weekly report for %s (week %s)' % (who, week)
+        week = self.window.min_timestamp.isocalendar()[1]
+        subject = 'Weekly report for {} (week {:0>2})'.format(who, week)
         return self._plain_report(output, email, who, subject,
                                   period_name='week',
                                   estimated_column=estimated_column)
@@ -746,12 +746,12 @@ class Reports(object):
         # would give us translated names
         weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         weekday = weekday_names[window.min_timestamp.weekday()]
-        week = window.min_timestamp.strftime('%V')
-        print >> output, "To: %(email)s" % {'email': email}
-        print >> output, ("Subject: %(date)s report for %(who)s"
-                          " (%(weekday)s, week %(week)s)"
-                          % {'date': window.min_timestamp.strftime('%Y-%m-%d'),
-                             'weekday': weekday, 'week': week, 'who': who})
+        week = window.min_timestamp.isocalendar()[1]
+        print >> output, "To: {email}".format(email=email)
+        print >> output, ("Subject: {:%Y-%m-%d} report for {who}"
+                          " ({weekday}, week {week:0>2})".format(
+                          window.min_timestamp, who=who,
+                          weekday=weekday, week=week))
         print >> output
         items = list(window.all_entries())
         if not items:
@@ -1066,13 +1066,39 @@ class Settings(object):
 
     report_style = 'plain'
 
-    def get_config_dir(self):
+    def check_legacy_config(self):
         envar_home = os.environ.get('GTIMELOG_HOME')
-        return os.path.expanduser(envar_home if envar_home else default_home)
+        if envar_home is not None:
+            return os.path.expanduser(envar_home)
+        if os.path.isdir(os.path.expanduser(legacy_default_home)):
+            return os.path.expanduser(legacy_default_home)
+
+    def get_config_dir(self):
+         legacy = self.check_legacy_config()
+         if legacy is not None: return legacy
+         #http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
+         xdg =  os.environ.get('XDG_CONFIG_HOME')
+         if xdg is not None:
+             return os.path.expanduser(xdg)
+         else:
+              return os.path.expanduser("~/.config/gtimelog")
+
+    def get_data_dir(self):
+         legacy = self.check_legacy_config()
+         if legacy is not None: return legacy
+
+         xdg =  os.environ.get('XDG_DATA_HOME')
+         if xdg is not None:
+              return os.path.expanduser(xdg)
+         else:
+              return os.path.expanduser("~/.local/share/gtimelog")
 
     def get_config_file(self):
         return os.path.join(self.get_config_dir(), 'gtimelogrc')
 
+    def get_timelog_file(self):
+        return os.path.join(self.get_data_dir(), 'timelog.txt')
+    
     def _config(self):
         config = ConfigParser.RawConfigParser()
         config.add_section('gtimelog')
@@ -1527,7 +1553,8 @@ class MainWindow:
         else:
             today = self.looking_at_date
             window = self.timelog.window_for_day(today)
-        today = today.strftime('%A, %Y-%m-%d (week %V)')
+        today = ("{:%A, %Y-%m-%d} (week {:0>2})"
+        .format(today, today.isocalendar()[1]))
         self.current_view_label.set_text(today)
         if self.chronological:
             for item in window.all_entries():
@@ -2286,13 +2313,21 @@ def main():
 
     settings = Settings()
     configdir = settings.get_config_dir()
+    datadir = settings.get_data_dir()
     try:
-        # Create it if it doesn't exist.
+        # Create configdir if it doesn't exist.
         os.makedirs(configdir)
     except OSError as error:
         if error.errno != errno.EEXIST:
             # XXX: not the most friendly way of error reporting for a GUI app
             raise
+    try:
+        # Create datadir if it doesn't exist.
+        os.makedirs(datadir)
+    except OSError as error:
+        if error.errno != errno.EEXIST:
+            raise
+
     settings_file = settings.get_config_file()
     if not os.path.exists(settings_file):
         if opts.debug:
@@ -2303,20 +2338,20 @@ def main():
             print 'Loading settings from %s' % settings_file
         settings.load(settings_file)
     if opts.debug:
-        print 'Loading time log from %s' % os.path.join(configdir, 'timelog.txt')
+        print 'Loading time log from %s' % settings.get_timelog_file()
         print 'Assuming date changes at %s' % settings.virtual_midnight
-    timelog = TimeLog(os.path.join(configdir, 'timelog.txt'),
+    timelog = TimeLog(settings.get_timelog_file(),
                       settings.virtual_midnight)
     if settings.task_list_url:
         if opts.debug:
             print 'Loading cached remote tasks from %s' % (
-                               os.path.join(configdir, 'remote-tasks.txt'))
+                               os.path.join(datadir, 'remote-tasks.txt'))
         tasks = RemoteTaskList(settings.task_list_url,
-                               os.path.join(configdir, 'remote-tasks.txt'))
+                               os.path.join(datadir, 'remote-tasks.txt'))
     else:
         if opts.debug:
-            print 'Loading tasks from %s' % os.path.join(configdir, 'tasks.txt')
-        tasks = TaskList(os.path.join(configdir, 'tasks.txt'))
+            print 'Loading tasks from %s' % os.path.join(datadir, 'tasks.txt')
+        tasks = TaskList(os.path.join(datadir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
     start_in_tray = False
     if settings.show_tray_icon:
