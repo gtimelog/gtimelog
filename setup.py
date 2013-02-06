@@ -39,6 +39,7 @@ setup(
         'Development Status :: 4 - Beta',
         'Environment :: X11 Applications :: GTK',
         'License :: OSI Approved :: GNU General Public License (GPL)',
+        'Programming Language :: Python :: 2.7',
         'Topic :: Office/Business',
     ],
 
