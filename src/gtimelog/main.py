@@ -12,6 +12,7 @@ import errno
 import codecs
 import signal
 import urllib
+import locale
 import logging
 import datetime
 import optparse
@@ -707,7 +708,7 @@ class Reports(object):
                                   estimated_column=False):
         """Format a weekly report with entries displayed  under categories."""
         week = self.window.min_timestamp.isocalendar()[1]
-        subject = 'Weekly report for {} (week {:0>2})'.format(who, week)
+        subject = u'Weekly report for {} (week {:0>2})'.format(who, week)
         return self._categorizing_report(output, email, who, subject,
                                          period_name='week',
                                          estimated_column=estimated_column)
@@ -716,7 +717,7 @@ class Reports(object):
                                    estimated_column=False):
         """Format a monthly report with entries displayed  under categories."""
         month = self.window.min_timestamp.strftime('%Y/%m')
-        subject = 'Monthly report for %s (%s)' % (who, month)
+        subject = u'Monthly report for %s (%s)' % (who, month)
         return self._categorizing_report(output, email, who, subject,
                                          period_name='month',
                                          estimated_column=estimated_column)
@@ -724,7 +725,7 @@ class Reports(object):
     def weekly_report_plain(self, output, email, who, estimated_column=False):
         """Format a weekly report ."""
         week = self.window.min_timestamp.isocalendar()[1]
-        subject = 'Weekly report for {} (week {:0>2})'.format(who, week)
+        subject = u'Weekly report for {} (week {:0>2})'.format(who, week)
         return self._plain_report(output, email, who, subject,
                                   period_name='week',
                                   estimated_column=estimated_column)
@@ -732,7 +733,7 @@ class Reports(object):
     def monthly_report_plain(self, output, email, who, estimated_column=False):
         """Format a monthly report ."""
         month = self.window.min_timestamp.strftime('%Y/%m')
-        subject = 'Monthly report for %s (%s)' % (who, month)
+        subject = u'Monthly report for %s (%s)' % (who, month)
         return self._plain_report(output, email, who, subject,
                                   period_name='month',
                                   estimated_column=estimated_column)
@@ -749,9 +750,9 @@ class Reports(object):
         weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         weekday = weekday_names[window.min_timestamp.weekday()]
         week = window.min_timestamp.isocalendar()[1]
-        print >> output, "To: {email}".format(email=email)
-        print >> output, ("Subject: {:%Y-%m-%d} report for {who}"
-                          " ({weekday}, week {week:0>2})".format(
+        print >> output, u"To: {email}".format(email=email)
+        print >> output, (u"Subject: {:%Y-%m-%d} report for {who}"
+                          u" ({weekday}, week {week:0>2})".format(
                           window.min_timestamp, who=who,
                           weekday=weekday, week=week))
         print >> output
@@ -1041,6 +1042,8 @@ class RemoteTaskList(TaskList):
 class Settings(object):
     """Configurable settings for GTimeLog."""
 
+    _encoding = locale.getpreferredencoding()
+
     # Insane defaults
     email = 'activity-list@example.com'
     name = 'Anonymous'
@@ -1102,7 +1105,7 @@ class Settings(object):
         config = ConfigParser.RawConfigParser()
         config.add_section('gtimelog')
         config.set('gtimelog', 'list-email', self.email)
-        config.set('gtimelog', 'name', self.name)
+        config.set('gtimelog', 'name', self.name.encode(self._encoding))
         config.set('gtimelog', 'editor', self.editor)
         config.set('gtimelog', 'mailer', self.mailer)
         config.set('gtimelog', 'spreadsheet', self.spreadsheet)
@@ -1131,7 +1134,7 @@ class Settings(object):
         config = self._config()
         config.read([filename])
         self.email = config.get('gtimelog', 'list-email')
-        self.name = config.get('gtimelog', 'name')
+        self.name = config.get('gtimelog', 'name').decode(self._encoding)
         self.editor = config.get('gtimelog', 'editor')
         self.mailer = config.get('gtimelog', 'mailer')
         self.spreadsheet = config.get('gtimelog', 'spreadsheet')
