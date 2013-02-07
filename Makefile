@@ -16,6 +16,11 @@ all:
 check test:
 	./runtests
 
+.PHONY: coverage
+coverage:
+	coverage run ./runtests
+	coverage report --include 'src/gtimelog/*'
+
 .PHONY: clean
 clean:
 	rm -rf temp tmp build gtimelog.egg-info

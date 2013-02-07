@@ -2,3 +2,4 @@ gtimelog.egg-info
 dist
 build
 temp
+.coverage
