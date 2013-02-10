@@ -1,4 +1,4 @@
-0.8.1 (unreleased)
+0.8.1 (2013-02-10)
 ==================
 * Fix strftime problem on Windows (LP: #1096489).
 * Fix gtimelog.desktop validation (LP: #1051226).
