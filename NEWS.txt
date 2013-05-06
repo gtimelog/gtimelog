@@ -1,6 +1,6 @@
 0.8.2 (unreleased)
 ==================
-
+* New custom date range report
 
 0.8.1 (2013-02-10)
 ==================

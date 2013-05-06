@@ -587,6 +587,74 @@ def doctest_Reports_monthly_report_plain():
 
     """
 
+def doctest_Reports_custom_range_report_categorized():
+    r"""Tests for Reports.custom_range_report_categorized
+
+        >>> import sys
+
+        >>> from datetime import datetime, time
+        >>> from tempfile import NamedTemporaryFile
+        >>> from gtimelog.main import TimeWindow, Reports
+
+        >>> vm = time(2, 0)
+        >>> min = datetime(2010, 1, 25)
+        >>> max = datetime(2010, 2, 1)
+        >>> fh = NamedTemporaryFile()
+
+        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> reports = Reports(window)
+        >>> reports.custom_range_report_categorized(sys.stdout, 'foo@bar.com',
+        ...                                         'Bob Jones')
+        To: foo@bar.com
+        Subject: Custom date range report for Bob Jones (2010-01-25 - 2010-01-31)
+        <BLANKLINE>
+        No work done this custom range.
+
+        >>> _ = [fh.write(s + '\n') for s in [
+        ...    '2010-01-20 09:00: arrived',
+        ...    '2010-01-20 09:30: asdf',
+        ...    '2010-01-20 10:00: Bar: Foo',
+        ...    ''
+        ...    '2010-01-30 09:00: arrived',
+        ...    '2010-01-30 09:23: Bing: stuff',
+        ...    '2010-01-30 12:54: Bong: other stuff',
+        ...    '2010-01-30 13:32: lunch **',
+        ...    '2010-01-30 23:46: misc',
+        ...    '']]
+        >>> fh.flush()
+
+        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> reports = Reports(window)
+        >>> reports.custom_range_report_categorized(sys.stdout, 'foo@bar.com',
+        ...                                         'Bob Jones')
+        To: foo@bar.com
+        Subject: Custom date range report for Bob Jones (2010-01-25 - 2010-01-31)
+        <BLANKLINE>
+                                                                          time
+        Bing:
+          Stuff                                                           0:23
+        ----------------------------------------------------------------------
+                                                                          0:23
+        <BLANKLINE>
+        Bong:
+          Other stuff                                                     3:31
+        ----------------------------------------------------------------------
+                                                                          3:31
+        <BLANKLINE>
+        No category:
+          Misc                                                           10:14
+        ----------------------------------------------------------------------
+                                                                         10:14
+        <BLANKLINE>
+        Total work done this custom range: 14:08
+        <BLANKLINE>
+        Categories by time spent:
+          No category     10:14
+          Bong             3:31
+          Bing             0:23
+
+    """
+
 def doctest_Settings_get_config_dir():
     """Test for Settings.get_config_dir
 
