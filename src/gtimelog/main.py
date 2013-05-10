@@ -1493,6 +1493,9 @@ class MainWindow:
         self.calendar.connect(
             'day_selected_double_click',
             self.on_calendar_day_selected_double_click)
+        self.two_calendar_dialog = builder.get_object('two_calendar_dialog')
+        self.calendar1 = builder.get_object('calendar1')
+        self.calendar2 = builder.get_object('calendar2')
         self.main_window = builder.get_object('main_window')
         self.main_window.connect('delete_event', self.delete_event)
         self.current_view_label = builder.get_object('current_view_label')
@@ -1887,7 +1890,7 @@ class MainWindow:
     def choose_date(self):
         """Pop up a calendar dialog.
 
-        Returns either a datetime.date, or one.
+        Returns either a datetime.date, or None.
         """
         if self.calendar_dialog.run() == GTK_RESPONSE_OK:
             y, m1, d = self.calendar.get_date()
@@ -1896,6 +1899,21 @@ class MainWindow:
             day = None
         self.calendar_dialog.hide()
         return day
+
+    def choose_date_range(self):
+        """Pop up a calendar dialog for a date range.
+
+        Returns either a tuple with two datetime.date objects, or (None, None).
+        """
+        if self.two_calendar_dialog.run() == GTK_RESPONSE_OK:
+            y1, m1, d1 = self.calendar1.get_date()
+            y2, m2, d2 = self.calendar2.get_date()
+            first = datetime.date(y1, m1 + 1, d1)
+            second = datetime.date(y2, m2 + 1, d2)
+        else:
+            first = second = None
+        self.two_calendar_dialog.hide()
+        return (first, second)
 
     def on_calendar_day_selected_double_click(self, widget):
         """Double-click on a calendar day: close the dialog."""
@@ -1995,8 +2013,7 @@ class MainWindow:
 
     def on_custom_range_report_activate(self, widget):
         """File -> Report for a Custom Date Range"""
-        min = self.choose_date()
-        max = self.choose_date()
+        min, max = self.choose_date_range()
         if min and max:
             reports = Reports(self.range_window(min, max))
             self.mail(reports.custom_range_report_categorized)
