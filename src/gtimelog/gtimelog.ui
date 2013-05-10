@@ -425,6 +425,17 @@ GTimeLog is a time tracking application.
                       </object>
                     </child>
                     <child>
+                      <object class="GtkImageMenuItem" id="custom_range_report">
+                        <property name="label">Report for a Custom Date Range...</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="use_underline">True</property>
+                        <property name="use_stock">True</property>
+                        <signal name="activate" handler="on_custom_range_report_activate" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkSeparatorMenuItem" id="separator1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>

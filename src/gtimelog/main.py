@@ -738,6 +738,17 @@ class Reports(object):
                                   period_name='month',
                                   estimated_column=estimated_column)
 
+    def custom_range_report_categorized(self, output, email, who,
+                                        estimated_column=False):
+        """Format a custom range report with entries displayed  under categories."""
+        min = self.window.min_timestamp.strftime('%Y-%m-%d')
+        max = self.window.max_timestamp - datetime.timedelta(1)
+        max = max.strftime('%Y-%m-%d')
+        subject = u'Custom date range report for %s (%s - %s)' % (who, min, max)
+        return self._categorizing_report(output, email, who, subject,
+                                         period_name='custom range',
+                                         estimated_column=estimated_column)
+
     def daily_report(self, output, email, who):
         """Format a daily report.
 
@@ -882,6 +893,12 @@ class TimeLog(object):
             first_of_this_month, self.virtual_midnight)
         max = datetime.datetime.combine(
             first_of_next_month, self.virtual_midnight)
+        return self.window_for(min, max)
+
+    def window_for_date_range(self, min, max):
+        min = datetime.datetime.combine(min, self.virtual_midnight)
+        max = datetime.datetime.combine(max, self.virtual_midnight)
+        max = max + datetime.timedelta(1)
         return self.window_for(min, max)
 
     def whole_history(self):
@@ -1966,6 +1983,23 @@ class MainWindow:
         else:
             report = reports.monthly_report_plain
         self.mail(report)
+
+    def range_window(self, min, max):
+        if not min:
+            min = self.timelog.day
+        if not max:
+            max = self.timelog.day
+        if max < min:
+            max = min
+        return self.timelog.window_for_date_range(min, max)
+
+    def on_custom_range_report_activate(self, widget):
+        """File -> Report for a Custom Date Range"""
+        min = self.choose_date()
+        max = self.choose_date()
+        if min and max:
+            reports = Reports(self.range_window(min, max))
+            self.mail(reports.custom_range_report_categorized)
 
     def on_open_complete_spreadsheet_activate(self, widget):
         """Report -> Complete Report in Spreadsheet"""
