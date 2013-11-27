@@ -1,6 +1,8 @@
 0.9.0 (unreleased)
 ==================
 * New custom date range report by Rohan Mitchell.
+* Moved to GitHub.
+* HACKING.txt renamed to CONTRIBUTING.rst.
 
 
 0.8.1 (2013-02-10)
@@ -258,5 +260,5 @@ from gtimelog.gtimelog, you'll have to change them.
 Changes in older versions
 =========================
 
-You'll have to dig through Subversion logs to discover those, if you're really
-that interested: http://mg.pov.lt/gtimelog/trac/log
+You'll have to dig through Git logs to discover those, if you're really
+that interested: https://github.com/gtimelog/gtimelog/commits

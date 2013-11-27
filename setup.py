@@ -21,9 +21,9 @@ There are screenshots at http://mg.pov.lt/gtimelog.
 
 Mailing list: http://groups.google.com/group/gtimelog
 
-Bugs: http://bugs.launchpad.net/gtimelog/
+Bugs: https://github.com/gtimelog/gtimelog/issues
 
-Source code: http://code.launchpad.net/gtimelog/
+Source code: https://github.com/gtimelog/gtimelog
 '''
 
 setup(

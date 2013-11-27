@@ -92,10 +92,18 @@ Configuration dialog.  The ability to browse through history (view daily and
 weekly reports for past days and weeks).
 
 
+System requirements
+-------------------
+
+- Python 2.x (Python 3 is not supported yet)
+- Python gobject-introspection bindings
+- gobject-introspection type libraries for GTK+, Pango
+
+
 Bugs
 ----
 
-See http://bugs.launchpad.net/gtimelog/
+See https://github.com/gtimelog/gtimelog/issues
 
 
 Other Tools
@@ -204,7 +212,8 @@ Chris Beaven
 Harald Friessnegger
 Rodrigo Daunoravicius
 Laurynas Speičys
-a few others (check bzr log)
+Barry Warsaw
+a few others (check git log)
 
 
 Icon
