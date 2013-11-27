@@ -14,6 +14,7 @@
   (~/.config/gtimelog and ~/.local/share/gtimelog).  There's no automatic
   migration: if ~/.gtimelog exists, it will continue to be used.
 * Fix Unicode errors when user's name is non-ASCII (LP: #1117109).
+* Dropped Python 2.6 support (by accident).
 
 
 0.8.0 (2012-08-24)
