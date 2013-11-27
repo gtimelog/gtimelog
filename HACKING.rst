@@ -51,7 +51,7 @@ Change the code in ``src/gtimelog/*.py``, play around, run the test suite ::
 
     $ python setup.py test
 
-When you're happy with the results, describe your change in ``NEWS.txt`` and
+When you're happy with the results, describe your change in ``NEWS.rst`` and
 commit ::
 
     $ bzr commit

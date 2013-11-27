@@ -9,7 +9,7 @@ d = {}
 execfile(version_file, d)
 version = d['__version__']
 
-changes_file = os.path.join(here, 'NEWS.txt')
+changes_file = os.path.join(here, 'NEWS.rst')
 changes = file(changes_file).read().split('\n\n\n')
 changes_in_latest_versions = '\n\n\n'.join(changes[:3])
 

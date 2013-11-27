@@ -62,8 +62,8 @@ releasechecklist:
 	    echo "Please remove the 'dev' suffix from the version number in src/gtimelog/__init__.py"; exit 1; }
 	@$(PYTHON) setup.py --long-description | rst2html --exit-status=2 > /dev/null
 	@ver_and_date="`$(PYTHON) setup.py --version` (`date +%Y-%m-%d`)" && \
-	    grep -q "^$$ver_and_date$$" NEWS.txt || { \
-	        echo "NEWS.txt has no entry for $$ver_and_date"; exit 1; }
+	    grep -q "^$$ver_and_date$$" NEWS.rst || { \
+	        echo "NEWS.rst has no entry for $$ver_and_date"; exit 1; }
 	# Bit of a chicken-and-egg here, but if the tree is unclean, make
 	# distcheck will fail.  Thankfully bzr lets me uncommit.
 	@test -z "`bzr status 2>&1`" || { echo; echo "Your working tree is not clean" 1>&2; bzr status; exit 1; }
@@ -77,7 +77,7 @@ release: releasechecklist
 	@echo "  $(PYTHON) setup.py sdist register upload && bzr tag `$(PYTHON) setup.py --version`"
 	@echo
 	@echo "Please increment the version number in src/gtimelog/__init__.py"
-	@echo "and add a new empty entry at the top of NEWS.txt, then"
+	@echo "and add a new empty entry at the top of NEWS.rst, then"
 	@echo
 	@echo '  bzr ci -m "Post-release version bump" && bzr push'
 	@echo
