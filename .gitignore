@@ -5,3 +5,4 @@ temp
 .coverage
 *.py[co]
 tmp/
+.tox/
