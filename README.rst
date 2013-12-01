@@ -1,6 +1,9 @@
 GTimeLog
 --------
 
+.. image:: https://travis-ci.org/gtimelog/gtimelog.png?branch=master
+   :target: https://travis-ci.org/gtimelog/gtimelog
+
 GTimeLog is a graphical (Gtk+) application for keeping track of time.  Here's
 how it works: every day, when you arrive to work, start up gtimelog and type
 "arrived".  Then start doing some activity (e.g. reading mail, or working on
@@ -103,7 +106,7 @@ System requirements
 Bugs
 ----
 
-See https://github.com/gtimelog/gtimelog/issues
+https://github.com/gtimelog/gtimelog/issues
 
 
 Other Tools
@@ -198,7 +201,7 @@ Author
 ------
 
 Marius Gedminas
-<marius@pov.lt>
+<marius@gedmin.as>
 
 
 Contributors
