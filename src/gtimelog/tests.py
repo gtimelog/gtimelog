@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """Tests for gtimelog/main.py"""
 
 import doctest
@@ -23,6 +22,7 @@ def doctest_as_hours():
 
     """
 
+
 def doctest_format_duration():
     """Tests for format_duration.
 
@@ -36,6 +36,7 @@ def doctest_format_duration():
         '1 h 0 min'
 
     """
+
 
 def doctest_format_short():
     """Tests for format_duration_short.
@@ -54,6 +55,7 @@ def doctest_format_short():
         '26:03'
 
     """
+
 
 def doctest_format_duration_long():
     """Tests for format_duration_long.
@@ -75,6 +77,7 @@ def doctest_format_duration_long():
 
     """
 
+
 def doctest_parse_datetime():
     """Tests for parse_datetime
 
@@ -88,6 +91,7 @@ def doctest_parse_datetime():
 
     """
 
+
 def doctest_parse_time():
     """Tests for parse_time
 
@@ -100,6 +104,7 @@ def doctest_parse_time():
         ValueError: ('bad time: ', 'xyzzy')
 
     """
+
 
 def doctest_virtual_day():
     """Tests for virtual_day
@@ -126,6 +131,7 @@ def doctest_virtual_day():
 
     """
 
+
 def doctest_different_days():
     """Tests for different_days
 
@@ -146,6 +152,7 @@ def doctest_different_days():
         False
 
     """
+
 
 def doctest_first_of_month():
     """Tests for first_of_month
@@ -181,6 +188,7 @@ def doctest_first_of_month():
         ...     d += timedelta(1)
 
     """
+
 
 def doctest_next_month():
     """Tests for next_month
@@ -218,6 +226,7 @@ def doctest_next_month():
 
     """
 
+
 def doctest_uniq():
     """Tests for uniq
 
@@ -230,6 +239,7 @@ def doctest_uniq():
         []
 
     """
+
 
 def doctest_TimeWindow_to_csv_daily():
     r"""Tests for TimeWindow.to_csv_daily
@@ -260,6 +270,7 @@ def doctest_TimeWindow_to_csv_daily():
         2008-06-05,12.75,0.0,0.5
 
     """
+
 
 def doctest_Reports_weekly_report_categorized():
     r"""Tests for Reports.weekly_report_categorized
@@ -328,6 +339,7 @@ def doctest_Reports_weekly_report_categorized():
 
     """
 
+
 def doctest_Reports_monthly_report_categorized():
     r"""Tests for Reports.monthly_report_categorized
 
@@ -392,6 +404,7 @@ def doctest_Reports_monthly_report_categorized():
 
     """
 
+
 def doctest_Reports_report_categories():
     r"""Tests for Reports._report_categories
 
@@ -421,6 +434,7 @@ def doctest_Reports_report_categories():
         <BLANKLINE>
 
     """
+
 
 def doctest_Reports_daily_report():
     r"""Tests for Reports.daily_report
@@ -481,6 +495,7 @@ def doctest_Reports_daily_report():
 
     """
 
+
 def doctest_Reports_weekly_report_plain():
     r"""Tests for Reports.weekly_report_plain
 
@@ -534,6 +549,7 @@ def doctest_Reports_weekly_report_plain():
 
     """
 
+
 def doctest_Reports_monthly_report_plain():
     r"""Tests for Reports.monthly_report_plain
 
@@ -586,6 +602,7 @@ def doctest_Reports_monthly_report_plain():
         <BLANKLINE>
 
     """
+
 
 def doctest_Reports_custom_range_report_categorized():
     r"""Tests for Reports.custom_range_report_categorized
@@ -655,6 +672,7 @@ def doctest_Reports_custom_range_report_categorized():
 
     """
 
+
 def doctest_Settings_get_config_dir():
     """Test for Settings.get_config_dir
 
@@ -693,6 +711,7 @@ def doctest_Settings_get_config_dir():
         >>> os.path.isdir = real_isdir
 
     """
+
 
 def doctest_Settings_get_data_dir():
     """Test for Settings.get_data_dir
