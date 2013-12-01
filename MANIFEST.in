@@ -5,4 +5,6 @@ include gtimelog.desktop
 include gtimelogrc.example
 include runtests
 include scripts/*.py
+include tox.ini
+include .travis.yml
 recursive-include src *.png *.ui
