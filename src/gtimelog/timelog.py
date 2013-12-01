@@ -592,7 +592,7 @@ class Reports(object):
                                   estimated_column=False):
         """Format a weekly report with entries displayed  under categories."""
         week = self.window.min_timestamp.isocalendar()[1]
-        subject = u'Weekly report for {} (week {:0>2})'.format(who, week)
+        subject = u'Weekly report for %s (week %02d)' % (who, week)
         return self._categorizing_report(output, email, who, subject,
                                          period_name='week',
                                          estimated_column=estimated_column)
@@ -609,7 +609,7 @@ class Reports(object):
     def weekly_report_plain(self, output, email, who, estimated_column=False):
         """Format a weekly report ."""
         week = self.window.min_timestamp.isocalendar()[1]
-        subject = u'Weekly report for {} (week {:0>2})'.format(who, week)
+        subject = u'Weekly report for %s (week %02d)' % (who, week)
         return self._plain_report(output, email, who, subject,
                                   period_name='week',
                                   estimated_column=estimated_column)
@@ -645,8 +645,8 @@ class Reports(object):
         weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         weekday = weekday_names[window.min_timestamp.weekday()]
         week = window.min_timestamp.isocalendar()[1]
-        print >> output, u"To: {email}".format(email=email)
-        print >> output, (u"Subject: {:%Y-%m-%d} report for {who}"
+        print >> output, u"To: %s" % email
+        print >> output, (u"Subject: {0:%Y-%m-%d} report for {who}"
                           u" ({weekday}, week {week:0>2})".format(
                               window.min_timestamp, who=who,
                               weekday=weekday, week=week))
