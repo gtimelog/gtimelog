@@ -3,6 +3,7 @@
 * New custom date range report by Rohan Mitchell.
 * Moved to GitHub.
 * HACKING.txt renamed to CONTRIBUTING.rst.
+* Tests no longer require PyGTK/PyGObject.
 
 
 0.8.1 (2013-02-10)
