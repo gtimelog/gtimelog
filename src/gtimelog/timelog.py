@@ -460,14 +460,15 @@ class Reports(object):
         total_work, total_slacking = window.totals()
         entries, totals = window.categorized_work_entries()
         if entries:
-            categories = sorted(entries)
-            if categories[0] is None:
-                categories = categories[1:]
-                categories.append('No category')
+            if None in entries:
                 e = entries.pop(None)
+                categories = sorted(entries)
+                categories.append('No category')
                 entries['No category'] = e
                 t = totals.pop(None)
                 totals['No category'] = t
+            else:
+                categories = sorted(entries)
             for cat in categories:
                 output.write('%s:\n' % cat)
 
@@ -513,22 +514,19 @@ class Reports(object):
         Learning:        3 hours
 
         category is a dict of entries (<category name>: <duration>).
+        It is not preserved.
         """
         output.write('\n')
         output.write("By category:\n")
         output.write('\n')
 
+        no_cat = categories.pop(None, None)
         items = sorted(categories.items())
+        if no_cat is not None:
+            items.append(('(none)', no_cat))
         for cat, duration in items:
-            if not cat:
-                continue
-
             output.write(u"%-62s  %s\n" % (
                 cat, format_duration_long(duration)))
-
-        if None in categories:
-            output.write(u"%-62s  %s\n" % (
-                '(none)', format_duration_long(categories[None])))
         output.write('\n')
 
     def _plain_report(self, output, email, who, subject, period_name,
@@ -673,7 +671,7 @@ class Reports(object):
             output.write('\n')
         output.write("Total work done: %s\n" % format_duration_long(total_work))
 
-        if len(categories) > 0:
+        if categories:
             self._report_categories(output, categories)
 
         output.write('Slacking:\n\n')
