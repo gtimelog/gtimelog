@@ -1,16 +1,25 @@
 #!/usr/bin/env python
 import os
+import re
 from setuptools import setup
 
 here = os.path.dirname(__file__)
 
-version_file = os.path.join(here, 'src/gtimelog/__init__.py')
-d = {}
-execfile(version_file, d)
-version = d['__version__']
 
-changes_file = os.path.join(here, 'NEWS.rst')
-changes = file(changes_file).read().split('\n\n\n')
+def read(filename):
+    with open(os.path.join(here, filename)) as f:
+        return f.read()
+
+
+metadata = dict(
+    (k, eval(v)) for k, v in
+    re.findall('^(__version__|__author__|__url__|__licence__) = (.*)$',
+               read('src/gtimelog/__init__.py'), flags=re.MULTILINE)
+)
+
+version = metadata['__version__']
+
+changes = read('NEWS.rst').split('\n\n\n')
 changes_in_latest_versions = '\n\n\n'.join(changes[:3])
 
 short_description = 'A Gtk+ time tracking application'
@@ -53,6 +62,7 @@ setup(
     [gui_scripts]
     gtimelog = gtimelog.main:main
     """,
-# This is true, but pointless, because easy_install PyGTK chokes and dies
-#   install_requires=['PyGTK'],
+# This is true, but pointless, because PyGObject cannot be installed via
+# setuptools/distutils
+#   install_requires=['PyGObject'], # or PyGTK
 )
