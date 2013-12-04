@@ -8,8 +8,10 @@ import os
 
 try:
     from configparser import RawConfigParser
+    PY3 = True
 except ImportError:
     from ConfigParser import RawConfigParser
+    PY3 = False
 
 
 from gtimelog.timelog import parse_time
@@ -109,11 +111,18 @@ class Settings(object):
         config.set('gtimelog', 'start_in_tray', str(self.start_in_tray))
         return config
 
+    if PY3:
+        def _unicode(self, value):
+            return value  # ConfigParser already gives us unicode
+    else:
+        def _unicode(self, value):
+            return value.decode(self._encoding)
+
     def load(self, filename):
         config = self._config()
         config.read([filename])
         self.email = config.get('gtimelog', 'list-email')
-        self.name = config.get('gtimelog', 'name').decode(self._encoding)
+        self.name = self._unicode(config.get('gtimelog', 'name'))
         self.editor = config.get('gtimelog', 'editor')
         self.mailer = config.get('gtimelog', 'mailer')
         self.spreadsheet = config.get('gtimelog', 'spreadsheet')

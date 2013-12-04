@@ -17,7 +17,15 @@ import tempfile
 
 import gtimelog
 
+
 log = logging.getLogger('gtimelog')
+
+
+try:
+    unicode
+except NameError:
+    unicode = str
+
 
 # Which Gnome toolkit should we use?  Prior to 0.7, pygtk was the default with
 # a fallback to gi (gobject introspection), except on Ubuntu where gi was
