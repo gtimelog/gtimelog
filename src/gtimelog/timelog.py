@@ -258,10 +258,8 @@ class TimeWindow(object):
                 start = min(start, old_start)
                 duration += old_duration
             entries[entry] = (start, entry, duration)
-        work = work.values()
-        work.sort()
-        slack = slack.values()
-        slack.sort()
+        work = sorted(work.values())
+        slack = sorted(slack.values())
         return work, slack
 
     def categorized_work_entries(self, skip_first=True):
@@ -462,8 +460,7 @@ class Reports(object):
         total_work, total_slacking = window.totals()
         entries, totals = window.categorized_work_entries()
         if entries:
-            categories = entries.keys()
-            categories.sort()
+            categories = sorted(entries)
             if categories[0] is None:
                 categories = categories[1:]
                 categories.append('No category')
@@ -522,8 +519,7 @@ class Reports(object):
         print >> output, "By category:"
         print >> output
 
-        items = categories.items()
-        items.sort()
+        items = sorted(categories.items())
         for cat, duration in items:
             if not cat:
                 continue
@@ -888,8 +884,7 @@ class TaskList(object):
                 groups.setdefault(group, []).append(task)
         except IOError:
             pass # the file's not there, so what?
-        self.groups = groups.items()
-        self.groups.sort()
+        self.groups = sorted(groups.items())
 
     def reload(self):
         """Reload the task list."""
