@@ -1252,19 +1252,19 @@ def main():
     if opts.sample_config:
         settings = Settings()
         settings.save("gtimelogrc.sample")
-        print "Sample configuration file written to gtimelogrc.sample"
-        print "Edit it and save as %s" % settings.get_config_file()
+        print("Sample configuration file written to gtimelogrc.sample")
+        print("Edit it and save as %s" % settings.get_config_file())
         return
 
     global dbus
 
     if opts.debug:
-        print 'GTimeLog version: %s' % gtimelog.__version__
-        print 'Toolkit: %s' % toolkit
-        print 'Gtk+ version: %s' % gtk_version
-        print 'D-Bus available: %s' % ('yes' if dbus else 'no')
-        print 'Config directory: %s' % Settings().get_config_dir()
-        print 'Data directory: %s' % Settings().get_data_dir()
+        print('GTimeLog version: %s' % gtimelog.__version__)
+        print('Toolkit: %s' % toolkit)
+        print('Gtk+ version: %s' % gtk_version)
+        print('D-Bus available: %s' % ('yes' if dbus else 'no'))
+        print('Config directory: %s' % Settings().get_config_dir())
+        print('Data directory: %s' % Settings().get_data_dir())
 
     if opts.ignore_dbus:
         dbus = None
@@ -1279,26 +1279,26 @@ def main():
             session_bus = dbus.SessionBus()
             dbus_service = session_bus.get_object(SERVICE, OBJECT_PATH)
             if opts.replace or opts.quit:
-                print 'gtimelog: Telling the already-running instance to quit'
+                print('gtimelog: Telling the already-running instance to quit')
                 dbus_service.Quit()
                 if opts.quit:
                     sys.exit()
             elif opts.toggle:
                 dbus_service.ToggleFocus()
-                print 'gtimelog: Already running, toggling visibility'
+                print('gtimelog: Already running, toggling visibility')
                 sys.exit()
             elif opts.tray:
-                print 'gtimelog: Already running, not doing anything'
+                print('gtimelog: Already running, not doing anything')
                 sys.exit()
             else:
                 dbus_service.Present()
-                print 'gtimelog: Already running, presenting main window'
+                print('gtimelog: Already running, presenting main window')
                 sys.exit()
-        except dbus.DBusException, e:
+        except dbus.DBusException as e:
             if e.get_dbus_name() == 'org.freedesktop.DBus.Error.ServiceUnknown':
                 # gtimelog is not running: that's fine and not an error at all
                 if opts.quit:
-                    print 'gtimelog is not running'
+                    print('gtimelog is not running')
                     sys.exit()
             else:
                 sys.exit('gtimelog: %s' % e)
@@ -1326,26 +1326,26 @@ def main():
     settings_file = settings.get_config_file()
     if not os.path.exists(settings_file):
         if opts.debug:
-            print 'Saving settings to %s' % settings_file
+            print('Saving settings to %s' % settings_file)
         settings.save(settings_file)
     else:
         if opts.debug:
-            print 'Loading settings from %s' % settings_file
+            print('Loading settings from %s' % settings_file)
         settings.load(settings_file)
     if opts.debug:
-        print 'Loading time log from %s' % settings.get_timelog_file()
-        print 'Assuming date changes at %s' % settings.virtual_midnight
+        print('Loading time log from %s' % settings.get_timelog_file())
+        print('Assuming date changes at %s' % settings.virtual_midnight)
     timelog = TimeLog(settings.get_timelog_file(),
                       settings.virtual_midnight)
     if settings.task_list_url:
         if opts.debug:
-            print 'Loading cached remote tasks from %s' % (
-                os.path.join(datadir, 'remote-tasks.txt'))
+            print('Loading cached remote tasks from %s' %
+                  os.path.join(datadir, 'remote-tasks.txt'))
         tasks = RemoteTaskList(settings.task_list_url,
                                os.path.join(datadir, 'remote-tasks.txt'))
     else:
         if opts.debug:
-            print 'Loading tasks from %s' % os.path.join(datadir, 'tasks.txt')
+            print('Loading tasks from %s' % os.path.join(datadir, 'tasks.txt'))
         tasks = TaskList(os.path.join(datadir, 'tasks.txt'))
     main_window = MainWindow(timelog, settings, tasks)
     start_in_tray = False
@@ -1357,25 +1357,25 @@ def main():
         else:
             icons = [SimpleStatusIcon, OldTrayIcon, AppIndicator]
         if opts.debug:
-            print 'Tray icon preference: %s' % ', '.join(icon_class.__name__
+            print('Tray icon preference: %s' % ', '.join(icon_class.__name__)
                                                          for icon_class in icons)
         for icon_class in icons:
             tray_icon = icon_class(main_window)
             if tray_icon.available():
                 if opts.debug:
-                    print 'Tray icon: %s' % icon_class.__name__
+                    print('Tray icon: %s' % icon_class.__name__)
                 start_in_tray = (settings.start_in_tray
                                  if settings.start_in_tray
                                  else opts.tray)
                 break # found one that works
             else:
                 if opts.debug:
-                    print '%s not available' % icon_class.__name__
+                    print('%s not available' % icon_class.__name__)
     if not start_in_tray:
         main_window.on_show_activate()
     else:
         if opts.debug:
-            print 'Starting minimized'
+            print('Starting minimized')
     if dbus:
         service = Service(main_window)
     # This is needed to make ^C terminate gtimelog when we're using
