@@ -6,6 +6,7 @@
 * Tests no longer require PyGTK/PyGObject.
 * Add back Python 2.6 support (not 100% guaranteed, I don't have
   PyGObject for 2.6).
+* Add Python 3.3 support.
 
 
 0.8.1 (2013-02-10)
