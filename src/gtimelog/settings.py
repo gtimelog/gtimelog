@@ -2,10 +2,14 @@
 Settings for GTimeLog
 """
 
-import ConfigParser
 import datetime
 import locale
 import os
+
+try:
+    from configparser import RawConfigParser
+except ImportError:
+    from ConfigParser import RawConfigParser
 
 
 from gtimelog.timelog import parse_time
@@ -77,7 +81,7 @@ class Settings(object):
         return os.path.join(self.get_data_dir(), 'timelog.txt')
 
     def _config(self):
-        config = ConfigParser.RawConfigParser()
+        config = RawConfigParser()
         config.add_section('gtimelog')
         config.set('gtimelog', 'list-email', self.email)
         config.set('gtimelog', 'name', self.name.encode(self._encoding))
