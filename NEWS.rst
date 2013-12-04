@@ -1,5 +1,9 @@
+Changelog
+---------
+
+
 0.9.0 (unreleased)
-==================
+~~~~~~~~~~~~~~~~~~
 * New custom date range report by Rohan Mitchell.
 * Moved to GitHub.
 * HACKING.txt renamed to CONTRIBUTING.rst.
@@ -10,7 +14,7 @@
 
 
 0.8.1 (2013-02-10)
-==================
+~~~~~~~~~~~~~~~~~~
 * Fix strftime problem on Windows (LP: #1096489).
 * Fix gtimelog.desktop validation (LP: #1051226).
 * Use gtimelog icon instead of gnome-week.png.
@@ -22,7 +26,7 @@
 
 
 0.8.0 (2012-08-24)
-==================
+~~~~~~~~~~~~~~~~~~
 * History browsing (LP: #220778).
 * New setting to hide the tasks pane on startup (LP: #767096).
 * Reload timelog.txt automatically when it changes (LP: #220775).
@@ -39,7 +43,7 @@
 
 
 0.7.1 (2012-02-01)
-==================
+~~~~~~~~~~~~~~~~~~
 * Fix reporting problems with non-ASCII characters when using
   gobject-introspection (LP: #785578).
 * Fix ^C not exiting the app when using gobject-introspection.
@@ -55,7 +59,7 @@
 
 
 0.7.0 (2011-09-21)
-==================
+~~~~~~~~~~~~~~~~~~
 * Use gobject-introspection by default, using pygtk only as a fallback.  This
   will require a newer gir1.2-pango-1.0 than what's in Ubuntu Oneiric
   (LP: #855076) and still suffers from key presses being ignored
@@ -70,12 +74,12 @@
 
 
 0.6.1 (2011-09-20)
-==================
+~~~~~~~~~~~~~~~~~~
 * Fix two crashes when using GI.  Given by Martin Pitt.
 
 
 0.6.0 (2011-08-23)
-==================
+~~~~~~~~~~~~~~~~~~
 * Ctrl-Q now quits.  (LP: #750092)
 * Fixed UnboundLocalError.  (LP: #778285)  Given by Jeroen Langeveld.
 * Ported from PyGTK to GI. This supports GTK 2 and GTK 3 with GI now, but still
@@ -92,7 +96,7 @@
 
 
 0.5.0 (2011-01-28)
-==================
+~~~~~~~~~~~~~~~~~~
 * Switched from Glade to GtkBuilder.  This fixes those strange theme problems
   GTimeLog had with Ubuntu's Radiance and especially Ambiance. (LP: #644393)
 
@@ -146,7 +150,7 @@
 
 
 0.4.0 (2010-09-03)
-==================
+~~~~~~~~~~~~~~~~~~
 * Added configuration variable 'chronological' to control initial view of
   either Chronological (True) or Grouped (False).  Contributed by Barry Warsaw
   <barry@python.org> (LP: #628876)
@@ -158,7 +162,7 @@
 
 
 0.3.2 (2010-07-22)
-==================
+~~~~~~~~~~~~~~~~~~
 * Double-clicking a category in task list tries hard to focus the input box
   (fixes: https://bugs.launchpad.net/gtimelog/+bug/608734).
 * Change default mailer to quote the command passed to x-terminal-emulator -e;
@@ -190,14 +194,14 @@
 
 
 0.3.1 (2009-12-18)
-==================
+~~~~~~~~~~~~~~~~~~
 * Fixed broken sdist (by adding MANIFEST.in, since setuptools doesn't
   understand bzr by default).
 * Added Makefile for convenience (make distcheck, make release).
 
 
 0.3 (2009-12-17)
-================
+~~~~~~~~~~~~~~~~
 * Fix DeprecationWarning: the sets module is deprecated.
 * Use gtk.StatusIcon if egg.trayicon is not available
   (https://bugs.launchpad.net/gtimelog/+bug/209798).
@@ -216,13 +220,13 @@ from gtimelog.gtimelog, you'll have to change them.
 
 
 0.2.5
-=====
+~~~~~
 * Don't open a console window on Windows.
 * Moved the primary GTimeLog source repository to Bazaar hosted on Launchpad.
 
 
 0.2.4
-=====
+~~~~~
 * Show time spent at the office
   (https://bugs.launchpad.net/gtimelog/+bug/238515).
 * Closing the main window minimizes GTimeLog to the system tray
@@ -232,7 +236,7 @@ from gtimelog.gtimelog, you'll have to change them.
 
 
 0.2.3
-=====
+~~~~~
 * Fix duplicates in the completion popup after you reload the log file
   (https://bugs.launchpad.net/gtimelog/+bug/238505).
 * Change status to Beta in setup.py -- while I still consider it to be
@@ -240,30 +244,30 @@ from gtimelog.gtimelog, you'll have to change them.
 
 
 0.2.2
-=====
+~~~~~
 * Tweak setup.py to get a sane page at http://pypi.python.org/pypi/gtimelog/
 
 
 0.2.1
-=====
+~~~~~
 * Entries with `***` are skipped from reports (bug 209750)
 * Help -> Online Documentation opens a browser with some help (bug 209754)
 * View -> Tasks allows you to hide the Tasks pane (bug 220773)
 
 
 0.2.0
-=====
+~~~~~
 * Reorganize the source tree properly.
 * Bump intermediate revision number to celebrate.
 
 
 0.0.85
-======
+~~~~~~
 * First setuptools-based release (`easy_install gtimelog` now works).
 
 
 Changes in older versions
-=========================
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You'll have to dig through Git logs to discover those, if you're really
 that interested: https://github.com/gtimelog/gtimelog/commits

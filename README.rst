@@ -63,10 +63,6 @@ IRC: #gtimelog on irc.freenode.net
 
 Source code: https://github.com/gtimelog/gtimelog
 
-
-Bugs
-----
-
 Report bugs at https://github.com/gtimelog/gtimelog/issues
 
 There's an old bugtracker at https://bugs.launchpad.net/gtimelog
