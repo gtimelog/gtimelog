@@ -7,6 +7,7 @@ import os
 import tempfile
 import shutil
 from cStringIO import StringIO
+from pprint import pprint
 
 
 def doctest_as_hours():
@@ -902,6 +903,58 @@ def doctest_Reports_custom_range_report_categorized():
           No category     10:14
           Bong             3:31
           Bing             0:23
+
+    """
+
+
+def doctest_TaskList_missing_file():
+    """Test for TaskList
+
+        >>> from gtimelog.timelog import TaskList
+        >>> tasklist = TaskList('/nosuchfile')
+        >>> tasklist.check_reload()
+        False
+        >>> tasklist.reload()
+
+    """
+
+
+def doctest_TaskList_real_file():
+    """Test for TaskList
+
+        >>> tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
+        >>> taskfile = os.path.join(tempdir, 'tasks.txt')
+        >>> with open(taskfile, 'w') as f:
+        ...     print >> f, '# comments are skipped'
+        ...     print >> f, 'some task'
+        ...     print >> f, 'other task'
+        ...     print >> f, 'project: do it'
+        ...     print >> f, 'project: fix bugs'
+        ...     print >> f, 'misc: paperwork'
+
+        >>> from gtimelog.timelog import TaskList
+        >>> tasklist = TaskList(taskfile)
+        >>> pprint(tasklist.groups)
+        [('Other', ['some task', 'other task']),
+         ('misc', ['paperwork']),
+         ('project', ['do it', 'fix bugs'])]
+
+        >>> tasklist.check_reload()
+        False
+
+        >>> import time
+        >>> time.sleep(0.01) # so mtime will be different :/
+
+        >>> with open(taskfile, 'w') as f:
+        ...     print >> f, 'new tasks'
+
+        >>> tasklist.check_reload()
+        True
+
+        >>> pprint(tasklist.groups)
+        [('Other', ['new tasks'])]
+
+        >>> shutil.rmtree(tempdir)
 
     """
 
