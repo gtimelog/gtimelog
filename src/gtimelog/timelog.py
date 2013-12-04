@@ -871,15 +871,16 @@ class TaskList(object):
         groups = {}
         self.last_mtime = self.get_mtime()
         try:
-            for line in file(self.filename):
-                line = line.strip()
-                if not line or line.startswith('#'):
-                    continue
-                if ':' in line:
-                    group, task = [s.strip() for s in line.split(':', 1)]
-                else:
-                    group, task = self.other_title, line
-                groups.setdefault(group, []).append(task)
+            with open(self.filename) as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith('#'):
+                        continue
+                    if ':' in line:
+                        group, task = [s.strip() for s in line.split(':', 1)]
+                    else:
+                        group, task = self.other_title, line
+                    groups.setdefault(group, []).append(task)
         except IOError:
             pass # the file's not there, so what?
         self.groups = sorted(groups.items())
