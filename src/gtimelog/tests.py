@@ -516,15 +516,13 @@ def doctest_Reports_weekly_report_categorized():
         >>> import sys
 
         >>> from datetime import datetime, time
-        >>> from tempfile import NamedTemporaryFile
         >>> from gtimelog.timelog import TimeWindow, Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
         >>> max = datetime(2010, 1, 31)
-        >>> fh = NamedTemporaryFile()
 
-        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window = TimeWindow(StringIO(), min, max, vm)
         >>> reports = Reports(window)
         >>> reports.weekly_report_categorized(sys.stdout, 'foo@bar.com',
         ...                                   'Bob Jones')
@@ -533,16 +531,15 @@ def doctest_Reports_weekly_report_categorized():
         <BLANKLINE>
         No work done this week.
 
-        >>> _ = [fh.write(s + '\n') for s in [
+        >>> fh = StringIO('\n'.join([
         ...    '2010-01-30 09:00: start',
         ...    '2010-01-30 09:23: Bing: stuff',
         ...    '2010-01-30 12:54: Bong: other stuff',
         ...    '2010-01-30 13:32: lunch **',
         ...    '2010-01-30 23:46: misc',
-        ...    '']]
-        >>> fh.flush()
+        ...    '']))
 
-        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window = TimeWindow(fh, min, max, vm)
         >>> reports = Reports(window)
         >>> reports.weekly_report_categorized(sys.stdout, 'foo@bar.com',
         ...                                   'Bob Jones')
@@ -584,15 +581,13 @@ def doctest_Reports_monthly_report_categorized():
         >>> import sys
 
         >>> from datetime import datetime, time
-        >>> from tempfile import NamedTemporaryFile
         >>> from gtimelog.timelog import TimeWindow, Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
         >>> max = datetime(2010, 1, 31)
-        >>> fh = NamedTemporaryFile()
 
-        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window = TimeWindow(StringIO(), min, max, vm)
         >>> reports = Reports(window)
         >>> reports.monthly_report_categorized(sys.stdout, 'foo@bar.com',
         ...                                   'Bob Jones')
@@ -601,16 +596,15 @@ def doctest_Reports_monthly_report_categorized():
         <BLANKLINE>
         No work done this month.
 
-        >>> _ = [fh.write(s + '\n') for s in [
+        >>> fh = StringIO('\n'.join([
         ...    '2010-01-30 09:00: start',
         ...    '2010-01-30 09:23: Bing: stuff',
         ...    '2010-01-30 12:54: Bong: other stuff',
         ...    '2010-01-30 13:32: lunch **',
         ...    '2010-01-30 23:46: misc',
-        ...    '']]
-        >>> fh.flush()
+        ...    '']))
 
-        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window = TimeWindow(fh, min, max, vm)
         >>> reports = Reports(window)
         >>> reports.monthly_report_categorized(sys.stdout, 'foo@bar.com',
         ...                                   'Bob Jones')
@@ -649,19 +643,17 @@ def doctest_Reports_report_categories():
         >>> import sys
 
         >>> from datetime import datetime, time, timedelta
-        >>> from tempfile import NamedTemporaryFile
         >>> from gtimelog.timelog import TimeWindow, Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
         >>> max = datetime(2010, 1, 31)
-        >>> fh = NamedTemporaryFile()
 
         >>> categories = {
         ...    'Bing': timedelta(2),
         ...    None: timedelta(1)}
 
-        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window = TimeWindow(StringIO(), min, max, vm)
         >>> reports = Reports(window)
         >>> reports._report_categories(sys.stdout, categories)
         <BLANKLINE>
@@ -680,15 +672,13 @@ def doctest_Reports_daily_report():
         >>> import sys
 
         >>> from datetime import datetime, time
-        >>> from tempfile import NamedTemporaryFile
         >>> from gtimelog.timelog import TimeWindow, Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 30)
         >>> max = datetime(2010, 1, 31)
-        >>> fh = NamedTemporaryFile()
 
-        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window = TimeWindow(StringIO(), min, max, vm)
         >>> reports = Reports(window)
         >>> reports.daily_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
@@ -696,16 +686,15 @@ def doctest_Reports_daily_report():
         <BLANKLINE>
         No work done today.
 
-        >>> _ = [fh.write(s + '\n') for s in [
+        >>> fh = StringIO('\n'.join([
         ...    '2010-01-30 09:00: start',
         ...    '2010-01-30 09:23: Bing: stuff',
         ...    '2010-01-30 12:54: Bong: other stuff',
         ...    '2010-01-30 13:32: lunch **',
         ...    '2010-01-30 15:46: misc',
-        ...    '']]
-        >>> fh.flush()
+        ...    '']))
 
-        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window = TimeWindow(fh, min, max, vm)
         >>> reports = Reports(window)
         >>> reports.daily_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
@@ -740,15 +729,13 @@ def doctest_Reports_weekly_report_plain():
         >>> import sys
 
         >>> from datetime import datetime, time
-        >>> from tempfile import NamedTemporaryFile
         >>> from gtimelog.timelog import TimeWindow, Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
         >>> max = datetime(2010, 1, 31)
-        >>> fh = NamedTemporaryFile()
 
-        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window = TimeWindow(StringIO(), min, max, vm)
         >>> reports = Reports(window)
         >>> reports.weekly_report_plain(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
@@ -756,16 +743,15 @@ def doctest_Reports_weekly_report_plain():
         <BLANKLINE>
         No work done this week.
 
-        >>> _ = [fh.write(s + '\n') for s in [
+        >>> fh = StringIO('\n'.join([
         ...    '2010-01-30 09:00: start',
         ...    '2010-01-30 09:23: Bing: stuff',
         ...    '2010-01-30 12:54: Bong: other stuff',
         ...    '2010-01-30 13:32: lunch **',
         ...    '2010-01-30 15:46: misc',
-        ...    '']]
-        >>> fh.flush()
+        ...    '']))
 
-        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window = TimeWindow(fh, min, max, vm)
         >>> reports = Reports(window)
         >>> reports.weekly_report_plain(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
@@ -794,15 +780,13 @@ def doctest_Reports_monthly_report_plain():
         >>> import sys
 
         >>> from datetime import datetime, time
-        >>> from tempfile import NamedTemporaryFile
         >>> from gtimelog.timelog import TimeWindow, Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2007, 9, 1)
         >>> max = datetime(2007, 10, 1)
-        >>> fh = NamedTemporaryFile()
 
-        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window = TimeWindow(StringIO(), min, max, vm)
         >>> reports = Reports(window)
         >>> reports.monthly_report_plain(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
@@ -810,16 +794,15 @@ def doctest_Reports_monthly_report_plain():
         <BLANKLINE>
         No work done this month.
 
-        >>> _ = [fh.write(s + '\n') for s in [
+        >>> fh = StringIO('\n'.join([
         ...    '2007-09-30 09:00: start',
         ...    '2007-09-30 09:23: Bing: stuff',
         ...    '2007-09-30 12:54: Bong: other stuff',
         ...    '2007-09-30 13:32: lunch **',
         ...    '2007-09-30 15:46: misc',
-        ...    '']]
-        >>> fh.flush()
+        ...    '']))
 
-        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window = TimeWindow(fh, min, max, vm)
         >>> reports = Reports(window)
         >>> reports.monthly_report_plain(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
@@ -848,15 +831,13 @@ def doctest_Reports_custom_range_report_categorized():
         >>> import sys
 
         >>> from datetime import datetime, time
-        >>> from tempfile import NamedTemporaryFile
         >>> from gtimelog.timelog import TimeWindow, Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
         >>> max = datetime(2010, 2, 1)
-        >>> fh = NamedTemporaryFile()
 
-        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window = TimeWindow(StringIO(), min, max, vm)
         >>> reports = Reports(window)
         >>> reports.custom_range_report_categorized(sys.stdout, 'foo@bar.com',
         ...                                         'Bob Jones')
@@ -865,7 +846,7 @@ def doctest_Reports_custom_range_report_categorized():
         <BLANKLINE>
         No work done this custom range.
 
-        >>> _ = [fh.write(s + '\n') for s in [
+        >>> fh = StringIO('\n'.join([
         ...    '2010-01-20 09:00: arrived',
         ...    '2010-01-20 09:30: asdf',
         ...    '2010-01-20 10:00: Bar: Foo',
@@ -875,10 +856,9 @@ def doctest_Reports_custom_range_report_categorized():
         ...    '2010-01-30 12:54: Bong: other stuff',
         ...    '2010-01-30 13:32: lunch **',
         ...    '2010-01-30 23:46: misc',
-        ...    '']]
-        >>> fh.flush()
+        ...    '']))
 
-        >>> window = TimeWindow(fh.name, min, max, vm)
+        >>> window = TimeWindow(fh, min, max, vm)
         >>> reports = Reports(window)
         >>> reports.custom_range_report_categorized(sys.stdout, 'foo@bar.com',
         ...                                         'Bob Jones')
