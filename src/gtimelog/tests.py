@@ -6,8 +6,12 @@ import unittest
 import os
 import tempfile
 import shutil
-from cStringIO import StringIO
 from pprint import pprint
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 
 def doctest_as_hours():
@@ -188,7 +192,7 @@ def doctest_first_of_month():
         >>> while d < date(2005, 1, 1):
         ...     f = first_of_month(d)
         ...     if (f.year, f.month, f.day) != (d.year, d.month, 1):
-        ...         print "WRONG: first_of_month(%r) returned %r" % (d, f)
+        ...         print("WRONG: first_of_month(%r) returned %r" % (d, f))
         ...     d += timedelta(1)
 
     """
@@ -225,7 +229,7 @@ def doctest_next_month():
         ...     f = next_month(d)
         ...     prev = f - timedelta(1)
         ...     if f.day != 1 or (prev.year, prev.month) != (d.year, d.month):
-        ...         print "WRONG: next_month(%r) returned %r" % (d, f)
+        ...         print("WRONG: next_month(%r) returned %r" % (d, f))
         ...     d += timedelta(1)
 
     """
@@ -312,7 +316,7 @@ def doctest_TimeWindow_reread_bad_ordering():
     order was preserved for events with the same timestamp
 
         >>> for t, e in window.items:
-        ...     print t.strftime('%H:%M:'), e
+        ...     print("%s: %s" % (t.strftime('%H:%M'), e))
         09:00: start **
         09:10: gtimelog: whoops clock got all confused
         09:10: gtimelog: so this will need to be fixed
@@ -920,17 +924,19 @@ def doctest_TaskList_missing_file():
 
 
 def doctest_TaskList_real_file():
-    """Test for TaskList
+    r"""Test for TaskList
 
         >>> tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
         >>> taskfile = os.path.join(tempdir, 'tasks.txt')
         >>> with open(taskfile, 'w') as f:
-        ...     print >> f, '# comments are skipped'
-        ...     print >> f, 'some task'
-        ...     print >> f, 'other task'
-        ...     print >> f, 'project: do it'
-        ...     print >> f, 'project: fix bugs'
-        ...     print >> f, 'misc: paperwork'
+        ...     f.write('\n'.join([
+        ...         '# comments are skipped',
+        ...         'some task',
+        ...         'other task',
+        ...         'project: do it',
+        ...         'project: fix bugs',
+        ...         'misc: paperwork',
+        ...         ]) + '\n')
 
         >>> from gtimelog.timelog import TaskList
         >>> tasklist = TaskList(taskfile)
@@ -946,7 +952,7 @@ def doctest_TaskList_real_file():
         >>> time.sleep(0.01) # so mtime will be different :/
 
         >>> with open(taskfile, 'w') as f:
-        ...     print >> f, 'new tasks'
+        ...     f.write('new tasks\n')
 
         >>> tasklist.check_reload()
         True
