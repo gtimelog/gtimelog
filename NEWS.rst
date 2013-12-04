@@ -2,7 +2,7 @@ Changelog
 ---------
 
 
-0.9.0 (unreleased)
+0.9.0 (2013-12-04)
 ~~~~~~~~~~~~~~~~~~
 * New custom date range report by Rohan Mitchell.
 * Moved to GitHub.
