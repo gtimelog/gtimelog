@@ -323,9 +323,9 @@ class TimeWindow(object):
 
     def icalendar(self, output):
         """Create an iCalendar file with activities."""
-        print >> output, "BEGIN:VCALENDAR"
-        print >> output, "PRODID:-//mg.pov.lt/NONSGML GTimeLog//EN"
-        print >> output, "VERSION:2.0"
+        output.write("BEGIN:VCALENDAR\n")
+        output.write("PRODID:-//mg.pov.lt/NONSGML GTimeLog//EN\n")
+        output.write("VERSION:2.0\n")
         try:
             import socket
             idhost = socket.getfqdn()
@@ -333,16 +333,16 @@ class TimeWindow(object):
             idhost = 'localhost'
         dtstamp = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
         for start, stop, duration, entry in self.all_entries():
-            print >> output, "BEGIN:VEVENT"
-            print >> output, "UID:%s@%s" % (hash((start, stop, entry)), idhost)
-            print >> output, "SUMMARY:%s" % (entry.replace('\\', '\\\\')
-                                                  .replace(';', '\\;')
-                                                  .replace(',', '\\,'))
-            print >> output, "DTSTART:%s" % start.strftime('%Y%m%dT%H%M%S')
-            print >> output, "DTEND:%s" % stop.strftime('%Y%m%dT%H%M%S')
-            print >> output, "DTSTAMP:%s" % dtstamp
-            print >> output, "END:VEVENT"
-        print >> output, "END:VCALENDAR"
+            output.write("BEGIN:VEVENT\n")
+            output.write("UID:%s@%s\n" % (hash((start, stop, entry)), idhost))
+            output.write("SUMMARY:%s\n" % (entry.replace('\\', '\\\\'))
+                                                .replace(';', '\\;')
+                                                .replace(',', '\\,'))
+            output.write("DTSTART:%s\n" % start.strftime('%Y%m%dT%H%M%S'))
+            output.write("DTEND:%s\n" % stop.strftime('%Y%m%dT%H%M%S'))
+            output.write("DTSTAMP:%s\n" % dtstamp)
+            output.write("END:VEVENT\n")
+        output.write("END:VCALENDAR\n")
 
     def to_csv_complete(self, output, title_row=True):
         """Export work entries to a CSV file.
@@ -444,18 +444,18 @@ class Reports(object):
         """
         window = self.window
 
-        print >> output, "To: %(email)s" % {'email': email}
-        print >> output, "Subject: %s" % subject
-        print >> output
+        output.write("To: %(email)s\n" % {'email': email})
+        output.write("Subject: %s\n" % subject)
+        output.write('\n')
         items = list(window.all_entries())
         if not items:
-            print >> output, "No work done this %s." % period_name
+            output.write("No work done this %s.\n" % period_name)
             return
-        print >> output, " " * 46,
+        output.write(" " * 46)
         if estimated_column:
-            print >> output, "estimated        actual"
+            output.write("estimated        actual\n")
         else:
-            print >> output, "                   time"
+            output.write("                   time\n")
 
         total_work, total_slacking = window.totals()
         entries, totals = window.categorized_work_entries()
@@ -469,7 +469,7 @@ class Reports(object):
                 t = totals.pop(None)
                 totals['No category'] = t
             for cat in categories:
-                print >> output, '%s:' % cat
+                output.write('%s:\n' % cat)
 
                 work = [(entry, duration)
                         for start, entry, duration in entries[cat]]
@@ -480,29 +480,28 @@ class Reports(object):
 
                     entry = entry[:1].upper() + entry[1:]
                     if estimated_column:
-                        print >> output, (u"  %-46s  %-14s  %s" %
-                                    (entry, '-',
+                        output.write(u"  %-46s  %-14s  %s\n" %
+                                     (entry, '-',
                                      format_duration_short(duration)))
                     else:
-                        print >> output, (u"  %-61s  %+5s" %
-                                    (entry, format_duration_short(duration)))
+                        output.write(u"  %-61s  %+5s\n" %
+                                     (entry, format_duration_short(duration)))
 
-                print >> output, '-' * 70
-                print >> output, (u"%+70s" %
-                                  format_duration_short(totals[cat]))
-                print >> output
-        print >> output, ("Total work done this %s: %s" %
-                          (period_name, format_duration_short(total_work)))
+                output.write('-' * 70 + '\n')
+                output.write(u"%+70s\n" % format_duration_short(totals[cat]))
+                output.write('\n')
+        output.write("Total work done this %s: %s\n" %
+                     (period_name, format_duration_short(total_work)))
 
-        print >> output
+        output.write('\n')
 
         ordered_by_time = [(time, cat) for cat, time in totals.items()]
         ordered_by_time.sort(reverse=True)
         max_cat_length = max([len(cat) for cat in totals.keys()])
-        line_format = '  %-' + str(max_cat_length + 4) + 's %+5s'
-        print >> output, 'Categories by time spent:'
+        line_format = '  %-' + str(max_cat_length + 4) + 's %+5s\n'
+        output.write('Categories by time spent:\n')
         for time, cat in ordered_by_time:
-            print >> output, line_format % (cat, format_duration_short(time))
+            output.write(line_format % (cat, format_duration_short(time)))
 
     def _report_categories(self, output, categories):
         """A helper method that lists time spent per category.
@@ -515,22 +514,22 @@ class Reports(object):
 
         category is a dict of entries (<category name>: <duration>).
         """
-        print >> output
-        print >> output, "By category:"
-        print >> output
+        output.write('\n')
+        output.write("By category:\n")
+        output.write('\n')
 
         items = sorted(categories.items())
         for cat, duration in items:
             if not cat:
                 continue
 
-            print >> output, u"%-62s  %s" % (
-                cat, format_duration_long(duration))
+            output.write(u"%-62s  %s\n" % (
+                cat, format_duration_long(duration)))
 
         if None in categories:
-            print >> output, u"%-62s  %s" % (
-                '(none)', format_duration_long(categories[None]))
-        print >> output
+            output.write(u"%-62s  %s\n" % (
+                '(none)', format_duration_long(categories[None])))
+        output.write('\n')
 
     def _plain_report(self, output, email, who, subject, period_name,
                       estimated_column=False):
@@ -540,18 +539,18 @@ class Reports(object):
         """
         window = self.window
 
-        print >> output, "To: %(email)s" % {'email': email}
-        print >> output, 'Subject: %s' % subject
-        print >> output
+        output.write("To: %(email)s\n" % {'email': email})
+        output.write('Subject: %s\n' % subject)
+        output.write('\n')
         items = list(window.all_entries())
         if not items:
-            print >> output, "No work done this %s." % period_name
+            output.write("No work done this %s.\n" % period_name)
             return
-        print >> output, " " * 46,
+        output.write(" " * 46)
         if estimated_column:
-            print >> output, "estimated       actual"
+            output.write("estimated       actual\n")
         else:
-            print >> output, "                time"
+            output.write("                time\n")
         work, slack = window.grouped_entries()
         total_work, total_slacking = window.totals()
         categories = {}
@@ -572,14 +571,14 @@ class Reports(object):
 
                 entry = entry[:1].upper() + entry[1:]
                 if estimated_column:
-                    print >> output, (u"%-46s  %-14s  %s" %
-                                (entry, '-', format_duration_long(duration)))
+                    output.write(u"%-46s  %-14s  %s\n" %
+                                 (entry, '-', format_duration_long(duration)))
                 else:
-                    print >> output, (u"%-62s  %s" %
-                                (entry, format_duration_long(duration)))
-            print >> output
-        print >> output, ("Total work done this %s: %s" %
-                          (period_name, format_duration_long(total_work)))
+                    output.write(u"%-62s  %s\n" %
+                                 (entry, format_duration_long(duration)))
+            output.write('\n')
+        output.write("Total work done this %s: %s\n" %
+                     (period_name, format_duration_long(total_work)))
 
         if categories:
             self._report_categories(output, categories)
@@ -641,28 +640,28 @@ class Reports(object):
         weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         weekday = weekday_names[window.min_timestamp.weekday()]
         week = window.min_timestamp.isocalendar()[1]
-        print >> output, u"To: %s" % email
-        print >> output, (u"Subject: {0:%Y-%m-%d} report for {who}"
-                          u" ({weekday}, week {week:0>2})".format(
-                              window.min_timestamp, who=who,
-                              weekday=weekday, week=week))
-        print >> output
+        output.write(u"To: %s\n" % email)
+        output.write(u"Subject: {0:%Y-%m-%d} report for {who}"
+                     u" ({weekday}, week {week:0>2})\n".format(
+                         window.min_timestamp, who=who,
+                         weekday=weekday, week=week))
+        output.write('\n')
         items = list(window.all_entries())
         if not items:
-            print >> output, "No work done today."
+            output.write("No work done today.\n")
             return
         start, stop, duration, entry = items[0]
         entry = entry[:1].upper() + entry[1:]
-        print >> output, "%s at %s" % (entry, start.strftime('%H:%M'))
-        print >> output
+        output.write("%s at %s\n" % (entry, start.strftime('%H:%M')))
+        output.write('\n')
         work, slack = window.grouped_entries()
         total_work, total_slacking = window.totals()
         categories = {}
         if work:
             for start, entry, duration in work:
                 entry = entry[:1].upper() + entry[1:]
-                print >> output, u"%-62s  %s" % (entry,
-                                                format_duration_long(duration))
+                output.write(u"%-62s  %s\n" % (entry,
+                                               format_duration_long(duration)))
                 if ': ' in entry:
                     cat, task = entry.split(': ', 1)
                     categories[cat] = categories.get(
@@ -671,23 +670,22 @@ class Reports(object):
                     categories[None] = categories.get(
                         None, datetime.timedelta(0)) + duration
 
-            print >> output
-        print >> output, ("Total work done: %s" %
-                          format_duration_long(total_work))
+            output.write('\n')
+        output.write("Total work done: %s\n" % format_duration_long(total_work))
 
         if len(categories) > 0:
             self._report_categories(output, categories)
 
-        print >> output, 'Slacking:\n'
+        output.write('Slacking:\n\n')
 
         if slack:
             for start, entry, duration in slack:
                 entry = entry[:1].upper() + entry[1:]
-                print >> output, u"%-62s  %s" % (entry,
-                                                format_duration_long(duration))
-            print >> output
-        print >> output, ("Time spent slacking: %s" %
-                          format_duration_long(total_slacking))
+                output.write(u"%-62s  %s\n" % (entry,
+                                               format_duration_long(duration)))
+            output.write('\n')
+        output.write("Time spent slacking: %s\n" %
+                     format_duration_long(total_slacking))
 
 
 class TimeLog(object):
@@ -793,8 +791,8 @@ class TimeLog(object):
         f = codecs.open(self.filename, "a", encoding='UTF-8')
         if self.need_space:
             self.need_space = False
-            print >> f
-        print >> f, line
+            f.write('\n')
+        f.write(line + '\n')
         f.close()
 
     def append(self, entry, now=None):
