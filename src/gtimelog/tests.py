@@ -1,9 +1,11 @@
 #!/usr/bin/env python
-"""Tests for gtimelog/main.py"""
+"""Tests for gtimelog"""
 
 import doctest
 import unittest
 import os
+import tempfile
+import shutil
 
 
 def doctest_as_hours():
@@ -749,6 +751,54 @@ def doctest_Settings_get_data_dir():
     Cleanup
 
         >>> os.path.isdir = real_isdir
+
+    """
+
+
+def doctest_Settings_get_config_file():
+    """Test for Settings.get_config_file
+
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings()
+        >>> settings.get_config_dir = lambda: '~/.config/gtimelog'
+        >>> settings.get_config_file()
+        '~/.config/gtimelog/gtimelogrc'
+
+    """
+
+
+def doctest_Settings_get_timelog_file():
+    """Test for Settings.get_timelog_file
+
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings()
+        >>> settings.get_data_dir = lambda: '~/.local/share/gtimelog'
+        >>> settings.get_timelog_file()
+        '~/.local/share/gtimelog/timelog.txt'
+
+    """
+
+
+def doctest_Settings_load():
+    """Test for Settings.load
+
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings()
+        >>> settings.load('/dev/null')
+
+    """
+
+
+def doctest_Settings_save():
+    """Test for Settings.load
+
+        >>> tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
+
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings()
+        >>> settings.save(os.path.join(tempdir, 'config'))
+
+        >>> shutil.rmtree(tempdir)
 
     """
 
