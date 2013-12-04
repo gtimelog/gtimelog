@@ -6,9 +6,13 @@ import codecs
 import csv
 import datetime
 import os
+import sys
 import re
 import urllib
 from operator import itemgetter
+
+
+PY3 = sys.version_info[0] >= 3
 
 
 def as_minutes(duration):
@@ -349,11 +353,11 @@ class TimeWindow(object):
 
         The file has two columns: task title and time (in minutes).
         """
-        writer = csv.writer(output)
+        writer = CSVWriter(output)
         if title_row:
             writer.writerow(["task", "time (minutes)"])
         work, slack = self.grouped_entries()
-        work = [(entry.encode('UTF-8'), as_minutes(duration))
+        work = [(entry, as_minutes(duration))
                 for start, entry, duration in work
                 if duration] # skip empty "arrival" entries
         work.sort()
@@ -365,7 +369,7 @@ class TimeWindow(object):
         The file has four columns: date, time from midnight til arrival at
         work, slacking, and work (in decimal hours).
         """
-        writer = csv.writer(output)
+        writer = CSVWriter(output)
         if title_row:
             writer.writerow(["date", "day-start (hours)",
                              "slacking (hours)", "work (hours)"])
@@ -931,3 +935,20 @@ class RemoteTaskList(TaskList):
         """Reload the task list."""
         self.download()
 
+
+class CSVWriter(object):
+
+    def __init__(self, *args, **kw):
+        self._writer = csv.writer(*args, **kw)
+
+    if PY3:
+        def writerow(self, row):
+            self._writer.writerow(row)
+    else:
+        def writerow(self, row):
+            self._writer.writerow([s.encode('UTF-8') if isinstance(s, unicode)
+                                   else s for s in row])
+
+    def writerows(self, rows):
+        for row in rows:
+            self.writerow(row)
