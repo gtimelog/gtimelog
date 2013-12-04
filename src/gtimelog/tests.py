@@ -6,6 +6,7 @@ import unittest
 import os
 import tempfile
 import shutil
+from cStringIO import StringIO
 
 
 def doctest_as_hours():
@@ -243,6 +244,236 @@ def doctest_uniq():
     """
 
 
+def doctest_TimeWindow_reread_no_file():
+    """Test for TimeWindow.reread
+
+        >>> from datetime import datetime, time
+        >>> min = datetime(2013, 12, 3)
+        >>> max = datetime(2013, 12, 4)
+        >>> vm = time(2, 0)
+
+        >>> from gtimelog.timelog import TimeWindow
+        >>> window = TimeWindow('/nosuchfile', min, max, vm)
+
+    There's no error.
+
+        >>> len(window.items)
+        0
+        >>> window.last_time()
+
+    """
+
+
+def doctest_TimeWindow_reread_bad_timestamp():
+    """Test for TimeWindow.reread
+
+        >>> from datetime import datetime, time
+        >>> min = datetime(2013, 12, 4)
+        >>> max = datetime(2013, 12, 5)
+        >>> vm = time(2, 0)
+
+        >>> sampledata = StringIO('''
+        ... 2013-12-04 09:00: start **
+        ... # hey: this is not a timestamp
+        ... 2013-12-04 09:14: gtimelog: write some tests
+        ... ''')
+
+        >>> from gtimelog.timelog import TimeWindow
+        >>> window = TimeWindow(sampledata, min, max, vm)
+
+    There's no error, the line with a bad timestamp is silently skipped.
+
+        >>> len(window.items)
+        2
+
+    """
+
+
+def doctest_TimeWindow_reread_bad_ordering():
+    """Test for TimeWindow.reread
+
+        >>> from datetime import datetime, time
+        >>> min = datetime(2013, 12, 4)
+        >>> max = datetime(2013, 12, 5)
+        >>> vm = time(2, 0)
+
+        >>> sampledata = StringIO('''
+        ... 2013-12-04 09:00: start **
+        ... 2013-12-04 09:14: gtimelog: write some tests
+        ... 2013-12-04 09:10: gtimelog: whoops clock got all confused
+        ... 2013-12-04 09:10: gtimelog: so this will need to be fixed
+        ... ''')
+
+        >>> from gtimelog.timelog import TimeWindow
+        >>> window = TimeWindow(sampledata, min, max, vm)
+
+    There's no error, the timestamps have been reordered, but note that
+    order was preserved for events with the same timestamp
+
+        >>> for t, e in window.items:
+        ...     print t.strftime('%H:%M:'), e
+        09:00: start **
+        09:10: gtimelog: whoops clock got all confused
+        09:10: gtimelog: so this will need to be fixed
+        09:14: gtimelog: write some tests
+
+        >>> window.last_time()
+        datetime.datetime(2013, 12, 4, 9, 14)
+
+    """
+
+
+def doctest_TimeWindow_reread_callbacks():
+    """Test for TimeWindow.reread
+
+        >>> from datetime import datetime, time
+        >>> min = datetime(2013, 12, 4)
+        >>> max = datetime(2013, 12, 5)
+        >>> vm = time(2, 0)
+
+        >>> sampledata = StringIO('''
+        ... 2013-12-03 09:00: stuff **
+        ... 2013-12-04 09:00: start **
+        ... 2013-12-04 09:14: gtimelog: write some tests
+        ... 2013-12-06 09:00: future **
+        ... ''')
+
+        >>> l = []
+
+        >>> from gtimelog.timelog import TimeWindow
+        >>> window = TimeWindow(sampledata, min, max, vm, callback=l.append)
+
+    The callback is invoked with all the entries (not just those in the
+    selected time window).  We use it to populate history completion.
+
+        >>> l
+        ['stuff **', 'start **', 'gtimelog: write some tests', 'future **']
+
+    """
+
+
+def doctest_TimeWindow_count_days():
+    """Test for TimeWindow.count_days
+
+        >>> from datetime import datetime, time
+        >>> min = datetime(2013, 12, 2)
+        >>> max = datetime(2013, 12, 9)
+        >>> vm = time(2, 0)
+
+        >>> sampledata = StringIO('''
+        ... 2013-12-04 09:00: start **
+        ... 2013-12-04 09:14: gtimelog: write some tests
+        ... 2013-12-04 09:10: gtimelog: whoops clock got all confused
+        ... 2013-12-04 09:10: gtimelog: so this will need to be fixed
+        ...
+        ... 2013-12-05 22:30: some fictional late night work **
+        ... 2013-12-06 00:30: frobnicate the widgets
+        ...
+        ... 2013-12-08 09:00: work **
+        ... 2013-12-08 09:01: and stuff
+        ... ''')
+
+        >>> from gtimelog.timelog import TimeWindow
+        >>> window = TimeWindow(sampledata, min, max, vm)
+        >>> window.count_days()
+        3
+
+    """
+
+
+def doctest_TimeWindow_last_entry():
+    """Test for TimeWindow.last_entry
+
+        >>> from datetime import datetime, time
+        >>> vm = time(2, 0)
+
+        >>> from gtimelog.timelog import TimeWindow
+        >>> window = TimeWindow(StringIO(), None, None, vm)
+
+    Case #1: no items
+
+        >>> window.items = []
+        >>> window.last_entry()
+
+    Case #2: single item
+
+        >>> window.items = [
+        ...     (datetime(2013, 12, 4, 9, 0), 'started **'),
+        ... ]
+        >>> start, stop, duration, entry = window.last_entry()
+        >>> start == stop == datetime(2013, 12, 4, 9, 0)
+        True
+        >>> duration
+        datetime.timedelta(0)
+        >>> entry
+        'started **'
+
+    Case #3: single item at start of new day
+
+        >>> window.items = [
+        ...     (datetime(2013, 12, 3, 12, 0), 'stuff'),
+        ...     (datetime(2013, 12, 4, 9, 0), 'started **'),
+        ... ]
+        >>> start, stop, duration, entry = window.last_entry()
+        >>> start == stop == datetime(2013, 12, 4, 9, 0)
+        True
+        >>> duration
+        datetime.timedelta(0)
+        >>> entry
+        'started **'
+
+
+    Case #4: several items
+
+        >>> window.items = [
+        ...     (datetime(2013, 12, 4, 9, 0), 'started **'),
+        ...     (datetime(2013, 12, 4, 9, 31), 'gtimelog: tests'),
+        ... ]
+        >>> start, stop, duration, entry = window.last_entry()
+        >>> start
+        datetime.datetime(2013, 12, 4, 9, 0)
+        >>> stop
+        datetime.datetime(2013, 12, 4, 9, 31)
+        >>> duration
+        datetime.timedelta(0, 1860)
+        >>> entry
+        'gtimelog: tests'
+
+    """
+
+
+def doctest_TimeWindow_to_csv_complete():
+    r"""Tests for TimeWindow.to_csv_complete
+
+        >>> from datetime import datetime, time
+        >>> min = datetime(2008, 6, 1)
+        >>> max = datetime(2008, 7, 1)
+        >>> vm = time(2, 0)
+
+        >>> sampledata = StringIO('''
+        ... 2008-06-03 12:45: start
+        ... 2008-06-03 13:00: something
+        ... 2008-06-03 14:45: something else
+        ... 2008-06-03 15:45: etc
+        ... 2008-06-05 12:45: start
+        ... 2008-06-05 13:15: something
+        ... 2008-06-05 14:15: rest **
+        ... 2008-06-05 16:15: let's not mention this ever again ***
+        ... ''')
+
+        >>> from gtimelog.timelog import TimeWindow
+        >>> window = TimeWindow(sampledata, min, max, vm)
+
+        >>> import sys
+        >>> window.to_csv_complete(sys.stdout)
+        task,time (minutes)
+        etc,60
+        something,45
+        something else,105
+
+    """
+
+
 def doctest_TimeWindow_to_csv_daily():
     r"""Tests for TimeWindow.to_csv_daily
 
@@ -251,7 +482,6 @@ def doctest_TimeWindow_to_csv_daily():
         >>> max = datetime(2008, 7, 1)
         >>> vm = time(2, 0)
 
-        >>> from StringIO import StringIO
         >>> sampledata = StringIO('''
         ... 2008-06-03 12:45: start
         ... 2008-06-03 13:00: something
@@ -259,6 +489,7 @@ def doctest_TimeWindow_to_csv_daily():
         ... 2008-06-03 15:45: etc
         ... 2008-06-05 12:45: start
         ... 2008-06-05 13:15: something
+        ... 2008-06-05 14:15: rest **
         ... ''')
 
         >>> from gtimelog.timelog import TimeWindow
@@ -269,7 +500,7 @@ def doctest_TimeWindow_to_csv_daily():
         date,day-start (hours),slacking (hours),work (hours)
         2008-06-03,12.75,0.0,3.0
         2008-06-04,0.0,0.0,0.0
-        2008-06-05,12.75,0.0,0.5
+        2008-06-05,12.75,1.0,0.5
 
     """
 
