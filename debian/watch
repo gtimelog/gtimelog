@@ -1,0 +1,2 @@
+version=3
+http://launchpad.net/gtimelog/+download .*/gtimelog-([0-9.]+)\.tar\.gz

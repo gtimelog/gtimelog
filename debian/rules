@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --with=python2
+
+override_dh_auto_build:
+	dh_auto_build -Spython_distutils
+
+override_dh_auto_install:
+	dh_auto_install -Spython_distutils

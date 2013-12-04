@@ -6,3 +6,4 @@ temp
 *.py[co]
 tmp/
 .tox/
+.pc/
