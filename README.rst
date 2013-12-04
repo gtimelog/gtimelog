@@ -47,8 +47,11 @@ Documentation
 
 This is work in progress:
 
-- docs/index.rst contains an overview
-- docs/formats.rst describes the file formats
+- `docs/index.rst`_ contains an overview
+- `docs/formats.rst`_ describes the file formats
+
+.. _docs/index.rst: https://github.com/gtimelog/gtimelog/blob/master/docs/index.rst
+.. _docs/formats.rst: https://github.com/gtimelog/gtimelog/blob/master/docs/formats.rst
 
 
 Resources
@@ -81,6 +84,8 @@ GTimeLog was mainly written by Marius Gedminas <marius@gedmin.as>.
 Barry Warsaw <barry@python.org> stepped in as a co-maintainer when
 Marius burned out.  Then Barry got busy and Marius recovered.
 
-Many excellent contributors are listed in CONTRIBUTORS.rst
+Many excellent contributors are listed in `CONTRIBUTORS.rst`_
+
+.. _CONTRIBUTORS.rst: https://github.com/gtimelog/gtimelog/blob/master/CONTRIBUTORS.rst
 
 If you want to leave a tip, see https://www.gittip.com/mgedmin/
