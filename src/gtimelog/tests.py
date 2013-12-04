@@ -909,7 +909,7 @@ def doctest_TaskList_real_file():
         >>> tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
         >>> taskfile = os.path.join(tempdir, 'tasks.txt')
         >>> with open(taskfile, 'w') as f:
-        ...     f.write('\n'.join([
+        ...     _ = f.write('\n'.join([
         ...         '# comments are skipped',
         ...         'some task',
         ...         'other task',
@@ -932,7 +932,7 @@ def doctest_TaskList_real_file():
         >>> time.sleep(0.01) # so mtime will be different :/
 
         >>> with open(taskfile, 'w') as f:
-        ...     f.write('new tasks\n')
+        ...     _ = f.write('new tasks\n')
 
         >>> tasklist.check_reload()
         True
