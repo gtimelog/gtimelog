@@ -40,6 +40,7 @@ setup(
         'Environment :: X11 Applications :: GTK',
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Programming Language :: Python :: 2.7',
+        # 2.6 might work, but I can't test it
         'Topic :: Office/Business',
     ],
 
