@@ -1,0 +1,10 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --with=python3 --buildsystem=pybuild
+
+override_dh_installman:
+	mkdir -p debian/tmp
+	rst2man debian/gtimelog.rst > debian/tmp/gtimelog.man
+	rst2man debian/gtimelogrc.rst > debian/tmp/gtimelogrc.man
+	dh_installman

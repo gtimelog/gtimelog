@@ -1,0 +1,26 @@
+Source: gtimelog
+Section: admin
+Priority: optional
+Maintainer: Barry Warsaw <barry@debian.org>
+Uploaders: Python Applications Packaging Team <python-apps-team@lists.alioth.debian.org>
+Build-Depends: debhelper (>= 7.0.50~),
+               python-docutils,
+               python3,
+               python3-setuptools
+Standards-Version: 3.9.5
+Homepage: http://mg.pov.lt/gtimelog/
+Vcs-Git: https://github.com/gtimelog/gtimelog
+X-Python3-Version: >= 3.3
+
+Package: gtimelog
+Architecture: all
+Depends: gir1.2-appindicator3-0.1,
+         gir1.2-gtk-3.0,
+         gir1.2-pango-1.0 (>= 1.29.3+git20110916),
+         python3-gi,
+         ${misc:Depends},
+         ${python3:Depends}
+Suggests: mutt, vim-gnome
+Description: time logging application
+ gtimelog provides a time tracking application to allow the user to track what
+ they work on during the day and how long they spend doing it.
