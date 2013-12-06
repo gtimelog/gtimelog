@@ -1,1 +1,2 @@
-debian/gtimelog.1
+debian/tmp/gtimelog.man
+debian/tmp/gtimelogrc.man
