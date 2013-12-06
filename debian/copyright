@@ -1,5 +1,10 @@
 This package was debianized by Thom May <thom@debian.org> on
+<<<<<<< HEAD
 Wed, 09 Feb 2005 13:43:16 +0000.
+=======
+Wed, 09 Feb 2005 13:43:16 +0000.  It was updated by Barry Warsaw
+<barry@debian.org> on 2013-12-05.
+>>>>>>> 0.9.0debian
 
 It was downloaded from http://mg.pov.lt/gtimelog/
 

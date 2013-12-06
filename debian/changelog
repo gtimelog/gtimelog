@@ -1,9 +1,35 @@
+<<<<<<< HEAD
 gtimelog (0.9.0-0ppa0) precise; urgency=low
 
   * New upstream release.
   * gtimelog.desktop: use full icon pathname.  (LP: #1104303)
 
  -- Marius Gedminas <marius@gedmin.as>  Wed, 04 Dec 2013 13:19:41 +0200
+=======
+gtimelog (0.9.0-1) unstable; urgency=low
+
+  [ Marius Gedminas ]
+  * New upstream release.
+  * gtimelog.desktop: use full icon pathname.  (LP: #1104303)
+
+  [ Barry Warsaw ]
+  * debian/compat: Update to v8
+  * d/control:
+    - Set myself as new Debian maintainer and PAPT as Uploaders for team
+      maintenance.
+    - Standards-Version 3.9.5 with no other changes.
+    - Build-Depend on python3.
+    - Update Vcs-* branches.
+    - Set X-Python3-Version.
+    - Update Depends for Python 3.
+  * d/copyright: Updated
+  * d/gtimelog.manpages: Updated
+  * d/rules:
+    - Use --buildsystem=pybuild and --with=python3
+    - Use rst2man to process rewritten manpages.
+
+ -- Barry Warsaw <barry@debian.org>  Thu, 05 Dec 2013 16:36:15 -0500
+>>>>>>> 0.9.0debian
 
 gtimelog (0.8.1-0ppa0) precise; urgency=low
 
