@@ -1,6 +1,2 @@
-<<<<<<< HEAD
-debian/gtimelog.1
-=======
 debian/tmp/gtimelog.man
 debian/tmp/gtimelogrc.man
->>>>>>> 0.9.0debian

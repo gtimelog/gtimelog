@@ -1,15 +1,6 @@
 #!/usr/bin/make -f
 
 %:
-<<<<<<< HEAD
-	dh $@ --with=python2
-
-override_dh_auto_build:
-	dh_auto_build -Spython_distutils
-
-override_dh_auto_install:
-	dh_auto_install -Spython_distutils
-=======
 	dh $@ --with=python3 --buildsystem=pybuild
 
 override_dh_installman:
@@ -17,4 +8,3 @@ override_dh_installman:
 	rst2man debian/gtimelog.rst > debian/tmp/gtimelog.man
 	rst2man debian/gtimelogrc.rst > debian/tmp/gtimelogrc.man
 	dh_installman
->>>>>>> 0.9.0debian
