@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """An application for keeping track of your time."""
 
 # Default to new-style classes.
