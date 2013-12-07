@@ -9,18 +9,46 @@ They are both human and machine readable, easy to edit, easy to parse.
 timelog.txt
 -----------
 
-Here is a more formal grammar::
+Here is a formal grammar::
 
-  file ::= (entry|comment)*
+  file ::= (entry|day-separator|comment|old-style-comment)*
 
-  entry ::= timestamp ":" space title newline
+  entry ::= timestamp ":" SPACE title NEWLINE
 
-  comment ::= anything* newline
+  day-separator ::= NEWLINE
+
+  comment ::= "#" anything* NEWLINE
+
+  old-style-comment ::= anything* NEWLINE
 
   title ::= anything*
 
-  timestamp is 'YYYY-MM-DD HH:MM' with a single space between the date and
-  time.
+*timestamp* is ``YYYY-MM-DD HH:MM`` with a single space between the date and
+the time.
+
+*anything* is any character except a newline.
+
+*NEWLINE* is whatever Python considers it to be (i.e. CR LF or just LF).
+
+GTimeLog adds a blank line between days.  It ignores them when loading, but
+this is likely to change in the future.
+
+GTimeLog considers any lines not starting with a valid timestamp to be
+comments.  This is likely to change in the future, so please use '#' to
+indicate real comments if you find you need them.
+
+All lines should be sorted by time.  Currently GTimeLog won't complain if
+they're not, and it will sort them to compensate (but there are probably bugs
+lurking with the computation of ``earliest_timestamp``).
+
+GTimeLog doesn't re-write the file, it only appends to it.
+
+Bugs:
+
+- There's no place for timezones.  If you want to track your travel times
+  with GTimeLog, you're gonna have a bad time.
+- If you work late at night and change the value of ``virtual_midnight``,
+  old historical entries can be misinterpreted.
 
 
 tasks.txt
