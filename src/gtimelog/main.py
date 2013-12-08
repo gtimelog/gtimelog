@@ -1364,8 +1364,8 @@ def main():
         else:
             icons = [SimpleStatusIcon, OldTrayIcon, AppIndicator]
         if opts.debug:
-            print('Tray icon preference: %s' % ', '.join(icon_class.__name__)
-                                                         for icon_class in icons)
+            print('Tray icon preference: %s' % ', '.join(icon_class.__name__
+                                                         for icon_class in icons))
         for icon_class in icons:
             tray_icon = icon_class(main_window)
             if tray_icon.available():
