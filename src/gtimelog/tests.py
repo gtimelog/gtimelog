@@ -5,6 +5,7 @@ import unittest
 import os
 import tempfile
 import shutil
+import time
 from pprint import pprint
 
 try:
@@ -916,6 +917,8 @@ def doctest_TaskList_real_file():
         ...         'project: fix bugs',
         ...         'misc: paperwork',
         ...         ]) + '\n')
+        >>> one_second_ago = time.time() - 1
+        >>> os.utime(taskfile, (one_second_ago, one_second_ago))
 
         >>> from gtimelog.timelog import TaskList
         >>> tasklist = TaskList(taskfile)
@@ -926,9 +929,6 @@ def doctest_TaskList_real_file():
 
         >>> tasklist.check_reload()
         False
-
-        >>> import time
-        >>> time.sleep(0.01) # so mtime will be different :/
 
         >>> with open(taskfile, 'w') as f:
         ...     _ = f.write('new tasks\n')
