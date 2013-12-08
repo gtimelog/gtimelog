@@ -1340,8 +1340,8 @@ def main():
             print('Loading settings from %s' % settings_file)
         settings.load(settings_file)
     if opts.debug:
-        print('Loading time log from %s' % settings.get_timelog_file())
         print('Assuming date changes at %s' % settings.virtual_midnight)
+        print('Loading time log from %s' % settings.get_timelog_file())
     timelog = TimeLog(settings.get_timelog_file(),
                       settings.virtual_midnight)
     if settings.task_list_url:
