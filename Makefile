@@ -10,9 +10,14 @@ FILE_WITH_CHANGELOG = NEWS.rst
 # Interesting targets
 #
 
+manpages = gtimelog.1 gtimelogrc.5
+
 .PHONY: all
-all:
-	@echo "There's nothing that needs building.  Just run ./gtimelog"
+all: $(manpages)
+
+.PHONY: run
+run:
+	./gtimelog
 
 .PHONY: check test
 check test:
@@ -82,3 +87,9 @@ release: releasechecklist
 	@echo '  git commit -a -m "Post-release version bump" && git push && git push --tags'
 	@echo
 
+
+%.1: %.rst
+	rst2man $< > $@
+
+%.5: %.rst
+	rst2man $< > $@
