@@ -2,6 +2,10 @@ Changelog
 ---------
 
 
+0.9.2 (unreleased)
+~~~~~~~~~~~~~~~~~~
+
+
 0.9.1 (2013-12-23)
 ~~~~~~~~~~~~~~~~~~
 * Manual pages for gtimelog(1) and gtimelogrc(5).
