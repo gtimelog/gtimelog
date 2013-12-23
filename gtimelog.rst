@@ -7,16 +7,16 @@ minimal time logging application
 --------------------------------
 
 :Author: Marius Gedminas <mgedmin@gedmin.as>
-:Date: 2013-12-05
+:Date: 2013-12-23
 :Copyright: Marius Gedminas
-:Version: 0.9.0
+:Version: 0.9.1
 :Manual section: 1
 
 
 SYNOPSYS
 ========
 
-gtimelog
+**gtimelog** [options]
 
 
 DESCRIPTION
@@ -120,18 +120,33 @@ Debugging Options:
 FILES
 =====
 
-~/.gtimelog/gtimelogrc
-~/.config/gtimelog/gtimelogrc
+| **~/.gtimelog/gtimelogrc**
+| **~/.config/gtimelog/gtimelogrc**
 
-    Configuration file.
+    Configuration file, see **gtimelogrc**\ (5).
 
-~/.gtimelog/timelog.txt
-~/.local/share/gtimelog/timelog.txt
+| **~/.gtimelog/timelog.txt**
+| **~/.local/share/gtimelog/timelog.txt**
 
-    Activity log file.
+    Activity log file.  Each line contains an ISO-8601 timestamp
+    (YYYY-MM-DD HH:MM:SS) followed by a ":" and a space, followed by the
+    activity name.  Lines are sorted chronologically.  Blank lines
+    separate days.  Lines starting with ``#`` are comments.
+
+| **~/.gtimelog/tasks.txt**
+| **~/.local/share/gtimelog/tasks.txt**
+
+    Tasks to be shown in the task pane.  Each line is either "task name"
+    or "category: task name", lines starting with a ``#`` are comments.
+
+| **~/.gtimelog/remote-tasks.txt**
+| **~/.local/share/gtimelog/remote-tasks.txt**
+
+    Tasks to be shown in the task pane, when ``remote_task_url`` is set.
+    Contains a downloaded copy of whatever is at that URL.
 
 
 SEE ALSO
 ========
 
-gtimelogrc(5)
+**gtimelogrc**\ (5)
