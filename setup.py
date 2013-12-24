@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 import os
 import re
+import io
 from setuptools import setup
 
 here = os.path.dirname(__file__)
 
 
 def read(filename):
-    with open(os.path.join(here, filename)) as f:
+    with io.open(os.path.join(here, filename), 'r', encoding='utf-8') as f:
         return f.read()
 
 
