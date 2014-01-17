@@ -533,8 +533,8 @@ class Reports(object):
                                      format_duration_short(duration)))
                     else:
                         if self.settings.report_categorized_withdate == False:
-		                    output.write(u"  %-61s  %+5s\n" %
-		                                 (entry, format_duration_short(duration)))
+                            output.write(u"  %-61s  %+5s\n" %
+                                         (entry, format_duration_short(duration)))
                         else:
                             output.write(u"  %-13s %-47s  %+5s\n" %
                                          (start.strftime("%d.%m %H:%M"), entry, format_duration_short(duration)))
