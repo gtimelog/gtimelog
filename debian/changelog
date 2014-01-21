@@ -1,3 +1,9 @@
+gtimelog (0.9.1-2) unstable; urgency=medium
+
+  * d/control: Add python3-setuptools to Depends.  Closes: #734499
+
+ -- Barry Warsaw <barry@debian.org>  Tue, 21 Jan 2014 16:31:54 -0500
+
 gtimelog (0.9.1-1) unstable; urgency=low
 
   [ Marius Gedminas ]
