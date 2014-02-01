@@ -1318,7 +1318,7 @@ def main():
                 sys.exit('gtimelog: %s' % e)
             else:
                 # otherwise just emit a warning
-                print("gtimelog: dbus is not available:\n%s' % e)
+                print("gtimelog: dbus is not available:\n%s" % e)
     else: # not dbus
         if opts.quit or opts.replace or opts.toggle:
             sys.exit("gtimelog: dbus not available")
