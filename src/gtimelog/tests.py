@@ -974,7 +974,7 @@ class TestSettings(unittest.TestCase):
 
     def test_get_config_dir(self):
         # Case 1: GTIMELOG_HOME is present in the environment
-        os.environ['HOME'] = '/tmp/home'
+        os.environ['HOME'] = os.path.normpath('/tmp/home')
         os.environ['GTIMELOG_HOME'] = '~/.gt'
         self.assertEqual(self.settings.get_config_dir(),
                          os.path.normpath('/tmp/home/.gt'))
@@ -997,7 +997,7 @@ class TestSettings(unittest.TestCase):
 
     def test_get_data_dir(self):
         # Case 1: GTIMELOG_HOME is present in the environment
-        os.environ['HOME'] = '/tmp/home'
+        os.environ['HOME'] = os.path.normpath('/tmp/home')
         os.environ['GTIMELOG_HOME'] = '~/.gt'
         self.assertEqual(self.settings.get_data_dir(),
                          os.path.normpath('/tmp/home/.gt'))
@@ -1019,12 +1019,12 @@ class TestSettings(unittest.TestCase):
                          os.path.normpath('/tmp/home/.data/gtimelog'))
 
     def test_get_config_file(self):
-        self.settings.get_config_dir = lambda: '~/.config/gtimelog'
+        self.settings.get_config_dir = lambda: os.path.normpath('~/.config/gtimelog')
         self.assertEqual(self.settings.get_config_file(),
                          os.path.normpath('~/.config/gtimelog/gtimelogrc'))
 
     def test_get_timelog_file(self):
-        self.settings.get_data_dir = lambda: '~/.local/share/gtimelog'
+        self.settings.get_data_dir = lambda: os.path.normpath('~/.local/share/gtimelog')
         self.assertEqual(self.settings.get_timelog_file(),
                          os.path.normpath('~/.local/share/gtimelog/timelog.txt'))
 
