@@ -1318,7 +1318,7 @@ def main():
                 sys.exit('gtimelog: %s' % e)
             else:
                 # otherwise just emit a warning
-                print("gtimelog: dbus is not available:\n%s" % e)
+                print("gtimelog: dbus is not available:\n  %s" % e)
     else: # not dbus
         if opts.quit or opts.replace or opts.toggle:
             sys.exit("gtimelog: dbus not available")
@@ -1394,7 +1394,10 @@ def main():
         if opts.debug:
             print('Starting minimized')
     if dbus:
-        service = Service(main_window)
+        try:
+            service = Service(main_window)  # noqa
+        except dbus.DBusException as e:
+            print("gtimelog: dbus is not available:\n  %s" % e)
     # This is needed to make ^C terminate gtimelog when we're using
     # gobject-introspection.
     signal.signal(signal.SIGINT, signal.SIG_DFL)
