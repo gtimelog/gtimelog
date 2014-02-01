@@ -37,15 +37,21 @@ if '--prefer-pygtk' in sys.argv:
         import pygtk
         toolkit = 'pygtk'
     except ImportError:
-        import gi
-        toolkit = 'gi'
+        try:
+            import gi
+            toolkit = 'gi'
+        except ImportError:
+            sys.exit("Please install pygobject or pygtk")
 else:
     try:
         import gi
         toolkit = 'gi'
     except ImportError:
-        import pygtk
-        toolkit = 'pygtk'
+        try:
+            import pygtk
+            toolkit = 'pygtk'
+        except ImportError:
+            sys.exit("Please install pygobject or pygtk")
 
 
 if toolkit == 'gi':
