@@ -18,6 +18,8 @@ from gtimelog.timelog import parse_time
 
 
 legacy_default_home = os.path.normpath('~/.gtimelog')
+default_config_home = os.path.normpath('~/.config')
+default_data_home = os.path.normpath('~/.local/share')
 
 
 class Settings(object):
@@ -66,14 +68,14 @@ class Settings(object):
         legacy = self.check_legacy_config()
         if legacy:
             return legacy
-        xdg = os.environ.get('XDG_CONFIG_HOME') or '~/.config'
+        xdg = os.environ.get('XDG_CONFIG_HOME') or default_config_home
         return os.path.join(os.path.expanduser(xdg), 'gtimelog')
 
     def get_data_dir(self):
         legacy = self.check_legacy_config()
         if legacy:
             return legacy
-        xdg = os.environ.get('XDG_DATA_HOME') or '~/.local/share'
+        xdg = os.environ.get('XDG_DATA_HOME') or default_data_home
         return os.path.join(os.path.expanduser(xdg), 'gtimelog')
 
     def get_config_file(self):
