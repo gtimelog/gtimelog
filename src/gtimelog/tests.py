@@ -5,7 +5,6 @@ import unittest
 import os
 import tempfile
 import shutil
-import time
 from pprint import pprint
 
 try:
@@ -906,6 +905,7 @@ def doctest_TaskList_missing_file():
 def doctest_TaskList_real_file():
     r"""Test for TaskList
 
+        >>> import time
         >>> tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
         >>> taskfile = os.path.join(tempdir, 'tasks.txt')
         >>> with open(taskfile, 'w') as f:
@@ -944,140 +944,111 @@ def doctest_TaskList_real_file():
     """
 
 
-def doctest_Settings_get_config_dir():
-    """Test for Settings.get_config_dir
+class TestSettings(unittest.TestCase):
 
-        >>> from gtimelog.settings import Settings
-        >>> settings = Settings()
-        >>> real_isdir = os.path.isdir
+    def setUp(self):
+        from gtimelog.settings import Settings
+        self.settings = Settings()
+        self.real_isdir = os.path.isdir
+        self.tempdir = None
+        self.old_home = os.environ.get('HOME')
+        self.old_gtimelog_home = os.environ.get('GTIMELOG_HOME')
 
-    Case 1: GTIMELOG_HOME is present in the environment
+    def tearDown(self):
+        os.path.isdir = self.real_isdir
+        if self.tempdir:
+            shutil.rmtree(self.tempdir)
+        self.restore_env('HOME', self.old_home)
+        self.restore_env('GTIMELOG_HOME', self.old_gtimelog_home)
 
-        >>> os.environ['HOME'] = '/tmp/home'
-        >>> os.environ['GTIMELOG_HOME'] = '~/.gt'
-        >>> settings.get_config_dir()
-        '/tmp/home/.gt'
+    def restore_env(self, envvar, value):
+        if value is not None:
+            os.environ[envvar] = value
+        else:
+            os.environ.pop(envvar, None)
 
-    Case 2: ~/.gtimelog exists
+    def mkdtemp(self):
+        if self.tempdir is None:
+            self.tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
+        return self.tempdir
 
-        >>> del os.environ['GTIMELOG_HOME']
-        >>> os.path.isdir = lambda dir: True
-        >>> settings.get_config_dir()
-        '/tmp/home/.gtimelog'
+    def test_get_config_dir(self):
+        # Case 1: GTIMELOG_HOME is present in the environment
+        os.environ['HOME'] = '/tmp/home'
+        os.environ['GTIMELOG_HOME'] = '~/.gt'
+        self.assertEqual(self.settings.get_config_dir(),
+                         '/tmp/home/.gt')
 
-    Case 3: ~/.gtimelog does not exist, so we use XDG
+        # Case 2: ~/.gtimelog exists
+        del os.environ['GTIMELOG_HOME']
+        os.path.isdir = lambda dir: True
+        self.assertEqual(self.settings.get_config_dir(),
+                         '/tmp/home/.gtimelog')
 
-        >>> os.path.isdir = lambda dir: False
-        >>> settings.get_config_dir()
-        '/tmp/home/.config/gtimelog'
+        # Case 3: ~/.gtimelog does not exist, so we use XDG
+        os.path.isdir = lambda dir: False
+        self.assertEqual(self.settings.get_config_dir(),
+                         '/tmp/home/.config/gtimelog')
 
-    Case 4: XDG_CONFIG_HOME is present in the environment
+        # Case 4: XDG_CONFIG_HOME is present in the environment
+        os.environ['XDG_CONFIG_HOME'] = '~/.conf'
+        self.assertEqual(self.settings.get_config_dir(),
+                         '/tmp/home/.conf/gtimelog')
 
-        >>> os.environ['XDG_CONFIG_HOME'] = '~/.conf'
-        >>> settings.get_config_dir()
-        '/tmp/home/.conf/gtimelog'
+    def test_get_data_dir(self):
+        # Case 1: GTIMELOG_HOME is present in the environment
+        os.environ['HOME'] = '/tmp/home'
+        os.environ['GTIMELOG_HOME'] = '~/.gt'
+        self.assertEqual(self.settings.get_data_dir(),
+                         '/tmp/home/.gt')
 
-    Cleanup
+        # Case 2: ~/.gtimelog exists
+        del os.environ['GTIMELOG_HOME']
+        os.path.isdir = lambda dir: True
+        self.assertEqual(self.settings.get_data_dir(),
+                         '/tmp/home/.gtimelog')
 
-        >>> os.path.isdir = real_isdir
+        # Case 3: ~/.gtimelog does not exist, so we use XDG
+        os.path.isdir = lambda dir: False
+        self.assertEqual(self.settings.get_data_dir(),
+                         '/tmp/home/.local/share/gtimelog')
 
-    """
+        # Case 4: XDG_CONFIG_HOME is present in the environment
+        os.environ['XDG_DATA_HOME'] = '~/.data'
+        self.assertEqual(self.settings.get_data_dir(),
+                         '/tmp/home/.data/gtimelog')
 
+    def test_get_config_file(self):
+        self.settings.get_config_dir = lambda: '~/.config/gtimelog'
+        self.assertEqual(self.settings.get_config_file(),
+                         '~/.config/gtimelog/gtimelogrc')
 
-def doctest_Settings_get_data_dir():
-    """Test for Settings.get_data_dir
+    def test_get_timelog_file(self):
+        self.settings.get_data_dir = lambda: '~/.local/share/gtimelog'
+        self.assertEqual(self.settings.get_timelog_file(),
+                         '~/.local/share/gtimelog/timelog.txt')
 
-        >>> from gtimelog.settings import Settings
-        >>> settings = Settings()
-        >>> real_isdir = os.path.isdir
+    def test_load(self):
+        self.settings.load('/dev/null')
 
-    Case 1: GTIMELOG_HOME is present in the environment
-
-        >>> os.environ['HOME'] = '/tmp/home'
-        >>> os.environ['GTIMELOG_HOME'] = '~/.gt'
-        >>> settings.get_data_dir()
-        '/tmp/home/.gt'
-
-    Case 2: ~/.gtimelog exists
-
-        >>> del os.environ['GTIMELOG_HOME']
-        >>> os.path.isdir = lambda dir: True
-        >>> settings.get_data_dir()
-        '/tmp/home/.gtimelog'
-
-    Case 3: ~/.gtimelog does not exist, so we use XDG
-
-        >>> os.path.isdir = lambda dir: False
-        >>> settings.get_data_dir()
-        '/tmp/home/.local/share/gtimelog'
-
-    Case 4: XDG_CONFIG_HOME is present in the environment
-
-        >>> os.environ['XDG_DATA_HOME'] = '~/.data'
-        >>> settings.get_data_dir()
-        '/tmp/home/.data/gtimelog'
-
-    Cleanup
-
-        >>> os.path.isdir = real_isdir
-
-    """
-
-
-def doctest_Settings_get_config_file():
-    """Test for Settings.get_config_file
-
-        >>> from gtimelog.settings import Settings
-        >>> settings = Settings()
-        >>> settings.get_config_dir = lambda: '~/.config/gtimelog'
-        >>> settings.get_config_file()
-        '~/.config/gtimelog/gtimelogrc'
-
-    """
-
-
-def doctest_Settings_get_timelog_file():
-    """Test for Settings.get_timelog_file
-
-        >>> from gtimelog.settings import Settings
-        >>> settings = Settings()
-        >>> settings.get_data_dir = lambda: '~/.local/share/gtimelog'
-        >>> settings.get_timelog_file()
-        '~/.local/share/gtimelog/timelog.txt'
-
-    """
-
-
-def doctest_Settings_load():
-    """Test for Settings.load
-
-        >>> from gtimelog.settings import Settings
-        >>> settings = Settings()
-        >>> settings.load('/dev/null')
-
-    """
-
-
-def doctest_Settings_save():
-    """Test for Settings.load
-
-        >>> tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
-
-        >>> from gtimelog.settings import Settings
-        >>> settings = Settings()
-        >>> settings.save(os.path.join(tempdir, 'config'))
-
-        >>> shutil.rmtree(tempdir)
-
-    """
+    def test_save(self):
+        tempdir = self.mkdtemp()
+        self.settings.save(os.path.join(tempdir, 'config'))
 
 
 def additional_tests(): # for setup.py
     return doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE)
 
 
+def test_suite():
+    return unittest.TestSuite([
+        unittest.defaultTestLoader.loadTestsFromName(__name__),
+        additional_tests(),
+    ])
+
+
 def main():
-    unittest.TextTestRunner().run(additional_tests())
+    unittest.TextTestRunner().run(test_suite())
 
 
 if __name__ == '__main__':
