@@ -17,7 +17,7 @@ except ImportError:
 from gtimelog.timelog import parse_time
 
 
-legacy_default_home = '~/.gtimelog'
+legacy_default_home = os.path.normpath('~/.gtimelog')
 
 
 class Settings(object):
