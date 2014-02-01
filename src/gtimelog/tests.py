@@ -977,56 +977,56 @@ class TestSettings(unittest.TestCase):
         os.environ['HOME'] = '/tmp/home'
         os.environ['GTIMELOG_HOME'] = '~/.gt'
         self.assertEqual(self.settings.get_config_dir(),
-                         '/tmp/home/.gt')
+                         os.path.normpath('/tmp/home/.gt'))
 
         # Case 2: ~/.gtimelog exists
         del os.environ['GTIMELOG_HOME']
         os.path.isdir = lambda dir: True
         self.assertEqual(self.settings.get_config_dir(),
-                         '/tmp/home/.gtimelog')
+                         os.path.normpath('/tmp/home/.gtimelog'))
 
         # Case 3: ~/.gtimelog does not exist, so we use XDG
         os.path.isdir = lambda dir: False
         self.assertEqual(self.settings.get_config_dir(),
-                         '/tmp/home/.config/gtimelog')
+                         os.path.normpath('/tmp/home/.config/gtimelog'))
 
         # Case 4: XDG_CONFIG_HOME is present in the environment
         os.environ['XDG_CONFIG_HOME'] = '~/.conf'
         self.assertEqual(self.settings.get_config_dir(),
-                         '/tmp/home/.conf/gtimelog')
+                         os.path.normpath('/tmp/home/.conf/gtimelog'))
 
     def test_get_data_dir(self):
         # Case 1: GTIMELOG_HOME is present in the environment
         os.environ['HOME'] = '/tmp/home'
         os.environ['GTIMELOG_HOME'] = '~/.gt'
         self.assertEqual(self.settings.get_data_dir(),
-                         '/tmp/home/.gt')
+                         os.path.normpath('/tmp/home/.gt'))
 
         # Case 2: ~/.gtimelog exists
         del os.environ['GTIMELOG_HOME']
         os.path.isdir = lambda dir: True
         self.assertEqual(self.settings.get_data_dir(),
-                         '/tmp/home/.gtimelog')
+                         os.path.normpath('/tmp/home/.gtimelog'))
 
         # Case 3: ~/.gtimelog does not exist, so we use XDG
         os.path.isdir = lambda dir: False
         self.assertEqual(self.settings.get_data_dir(),
-                         '/tmp/home/.local/share/gtimelog')
+                         os.path.normpath('/tmp/home/.local/share/gtimelog'))
 
         # Case 4: XDG_CONFIG_HOME is present in the environment
         os.environ['XDG_DATA_HOME'] = '~/.data'
         self.assertEqual(self.settings.get_data_dir(),
-                         '/tmp/home/.data/gtimelog')
+                         os.path.normpath('/tmp/home/.data/gtimelog'))
 
     def test_get_config_file(self):
         self.settings.get_config_dir = lambda: '~/.config/gtimelog'
         self.assertEqual(self.settings.get_config_file(),
-                         '~/.config/gtimelog/gtimelogrc')
+                         os.path.normpath('~/.config/gtimelog/gtimelogrc'))
 
     def test_get_timelog_file(self):
         self.settings.get_data_dir = lambda: '~/.local/share/gtimelog'
         self.assertEqual(self.settings.get_timelog_file(),
-                         '~/.local/share/gtimelog/timelog.txt')
+                         os.path.normpath('~/.local/share/gtimelog/timelog.txt'))
 
     def test_load(self):
         self.settings.load('/dev/null')
