@@ -825,20 +825,20 @@ class MainWindow:
 
     def on_daily_report_activate(self, widget):
         """File -> Daily Report"""
-        reports = Reports(self.timelog.window)
+        reports = Reports(self.timelog.window, self.settings)
         self.mail(reports.daily_report)
 
     def on_yesterdays_report_activate(self, widget):
         """File -> Daily Report for Yesterday"""
         day = self.timelog.day - datetime.timedelta(1)
-        reports = Reports(self.timelog.window_for_day(day))
+        reports = Reports(self.timelog.window_for_day(day), self.settings)
         self.mail(reports.daily_report)
 
     def on_previous_day_report_activate(self, widget):
         """File -> Daily Report for a Previous Day"""
         day = self.choose_date()
         if day:
-            reports = Reports(self.timelog.window_for_day(day))
+            reports = Reports(self.timelog.window_for_day(day), self.settings)
             self.mail(reports.daily_report)
 
     def choose_date(self):
@@ -881,7 +881,7 @@ class MainWindow:
     def on_weekly_report_activate(self, widget):
         """File -> Weekly Report"""
         day = self.timelog.day
-        reports = Reports(self.weekly_window(day=day))
+        reports = Reports(self.weekly_window(day=day), self.settings)
         if self.settings.report_style == 'plain':
             report = reports.weekly_report_plain
         elif self.settings.report_style == 'categorized':
@@ -893,7 +893,7 @@ class MainWindow:
     def on_last_weeks_report_activate(self, widget):
         """File -> Weekly Report for Last Week"""
         day = self.timelog.day - datetime.timedelta(7)
-        reports = Reports(self.weekly_window(day=day))
+        reports = Reports(self.weekly_window(day=day), self.settings)
         if self.settings.report_style == 'plain':
             report = reports.weekly_report_plain
         elif self.settings.report_style == 'categorized':
@@ -906,7 +906,7 @@ class MainWindow:
         """File -> Weekly Report for a Previous Week"""
         day = self.choose_date()
         if day:
-            reports = Reports(self.weekly_window(day=day))
+            reports = Reports(self.weekly_window(day=day), self.settings)
             if self.settings.report_style == 'plain':
                 report = reports.weekly_report_plain
             elif self.settings.report_style == 'categorized':
@@ -924,7 +924,7 @@ class MainWindow:
         """File -> Monthly Report for a Previous Month"""
         day = self.choose_date()
         if day:
-            reports = Reports(self.monthly_window(day=day))
+            reports = Reports(self.monthly_window(day=day), self.settings)
             if self.settings.report_style == 'plain':
                 report = reports.monthly_report_plain
             elif self.settings.report_style == 'categorized':
@@ -936,7 +936,7 @@ class MainWindow:
     def on_last_month_report_activate(self, widget):
         """File -> Monthly Report for Last Month"""
         day = self.timelog.day - datetime.timedelta(self.timelog.day.day)
-        reports = Reports(self.monthly_window(day=day))
+        reports = Reports(self.monthly_window(day=day), self.settings)
         if self.settings.report_style == 'plain':
             report = reports.monthly_report_plain
         elif self.settings.report_style == 'categorized':
@@ -947,7 +947,7 @@ class MainWindow:
 
     def on_monthly_report_activate(self, widget):
         """File -> Monthly Report"""
-        reports = Reports(self.monthly_window())
+        reports = Reports(self.monthly_window(), self.settings)
         if self.settings.report_style == 'plain':
             report = reports.monthly_report_plain
         elif self.settings.report_style == 'categorized':
@@ -969,7 +969,7 @@ class MainWindow:
         """File -> Report for a Custom Date Range"""
         min, max = self.choose_date_range()
         if min and max:
-            reports = Reports(self.range_window(min, max))
+            reports = Reports(self.range_window(min, max), self.settings)
             self.mail(reports.custom_range_report_categorized)
 
     def on_open_complete_spreadsheet_activate(self, widget):
@@ -1352,8 +1352,7 @@ def main():
     if opts.debug:
         print('Assuming date changes at %s' % settings.virtual_midnight)
         print('Loading time log from %s' % settings.get_timelog_file())
-    timelog = TimeLog(settings.get_timelog_file(),
-                      settings.virtual_midnight)
+    timelog = TimeLog(settings)
     if settings.task_list_url:
         if opts.debug:
             print('Loading cached remote tasks from %s' %

@@ -130,12 +130,12 @@ class TimeWindow(object):
     oldest) timestamp in the file.
     """
 
-    def __init__(self, filename, min_timestamp, max_timestamp,
-                 virtual_midnight, callback=None):
-        self.filename = filename
+    def __init__(self, min_timestamp, max_timestamp, settings, callback=None):
         self.min_timestamp = min_timestamp
         self.max_timestamp = max_timestamp
-        self.virtual_midnight = virtual_midnight
+        self.settings = settings
+        self.filename = settings.get_timelog_file()
+        self.virtual_midnight = settings.virtual_midnight
         self.reread(callback)
 
     def reread(self, callback=None):
@@ -266,6 +266,26 @@ class TimeWindow(object):
         slack = sorted(slack.values())
         return work, slack
 
+    def separate_entries(self, skip_first=True):
+        """Return consolidated entries (grouped by entry title).
+
+        Like def grouped_entries(self, skip_first=True) but don't group entries.
+        """
+        work = []
+        slack = []
+        for start, stop, duration, entry in self.all_entries():
+            if skip_first:
+                skip_first = False
+                continue
+            if '***' in entry:
+                continue
+            if '**' in entry:
+                entries = slack
+            else:
+                entries = work
+            entries.append( (start, entry, duration) )
+        return work, slack
+
     def categorized_work_entries(self, skip_first=True):
         """Return consolidated work entries grouped by category.
 
@@ -279,16 +299,36 @@ class TimeWindow(object):
             total duration of work in the <category>.
         """
 
-        work, slack = self.grouped_entries(skip_first=skip_first)
+        if self.settings.report_categorized_withdate == False:
+            work, slack = self.grouped_entries(skip_first=skip_first)
+        else:
+            work, slack = self.separate_entries(skip_first=skip_first)
         entries = {}
         totals = {}
         for start, entry, duration in work:
             if ': ' in entry:
                 cat, clipped_entry = entry.split(': ', 1)
-                entry_list = entries.get(cat, [])
-                entry_list.append((start, clipped_entry, duration))
-                entries[cat] = entry_list
-                totals[cat] = totals.get(cat, datetime.timedelta(0)) + duration
+                
+                if self.settings.subcategories_enabled == False:
+                    entry_list = entries.get(cat, [])
+                    entry_list.append((start, clipped_entry, duration))
+                    entries[cat] = entry_list
+                    totals[cat] = totals.get(cat, datetime.timedelta(0)) + duration
+                else:
+                    subcats = cat.split(self.settings.subcategories_separator)
+                    localsubcat = ''
+                    for subcat in subcats:
+                        
+                        if localsubcat == '':
+                            localsubcat = subcat.strip()
+                        else:
+                            localsubcat = localsubcat + self.settings.subcategories_separator + subcat.strip()
+                        
+                        entry_list = entries.get(localsubcat, [])
+                        entry_list.append((start, clipped_entry, duration))
+                        entries[localsubcat] = entry_list
+                        totals[localsubcat] = totals.get(localsubcat, datetime.timedelta(0)) + duration
+                    
             else:
                 entry_list = entries.get(None, [])
                 entry_list.append((start, entry, duration))
@@ -409,8 +449,9 @@ class TimeWindow(object):
 class Reports(object):
     """Generation of reports."""
 
-    def __init__(self, window):
+    def __init__(self, window, settings):
         self.window = window
+        self.settings = settings
 
     def _categorizing_report(self, output, email, who, subject, period_name,
                              estimated_column=False):
@@ -476,10 +517,12 @@ class Reports(object):
             for cat in categories:
                 output.write('%s:\n' % cat)
 
-                work = [(entry, duration)
+                work = [(entry, duration, start)
                         for start, entry, duration in entries[cat]]
-                work.sort()
-                for entry, duration in work:
+                if self.settings.report_categorized_withdate == False:
+                    work.sort()
+
+                for entry, duration, start in work:
                     if not duration:
                         continue # skip empty "arrival" entries
 
@@ -489,8 +532,12 @@ class Reports(object):
                                      (entry, '-',
                                      format_duration_short(duration)))
                     else:
-                        output.write(u"  %-61s  %+5s\n" %
-                                     (entry, format_duration_short(duration)))
+                        if self.settings.report_categorized_withdate == False:
+                            output.write(u"  %-61s  %+5s\n" %
+                                         (entry, format_duration_short(duration)))
+                        else:
+                            output.write(u"  %-13s %-47s  %+5s\n" %
+                                         (start.strftime("%d.%m %H:%M"), entry, format_duration_short(duration)))
 
                 output.write('-' * 70 + '\n')
                 output.write(u"%+70s\n" % format_duration_short(totals[cat]))
@@ -506,6 +553,9 @@ class Reports(object):
         line_format = '  %-' + str(max_cat_length + 4) + 's %+5s\n'
         output.write('Categories by time spent:\n')
         for time, cat in ordered_by_time:
+            if self.settings.subcategories_enabled == True:
+                if cat.find(self.settings.subcategories_separator) > 0:
+                    continue
             output.write(line_format % (cat, format_duration_short(time)))
 
     def _report_categories(self, output, categories):
@@ -528,6 +578,30 @@ class Reports(object):
         items = sorted(categories.items())
         if no_cat is not None:
             items.append(('(none)', no_cat))
+
+        if self.settings.subcategories_enabled == True:
+            # normalize categories
+            categories_normalized = {}    
+            for cat, duration in items:
+                if not cat:
+                    continue
+                
+                subcats = cat.split(self.settings.subcategories_separator)
+                localsubcat = ''
+                for subcat in subcats:
+                    subcat = subcat.strip()
+                    
+                    if localsubcat == '':
+                        localsubcat = subcat
+                    else:
+                        localsubcat = localsubcat + self.settings.subcategories_separator + subcat
+                    
+                    categories_normalized[localsubcat] = categories_normalized.get(
+                        localsubcat, datetime.timedelta(0)) + duration
+            # use normalized categories
+            items = categories_normalized.items()
+            items.sort()
+        
         for cat, duration in items:
             output.write(u"%-62s  %s\n" % (
                 cat, format_duration_long(duration)))
@@ -697,9 +771,10 @@ class TimeLog(object):
     the end.
     """
 
-    def __init__(self, filename, virtual_midnight):
-        self.filename = filename
-        self.virtual_midnight = virtual_midnight
+    def __init__(self, settings):
+        self.settings = settings
+        self.filename = settings.get_timelog_file()
+        self.virtual_midnight = settings.virtual_midnight
         self.reread()
 
     def virtual_today(self):
@@ -735,9 +810,7 @@ class TimeLog(object):
         min = datetime.datetime.combine(self.day, self.virtual_midnight)
         max = min + datetime.timedelta(1)
         self.history = []
-        self.window = TimeWindow(self.filename, min, max,
-                                 self.virtual_midnight,
-                                 callback=self.history.append)
+        self.window = TimeWindow(min, max, self.settings, callback=self.history.append)
         self.need_space = not self.window.items
         self._cache = {(min, max): self.window}
 
@@ -746,7 +819,7 @@ class TimeLog(object):
         try:
             return self._cache[min, max]
         except KeyError:
-            window = TimeWindow(self.filename, min, max, self.virtual_midnight)
+            window = TimeWindow(min, max, self.settings)
             if len(self._cache) > 1000:
                 self._cache.clear()
             self._cache[min, max] = window
