@@ -917,7 +917,7 @@ def doctest_TaskList_real_file():
         ...         'project: fix bugs',
         ...         'misc: paperwork',
         ...         ]) + '\n')
-        >>> one_second_ago = time.time() - 1
+        >>> one_second_ago = time.time() - 2
         >>> os.utime(taskfile, (one_second_ago, one_second_ago))
 
         >>> from gtimelog.timelog import TaskList
