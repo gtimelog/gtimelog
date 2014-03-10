@@ -3,6 +3,7 @@
 # Default to new-style classes.
 __metaclass__ = type
 
+import argparse
 import os
 import re
 import sys
@@ -11,7 +12,6 @@ import codecs
 import signal
 import logging
 import datetime
-import optparse
 import tempfile
 
 import gtimelog
@@ -1228,33 +1228,32 @@ if dbus:
 
 def main():
     """Run the program."""
-    parser = optparse.OptionParser(usage='%prog [options]',
-                                   version=gtimelog.__version__)
-    parser.add_option('--tray', action='store_true',
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--version', action='version', version=gtimelog.__version__)
+    parser.add_argument('--tray', action='store_true',
         help="start minimized")
-    parser.add_option('--sample-config', action='store_true',
+    parser.add_argument('--sample-config', action='store_true',
         help="write a sample configuration file to 'gtimelogrc.sample'")
 
-    dbus_options = optparse.OptionGroup(parser, "Single-Instance Options")
-    dbus_options.add_option('--replace', action='store_true',
+    dbus_options = parser.add_argument_group("Single-Instance Options")
+    dbus_options.add_argument('--replace', action='store_true',
         help="replace the already running GTimeLog instance")
-    dbus_options.add_option('--quit', action='store_true',
+    dbus_options.add_argument('--quit', action='store_true',
         help="tell an already-running GTimeLog instance to quit")
-    dbus_options.add_option('--toggle', action='store_true',
+    dbus_options.add_argument('--toggle', action='store_true',
         help="show/hide the GTimeLog window if already running")
-    dbus_options.add_option('--ignore-dbus', action='store_true',
+    dbus_options.add_argument('--ignore-dbus', action='store_true',
         help="do not check if GTimeLog is already running"
              " (allows you to have multiple instances running)")
-    parser.add_option_group(dbus_options)
 
-    debug_options = optparse.OptionGroup(parser, "Debugging Options")
-    debug_options.add_option('--debug', action='store_true',
+    debug_options = parser.add_argument_group("Debugging Options")
+    debug_options.add_argument('--debug', action='store_true',
         help="show debug information")
-    debug_options.add_option('--prefer-pygtk', action='store_true',
+    debug_options.add_argument('--prefer-pygtk', action='store_true',
         help="try to use the (obsolete) pygtk library instead of pygi")
-    parser.add_option_group(debug_options)
 
-    opts, args = parser.parse_args()
+    opts = parser.parse_args()
 
     log.addHandler(logging.StreamHandler(sys.stdout))
     if opts.debug:
