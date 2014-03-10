@@ -25,87 +25,9 @@ try:
 except NameError:
     unicode = str
 
-
-# Which Gnome toolkit should we use?  Prior to 0.7, pygtk was the default with
-# a fallback to gi (gobject introspection), except on Ubuntu where gi was
-# forced.  With 0.7, gi was made the default in upstream, so the Ubuntu
-# specific patch isn't necessary.
-
-if '--prefer-pygtk' in sys.argv:
-    sys.argv.remove('--prefer-pygtk')
-    try:
-        import pygtk
-        toolkit = 'pygtk'
-    except ImportError:
-        try:
-            import gi
-            toolkit = 'gi'
-        except ImportError:
-            sys.exit("Please install pygobject or pygtk")
-else:
-    try:
-        import gi
-        toolkit = 'gi'
-    except ImportError:
-        try:
-            import pygtk
-            toolkit = 'pygtk'
-        except ImportError:
-            sys.exit("Please install pygobject or pygtk")
-
-
-if toolkit == 'gi':
-    from gi.repository import GObject as gobject
-    from gi.repository import Gdk as gdk
-    from gi.repository import Gtk as gtk
-    from gi.repository import Pango as pango
-    # These are hacks until we fully switch to GI.
-    try:
-        PANGO_ALIGN_LEFT = pango.TabAlign.LEFT
-    except AttributeError:
-        # Backwards compatible for older Pango versions with broken GIR.
-        PANGO_ALIGN_LEFT = pango.TabAlign.TAB_LEFT
-    GTK_RESPONSE_OK = gtk.ResponseType.OK
-    gtk_status_icon_new = gtk.StatusIcon.new_from_file
-    pango_tabarray_new = pango.TabArray.new
-
-    if gtk._version.startswith('2'):
-        gtk_version = 2
-    else:
-        gtk_version = 3
-
-    try:
-        if gtk._version.startswith('2'):
-            from gi.repository import AppIndicator
-        else:
-            from gi.repository import AppIndicator3 as AppIndicator
-        new_app_indicator = AppIndicator.Indicator.new
-        APPINDICATOR_CATEGORY = (
-            AppIndicator.IndicatorCategory.APPLICATION_STATUS)
-        APPINDICATOR_ACTIVE = AppIndicator.IndicatorStatus.ACTIVE
-    except (ImportError, gi._gi.RepositoryError):
-        new_app_indicator = None
-else:
-    pygtk.require('2.0')
-    import gobject
-    import gtk
-    from gtk import gdk as gdk
-    import pango
-
-    gtk_version = 2
-    PANGO_ALIGN_LEFT = pango.TAB_LEFT
-    GTK_RESPONSE_OK = gtk.RESPONSE_OK
-    gtk_status_icon_new = gtk.status_icon_new_from_file
-    pango_tabarray_new = pango.TabArray
-
-    try:
-        import appindicator
-        new_app_indicator = appindicator.Indicator
-        APPINDICATOR_CATEGORY = appindicator.CATEGORY_APPLICATION_STATUS
-        APPINDICATOR_ACTIVE = appindicator.STATUS_ACTIVE
-    except ImportError:
-        # apt-get install python-appindicator on Ubuntu
-        new_app_indicator = None
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import AppIndicator3, GObject, Gdk, Gtk, Pango
 
 try:
     import dbus
@@ -145,16 +67,11 @@ class IconChooser:
         # XXX assumes the panel's color matches a menu bar's color, which is
         # not necessarily the case!  this logic works for, say,
         # Ambiance/Radiance, but it gets New Wave and Dark Room wrong.
-        if toolkit == 'gi':
-            menu_bar = gtk.MenuBar()
-            # need to hold a reference to menu_bar to avoid LP#1016212
-            style = menu_bar.get_style_context()
-            color = style.get_color(gtk.StateFlags.NORMAL)
-            value = (color.red + color.green + color.blue) / 3
-        else:
-            style = gtk.MenuBar().rc_get_style()
-            color = style.text[gtk.STATE_NORMAL]
-            value = color.value
+        menu_bar = Gtk.MenuBar()
+        # need to hold a reference to menu_bar to avoid LP#1016212
+        style = menu_bar.get_style_context()
+        color = style.get_color(Gtk.StateFlags.NORMAL)
+        value = (color.red + color.green + color.blue) / 3
         filename = icon_file_bright if value >= 0.5 else icon_file_dark
         log.debug('Menu bar color: (%g, %g, %g), averages to %g; picking %s',
                   color.red, color.green, color.blue, value, filename)
@@ -168,21 +85,14 @@ class SimpleStatusIcon(IconChooser):
         self.gtimelog_window = gtimelog_window
         self.timelog = gtimelog_window.timelog
         self.trayicon = None
-        if not hasattr(gtk, 'StatusIcon'):
-            # You must be using a very old PyGtk.
-            return
-        self.icon = gtk_status_icon_new(self.icon_name)
+        self.icon = Gtk.StatusIcon.new_from_file(self.icon_name)
         self.last_tick = False
         self.tick()
         self.icon.connect('activate', self.on_activate)
         self.icon.connect('popup-menu', self.on_popup_menu)
-        if gtk_version == 2:
-            self.gtimelog_window.main_window.connect(
-                'style-set', self.on_style_set)
-        else: # assume Gtk+ 3
-            self.gtimelog_window.main_window.connect(
-                'style-updated', self.on_style_set)
-        gobject.timeout_add_seconds(1, self.tick)
+        self.gtimelog_window.main_window.connect(
+            'style-updated', self.on_style_set)
+        GObject.timeout_add_seconds(1, self.tick)
         self.gtimelog_window.entry_watchers.append(self.entry_added)
         self.gtimelog_window.tray_icon = self
 
@@ -204,14 +114,9 @@ class SimpleStatusIcon(IconChooser):
     def on_popup_menu(self, widget, button, activate_time):
         """The user clicked on the icon."""
         tray_icon_popup_menu = self.gtimelog_window.tray_icon_popup_menu
-        if toolkit == "gi":
-            tray_icon_popup_menu.popup(
-                None, None, gtk.StatusIcon.position_menu,
-                self.icon, button, activate_time)
-        else:
-            tray_icon_popup_menu.popup(
-                None, None, gtk.status_icon_position_menu,
-                button, activate_time, self.icon)
+        tray_icon_popup_menu.popup(
+            None, None, Gtk.StatusIcon.position_menu,
+            self.icon, button, activate_time)
 
     def entry_added(self, entry):
         """An entry has been added."""
@@ -250,19 +155,13 @@ class AppIndicator(IconChooser):
         self.gtimelog_window = gtimelog_window
         self.timelog = gtimelog_window.timelog
         self.indicator = None
-        if new_app_indicator is None:
-            return
-        self.indicator = new_app_indicator(
-            'gtimelog', self.icon_name, APPINDICATOR_CATEGORY)
-        self.indicator.set_status(APPINDICATOR_ACTIVE)
+        self.indicator = AppIndicator3.Indicator.new(
+            'gtimelog', self.icon_name, AppIndicator3.IndicatorCategory.APPLICATION_STATUS)
+        self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
         self.indicator.set_menu(gtimelog_window.app_indicator_menu)
         self.gtimelog_window.tray_icon = self
-        if gtk_version == 2:
-            self.gtimelog_window.main_window.connect(
-                'style-set', self.on_style_set)
-        else: # assume Gtk+ 3
-            self.gtimelog_window.main_window.connect(
-                'style-updated', self.on_style_set)
+        self.gtimelog_window.main_window.connect(
+            'style-updated', self.on_style_set)
 
     def available(self):
         """Is the icon supported by this system?
@@ -292,12 +191,12 @@ class OldTrayIcon(IconChooser):
             # Nothing to do here, move along or install python-gnome2-extras
             # which was later renamed to python-eggtrayicon.
             return
-        self.eventbox = gtk.EventBox()
-        hbox = gtk.HBox()
-        self.icon = gtk.Image()
+        self.eventbox = Gtk.EventBox()
+        hbox = Gtk.HBox()
+        self.icon = Gtk.Image()
         self.icon.set_from_file(self.icon_name)
         hbox.add(self.icon)
-        self.time_label = gtk.Label()
+        self.time_label = Gtk.Label()
         hbox.add(self.time_label)
         self.eventbox.add(hbox)
         self.trayicon = egg.trayicon.TrayIcon('GTimeLog')
@@ -305,17 +204,13 @@ class OldTrayIcon(IconChooser):
         self.last_tick = False
         self.tick(force_update=True)
         self.trayicon.show_all()
-        if gtk_version == 2:
-            self.gtimelog_window.main_window.connect(
-                'style-set', self.on_style_set)
-        else: # assume Gtk+ 3
-            self.gtimelog_window.main_window.connect(
-                'style-updated', self.on_style_set)
+        self.gtimelog_window.main_window.connect(
+            'style-updated', self.on_style_set)
         tray_icon_popup_menu = gtimelog_window.tray_icon_popup_menu
         self.eventbox.connect_object(
             'button-press-event', self.on_press, tray_icon_popup_menu)
         self.eventbox.connect('button-release-event', self.on_release)
-        gobject.timeout_add_seconds(1, self.tick)
+        GObject.timeout_add_seconds(1, self.tick)
         self.gtimelog_window.entry_watchers.append(self.entry_added)
         self.gtimelog_window.tray_icon = self
 
@@ -418,7 +313,7 @@ class MainWindow:
 
     def _init_ui(self):
         """Initialize the user interface."""
-        builder = gtk.Builder()
+        builder = Gtk.Builder()
         builder.add_from_file(ui_file)
         # Set initial state of menu items *before* we hook up signals
         chronological_menu_item = builder.get_object('chronological')
@@ -463,9 +358,9 @@ class MainWindow:
         self.tasks.loaded_callback = self.task_list_loaded
         self.tasks.error_callback = self.task_list_error
         self.task_list = builder.get_object('task_list')
-        self.task_store = gtk.TreeStore(str, str)
+        self.task_store = Gtk.TreeStore(str, str)
         self.task_list.set_model(self.task_store)
-        column = gtk.TreeViewColumn('Task', gtk.CellRendererText(), text=0)
+        column = Gtk.TreeViewColumn('Task', Gtk.CellRendererText(), text=0)
         self.task_list.append_column(column)
         self.task_list.connect('row_activated', self.task_list_row_activated)
         self.task_list_popup_menu = builder.get_object('task_list_popup_menu')
@@ -494,7 +389,7 @@ class MainWindow:
         self.populate_log()
         self.update_show_checkbox()
         self.tick(True)
-        gobject.timeout_add_seconds(1, self.tick)
+        GObject.timeout_add_seconds(1, self.tick)
 
     def set_up_log_view_columns(self):
         """Set up tab stops in the log view."""
@@ -502,9 +397,9 @@ class MainWindow:
         self.log_view.realize()
         pango_context = self.log_view.get_pango_context()
         em = pango_context.get_font_description().get_size()
-        tabs = pango_tabarray_new(2, False)
-        tabs.set_tab(0, PANGO_ALIGN_LEFT, 9 * em)
-        tabs.set_tab(1, PANGO_ALIGN_LEFT, 12 * em)
+        tabs = Pango.TabArray.new(2, False)
+        tabs.set_tab(0, Pango.TabAlign.LEFT, 9 * em)
+        tabs.set_tab(1, Pango.TabAlign.LEFT, 12 * em)
         self.log_view.set_tabs(tabs)
 
     def w(self, text, tag=None):
@@ -693,11 +588,11 @@ class MainWindow:
         if not self.settings.enable_gtk_completion:
             self.have_completion = False
             return
-        self.have_completion = hasattr(gtk, 'EntryCompletion')
+        self.have_completion = hasattr(Gtk, 'EntryCompletion')
         if not self.have_completion:
             return
-        self.completion_choices = gtk.ListStore(str)
-        completion = gtk.EntryCompletion()
+        self.completion_choices = Gtk.ListStore(str)
+        completion = Gtk.EntryCompletion()
         completion.set_model(self.completion_choices)
         completion.set_text_column(0)
         self.task_entry.set_completion(completion)
@@ -728,7 +623,7 @@ class MainWindow:
             self.on_hide_activate()
             return True
         else:
-            gtk.main_quit()
+            Gtk.main_quit()
             return False
 
     def close_about_dialog(self, widget):
@@ -789,7 +684,7 @@ class MainWindow:
 
     def on_quit_activate(self, widget):
         """File -> Quit selected"""
-        gtk.main_quit()
+        Gtk.main_quit()
 
     def on_about_activate(self, widget):
         """Help -> About selected"""
@@ -846,7 +741,7 @@ class MainWindow:
 
         Returns either a datetime.date, or None.
         """
-        if self.calendar_dialog.run() == GTK_RESPONSE_OK:
+        if self.calendar_dialog.run() == Gtk.ResponseType.OK:
             y, m1, d = self.calendar.get_date()
             day = datetime.date(y, m1 + 1, d)
         else:
@@ -859,7 +754,7 @@ class MainWindow:
 
         Returns either a tuple with two datetime.date objects, or (None, None).
         """
-        if self.two_calendar_dialog.run() == GTK_RESPONSE_OK:
+        if self.two_calendar_dialog.run() == Gtk.ResponseType.OK:
             y1, m1, d1 = self.calendar1.get_date()
             y2, m2, d2 = self.calendar2.get_date()
             first = datetime.date(y1, m1 + 1, d1)
@@ -871,7 +766,7 @@ class MainWindow:
 
     def on_calendar_day_selected_double_click(self, widget):
         """Double-click on a calendar day: close the dialog."""
-        self.calendar_dialog.response(GTK_RESPONSE_OK)
+        self.calendar_dialog.response(Gtk.ResponseType.OK)
 
     def weekly_window(self, day=None):
         if not day:
@@ -1033,6 +928,7 @@ class MainWindow:
         model = treeview.get_model()
         task = model[path][1]
         self.task_entry.set_text(task)
+
         def grab_focus():
             self.task_entry.grab_focus()
             self.task_entry.set_position(-1)
@@ -1040,14 +936,11 @@ class MainWindow:
         # handled _after_ row-activated, which makes the tree control steal
         # the focus back from the task entry.  To avoid this, wait until all
         # the events have been handled.
-        gobject.idle_add(grab_focus)
+        GObject.idle_add(grab_focus)
 
     def task_list_button_press(self, menu, event):
         if event.button == 3:
-            if toolkit == "gi":
-                menu.popup(None, None, None, None, event.button, event.time)
-            else:
-                menu.popup(None, None, None, event.button, event.time)
+            menu.popup(None, None, None, None, event.button, event.time)
             return True
         else:
             return False
@@ -1064,8 +957,8 @@ class MainWindow:
         self.task_pane_info_label.set_text('Loading...')
         self.task_pane_info_label.show()
         # let the ui update become visible
-        while gtk.events_pending():
-            gtk.main_iteration()
+        while Gtk.events_pending():
+            Gtk.main_iteration()
 
     def task_list_error(self):
         self.task_list_loading_failed = True
@@ -1082,23 +975,23 @@ class MainWindow:
 
     def task_entry_key_press(self, widget, event):
         """Handle key presses in task entry."""
-        if event.keyval == gdk.keyval_from_name('Escape') and self.tray_icon:
+        if event.keyval == Gdk.keyval_from_name('Escape') and self.tray_icon:
             self.on_hide_activate()
             return True
-        if event.keyval == gdk.keyval_from_name('Prior'):
+        if event.keyval == Gdk.keyval_from_name('Prior'):
             self._do_history(1)
             return True
-        if event.keyval == gdk.keyval_from_name('Next'):
+        if event.keyval == Gdk.keyval_from_name('Next'):
             self._do_history(-1)
             return True
         # XXX This interferes with the completion box.  How do I determine
         # whether the completion box is visible or not?
         if self.have_completion:
             return False
-        if event.keyval == gdk.keyval_from_name('Up'):
+        if event.keyval == Gdk.keyval_from_name('Up'):
             self._do_history(1)
             return True
-        if event.keyval == gdk.keyval_from_name('Down'):
+        if event.keyval == Gdk.keyval_from_name('Down'):
             self._do_history(-1)
             return True
         return False
@@ -1223,7 +1116,7 @@ if dbus:
 
         @dbus.service.method(INTERFACE)
         def Quit(self):
-            gtk.main_quit()
+            Gtk.main_quit()
 
 
 def main():
@@ -1250,8 +1143,6 @@ def main():
     debug_options = parser.add_argument_group("Debugging Options")
     debug_options.add_argument('--debug', action='store_true',
         help="show debug information")
-    debug_options.add_argument('--prefer-pygtk', action='store_true',
-        help="try to use the (obsolete) pygtk library instead of pygi")
 
     opts = parser.parse_args()
 
@@ -1272,8 +1163,7 @@ def main():
 
     if opts.debug:
         print('GTimeLog version: %s' % gtimelog.__version__)
-        print('Toolkit: %s' % toolkit)
-        print('Gtk+ version: %s' % gtk_version)
+        print('Gtk+ version: %s.%s.%s' % (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION))
         print('D-Bus available: %s' % ('yes' if dbus else 'no'))
         print('Config directory: %s' % Settings().get_config_dir())
         print('Data directory: %s' % Settings().get_data_dir())
@@ -1401,7 +1291,7 @@ def main():
     # gobject-introspection.
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     try:
-        gtk.main()
+        Gtk.main()
     except KeyboardInterrupt:
         pass
 
