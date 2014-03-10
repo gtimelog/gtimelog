@@ -27,14 +27,7 @@ except NameError:
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import AppIndicator3, GObject, Gdk, Gtk, Pango
-
-try:
-    import dbus
-    import dbus.service
-    import dbus.mainloop.glib
-except ImportError:
-    dbus = None
+from gi.repository import AppIndicator3, GObject, Gdk, Gio, Gtk, Pango
 
 from gtimelog import __version__
 
@@ -391,6 +384,9 @@ class MainWindow:
         self.tick(True)
         GObject.timeout_add_seconds(1, self.tick)
 
+    def quit(self):
+        self.main_window.destroy()
+
     def set_up_log_view_columns(self):
         """Set up tab stops in the log view."""
         # we can't get a Pango context for unrealized widgets
@@ -623,7 +619,7 @@ class MainWindow:
             self.on_hide_activate()
             return True
         else:
-            Gtk.main_quit()
+            self.quit()
             return False
 
     def close_about_dialog(self, widget):
@@ -684,7 +680,7 @@ class MainWindow:
 
     def on_quit_activate(self, widget):
         """File -> Quit selected"""
-        Gtk.main_quit()
+        self.quit()
 
     def on_about_activate(self, widget):
         """Help -> About selected"""
@@ -1091,210 +1087,134 @@ class MainWindow:
         return True
 
 
-if dbus:
-    INTERFACE = 'lt.pov.mg.gtimelog.Service'
-    OBJECT_PATH = '/lt/pov/mg/gtimelog/Service'
-    SERVICE = 'lt.pov.mg.gtimelog.GTimeLog'
+class Application(Gtk.Application):
+    def __init__(self, *args, **kwargs):
+        kwargs['application_id'] = 'lt.pov.mg.gtimelog'
+        kwargs['flags'] = Gio.ApplicationFlags.HANDLES_COMMAND_LINE
+        Gtk.Application.__init__(self, *args, **kwargs)
+        self.main_window = None
 
-    class Service(dbus.service.Object):
-        """Our DBus service, used to communicate with the main instance."""
+    def do_command_line(self, args):
+        parser = argparse.ArgumentParser()
 
-        def __init__(self, main_window):
-            session_bus = dbus.SessionBus()
-            connection = dbus.service.BusName(SERVICE, session_bus)
-            dbus.service.Object.__init__(self, connection, OBJECT_PATH)
+        parser.add_argument('--version', action='version', version=gtimelog.__version__)
+        parser.add_argument('--tray', action='store_true',
+            help="start minimized")
+        parser.add_argument('--sample-config', action='store_true',
+            help="write a sample configuration file to 'gtimelogrc.sample'")
 
-            self.main_window = main_window
+        parser.add_argument('--debug', action='store_true',
+            help="show debug information")
 
-        @dbus.service.method(INTERFACE)
-        def ToggleFocus(self):
-            self.main_window.toggle_visible()
+        self.opts = parser.parse_args()
 
-        @dbus.service.method(INTERFACE)
-        def Present(self):
+        self.do_activate()
+
+        return 0
+
+    def do_activate(self):
+        if self.main_window is not None:
+            self.main_window.main_window.present()
+            return
+
+        log.addHandler(logging.StreamHandler(sys.stdout))
+        if self.opts.debug:
+            log.setLevel(logging.DEBUG)
+        else:
+            log.setLevel(logging.INFO)
+
+        if self.opts.sample_config:
+            settings = Settings()
+            settings.save("gtimelogrc.sample")
+            print("Sample configuration file written to gtimelogrc.sample")
+            print("Edit it and save as %s" % settings.get_config_file())
+            return
+
+        if self.opts.debug:
+            print('GTimeLog version: %s' % gtimelog.__version__)
+            print('Gtk+ version: %s.%s.%s' % (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION))
+            print('Config directory: %s' % Settings().get_config_dir())
+            print('Data directory: %s' % Settings().get_data_dir())
+
+        settings = Settings()
+        configdir = settings.get_config_dir()
+        datadir = settings.get_data_dir()
+        try:
+            # Create configdir if it doesn't exist.
+            os.makedirs(configdir)
+        except OSError as error:
+            if error.errno != errno.EEXIST:
+                # XXX: not the most friendly way of error reporting for a GUI app
+                raise
+        try:
+            # Create datadir if it doesn't exist.
+            os.makedirs(datadir)
+        except OSError as error:
+            if error.errno != errno.EEXIST:
+                raise
+
+        settings_file = settings.get_config_file()
+        if not os.path.exists(settings_file):
+            if self.opts.debug:
+                print('Saving settings to %s' % settings_file)
+            settings.save(settings_file)
+        else:
+            if self.opts.debug:
+                print('Loading settings from %s' % settings_file)
+            settings.load(settings_file)
+        if self.opts.debug:
+            print('Assuming date changes at %s' % settings.virtual_midnight)
+            print('Loading time log from %s' % settings.get_timelog_file())
+        timelog = TimeLog(settings.get_timelog_file(),
+                          settings.virtual_midnight)
+        if settings.task_list_url:
+            if self.opts.debug:
+                print('Loading cached remote tasks from %s' %
+                      os.path.join(datadir, 'remote-tasks.txt'))
+            tasks = RemoteTaskList(settings.task_list_url,
+                                   os.path.join(datadir, 'remote-tasks.txt'))
+        else:
+            if self.opts.debug:
+                print('Loading tasks from %s' % os.path.join(datadir, 'tasks.txt'))
+            tasks = TaskList(os.path.join(datadir, 'tasks.txt'))
+        self.main_window = MainWindow(timelog, settings, tasks)
+        self.add_window(self.main_window.main_window)
+        start_in_tray = False
+        if settings.show_tray_icon:
+            if settings.prefer_app_indicator:
+                icons = [AppIndicator, SimpleStatusIcon, OldTrayIcon]
+            elif settings.prefer_old_tray_icon:
+                icons = [OldTrayIcon, SimpleStatusIcon, AppIndicator]
+            else:
+                icons = [SimpleStatusIcon, OldTrayIcon, AppIndicator]
+            if self.opts.debug:
+                print('Tray icon preference: %s' % ', '.join(icon_class.__name__
+                                                             for icon_class in icons))
+            for icon_class in icons:
+                tray_icon = icon_class(self.main_window)
+                if tray_icon.available():
+                    if self.opts.debug:
+                        print('Tray icon: %s' % icon_class.__name__)
+                    start_in_tray = (settings.start_in_tray
+                                     if settings.start_in_tray
+                                     else self.opts.tray)
+                    break # found one that works
+                else:
+                    if self.opts.debug:
+                        print('%s not available' % icon_class.__name__)
+        if not start_in_tray:
             self.main_window.on_show_activate()
-
-        @dbus.service.method(INTERFACE)
-        def Quit(self):
-            Gtk.main_quit()
-
+        else:
+            if self.opts.debug:
+                print('Starting minimized')
+        # This is needed to make ^C terminate gtimelog when we're using
+        # gobject-introspection.
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 def main():
     """Run the program."""
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument('--version', action='version', version=gtimelog.__version__)
-    parser.add_argument('--tray', action='store_true',
-        help="start minimized")
-    parser.add_argument('--sample-config', action='store_true',
-        help="write a sample configuration file to 'gtimelogrc.sample'")
-
-    dbus_options = parser.add_argument_group("Single-Instance Options")
-    dbus_options.add_argument('--replace', action='store_true',
-        help="replace the already running GTimeLog instance")
-    dbus_options.add_argument('--quit', action='store_true',
-        help="tell an already-running GTimeLog instance to quit")
-    dbus_options.add_argument('--toggle', action='store_true',
-        help="show/hide the GTimeLog window if already running")
-    dbus_options.add_argument('--ignore-dbus', action='store_true',
-        help="do not check if GTimeLog is already running"
-             " (allows you to have multiple instances running)")
-
-    debug_options = parser.add_argument_group("Debugging Options")
-    debug_options.add_argument('--debug', action='store_true',
-        help="show debug information")
-
-    opts = parser.parse_args()
-
-    log.addHandler(logging.StreamHandler(sys.stdout))
-    if opts.debug:
-        log.setLevel(logging.DEBUG)
-    else:
-        log.setLevel(logging.INFO)
-
-    if opts.sample_config:
-        settings = Settings()
-        settings.save("gtimelogrc.sample")
-        print("Sample configuration file written to gtimelogrc.sample")
-        print("Edit it and save as %s" % settings.get_config_file())
-        return
-
-    global dbus
-
-    if opts.debug:
-        print('GTimeLog version: %s' % gtimelog.__version__)
-        print('Gtk+ version: %s.%s.%s' % (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION))
-        print('D-Bus available: %s' % ('yes' if dbus else 'no'))
-        print('Config directory: %s' % Settings().get_config_dir())
-        print('Data directory: %s' % Settings().get_data_dir())
-
-    if opts.ignore_dbus:
-        dbus = None
-
-    # Let's check if there is already an instance of GTimeLog running
-    # and if it is make it present itself or when it is already presented
-    # hide it and then quit.
-    if dbus:
-        dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-
-        try:
-            session_bus = dbus.SessionBus()
-            dbus_service = session_bus.get_object(SERVICE, OBJECT_PATH)
-            if opts.replace or opts.quit:
-                print('gtimelog: Telling the already-running instance to quit')
-                dbus_service.Quit()
-                if opts.quit:
-                    sys.exit()
-            elif opts.toggle:
-                dbus_service.ToggleFocus()
-                print('gtimelog: Already running, toggling visibility')
-                sys.exit()
-            elif opts.tray:
-                print('gtimelog: Already running, not doing anything')
-                sys.exit()
-            else:
-                dbus_service.Present()
-                print('gtimelog: Already running, presenting main window')
-                sys.exit()
-        except dbus.DBusException as e:
-            if e.get_dbus_name() == 'org.freedesktop.DBus.Error.ServiceUnknown':
-                # gtimelog is not running: that's fine and not an error at all
-                if opts.quit:
-                    print('gtimelog is not running')
-                    sys.exit()
-            elif opts.quit or opts.replace or opts.toggle:
-                # we need dbus to work for this, so abort
-                sys.exit('gtimelog: %s' % e)
-            else:
-                # otherwise just emit a warning
-                print("gtimelog: dbus is not available:\n  %s" % e)
-    else: # not dbus
-        if opts.quit or opts.replace or opts.toggle:
-            sys.exit("gtimelog: dbus not available")
-
-    settings = Settings()
-    configdir = settings.get_config_dir()
-    datadir = settings.get_data_dir()
-    try:
-        # Create configdir if it doesn't exist.
-        os.makedirs(configdir)
-    except OSError as error:
-        if error.errno != errno.EEXIST:
-            # XXX: not the most friendly way of error reporting for a GUI app
-            raise
-    try:
-        # Create datadir if it doesn't exist.
-        os.makedirs(datadir)
-    except OSError as error:
-        if error.errno != errno.EEXIST:
-            raise
-
-    settings_file = settings.get_config_file()
-    if not os.path.exists(settings_file):
-        if opts.debug:
-            print('Saving settings to %s' % settings_file)
-        settings.save(settings_file)
-    else:
-        if opts.debug:
-            print('Loading settings from %s' % settings_file)
-        settings.load(settings_file)
-    if opts.debug:
-        print('Assuming date changes at %s' % settings.virtual_midnight)
-        print('Loading time log from %s' % settings.get_timelog_file())
-    timelog = TimeLog(settings.get_timelog_file(),
-                      settings.virtual_midnight)
-    if settings.task_list_url:
-        if opts.debug:
-            print('Loading cached remote tasks from %s' %
-                  os.path.join(datadir, 'remote-tasks.txt'))
-        tasks = RemoteTaskList(settings.task_list_url,
-                               os.path.join(datadir, 'remote-tasks.txt'))
-    else:
-        if opts.debug:
-            print('Loading tasks from %s' % os.path.join(datadir, 'tasks.txt'))
-        tasks = TaskList(os.path.join(datadir, 'tasks.txt'))
-    main_window = MainWindow(timelog, settings, tasks)
-    start_in_tray = False
-    if settings.show_tray_icon:
-        if settings.prefer_app_indicator:
-            icons = [AppIndicator, SimpleStatusIcon, OldTrayIcon]
-        elif settings.prefer_old_tray_icon:
-            icons = [OldTrayIcon, SimpleStatusIcon, AppIndicator]
-        else:
-            icons = [SimpleStatusIcon, OldTrayIcon, AppIndicator]
-        if opts.debug:
-            print('Tray icon preference: %s' % ', '.join(icon_class.__name__
-                                                         for icon_class in icons))
-        for icon_class in icons:
-            tray_icon = icon_class(main_window)
-            if tray_icon.available():
-                if opts.debug:
-                    print('Tray icon: %s' % icon_class.__name__)
-                start_in_tray = (settings.start_in_tray
-                                 if settings.start_in_tray
-                                 else opts.tray)
-                break # found one that works
-            else:
-                if opts.debug:
-                    print('%s not available' % icon_class.__name__)
-    if not start_in_tray:
-        main_window.on_show_activate()
-    else:
-        if opts.debug:
-            print('Starting minimized')
-    if dbus:
-        try:
-            service = Service(main_window)  # noqa
-        except dbus.DBusException as e:
-            print("gtimelog: dbus is not available:\n  %s" % e)
-    # This is needed to make ^C terminate gtimelog when we're using
-    # gobject-introspection.
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-    try:
-        Gtk.main()
-    except KeyboardInterrupt:
-        pass
-
+    app = Application()
+    app.run(sys.argv)
 
 if __name__ == '__main__':
     main()
