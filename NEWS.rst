@@ -6,6 +6,9 @@ Changelog
 ~~~~~~~~~~~~~~~~~~
 * Fix setup.py to work on Python 3 when your locale is not UTF-8
   (LP: #1263772).
+* Note that Gtk+ 2.x is no longer supported (this regressed somewhere between
+  0.9.0 and 0.9.1, but I didn't notice because I have no access to a system
+  that has Gtk+ 2.x).
 
 
 0.9.1 (2013-12-23)
