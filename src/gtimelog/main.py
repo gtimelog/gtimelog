@@ -175,115 +175,6 @@ class AppIndicator(IconChooser):
         self.indicator.set_icon(self.icon_name)
 
 
-class OldTrayIcon(IconChooser):
-    """Old tray icon for gtimelog, shows a ticking clock.
-
-    Uses the old and deprecated egg.trayicon module.
-    """
-
-    def __init__(self, gtimelog_window):
-        self.gtimelog_window = gtimelog_window
-        self.timelog = gtimelog_window.timelog
-        self.trayicon = None
-        try:
-            import egg.trayicon
-        except ImportError:
-            # Nothing to do here, move along or install python-gnome2-extras
-            # which was later renamed to python-eggtrayicon.
-            return
-        self.eventbox = Gtk.EventBox()
-        hbox = Gtk.HBox()
-        self.icon = Gtk.Image()
-        self.icon.set_from_file(self.icon_name)
-        hbox.add(self.icon)
-        self.time_label = Gtk.Label()
-        hbox.add(self.time_label)
-        self.eventbox.add(hbox)
-        self.trayicon = egg.trayicon.TrayIcon('GTimeLog')
-        self.trayicon.add(self.eventbox)
-        self.last_tick = False
-        self.tick(force_update=True)
-        self.trayicon.show_all()
-        self.gtimelog_window.main_window.connect(
-            'style-updated', self.on_style_set)
-        tray_icon_popup_menu = gtimelog_window.tray_icon_popup_menu
-        self.eventbox.connect_object(
-            'button-press-event', self.on_press, tray_icon_popup_menu)
-        self.eventbox.connect('button-release-event', self.on_release)
-        GObject.timeout_add_seconds(1, self.tick)
-        self.gtimelog_window.entry_watchers.append(self.entry_added)
-        self.gtimelog_window.tray_icon = self
-
-    def available(self):
-        """Is the icon supported by this system?
-
-        OldTrayIcon needs egg.trayicon, which is now deprecated and likely
-        no longer available in modern Linux distributions.
-        """
-        return self.trayicon is not None
-
-    def on_style_set(self, *args):
-        """The user chose a different theme."""
-        self.icon.set_from_file(self.icon_name)
-
-    def on_press(self, widget, event):
-        """A mouse button was pressed on the tray icon label."""
-        if event.button != 3:
-            return
-        main_window = self.gtimelog_window.main_window
-        # This should be unnecessary, as we now show/hide menu items
-        # immediatelly after showing/hiding the main window.
-        if main_window.get_property('visible'):
-            self.gtimelog_window.tray_show.hide()
-            self.gtimelog_window.tray_hide.show()
-        else:
-            self.gtimelog_window.tray_show.show()
-            self.gtimelog_window.tray_hide.hide()
-        # I'm assuming toolkit == 'pygtk' here, since there's now way the old
-        # EggTrayIcon can work with PyGI/Gtk+ 3.
-        widget.popup(None, None, None, event.button, event.time)
-
-    def on_release(self, widget, event):
-        """A mouse button was released on the tray icon label."""
-        if event.button != 1:
-            return
-        self.gtimelog_window.toggle_visible()
-
-    def entry_added(self, entry):
-        """An entry has been added."""
-        self.tick(force_update=True)
-
-    def tick(self, force_update=False):
-        """Tick every second."""
-        now = datetime.datetime.now().replace(second=0, microsecond=0)
-        if now != self.last_tick or force_update: # Do not eat CPU too much
-            self.last_tick = now
-            last_time = self.timelog.window.last_time()
-            if last_time is None:
-                self.time_label.set_text(now.strftime('%H:%M'))
-            else:
-                self.time_label.set_text(
-                    format_duration_short(now - last_time))
-        self.trayicon.set_tooltip_text(self.tip())
-        return True
-
-    def tip(self):
-        """Compute tooltip text."""
-        current_task = self.gtimelog_window.task_entry.get_text()
-        if not current_task:
-            current_task = 'nothing'
-        tip = 'GTimeLog: working on {0}'.format(current_task)
-        total_work, total_slacking = self.timelog.window.totals()
-        tip += '\nWork done today: {0}'.format(format_duration(total_work))
-        time_left = self.gtimelog_window.time_left_at_work(total_work)
-        if time_left is not None:
-            if time_left < datetime.timedelta(0):
-                time_left = datetime.timedelta(0)
-            tip += '\nTime left at work: {0}'.format(
-                format_duration(time_left))
-        return tip
-
-
 class MainWindow:
     """Main application window."""
 
@@ -1187,33 +1078,32 @@ class Application(Gtk.Application):
         self.main_window = MainWindow(timelog, settings, tasks)
         self.add_window(self.main_window.main_window)
         start_in_tray = False
+
         if settings.show_tray_icon:
-            if settings.prefer_app_indicator:
-                icons = [AppIndicator, SimpleStatusIcon, OldTrayIcon]
-            elif settings.prefer_old_tray_icon:
-                icons = [OldTrayIcon, SimpleStatusIcon, AppIndicator]
-            else:
-                icons = [SimpleStatusIcon, OldTrayIcon, AppIndicator]
             if self.opts.debug:
-                print('Tray icon preference: %s' % ', '.join(icon_class.__name__
-                                                             for icon_class in icons))
-            for icon_class in icons:
-                tray_icon = icon_class(self.main_window)
-                if tray_icon.available():
-                    if self.opts.debug:
-                        print('Tray icon: %s' % icon_class.__name__)
-                    start_in_tray = (settings.start_in_tray
-                                     if settings.start_in_tray
-                                     else self.opts.tray)
-                    break # found one that works
-                else:
-                    if self.opts.debug:
-                        print('%s not available' % icon_class.__name__)
+                print('Tray icon preference: %s' % ('AppIndicator'
+                                                    if settings.prefer_app_indicator
+                                                    else 'SimpleStatusIcon'))
+
+            if settings.prefer_app_indicator and have_app_indicator:
+                tray_icon = AppIndicator(self.main_window)
+            else:
+                tray_icon = SimpleStatusIcon(self.main_window)
+
+            if tray_icon:
+                if self.opts.debug:
+                    print('Using: %s' % tray_icon.__class__.__name__)
+
+                start_in_tray = (settings.start_in_tray
+                                 if settings.start_in_tray
+                                 else self.opts.tray)
+
         if not start_in_tray:
             self.main_window.on_show_activate()
         else:
             if self.opts.debug:
                 print('Starting minimized')
+
         # This is needed to make ^C terminate gtimelog when we're using
         # gobject-introspection.
         signal.signal(signal.SIGINT, signal.SIG_DFL)
