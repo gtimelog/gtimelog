@@ -484,9 +484,9 @@ class MainWindow:
         self.add_button.connect('clicked', self.add_entry)
         buffer = self.log_view.get_buffer()
         self.log_buffer = buffer
-        buffer.create_tag('today', foreground='blue')
-        buffer.create_tag('duration', foreground='red')
-        buffer.create_tag('time', foreground='green')
+        buffer.create_tag('today', foreground='#204a87')  # Tango dark blue
+        buffer.create_tag('duration', foreground='#ce5c00')  # Tango dark orange
+        buffer.create_tag('time', foreground='#4e9a06')  # Tango dark green
         buffer.create_tag('slacking', foreground='gray')
         self.set_up_task_list()
         self.set_up_completion()
