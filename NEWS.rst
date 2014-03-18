@@ -6,6 +6,8 @@ Changelog
 * Fix setup.py to work on Python 3 when your locale is not UTF-8
   (LP: #1263772).
 * Drop PyGTK/GTK+2 support that didn't work since 0.9.1.
+* Drop support for Python 2.6 (through use of argparse module). Latest
+  Ubuntu LTS (12.04) has 2.7.
 
 
 0.9.1 (2013-12-23)
