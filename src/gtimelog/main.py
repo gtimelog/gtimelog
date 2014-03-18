@@ -27,7 +27,13 @@ except NameError:
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import AppIndicator3, GObject, Gdk, Gio, Gtk, Pango
+from gi.repository import GObject, Gdk, Gio, Gtk, Pango
+
+try:
+    from gi.repository import AppIndicator3
+    have_app_indicator = True
+except ImportError:
+    have_app_indicator = False
 
 from gtimelog import __version__
 
@@ -148,13 +154,14 @@ class AppIndicator(IconChooser):
         self.gtimelog_window = gtimelog_window
         self.timelog = gtimelog_window.timelog
         self.indicator = None
-        self.indicator = AppIndicator3.Indicator.new(
-            'gtimelog', self.icon_name, AppIndicator3.IndicatorCategory.APPLICATION_STATUS)
-        self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
-        self.indicator.set_menu(gtimelog_window.app_indicator_menu)
-        self.gtimelog_window.tray_icon = self
-        self.gtimelog_window.main_window.connect(
-            'style-updated', self.on_style_set)
+        if have_app_indicator:
+            self.indicator = AppIndicator3.Indicator.new(
+                'gtimelog', self.icon_name, AppIndicator3.IndicatorCategory.APPLICATION_STATUS)
+            self.indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
+            self.indicator.set_menu(gtimelog_window.app_indicator_menu)
+            self.gtimelog_window.tray_icon = self
+            self.gtimelog_window.main_window.connect(
+                'style-updated', self.on_style_set)
 
     def available(self):
         """Is the icon supported by this system?
