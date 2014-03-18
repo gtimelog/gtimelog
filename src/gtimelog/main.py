@@ -5,6 +5,7 @@ __metaclass__ = type
 
 import os
 import re
+import imp
 import sys
 import errno
 import codecs
@@ -420,6 +421,7 @@ class MainWindow:
         """Initialize the user interface."""
         builder = gtk.Builder()
         builder.add_from_file(ui_file)
+        gtimelog.call_hook('ui', self, builder, resource_dir)
         # Set initial state of menu items *before* we hook up signals
         chronological_menu_item = builder.get_object('chronological')
         chronological_menu_item.set_active(self.chronological)
@@ -1198,6 +1200,20 @@ class MainWindow:
         return True
 
 
+def load_extensions():
+    # Load extensions, if any.
+    dirname = os.path.dirname(gtimelog.__file__)
+    pathnames = [os.path.join(dirname, x)
+                 for x in os.listdir(dirname)
+                 if x.endswith('_ext.py')]
+    for pathname in pathnames:
+        module_name, suffix = os.path.splitext(os.path.basename(pathname))
+        with open(pathname, 'r') as f:
+            m = imp.load_module(module_name, f, pathname,
+                                ('.py', 'r', imp.PY_SOURCE))
+            m.init()
+
+
 if dbus:
     INTERFACE = 'lt.pov.mg.gtimelog.Service'
     OBJECT_PATH = '/lt/pov/mg/gtimelog/Service'
@@ -1255,6 +1271,8 @@ def main():
     parser.add_option_group(debug_options)
 
     opts, args = parser.parse_args()
+
+    load_extensions()
 
     log.addHandler(logging.StreamHandler(sys.stdout))
     if opts.debug:
@@ -1402,6 +1420,7 @@ def main():
     # gobject-introspection.
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     try:
+        gtimelog.call_hook('before-gtk-main')
         gtk.main()
     except KeyboardInterrupt:
         pass
