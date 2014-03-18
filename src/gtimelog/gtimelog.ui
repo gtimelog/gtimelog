@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.16.1 -->
 <interface>
-  <!-- interface-requires gtk+ 3.0 -->
+  <requires lib="gtk+" version="3.0"/>
   <object class="GtkDialog" id="about_dialog">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">About TimeLog</property>
@@ -52,7 +53,7 @@
 
 GTimeLog is a time tracking application.
 
-&lt;small&gt;© 2004–2013 Marius Gedminas and contributors&lt;/small&gt;</property>
+&lt;small&gt;© 2004–2014 Marius Gedminas and contributors&lt;/small&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="justify">center</property>
               </object>
@@ -208,8 +209,8 @@ GTimeLog is a time tracking application.
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                        <accelerator key="R" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="on_reread_activate" swapped="no"/>
+                        <accelerator key="R" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -219,8 +220,8 @@ GTimeLog is a time tracking application.
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                        <accelerator key="E" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="on_edit_timelog_activate" swapped="no"/>
+                        <accelerator key="E" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -230,8 +231,8 @@ GTimeLog is a time tracking application.
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                        <accelerator key="q" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="on_quit_activate" swapped="no"/>
+                        <accelerator key="q" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                   </object>
@@ -253,8 +254,8 @@ GTimeLog is a time tracking application.
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">_Chronological</property>
                         <property name="use_underline">True</property>
-                        <accelerator key="1" signal="activate" modifiers="GDK_MOD1_MASK"/>
                         <signal name="activate" handler="on_chronological_activate" swapped="no"/>
+                        <accelerator key="1" signal="activate" modifiers="GDK_MOD1_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -265,8 +266,8 @@ GTimeLog is a time tracking application.
                         <property name="use_underline">True</property>
                         <property name="active">True</property>
                         <property name="group">chronological</property>
-                        <accelerator key="2" signal="activate" modifiers="GDK_MOD1_MASK"/>
                         <signal name="activate" handler="on_grouped_activate" swapped="no"/>
+                        <accelerator key="2" signal="activate" modifiers="GDK_MOD1_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -276,8 +277,8 @@ GTimeLog is a time tracking application.
                         <property name="label" translatable="yes">_Summary</property>
                         <property name="use_underline">True</property>
                         <property name="group">chronological</property>
-                        <accelerator key="3" signal="activate" modifiers="GDK_MOD1_MASK"/>
                         <signal name="activate" handler="on_summary_activate" swapped="no"/>
+                        <accelerator key="3" signal="activate" modifiers="GDK_MOD1_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -294,8 +295,8 @@ GTimeLog is a time tracking application.
                         <property name="label" translatable="yes">_Tasks</property>
                         <property name="use_underline">True</property>
                         <property name="active">True</property>
-                        <accelerator key="F9" signal="activate"/>
                         <signal name="toggled" handler="on_show_task_pane_toggled" swapped="no"/>
+                        <accelerator key="F9" signal="activate"/>
                       </object>
                     </child>
                   </object>
@@ -318,8 +319,8 @@ GTimeLog is a time tracking application.
                         <property name="can_focus">False</property>
                         <property name="use_underline">True</property>
                         <property name="use_stock">True</property>
-                        <accelerator key="D" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                         <signal name="activate" handler="on_daily_report_activate" swapped="no"/>
+                        <accelerator key="D" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -503,8 +504,8 @@ GTimeLog is a time tracking application.
                         <property name="label" translatable="yes">Back</property>
                         <property name="use_underline">True</property>
                         <property name="stock_id">gtk-go-back</property>
-                        <accelerator key="Left" signal="clicked" modifiers="GDK_MOD1_MASK"/>
                         <signal name="clicked" handler="on_back_toolbutton_clicked" swapped="no"/>
+                        <accelerator key="Left" signal="clicked" modifiers="GDK_MOD1_MASK"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -536,8 +537,8 @@ GTimeLog is a time tracking application.
                         <property name="label" translatable="yes">Forward</property>
                         <property name="use_underline">True</property>
                         <property name="stock_id">gtk-go-forward</property>
-                        <accelerator key="Right" signal="clicked" modifiers="GDK_MOD1_MASK"/>
                         <signal name="clicked" handler="on_forward_toolbutton_clicked" swapped="no"/>
+                        <accelerator key="Right" signal="clicked" modifiers="GDK_MOD1_MASK"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -552,8 +553,8 @@ GTimeLog is a time tracking application.
                         <property name="label" translatable="yes">toolbutton2</property>
                         <property name="use_underline">True</property>
                         <property name="stock_id">gtk-goto-last</property>
-                        <accelerator key="Home" signal="clicked" modifiers="GDK_MOD1_MASK"/>
                         <signal name="clicked" handler="on_today_toolbutton_clicked" swapped="no"/>
+                        <accelerator key="Home" signal="clicked" modifiers="GDK_MOD1_MASK"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
