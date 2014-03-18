@@ -1211,6 +1211,7 @@ class Application(Gtk.Application):
         # gobject-introspection.
         signal.signal(signal.SIGINT, signal.SIG_DFL)
 
+
 def main():
     """Run the program."""
     app = Application()
