@@ -71,5 +71,5 @@ setup(
     """,
 # This is true, but pointless, because PyGObject cannot be installed via
 # setuptools/distutils
-#   install_requires=['PyGObject'], # or PyGTK
+#   install_requires=['PyGObject'],
 )
