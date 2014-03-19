@@ -7,9 +7,9 @@ minimal time logging application
 --------------------------------
 
 :Author: Marius Gedminas <mgedmin@gedmin.as>
-:Date: 2013-12-23
+:Date: 2014-03-19
 :Copyright: Marius Gedminas
-:Version: 0.9.1
+:Version: 0.10
 :Manual section: 1
 
 
@@ -93,28 +93,8 @@ OPTIONS
 --sample-config
     Write a sample configuration file to 'gtimelogrc.sample'.
 
-Single-Instance Options:
-
---replace
-    Replace the already running ``gtimelog`` instance.
-
---quit
-    Tell an already-running ``gtimelog`` instance to quit.
-
---toggle
-    Show/hide the ``gtimelog`` window if already running.
-
---ignore-dbus
-    Do not check if ``gtimelog`` is already running (allows you to have
-    multiple instances running).
-
-Debugging Options:
-
 --debug
     Show debug information.
-
---prefer-pygtk
-    Try to use the (obsolete) pygtk library instead of pygi.
 
 
 FILES
