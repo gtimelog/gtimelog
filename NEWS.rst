@@ -1,13 +1,16 @@
 Changelog
 ---------
 
-0.9.2 (unreleased)
-~~~~~~~~~~~~~~~~~~
+0.10 (unreleased)
+~~~~~~~~~~~~~~~~~
 * Fix setup.py to work on Python 3 when your locale is not UTF-8
   (LP: #1263772).
-* Note that Gtk+ 2.x is no longer supported (this regressed somewhere between
-  0.9.0 and 0.9.1, but I didn't notice because I have no access to a system
-  that has Gtk+ 2.x).
+* Drop PyGtk/Gtk+ 2 support (it didn't work since 0.9.1 anyway).
+* Drop support for Python 2.6.
+* Drop EggTrayIcon support.
+* Use GtkApplication instead of own DBus server for enforcing single-instance.
+* Drop --prefer-pygtk, --replace, --quit, --toggle, --ignore-dbus command-line
+  options because of the above changes.
 * Use Tango colors in the main text buffer (GH: #13).
 * Fix two Gtk-CRITICAL warnings on startup (GH: #14).
 
