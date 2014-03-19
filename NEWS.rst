@@ -6,7 +6,7 @@ Changelog
 * Fix setup.py to work on Python 3 when your locale is not UTF-8
   (LP: #1263772).
 * Drop PyGtk/Gtk+ 2 support (it didn't work since 0.9.1 anyway).
-* Drop support for Python 2.6.
+* Drop support for Python 2.6 (PyGObject dropped support for it long ago).
 * Drop EggTrayIcon support.
 * Use GtkApplication instead of own DBus server for enforcing single-instance.
 * Drop --prefer-pygtk, --replace, --quit, --toggle, --ignore-dbus command-line

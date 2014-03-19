@@ -55,8 +55,6 @@ setup(
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
-        # 2.6 might work, but I can't test it myself -- recent
-        # python-gobject versions dropped support for Python 2.6
         'Topic :: Office/Business',
     ],
 
