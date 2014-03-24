@@ -55,7 +55,7 @@ if not os.path.exists(icon_file_bright):
 
 from gtimelog.settings import Settings
 from gtimelog.timelog import (
-    format_duration, format_duration_short, uniq,
+    format_duration, uniq,
     Reports, TimeLog, TaskList, RemoteTaskList)
 
 
