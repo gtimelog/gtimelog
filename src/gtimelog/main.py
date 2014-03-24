@@ -139,10 +139,6 @@ class SimpleStatusIcon(IconChooser):
 class AppIndicator(IconChooser):
     """Ubuntu's application indicator for gtimelog."""
 
-    # XXX: on Ubuntu 10.04 the app indicator apparently doesn't understand
-    # set_icon('/absolute/path'), and so gtimelog ends up being without an
-    # icon.  I don't know if I want to continue supporting Ubuntu 10.04.
-
     def __init__(self, gtimelog_window):
         self.gtimelog_window = gtimelog_window
         self.timelog = gtimelog_window.timelog
