@@ -54,6 +54,14 @@ class Settings(object):
 
     report_style = 'plain'
 
+    def __init__(self, file=None):
+        """init method with optional parameters
+        
+        file ... can be filename or file object
+        """
+        if file:
+            self.load(file)
+
     def check_legacy_config(self):
         envar_home = os.environ.get('GTIMELOG_HOME')
         if envar_home is not None:
@@ -120,9 +128,19 @@ class Settings(object):
         def _unicode(self, value):
             return value.decode(self._encoding)
 
-    def load(self, filename):
+    def load(self, file):
+        """load config file
+        
+        file ... can be filename or file object
+        """
         config = self._config()
-        config.read([filename])
+        if hasattr(file, "read"):
+            # we have file object
+            config.readfp(file)
+        else:
+            # we have filename
+            config.read([file])
+            
         self.email = config.get('gtimelog', 'list-email')
         self.name = self._unicode(config.get('gtimelog', 'name'))
         self.editor = config.get('gtimelog', 'editor')
