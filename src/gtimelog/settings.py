@@ -55,6 +55,11 @@ class Settings(object):
     report_style = 'plain'
 
     def __init__(self, filename = None, required = False):
+        """init method with optional parameters
+        
+        filename ... if set parse this config file
+        required ... if True and filename doesn't exists - exception is thrown
+        """
         if filename is None:
             return
         else:
