@@ -130,12 +130,11 @@ class TimeWindow(object):
     oldest) timestamp in the file.
     """
 
-    def __init__(self, filename, min_timestamp, max_timestamp,
-                 virtual_midnight, callback=None):
-        self.filename = filename
+    def __init__(self, settings, min_timestamp, max_timestamp,
+                 callback=None):
         self.min_timestamp = min_timestamp
         self.max_timestamp = max_timestamp
-        self.virtual_midnight = virtual_midnight
+        self.settings = settings
         self.reread(callback)
 
     def reread(self, callback=None):
@@ -148,11 +147,11 @@ class TimeWindow(object):
         try:
             # accept any file-like object
             # this is a hook for unit tests, really
-            if hasattr(self.filename, 'read'):
-                f = self.filename
+            if hasattr(self.settings.data_file, 'read'):
+                f = self.settings.data_file
                 f.seek(0)
             else:
-                f = codecs.open(self.filename, encoding='UTF-8')
+                f = codecs.open(self.settings.data_file, encoding='UTF-8')
         except IOError:
             return
         line = ''
@@ -201,7 +200,7 @@ class TimeWindow(object):
             stop = item[0]
             entry = item[1]
             if start is None or different_days(start, stop,
-                                               self.virtual_midnight):
+                                               self.settings.virtual_midnight):
                 start = stop
             duration = stop - start
             yield start, stop, duration, entry
@@ -212,7 +211,7 @@ class TimeWindow(object):
         last = None
         for start, stop, duration, entry in self.all_entries():
             if last is None or different_days(last, start,
-                                              self.virtual_midnight):
+                                              self.settings.virtual_midnight):
                 last = start
                 count += 1
         return count
@@ -233,7 +232,7 @@ class TimeWindow(object):
             start = stop
         else:
             start = self.items[-2][0]
-        if different_days(start, stop, self.virtual_midnight):
+        if different_days(start, stop, self.settings.virtual_midnight):
             start = stop
         duration = stop - start
         return start, stop, duration, entry
@@ -697,14 +696,19 @@ class TimeLog(object):
     the end.
     """
 
-    def __init__(self, filename, virtual_midnight):
-        self.filename = filename
-        self.virtual_midnight = virtual_midnight
+    def __init__(self, settings):
+        """Init TimeLog object
+        
+        settings ... settings
+        """
+        self.settings = settings
+        #self.filename = settings.data_file
+        #self.virtual_midnight = settings.virtual_midnight
         self.reread()
 
     def virtual_today(self):
         """Return today's date, adjusted for virtual midnight."""
-        return virtual_day(datetime.datetime.now(), self.virtual_midnight)
+        return virtual_day(datetime.datetime.now(), self.settings.virtual_midnight)
 
     def check_reload(self):
         """Look at the mtime of timelog.txt, and reload it if necessary.
@@ -719,12 +723,12 @@ class TimeLog(object):
             return False
 
     def get_mtime(self):
-        """Return the mtime of self.filename, if it exists.
+        """Return the mtime of self.settings.data_file, if it exists.
 
         Returns None if the file doesn't exist.
         """
         try:
-            return os.stat(self.filename).st_mtime
+            return os.stat(self.settings.data_file).st_mtime
         except OSError:
             return None
 
@@ -732,11 +736,10 @@ class TimeLog(object):
         """Reload today's log."""
         self.last_mtime = self.get_mtime()
         self.day = self.virtual_today()
-        min = datetime.datetime.combine(self.day, self.virtual_midnight)
+        min = datetime.datetime.combine(self.day, self.settings.virtual_midnight)
         max = min + datetime.timedelta(1)
         self.history = []
-        self.window = TimeWindow(self.filename, min, max,
-                                 self.virtual_midnight,
+        self.window = TimeWindow(self.settings, min, max, 
                                  callback=self.history.append)
         self.need_space = not self.window.items
         self._cache = {(min, max): self.window}
@@ -746,7 +749,7 @@ class TimeLog(object):
         try:
             return self._cache[min, max]
         except KeyError:
-            window = TimeWindow(self.filename, min, max, self.virtual_midnight)
+            window = TimeWindow(self.settings, min, max)
             if len(self._cache) > 1000:
                 self._cache.clear()
             self._cache[min, max] = window
@@ -754,14 +757,14 @@ class TimeLog(object):
 
     def window_for_day(self, date):
         """Return a TimeWindow for the specified day."""
-        min = datetime.datetime.combine(date, self.virtual_midnight)
+        min = datetime.datetime.combine(date, self.settings.virtual_midnight)
         max = min + datetime.timedelta(1)
         return self.window_for(min, max)
 
     def window_for_week(self, date):
         """Return a TimeWindow for the week that contains date."""
         monday = date - datetime.timedelta(date.weekday())
-        min = datetime.datetime.combine(monday, self.virtual_midnight)
+        min = datetime.datetime.combine(monday, self.settings.virtual_midnight)
         max = min + datetime.timedelta(7)
         return self.window_for(min, max)
 
@@ -770,14 +773,14 @@ class TimeLog(object):
         first_of_this_month = first_of_month(date)
         first_of_next_month = next_month(date)
         min = datetime.datetime.combine(
-            first_of_this_month, self.virtual_midnight)
+            first_of_this_month, self.settings.virtual_midnight)
         max = datetime.datetime.combine(
-            first_of_next_month, self.virtual_midnight)
+            first_of_next_month, self.settings.virtual_midnight)
         return self.window_for(min, max)
 
     def window_for_date_range(self, min, max):
-        min = datetime.datetime.combine(min, self.virtual_midnight)
-        max = datetime.datetime.combine(max, self.virtual_midnight)
+        min = datetime.datetime.combine(min, self.settings.virtual_midnight)
+        max = datetime.datetime.combine(max, self.settings.virtual_midnight)
         max = max + datetime.timedelta(1)
         return self.window_for(min, max)
 
@@ -790,7 +793,7 @@ class TimeLog(object):
 
     def raw_append(self, line):
         """Append a line to the time log file."""
-        f = codecs.open(self.filename, "a", encoding='UTF-8')
+        f = codecs.open(self.settings.data_file, "a", encoding='UTF-8')
         if self.need_space:
             self.need_space = False
             f.write('\n')
@@ -802,7 +805,7 @@ class TimeLog(object):
         if not now:
             now = datetime.datetime.now().replace(second=0, microsecond=0)
         last = self.window.last_time()
-        if last and different_days(now, last, self.virtual_midnight):
+        if last and different_days(now, last, self.settings.virtual_midnight):
             # next day: reset self.window
             self.reread()
         self.window.items.append((now, entry))
@@ -843,6 +846,10 @@ class TaskList(object):
     error_callback = None
 
     def __init__(self, filename):
+        """Init TaskList object
+        
+        filename ... task list file
+        """
         self.filename = filename
         self.load()
 

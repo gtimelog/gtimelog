@@ -53,6 +53,26 @@ class Settings(object):
     start_in_tray = False
 
     report_style = 'plain'
+    
+    # data file name
+    data_file_name = 'timelog.txt'
+    # data_dir() + data file name. It's resolved in _init_ or from stored
+    # configuration data
+    data_file = None
+    # config file name
+    config_file_name = 'gtimelogrc'
+    # config_file (config_dir + config_file_name) is alweys resolved dynamicly
+    # there is no point in storing full path config file in configuration file. 
+
+    def __init__(self, file=None):
+        """init method with optional parameters
+        
+        file ... can be filename or file object
+        """
+        self.data_file = os.path.join(self.get_data_dir(), self.data_file_name)
+        
+        if file:
+            self.load(file)
 
     def check_legacy_config(self):
         envar_home = os.environ.get('GTIMELOG_HOME')
@@ -79,10 +99,7 @@ class Settings(object):
         return os.path.join(os.path.expanduser(xdg), 'gtimelog')
 
     def get_config_file(self):
-        return os.path.join(self.get_config_dir(), 'gtimelogrc')
-
-    def get_timelog_file(self):
-        return os.path.join(self.get_data_dir(), 'timelog.txt')
+        return os.path.join(self.get_config_dir(), self.config_file_name)
 
     def _config(self):
         config = RawConfigParser()
@@ -111,6 +128,7 @@ class Settings(object):
                    str(self.prefer_old_tray_icon))
         config.set('gtimelog', 'report_style', str(self.report_style))
         config.set('gtimelog', 'start_in_tray', str(self.start_in_tray))
+        config.set('gtimelog', 'data_file', str(self.data_file))
         return config
 
     if PY3:
@@ -120,9 +138,19 @@ class Settings(object):
         def _unicode(self, value):
             return value.decode(self._encoding)
 
-    def load(self, filename):
+    def load(self, file):
+        """load config file
+        
+        file ... can be filename or file object
+        """
         config = self._config()
-        config.read([filename])
+        if hasattr(file, "read"):
+            # we have file object
+            config.readfp(file)
+        else:
+            # we have filename
+            config.read([file])
+            
         self.email = config.get('gtimelog', 'list-email')
         self.name = self._unicode(config.get('gtimelog', 'name'))
         self.editor = config.get('gtimelog', 'editor')
@@ -147,6 +175,7 @@ class Settings(object):
                                                       'prefer_old_tray_icon')
         self.report_style = config.get('gtimelog', 'report_style')
         self.start_in_tray = config.getboolean('gtimelog', 'start_in_tray')
+        self.data_file = config.get('gtimelog', 'data_file')
 
     def save(self, filename):
         config = self._config()
