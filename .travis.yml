@@ -6,9 +6,8 @@ python:
 install:
     - travis_retry pip install coverage coveralls -e .
 script:
-    - coverage run -m gtimelog.tests
+    - make coverage
 after_success:
-    - coverage report
     - coveralls
 notifications:
     email: false
