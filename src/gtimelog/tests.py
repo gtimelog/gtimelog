@@ -252,12 +252,13 @@ def doctest_TimeWindow_reread_no_file():
     """Test for TimeWindow.reread
 
         >>> from datetime import datetime, time
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings("src/tests/gtimelogrc.vm0300", True)
         >>> min = datetime(2013, 12, 3)
         >>> max = datetime(2013, 12, 4)
-        >>> vm = time(2, 0)
 
         >>> from gtimelog.timelog import TimeWindow
-        >>> window = TimeWindow('/nosuchfile', min, max, vm)
+        >>> window = TimeWindow('/nosuchfile', min, max, settings)
 
     There's no error.
 

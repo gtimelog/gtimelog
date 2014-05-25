@@ -1,0 +1,21 @@
+[gtimelog]
+list-email = activity-list@example.com
+name = Anonymous
+editor = xdg-open
+mailer = x-terminal-emulator -e "mutt -H %s"
+spreadsheet = xdg-open %s
+chronological = True
+summary_view = False
+show_tasks = True
+gtk-completion = True
+hours = 8
+virtual_midnight = 02:00
+task_list_url = 
+edit_task_list_cmd = 
+show_office_hours = True
+show_tray_icon = True
+prefer_app_indicator = True
+prefer_old_tray_icon = False
+report_style = plain
+start_in_tray = False
+
