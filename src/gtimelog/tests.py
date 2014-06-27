@@ -404,7 +404,7 @@ def doctest_TimeWindow_last_entry():
         >>> window.items = [
         ...     (datetime(2013, 12, 4, 9, 0), 'started **'),
         ... ]
-        >>> start, stop, duration, entry = window.last_entry()
+        >>> start, stop, duration, tags, entry = window.last_entry()
         >>> start == stop == datetime(2013, 12, 4, 9, 0)
         True
         >>> duration
@@ -418,7 +418,7 @@ def doctest_TimeWindow_last_entry():
         ...     (datetime(2013, 12, 3, 12, 0), 'stuff'),
         ...     (datetime(2013, 12, 4, 9, 0), 'started **'),
         ... ]
-        >>> start, stop, duration, entry = window.last_entry()
+        >>> start, stop, duration, tags, entry = window.last_entry()
         >>> start == stop == datetime(2013, 12, 4, 9, 0)
         True
         >>> duration
@@ -433,7 +433,7 @@ def doctest_TimeWindow_last_entry():
         ...     (datetime(2013, 12, 4, 9, 0), 'started **'),
         ...     (datetime(2013, 12, 4, 9, 31), 'gtimelog: tests'),
         ... ]
-        >>> start, stop, duration, entry = window.last_entry()
+        >>> start, stop, duration, tags, entry = window.last_entry()
         >>> start
         datetime.datetime(2013, 12, 4, 9, 0)
         >>> stop
