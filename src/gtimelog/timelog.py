@@ -584,7 +584,7 @@ class Reports(object):
         for tag, spent in sorted(tags_totals.items(),
                                  key=(lambda it: it[1]),
                                  reverse=True):
-            output.write(line_format % (tag, spent))
+            output.write(line_format % (tag, format_duration_short(spent)))
         output.write('\n')
         output.write(
             'Note that area totals may not add up to the period totals,\n'
