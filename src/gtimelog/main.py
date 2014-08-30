@@ -479,7 +479,7 @@ class MainWindow:
         self.history_pos = 0
         if not self.have_completion:
             return
-        if entry not in [row[0] for row in self.completion_choices]:
+        if entry not in [row[0].decode('UTF-8') for row in self.completion_choices]:
             self.completion_choices.append([entry])
 
     def jump_to_date(self, date):
