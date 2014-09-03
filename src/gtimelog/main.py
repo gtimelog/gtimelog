@@ -1017,8 +1017,9 @@ class Application(Gtk.Application):
 
         if self.opts.sample_config:
             settings = Settings()
-            settings.save("gtimelogrc.sample")
-            print("Sample configuration file written to gtimelogrc.sample")
+            sample_cfgfile = settings.get_config_file() + ".sample" 
+            settings.save(sample_cfgfile)
+            print("Sample configuration file written to %s" % sample_cfgfile)
             print("Edit it and save as %s" % settings.get_config_file())
             return
 
@@ -1056,9 +1057,8 @@ class Application(Gtk.Application):
             settings.load(settings_file)
         if self.opts.debug:
             print('Assuming date changes at %s' % settings.virtual_midnight)
-            print('Loading time log from %s' % settings.get_timelog_file())
-        timelog = TimeLog(settings.get_timelog_file(),
-                          settings.virtual_midnight)
+            print('Loading time log from %s' % settings.data_file)
+        timelog = TimeLog(settings)
         if settings.task_list_url:
             if self.opts.debug:
                 print('Loading cached remote tasks from %s' %
