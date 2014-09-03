@@ -1188,6 +1188,7 @@ class MainWindow:
         if self.timelog.check_reload():
             self.populate_log()
             self.set_up_history()
+            force_update = True
         if self.task_pane.get_property('visible'):
             if self.tasks.check_reload():
                 self.set_up_task_list()
