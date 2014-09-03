@@ -13,6 +13,7 @@ Changelog
   options because of the above changes.
 * Use Tango colors in the main text buffer (GH: #13).
 * Fix two Gtk-CRITICAL warnings on startup (GH: #14).
+* Fix Unicode warning when adding entries (GH: #20).
 
 Regression: --help no longer reports GTimeLog's own command line arguments.
 
