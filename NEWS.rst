@@ -15,6 +15,7 @@ Changelog
 * Fix two Gtk-CRITICAL warnings on startup (GH: #14).
 * Fix Unicode warning when adding entries (GH: #20).
 * Speed up entry addition (GH: #21).
+* Fix Unicode error when navigating history with PageUp/PageDown (GH: #22).
 
 Regression: --help no longer reports GTimeLog's own command line arguments.
 

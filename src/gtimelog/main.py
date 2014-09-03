@@ -878,13 +878,19 @@ class MainWindow:
             return True
         return False
 
+    def _get_entry_text(self):
+        """Return the current task entry text (as Unicode)."""
+        entry = self.task_entry.get_text()
+        if not isinstance(entry, unicode):
+            entry = unicode(entry, 'UTF-8')
+        return entry
+
     def _do_history(self, delta):
         """Handle movement in history."""
         if not self.history:
             return
         if self.history_pos == 0:
-            # XXX: Unicode trouble!
-            self.history_undo = self.task_entry.get_text()
+            self.history_undo = self._get_entry_text()
             self.filtered_history = uniq([
                 l for l in self.history if l.startswith(self.history_undo)])
         history = self.filtered_history
@@ -903,9 +909,7 @@ class MainWindow:
         if self.looking_at_date is not None:
             self.jump_to_today()
 
-        entry = self.task_entry.get_text()
-        if not isinstance(entry, unicode):
-            entry = unicode(entry, 'UTF-8')
+        entry = self._get_entry_text()
 
         now = None
         date_match = re.match(r'(\d\d):(\d\d)\s+', entry)
