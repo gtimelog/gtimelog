@@ -16,6 +16,7 @@ Changelog
 * Fix Unicode warning when adding entries (GH: #20).
 * Speed up entry addition (GH: #21).
 * Fix Unicode error when navigating history with PageUp/PageDown (GH: #22).
+* Update current task time when autoreloading (GH: #23).
 
 Regression: --help no longer reports GTimeLog's own command line arguments.
 
