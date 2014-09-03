@@ -14,6 +14,8 @@ Changelog
 * Use Tango colors in the main text buffer (GH: #13).
 * Fix two Gtk-CRITICAL warnings on startup (GH: #14).
 
+Regression: --help no longer reports GTimeLog's own command line arguments.
+
 
 0.9.1 (2013-12-23)
 ~~~~~~~~~~~~~~~~~~
