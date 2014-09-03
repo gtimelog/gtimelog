@@ -796,6 +796,7 @@ class TimeLog(object):
             f.write('\n')
         f.write(line + '\n')
         f.close()
+        self.last_mtime = self.get_mtime()
 
     def append(self, entry, now=None):
         """Append a new entry to the time log."""

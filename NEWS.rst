@@ -11,6 +11,7 @@ Changelog
   that has Gtk+ 2.x).
 * Fix two Gtk-CRITICAL warnings on startup (GH: #14).
 * Fix Unicode warning when adding entries (GH: #20).
+* Speed up entry addition (GH: #21).
 
 
 0.9.1 (2013-12-23)
