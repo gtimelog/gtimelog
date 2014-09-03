@@ -10,6 +10,7 @@ Changelog
   0.9.0 and 0.9.1, but I didn't notice because I have no access to a system
   that has Gtk+ 2.x).
 * Fix two Gtk-CRITICAL warnings on startup (GH: #14).
+* Fix Unicode warning when adding entries (GH: #20).
 
 
 0.9.1 (2013-12-23)

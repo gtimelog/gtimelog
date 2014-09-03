@@ -224,6 +224,8 @@ class SimpleStatusIcon(IconChooser):
 
     def tip(self):
         """Compute tooltip text."""
+        # NB: returns UTF-8 text instead of Unicode on Python 2.  This
+        # seems to be harmless for now.
         current_task = self.gtimelog_window.task_entry.get_text()
         if not current_task:
             current_task = 'nothing'
@@ -628,6 +630,8 @@ class MainWindow:
         if last_time is None:
             return None
         now = datetime.datetime.now()
+        # NB: works with UTF-8-encoded binary strings on Python 2.  This
+        # seems harmless for now.
         current_task = self.task_entry.get_text()
         current_task_time = now - last_time
         if '**' in current_task:
@@ -681,12 +685,12 @@ class MainWindow:
         self.history_undo = ''
         if not self.have_completion:
             return
-        seen = set()
+        self.completion_choices_as_set.clear()
         self.completion_choices.clear()
         for entry in self.history:
-            if entry not in seen:
-                seen.add(entry)
+            if entry not in self.completion_choices_as_set:
                 self.completion_choices.append([entry])
+                self.completion_choices_as_set.add(entry)
 
     def set_up_completion(self):
         """Set up autocompletion."""
@@ -697,6 +701,7 @@ class MainWindow:
         if not self.have_completion:
             return
         self.completion_choices = gtk.ListStore(str)
+        self.completion_choices_as_set = set()
         completion = gtk.EntryCompletion()
         completion.set_model(self.completion_choices)
         completion.set_text_column(0)
@@ -708,8 +713,9 @@ class MainWindow:
         self.history_pos = 0
         if not self.have_completion:
             return
-        if entry not in [row[0] for row in self.completion_choices]:
+        if entry not in self.completion_choices_as_set:
             self.completion_choices.append([entry])
+            self.completion_choices_as_set.add(entry)
 
     def jump_to_date(self, date):
         """Switch to looking at a given date"""
@@ -1108,6 +1114,7 @@ class MainWindow:
         if not self.history:
             return
         if self.history_pos == 0:
+            # XXX: Unicode trouble!
             self.history_undo = self.task_entry.get_text()
             self.filtered_history = uniq([
                 l for l in self.history if l.startswith(self.history_undo)])
