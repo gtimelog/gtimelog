@@ -1010,6 +1010,12 @@ class Application(Gtk.Application):
         if options.contains('version'):
             print(gtimelog.__version__)
             return 0
+        if options.contains('sample-config'):
+            settings = Settings()
+            settings.save("gtimelogrc.sample")
+            print("Sample configuration file written to gtimelogrc.sample")
+            print("Edit it and save as %s" % settings.get_config_file())
+            return 0
         return -1  # send the args to the remote instance for processing
 
     def do_command_line(self, args):
@@ -1040,13 +1046,6 @@ class Application(Gtk.Application):
             log.setLevel(logging.DEBUG)
         else:
             log.setLevel(logging.INFO)
-
-        if self.opts.sample_config:
-            settings = Settings()
-            settings.save("gtimelogrc.sample")
-            print("Sample configuration file written to gtimelogrc.sample")
-            print("Edit it and save as %s" % settings.get_config_file())
-            return
 
         if self.opts.debug:
             print('GTimeLog version: %s' % gtimelog.__version__)
