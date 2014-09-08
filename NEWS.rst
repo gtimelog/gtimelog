@@ -18,8 +18,6 @@ Changelog
 * Fix Unicode error when navigating history with PageUp/PageDown (GH: #22).
 * Update current task time when autoreloading (GH: #23).
 
-Regression: --help no longer reports GTimeLog's own command line arguments.
-
 
 0.9.1 (2013-12-23)
 ~~~~~~~~~~~~~~~~~~

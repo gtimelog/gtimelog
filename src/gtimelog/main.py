@@ -27,7 +27,7 @@ except NameError:
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import GObject, Gdk, Gio, Gtk, Pango
+from gi.repository import GObject, GLib, Gdk, Gio, Gtk, Pango
 
 try:
     from gi.repository import AppIndicator3
@@ -979,11 +979,31 @@ class MainWindow:
         return True
 
 
+def make_option(long_name, short_name=None, flags=0, arg=GLib.OptionArg.NONE,
+                arg_data=None, description=None, arg_description=None):
+    # surely something like this should exist inside PyGObject itself?!
+    option = GLib.OptionEntry()
+    option.long_name = long_name.lstrip('-')
+    option.short_name = 0 if not short_name else short_name.lstrip('-')
+    option.flags = flags
+    option.arg = arg
+    option.arg_data = arg_data
+    option.description = description
+    option.arg_description = arg_description
+    return option
+
+
 class Application(Gtk.Application):
     def __init__(self, *args, **kwargs):
         kwargs['application_id'] = 'lt.pov.mg.gtimelog'
         kwargs['flags'] = Gio.ApplicationFlags.HANDLES_COMMAND_LINE
         Gtk.Application.__init__(self, *args, **kwargs)
+        self.add_main_option_entries([
+            make_option("--version", description="Show version number and exit"),
+            make_option("--tray", description="Start minimized"),
+            make_option("--sample-config", description="Write a sample configuration file to 'gtimelogrc.sample'"),
+            make_option("--debug", description="Show debug information"),
+        ])
         self.main_window = None
 
     def do_command_line(self, args):
