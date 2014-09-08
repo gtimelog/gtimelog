@@ -9,7 +9,7 @@ Changelog
 * Drop support for Python 2.6 (PyGObject dropped support for it long ago).
 * Drop EggTrayIcon support.
 * Use GtkApplication instead of own DBus server for enforcing single-instance.
-* Drop --prefer-pygtk, --replace, --quit, --ignore-dbus command-line
+* Drop --prefer-pygtk, --replace, --ignore-dbus command-line
   options because of the above changes.
 * Use Tango colors in the main text buffer (GH: #13).
 * Fix two Gtk-CRITICAL warnings on startup (GH: #14).

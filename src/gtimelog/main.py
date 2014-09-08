@@ -1001,6 +1001,7 @@ class Application(Gtk.Application):
             make_option("--version", description="Show version number and exit"),
             make_option("--tray", description="Start minimized"),
             make_option("--toggle", description="Show/hide the GTimeLog window if already running"),
+            make_option("--quit", description="Tell an already-running GTimeLog instance to quit"),
             make_option("--sample-config", description="Write a sample configuration file to 'gtimelogrc.sample'"),
             make_option("--debug", description="Show debug information"),
         ])
@@ -1020,6 +1021,8 @@ class Application(Gtk.Application):
             return 0
         self.debug = options.contains('debug')
         self.start_minimized = options.contains('tray')
+        if options.contains('quit'):
+            print('gtimelog: Telling the already-running instance to quit')
         return -1  # send the args to the remote instance for processing
 
     def do_command_line(self, command_line):
@@ -1028,6 +1031,12 @@ class Application(Gtk.Application):
             # NB: Even if there's no tray icon, it's still possible to
             # hide the gtimelog window.  Bug or feature?
             self.main_window.toggle_visible()
+            return 0
+        if options.contains('quit'):
+            if self.main_window:
+                self.main_window.quit()
+            else:
+                print('gtimelog: not running')
             return 0
 
         self.do_activate()
