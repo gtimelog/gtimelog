@@ -1041,13 +1041,16 @@ class Application(Gtk.Application):
             self.main_window.main_window.present()
             return
 
+        debug = self.opts.debug
+        start_minimized = self.opts.tray
+
         log.addHandler(logging.StreamHandler(sys.stdout))
-        if self.opts.debug:
+        if debug:
             log.setLevel(logging.DEBUG)
         else:
             log.setLevel(logging.INFO)
 
-        if self.opts.debug:
+        if debug:
             print('GTimeLog version: %s' % gtimelog.__version__)
             print('Python version: %s' % sys.version)
             print('Gtk+ version: %s.%s.%s' % (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION))
@@ -1073,26 +1076,26 @@ class Application(Gtk.Application):
 
         settings_file = settings.get_config_file()
         if not os.path.exists(settings_file):
-            if self.opts.debug:
+            if debug:
                 print('Saving settings to %s' % settings_file)
             settings.save(settings_file)
         else:
-            if self.opts.debug:
+            if debug:
                 print('Loading settings from %s' % settings_file)
             settings.load(settings_file)
-        if self.opts.debug:
+        if debug:
             print('Assuming date changes at %s' % settings.virtual_midnight)
             print('Loading time log from %s' % settings.get_timelog_file())
         timelog = TimeLog(settings.get_timelog_file(),
                           settings.virtual_midnight)
         if settings.task_list_url:
-            if self.opts.debug:
+            if debug:
                 print('Loading cached remote tasks from %s' %
                       os.path.join(datadir, 'remote-tasks.txt'))
             tasks = RemoteTaskList(settings.task_list_url,
                                    os.path.join(datadir, 'remote-tasks.txt'))
         else:
-            if self.opts.debug:
+            if debug:
                 print('Loading tasks from %s' % os.path.join(datadir, 'tasks.txt'))
             tasks = TaskList(os.path.join(datadir, 'tasks.txt'))
         self.main_window = MainWindow(timelog, settings, tasks)
@@ -1100,7 +1103,7 @@ class Application(Gtk.Application):
         start_in_tray = False
 
         if settings.show_tray_icon:
-            if self.opts.debug:
+            if debug:
                 print('Tray icon preference: %s' % ('AppIndicator'
                                                     if settings.prefer_app_indicator
                                                     else 'SimpleStatusIcon'))
@@ -1111,20 +1114,20 @@ class Application(Gtk.Application):
                 tray_icon = SimpleStatusIcon(self.main_window)
 
             if tray_icon:
-                if self.opts.debug:
+                if debug:
                     print('Using: %s' % tray_icon.__class__.__name__)
 
                 start_in_tray = (settings.start_in_tray
                                  if settings.start_in_tray
-                                 else self.opts.tray)
+                                 else start_minimized)
 
-        if self.opts.debug:
+        if debug:
             print('GTK completion: %s' % ('enabled' if settings.enable_gtk_completion else 'disabled'))
 
         if not start_in_tray:
             self.main_window.on_show_activate()
         else:
-            if self.opts.debug:
+            if debug:
                 print('Starting minimized')
 
         # This is needed to make ^C terminate gtimelog when we're using
