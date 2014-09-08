@@ -3,7 +3,6 @@
 # Default to new-style classes.
 __metaclass__ = type
 
-import argparse
 import os
 import re
 import sys
@@ -1005,6 +1004,8 @@ class Application(Gtk.Application):
             make_option("--debug", description="Show debug information"),
         ])
         self.main_window = None
+        self.debug = False
+        self.start_minimized = False
 
     def do_handle_local_options(self, options):
         if options.contains('version'):
@@ -1016,24 +1017,20 @@ class Application(Gtk.Application):
             print("Sample configuration file written to gtimelogrc.sample")
             print("Edit it and save as %s" % settings.get_config_file())
             return 0
+        self.debug = options.contains('debug')
+        self.start_minimized = options.contains('tray')
         return -1  # send the args to the remote instance for processing
 
-    def do_command_line(self, args):
-        parser = argparse.ArgumentParser()
-
-        parser.add_argument('--version', action='version', version=gtimelog.__version__)
-        parser.add_argument('--tray', action='store_true',
-            help="start minimized")
-        parser.add_argument('--sample-config', action='store_true',
-            help="write a sample configuration file to 'gtimelogrc.sample'")
-
-        parser.add_argument('--debug', action='store_true',
-            help="show debug information")
-
-        self.opts = parser.parse_args()
-
+    def do_command_line(self, command_line):
+        # This is what we'd do if we need to handle command-line options
+        # passed to the main instance:
+        #   options = command_line.get_options_dict()
+        #   self.debug = options.contains('debug')
+        #   self.start_minimized = options.contains('tray')
+        # We don't need to do that because these two options only matter for
+        # the initial instance, where do_handle_local_options already processed
+        # them.
         self.do_activate()
-
         return 0
 
     def do_activate(self):
@@ -1041,8 +1038,8 @@ class Application(Gtk.Application):
             self.main_window.main_window.present()
             return
 
-        debug = self.opts.debug
-        start_minimized = self.opts.tray
+        debug = self.debug
+        start_minimized = self.start_minimized
 
         log.addHandler(logging.StreamHandler(sys.stdout))
         if debug:
