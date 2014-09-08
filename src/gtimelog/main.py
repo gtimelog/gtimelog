@@ -1118,7 +1118,7 @@ class Application(Gtk.Application):
                                  else self.opts.tray)
 
         if self.opts.debug:
-            print('GTK completion: %s' % 'enabled' if settings.enable_gtk_completion else 'disabled')
+            print('GTK completion: %s' % ('enabled' if settings.enable_gtk_completion else 'disabled'))
 
         if not start_in_tray:
             self.main_window.on_show_activate()
