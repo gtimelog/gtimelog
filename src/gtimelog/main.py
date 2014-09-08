@@ -1049,6 +1049,7 @@ class Application(Gtk.Application):
 
         if self.opts.debug:
             print('GTimeLog version: %s' % gtimelog.__version__)
+            print('Python version: %s' % sys.version)
             print('Gtk+ version: %s.%s.%s' % (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION))
             print('Config directory: %s' % Settings().get_config_dir())
             print('Data directory: %s' % Settings().get_data_dir())
