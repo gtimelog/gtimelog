@@ -1285,6 +1285,7 @@ def main():
 
     if opts.debug:
         print('GTimeLog version: %s' % gtimelog.__version__)
+        print('Python version: %s' % sys.version)
         print('Toolkit: %s' % toolkit)
         print('Gtk+ version: %s' % gtk_version)
         print('D-Bus available: %s' % ('yes' if dbus else 'no'))
