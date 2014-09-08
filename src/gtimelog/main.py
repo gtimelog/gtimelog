@@ -1006,6 +1006,12 @@ class Application(Gtk.Application):
         ])
         self.main_window = None
 
+    def do_handle_local_options(self, options):
+        if options.contains('version'):
+            print(gtimelog.__version__)
+            return 0
+        return -1  # send the args to the remote instance for processing
+
     def do_command_line(self, args):
         parser = argparse.ArgumentParser()
 
