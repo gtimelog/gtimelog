@@ -1000,6 +1000,7 @@ class Application(Gtk.Application):
         self.add_main_option_entries([
             make_option("--version", description="Show version number and exit"),
             make_option("--tray", description="Start minimized"),
+            make_option("--toggle", description="Show/hide the GTimeLog window if already running"),
             make_option("--sample-config", description="Write a sample configuration file to 'gtimelogrc.sample'"),
             make_option("--debug", description="Show debug information"),
         ])
@@ -1022,14 +1023,13 @@ class Application(Gtk.Application):
         return -1  # send the args to the remote instance for processing
 
     def do_command_line(self, command_line):
-        # This is what we'd do if we need to handle command-line options
-        # passed to the main instance:
-        #   options = command_line.get_options_dict()
-        #   self.debug = options.contains('debug')
-        #   self.start_minimized = options.contains('tray')
-        # We don't need to do that because these two options only matter for
-        # the initial instance, where do_handle_local_options already processed
-        # them.
+        options = command_line.get_options_dict()
+        if options.contains('toggle') and self.main_window is not None:
+            # NB: Even if there's no tray icon, it's still possible to
+            # hide the gtimelog window.  Bug or feature?
+            self.main_window.toggle_visible()
+            return 0
+
         self.do_activate()
         return 0
 
