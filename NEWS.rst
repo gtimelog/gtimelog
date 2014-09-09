@@ -11,6 +11,8 @@ Changelog
 * Use GtkApplication instead of own DBus server for enforcing single-instance.
 * Drop --prefer-pygtk, --replace, --ignore-dbus command-line
   options because of the above changes.
+* Require glib and gio >= 2.40 for sane GtkApplication-based command line
+  parsing (check with ``pkg-config --modversion glib-2.0 gio-2.0``).
 * Use Tango colors in the main text buffer (GH: #13).
 * Fix two Gtk-CRITICAL warnings on startup (GH: #14).
 * Fix Unicode warning when adding entries (GH: #20).
