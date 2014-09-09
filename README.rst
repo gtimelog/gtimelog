@@ -87,5 +87,3 @@ Marius burned out.  Then Barry got busy and Marius recovered.
 Many excellent contributors are listed in `CONTRIBUTORS.rst`_
 
 .. _CONTRIBUTORS.rst: https://github.com/gtimelog/gtimelog/blob/master/CONTRIBUTORS.rst
-
-If you want to leave a tip, see https://www.gittip.com/mgedmin/
