@@ -194,15 +194,15 @@ class TimeWindow(object):
         """
         Split the entry title (proper) from the trailing tags.
 
-        Tags are separated from the title by a ``//`` marker:
+        Tags are separated from the title by a `` -- `` marker:
         anything *before* the marker is the entry title,
         anything *following* it is the (space-separated) set of tags.
 
         Return a tuple consisting of entry title and set of tags.
         """
-        if '//' in entry:
-            entry, tags_bundle = entry.split('//', 1)
-            # there might be spaces preceding '//'
+        if ' -- ' in entry:
+            entry, tags_bundle = entry.split(' -- ', 1)
+            # there might be spaces preceding ' -- '
             entry = entry.rstrip()
             # put back '**' and '***' if they were in the tags part
             if '***' in tags_bundle:
@@ -229,7 +229,7 @@ class TimeWindow(object):
                                                self.virtual_midnight):
                 start = stop
             duration = stop - start
-            # tags are appended to the entry title, separated by '//'
+            # tags are appended to the entry title, separated by ' -- '
             entry, tags = self._split_entry_and_tags(entry)
             yield start, stop, duration, tags, entry
 
