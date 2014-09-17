@@ -217,7 +217,7 @@ class TimeWindow(object):
     def all_entries(self):
         """Iterate over all entries.
 
-        Yields (start, stop, duration, entry) tuples.  The first entry
+        Yields (start, stop, duration, tags, entry) tuples.  The first entry
         has a duration of 0.
         """
         stop = None
