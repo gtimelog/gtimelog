@@ -572,7 +572,6 @@ class Reports(object):
         output.write('Time spent in each area:\n')
         output.write('\n')
         # sum work and slacking time per tag; we do not care in this report
-        #tags_totals = { tag:sum(* self.window.totals(tag)) for tag in tags }
         tags_totals = { }
         for tag in tags:
             spent_working, spent_slacking = self.window.totals(tag)
