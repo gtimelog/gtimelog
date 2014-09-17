@@ -1094,7 +1094,7 @@ class TestTagging (unittest.TestCase):
         work, slack = result
         self.assertEqual(work, (
             # start/end times are manually extracted from the TEST_TIMELOG sample
-            (datetime.timedelta(hours=17, minutes=03) - datetime.timedelta(hours=15, minutes=12))
+            (datetime.timedelta(hours=17, minutes=3) - datetime.timedelta(hours=15, minutes=12))
             + (datetime.timedelta(hours=22, minutes=19) - datetime.timedelta(hours=19, minutes=6))
         ))
         self.assertEqual(slack, datetime.timedelta(0))
