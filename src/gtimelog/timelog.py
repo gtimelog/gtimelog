@@ -204,12 +204,14 @@ class TimeWindow(object):
             entry, tags_bundle = entry.split(' -- ', 1)
             # there might be spaces preceding ' -- '
             entry = entry.rstrip()
-            # put back '**' and '***' if they were in the tags part
-            if '***' in tags_bundle:
-                entry += ' ***'
-            elif '**' in tags_bundle:
-                entry += ' **'
             tags = set(tags_bundle.split())
+            # put back '**' and '***' if they were in the tags part
+            if '***' in tags:
+                entry += ' ***'
+                tags.remove('***')
+            elif '**' in tags:
+                entry += ' **'
+                tags.remove('**')
         else:
             tags = set()
         return entry, tags
