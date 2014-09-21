@@ -25,7 +25,8 @@ default_data_home = os.path.normpath('~/.local/share')
 class Settings(object):
     """Configurable settings for GTimeLog."""
 
-    _encoding = locale.getpreferredencoding()
+    # Apparently locale.getpreferredencoding() might be blank on Mac OS X
+    _encoding = locale.getpreferredencoding() or 'UTF-8'
 
     # Insane defaults
     email = 'activity-list@example.com'
