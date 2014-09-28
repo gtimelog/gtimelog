@@ -2,7 +2,7 @@ Changelog
 ---------
 
 
-0.9.2 (unreleased)
+0.9.2 (2014-09-28)
 ~~~~~~~~~~~~~~~~~~
 * Fix setup.py to work on Python 3 when your locale is not UTF-8
   (LP: #1263772).
