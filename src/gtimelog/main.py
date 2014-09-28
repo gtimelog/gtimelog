@@ -415,7 +415,7 @@ class MainWindow:
 
     def write_item(self, item):
         buffer = self.log_buffer
-        start, stop, duration, entry = item
+        start, stop, duration, tags, entry = item
         self.w(format_duration(duration), 'duration')
         period = '\t({0}-{1})\t'.format(
             start.strftime('%H:%M'), stop.strftime('%H:%M'))

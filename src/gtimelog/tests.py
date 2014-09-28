@@ -1,5 +1,6 @@
 """Tests for gtimelog"""
 
+import datetime
 import doctest
 import unittest
 import os
@@ -404,7 +405,7 @@ def doctest_TimeWindow_last_entry():
         >>> window.items = [
         ...     (datetime(2013, 12, 4, 9, 0), 'started **'),
         ... ]
-        >>> start, stop, duration, entry = window.last_entry()
+        >>> start, stop, duration, tags, entry = window.last_entry()
         >>> start == stop == datetime(2013, 12, 4, 9, 0)
         True
         >>> duration
@@ -418,7 +419,7 @@ def doctest_TimeWindow_last_entry():
         ...     (datetime(2013, 12, 3, 12, 0), 'stuff'),
         ...     (datetime(2013, 12, 4, 9, 0), 'started **'),
         ... ]
-        >>> start, stop, duration, entry = window.last_entry()
+        >>> start, stop, duration, tags, entry = window.last_entry()
         >>> start == stop == datetime(2013, 12, 4, 9, 0)
         True
         >>> duration
@@ -433,7 +434,7 @@ def doctest_TimeWindow_last_entry():
         ...     (datetime(2013, 12, 4, 9, 0), 'started **'),
         ...     (datetime(2013, 12, 4, 9, 31), 'gtimelog: tests'),
         ... ]
-        >>> start, stop, duration, entry = window.last_entry()
+        >>> start, stop, duration, tags, entry = window.last_entry()
         >>> start
         datetime.datetime(2013, 12, 4, 9, 0)
         >>> stop
@@ -943,7 +944,6 @@ def doctest_TaskList_real_file():
 
     """
 
-
 class TestSettings(unittest.TestCase):
 
     def setUp(self):
@@ -1045,6 +1045,105 @@ class TestSettings(unittest.TestCase):
         tempdir = self.mkdtemp()
         self.settings.save(os.path.join(tempdir, 'config'))
 
+
+class TestTagging (unittest.TestCase):
+
+    TEST_TIMELOG = """
+2014-05-27 10:03: arrived
+2014-05-27 10:13: edx: introduce topic to new sysadmins -- edx
+2014-05-27 10:30: email
+2014-05-27 12:11: meeting: how to support new courses?  -- edx meeting
+2014-05-27 15:12: edx: write test procedure for EdX instances -- edx sysadmin
+2014-05-27 17:03: cluster: set-up accounts, etc. -- sysadmin hpc
+2014-05-27 17:14: support: how to run statistics on Hydra? -- support hydra
+2014-05-27 17:36: off: pause **
+2014-05-27 17:38: email
+2014-05-27 19:06: off: dinner & family **
+2014-05-27 22:19: cluster: fix shmmax-shmall issue -- sysadmin hpc
+        """
+
+    def setUp(self):
+        from gtimelog.timelog import TimeWindow
+        self.tw = TimeWindow(
+            filename=StringIO(self.TEST_TIMELOG),
+            min_timestamp=datetime.datetime(2014, 5, 27, 9, 0),
+            max_timestamp=datetime.datetime(2014, 5, 27, 23, 59),
+            virtual_midnight=datetime.time(2, 0))
+
+    def test_TimeWindow_set_of_all_tags(self):
+        tags = self.tw.set_of_all_tags()
+        self.assertEqual(tags,
+                         set(['edx', 'hpc', 'hydra',
+                              'meeting', 'support', 'sysadmin']))
+
+    def test_TimeWindow_totals_per_tag1(self):
+        """Test aggregate time per tag, 1 entry only"""
+        result = self.tw.totals('meeting')
+        self.assertEqual(len(result), 2)
+        work, slack = result
+        self.assertEqual(work, (
+            # start/end times are manually extracted from the TEST_TIMELOG sample
+            (datetime.timedelta(hours=12, minutes=11) - datetime.timedelta(hours=10, minutes=30))
+        ))
+        self.assertEqual(slack, datetime.timedelta(0))
+
+    def test_TimeWindow_totals_per_tag2(self):
+        """Test aggregate time per tag, several entries"""
+        result = self.tw.totals('hpc')
+        self.assertEqual(len(result), 2)
+        work, slack = result
+        self.assertEqual(work, (
+            # start/end times are manually extracted from the TEST_TIMELOG sample
+            (datetime.timedelta(hours=17, minutes=3) - datetime.timedelta(hours=15, minutes=12))
+            + (datetime.timedelta(hours=22, minutes=19) - datetime.timedelta(hours=19, minutes=6))
+        ))
+        self.assertEqual(slack, datetime.timedelta(0))
+
+    def test_TimeWindow__split_entry_and_tags1(self):
+        """Test `TimeWindow._split_entry_and_tags` with simple entry"""
+        result = self.tw._split_entry_and_tags('email')
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], 'email')
+        self.assertEqual(result[1], set())
+
+    def test_TimeWindow__split_entry_and_tags2(self):
+        """Test `TimeWindow._split_entry_and_tags` with simple entry and tags"""
+        result = self.tw._split_entry_and_tags('restart CFEngine server -- sysadmin cfengine issue327')
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], 'restart CFEngine server')
+        self.assertEqual(result[1], set(['sysadmin', 'cfengine', 'issue327']))
+
+    def test_TimeWindow__split_entry_and_tags3(self):
+        """Test `TimeWindow._split_entry_and_tags` with category, entry, and tags"""
+        result = self.tw._split_entry_and_tags('tooling: tagging support in gtimelog -- tooling gtimelog')
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], 'tooling: tagging support in gtimelog')
+        self.assertEqual(result[1], set(['tooling', 'gtimelog']))
+
+    def test_TimeWindow__split_entry_and_tags4(self):
+        """Test `TimeWindow._split_entry_and_tags` with slack-type entry"""
+        result = self.tw._split_entry_and_tags('read news -- reading **')
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], 'read news **')
+        self.assertEqual(result[1], set(['reading']))
+
+    def test_Reports__report_tags(self):
+        from gtimelog.timelog import Reports
+        rp = Reports(self.tw)
+        txt = StringIO()
+        # use same tags as in tests above, so we know the totals
+        rp._report_tags(txt, ['meeting', 'hpc'])
+        self.assertEqual(
+            txt.getvalue().strip(),
+            """
+Time spent in each area:
+
+  hpc          5:04
+  meeting      1:41
+
+Note that area totals may not add up to the period totals,
+as each entry may be belong to multiple areas (or none at all).
+            """.strip())
 
 def additional_tests(): # for setup.py
     return doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE)

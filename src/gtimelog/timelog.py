@@ -189,10 +189,37 @@ class TimeWindow(object):
             return None
         return self.items[-1][0]
 
+    @staticmethod
+    def _split_entry_and_tags(entry):
+        """
+        Split the entry title (proper) from the trailing tags.
+
+        Tags are separated from the title by a `` -- `` marker:
+        anything *before* the marker is the entry title,
+        anything *following* it is the (space-separated) set of tags.
+
+        Return a tuple consisting of entry title and set of tags.
+        """
+        if ' -- ' in entry:
+            entry, tags_bundle = entry.split(' -- ', 1)
+            # there might be spaces preceding ' -- '
+            entry = entry.rstrip()
+            tags = set(tags_bundle.split())
+            # put back '**' and '***' if they were in the tags part
+            if '***' in tags:
+                entry += ' ***'
+                tags.remove('***')
+            elif '**' in tags:
+                entry += ' **'
+                tags.remove('**')
+        else:
+            tags = set()
+        return entry, tags
+
     def all_entries(self):
         """Iterate over all entries.
 
-        Yields (start, stop, duration, entry) tuples.  The first entry
+        Yields (start, stop, duration, tags, entry) tuples.  The first entry
         has a duration of 0.
         """
         stop = None
@@ -204,13 +231,24 @@ class TimeWindow(object):
                                                self.virtual_midnight):
                 start = stop
             duration = stop - start
-            yield start, stop, duration, entry
+            # tags are appended to the entry title, separated by ' -- '
+            entry, tags = self._split_entry_and_tags(entry)
+            yield start, stop, duration, tags, entry
+
+    def set_of_all_tags(self):
+        """
+        Return set of all tags mentioned in entries.
+        """
+        all_tags = set()
+        for _, _, _, entry_tags, _ in self.all_entries():
+            all_tags.update(entry_tags)
+        return all_tags
 
     def count_days(self):
         """Count days that have entries."""
         count = 0
         last = None
-        for start, stop, duration, entry in self.all_entries():
+        for start, stop, duration, tags, entry in self.all_entries():
             if last is None or different_days(last, start,
                                               self.virtual_midnight):
                 last = start
@@ -236,7 +274,8 @@ class TimeWindow(object):
         if different_days(start, stop, self.virtual_midnight):
             start = stop
         duration = stop - start
-        return start, stop, duration, entry
+        entry, tags = self._split_entry_and_tags(entry)
+        return start, stop, duration, tags, entry
 
     def grouped_entries(self, skip_first=True):
         """Return consolidated entries (grouped by entry title).
@@ -247,7 +286,7 @@ class TimeWindow(object):
         """
         work = {}
         slack = {}
-        for start, stop, duration, entry in self.all_entries():
+        for start, stop, duration, tags, entry in self.all_entries():
             if skip_first:
                 skip_first = False
                 continue
@@ -297,8 +336,11 @@ class TimeWindow(object):
                     None, datetime.timedelta(0)) + duration
         return entries, totals
 
-    def totals(self):
+    def totals(self, tag=None):
         """Calculate total time of work and slacking entries.
+
+        If optional argument `tag` is given, only compute
+        totals for entries marked with the given tag.
 
         Returns (total_work, total_slacking) tuple.
 
@@ -318,7 +360,9 @@ class TimeWindow(object):
         (that is, it would be true if sum could operate on timedeltas).
         """
         total_work = total_slacking = datetime.timedelta(0)
-        for start, stop, duration, entry in self.all_entries():
+        for start, stop, duration, tags, entry in self.all_entries():
+            if tag is not None and tag not in tags:
+                continue
             if '**' in entry:
                 total_slacking += duration
             else:
@@ -336,7 +380,7 @@ class TimeWindow(object):
         except: # can it actually ever fail?
             idhost = 'localhost'
         dtstamp = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-        for start, stop, duration, entry in self.all_entries():
+        for start, stop, duration, tags, entry in self.all_entries():
             output.write("BEGIN:VEVENT\n")
             output.write("UID:%s@%s\n" % (hash((start, stop, entry)), idhost))
             output.write("SUMMARY:%s\n" % (entry.replace('\\', '\\\\'))
@@ -380,7 +424,7 @@ class TimeWindow(object):
         d0 = datetime.timedelta(0)
         days = {} # date -> [time_started, slacking, work]
         dmin = None
-        for start, stop, duration, entry in self.all_entries():
+        for start, stop, duration, tags, entry in self.all_entries():
             if dmin is None:
                 dmin = start.date()
             day = days.setdefault(start.date(),
@@ -508,6 +552,45 @@ class Reports(object):
         for time, cat in ordered_by_time:
             output.write(line_format % (cat, format_duration_short(time)))
 
+        tags = self.window.set_of_all_tags()
+        if tags:
+            self._report_tags(output, tags)
+
+    def _report_tags(self, output, tags):
+        """Helper method that lists time spent per tag.
+
+        Use this to add a section in a report looks similar to this:
+
+        sysadmin:     2 hours 1 min
+        www:          18 hours 45 min
+        mailserver:   3 hours
+
+        Note that duration may not add up to the total working time,
+        as a single entry can have multiple or no tags at all!
+
+        Argument `tags` is a set of tags (string).  It is not modified.
+        """
+        output.write('\n')
+        output.write('Time spent in each area:\n')
+        output.write('\n')
+        # sum work and slacking time per tag; we do not care in this report
+        tags_totals = { }
+        for tag in tags:
+            spent_working, spent_slacking = self.window.totals(tag)
+            tags_totals[tag] = spent_working + spent_slacking
+        # compute width of tag label column
+        max_tag_length = max([len(tag) for tag in tags_totals.keys()])
+        line_format = '  %-' + str(max_tag_length + 4) + 's %+5s\n'
+        # sort by time spent (descending)
+        for tag, spent in sorted(tags_totals.items(),
+                                 key=(lambda it: it[1]),
+                                 reverse=True):
+            output.write(line_format % (tag, format_duration_short(spent)))
+        output.write('\n')
+        output.write(
+            'Note that area totals may not add up to the period totals,\n'
+            'as each entry may be belong to multiple areas (or none at all).\n')
+
     def _report_categories(self, output, categories):
         """A helper method that lists time spent per category.
 
@@ -585,6 +668,10 @@ class Reports(object):
         if categories:
             self._report_categories(output, categories)
 
+        tags = self.window.set_of_all_tags()
+        if tags:
+            self._report_tags(output, tags)
+
     def weekly_report_categorized(self, output, email, who,
                                   estimated_column=False):
         """Format a weekly report with entries displayed  under categories."""
@@ -652,7 +739,7 @@ class Reports(object):
         if not items:
             output.write("No work done today.\n")
             return
-        start, stop, duration, entry = items[0]
+        start, stop, duration, tags, entry = items[0]
         entry = entry[:1].upper() + entry[1:]
         output.write("%s at %s\n" % (entry, start.strftime('%H:%M')))
         output.write('\n')
@@ -688,6 +775,10 @@ class Reports(object):
             output.write('\n')
         output.write("Time spent slacking: %s\n" %
                      format_duration_long(total_slacking))
+
+        tags = self.window.set_of_all_tags()
+        if tags:
+            self._report_tags(output, tags)
 
 
 class TimeLog(object):
