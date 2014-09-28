@@ -3,9 +3,7 @@ Changelog
 
 0.10 (unreleased)
 ~~~~~~~~~~~~~~~~~
-* Fix setup.py to work on Python 3 when your locale is not UTF-8
-  (LP: #1263772).
-* Drop PyGtk/Gtk+ 2 support (it didn't work since 0.9.1 anyway).
+* Drop PyGtk/Gtk+ 2 support code (it didn't work since 0.9.1 anyway).
 * Drop support for Python 2.6 (PyGObject dropped support for it long ago).
 * Drop EggTrayIcon support.
 * Use GtkApplication instead of own DBus server for enforcing single-instance.
@@ -14,6 +12,15 @@ Changelog
 * Require glib and gio >= 2.40 for sane GtkApplication-based command line
   parsing (check with ``pkg-config --modversion glib-2.0 gio-2.0``).
 * Use Tango colors in the main text buffer (GH: #13).
+
+
+0.9.2 (2014-09-28)
+~~~~~~~~~~~~~~~~~~
+* Fix setup.py to work on Python 3 when your locale is not UTF-8
+  (LP: #1263772).
+* Note that Gtk+ 2.x is no longer supported (this regressed somewhere between
+  0.9.0 and 0.9.1, but I didn't notice because I have no access to a system
+  that has Gtk+ 2.x).
 * Fix two Gtk-CRITICAL warnings on startup (GH: #14).
 * Fix Unicode warning when adding entries (GH: #20).
 * Speed up entry addition (GH: #21).
