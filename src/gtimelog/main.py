@@ -309,8 +309,11 @@ class MainWindow:
                 self.write_item(item)
         elif self.summary_view:
             entries, totals = window.categorized_work_entries()
+            no_cat = totals.pop(None, None)
+            if no_cat is not None:
+                self.write_group('no category', no_cat)
             for category, duration in sorted(totals.items()):
-                self.write_group(category or 'no category', duration)
+                self.write_group(category, duration)
             where = buffer.get_end_iter()
             where.backward_cursor_position()
             buffer.place_cursor(where)
