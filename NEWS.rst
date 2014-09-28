@@ -9,6 +9,7 @@ Changelog
 * Note that Gtk+ 2.x is no longer supported (this regressed somewhere between
   0.9.0 and 0.9.1, but I didn't notice because I have no access to a system
   that has Gtk+ 2.x).
+* Fix two Gtk-CRITICAL warnings on startup (GH: #14).
 
 
 0.9.1 (2013-12-23)
