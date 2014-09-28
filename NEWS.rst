@@ -14,7 +14,9 @@ Changelog
 * Speed up entry addition (GH: #21).
 * Fix Unicode error when navigating history with PageUp/PageDown (GH: #22).
 * Update current task time when autoreloading (GH: #23).
-* Fix 'LocaleError: unknown encoding:' on Mac OS X (GH #25).
+* Fix 'LocaleError: unknown encoding:' on Mac OS X (GH: #25).
+* Fix 'TypeError: unorderable types: NoneType() < str()' in summary view
+  on Python 3 (GH: #26).
 
 
 0.9.1 (2013-12-23)
