@@ -753,14 +753,14 @@ class MainWindow:
 
     def on_open_complete_spreadsheet_activate(self, widget):
         """Report -> Complete Report in Spreadsheet"""
-        tempfn = tempfile.mktemp(suffix='gtimelog.csv') # XXX unsafe!
+        tempfn = tempfile.mktemp(prefix='gtimelog-', suffix='.csv') # XXX unsafe!
         with open(tempfn, 'w') as f:
             self.timelog.whole_history().to_csv_complete(f)
         self.spawn(self.settings.spreadsheet, tempfn)
 
     def on_open_slack_spreadsheet_activate(self, widget):
         """Report -> Work/_Slacking stats in Spreadsheet"""
-        tempfn = tempfile.mktemp(suffix='gtimelog.csv') # XXX unsafe!
+        tempfn = tempfile.mktemp(prefix='gtimelog-', suffix='.csv') # XXX unsafe!
         with open(tempfn, 'w') as f:
             self.timelog.whole_history().to_csv_daily(f)
         self.spawn(self.settings.spreadsheet, tempfn)
@@ -771,7 +771,7 @@ class MainWindow:
 
     def mail(self, write_draft):
         """Send an email."""
-        draftfn = tempfile.mktemp(suffix='gtimelog') # XXX unsafe!
+        draftfn = tempfile.mktemp(prefix='gtimelog-') # XXX unsafe!
         with codecs.open(draftfn, 'w', encoding='UTF-8') as draft:
             write_draft(draft, self.settings.email, self.settings.name)
         self.spawn(self.settings.mailer, draftfn)
