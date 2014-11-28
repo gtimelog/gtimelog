@@ -946,6 +946,34 @@ def doctest_TaskList_real_file():
     """
 
 
+class TestTimeLog(unittest.TestCase):
+
+    def setUp(self):
+        self.tempdir = None
+
+    def tearDown(self):
+        if self.tempdir:
+            shutil.rmtree(self.tempdir)
+
+    def mkdtemp(self):
+        if self.tempdir is None:
+            self.tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
+        return self.tempdir
+
+    def test_appending_clears_window_cache(self):
+        # Regression test for https://github.com/gtimelog/gtimelog/issues/28
+        from gtimelog.timelog import TimeLog
+        tempfile = os.path.join(self.mkdtemp(), 'timelog.txt')
+        timelog = TimeLog(tempfile, datetime.time(2, 0))
+
+        w = timelog.window_for_day(datetime.date(2014, 11, 12))
+        self.assertEqual(list(w.all_entries()), [])
+
+        timelog.append('started **', now=datetime.datetime(2014, 11, 12, 10, 00))
+        w = timelog.window_for_day(datetime.date(2014, 11, 12))
+        self.assertEqual(len(list(w.all_entries())), 1)
+
+
 class TestSettings(unittest.TestCase):
 
     def setUp(self):

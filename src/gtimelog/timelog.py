@@ -900,6 +900,7 @@ class TimeLog(object):
         self.window.items.append((now, entry))
         line = '%s: %s' % (now.strftime("%Y-%m-%d %H:%M"), entry)
         self.raw_append(line)
+        self._cache.clear()
 
     def valid_time(self, time):
         if time > datetime.datetime.now():
