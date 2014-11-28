@@ -26,6 +26,12 @@ Changelog
   - Drop the --prefer-pygtk command-line option.
 
 
+0.9.3 (unreleased)
+~~~~~~~~~~~~~~~~~~
+
+* Adding new entries didn't update total weekly numbers (GH: #28).
+
+
 0.9.2 (2014-09-28)
 ~~~~~~~~~~~~~~~~~~
 * Note that Gtk+ 2.x is no longer supported (this regressed somewhere between
