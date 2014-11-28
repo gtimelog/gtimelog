@@ -944,6 +944,7 @@ def doctest_TaskList_real_file():
 
     """
 
+
 class TestSettings(unittest.TestCase):
 
     def setUp(self):
@@ -1144,6 +1145,7 @@ Time spent in each area:
 Note that area totals may not add up to the period totals,
 as each entry may be belong to multiple areas (or none at all).
             """.strip())
+
 
 def additional_tests(): # for setup.py
     return doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE)
