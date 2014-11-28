@@ -5,6 +5,8 @@ Changelog
 0.9.3 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
+* Adding new entries didn't update total weekly numbers (GH: #28).
+
 
 0.9.2 (2014-09-28)
 ~~~~~~~~~~~~~~~~~~
