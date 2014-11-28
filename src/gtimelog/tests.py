@@ -2,10 +2,11 @@
 
 import datetime
 import doctest
-import unittest
 import os
-import tempfile
 import shutil
+import tempfile
+import textwrap
+import unittest
 from pprint import pprint
 
 try:
@@ -1049,19 +1050,19 @@ class TestSettings(unittest.TestCase):
 
 class TestTagging (unittest.TestCase):
 
-    TEST_TIMELOG = """
-2014-05-27 10:03: arrived
-2014-05-27 10:13: edx: introduce topic to new sysadmins -- edx
-2014-05-27 10:30: email
-2014-05-27 12:11: meeting: how to support new courses?  -- edx meeting
-2014-05-27 15:12: edx: write test procedure for EdX instances -- edx sysadmin
-2014-05-27 17:03: cluster: set-up accounts, etc. -- sysadmin hpc
-2014-05-27 17:14: support: how to run statistics on Hydra? -- support hydra
-2014-05-27 17:36: off: pause **
-2014-05-27 17:38: email
-2014-05-27 19:06: off: dinner & family **
-2014-05-27 22:19: cluster: fix shmmax-shmall issue -- sysadmin hpc
-        """
+    TEST_TIMELOG = textwrap.dedent("""
+        2014-05-27 10:03: arrived
+        2014-05-27 10:13: edx: introduce topic to new sysadmins -- edx
+        2014-05-27 10:30: email
+        2014-05-27 12:11: meeting: how to support new courses?  -- edx meeting
+        2014-05-27 15:12: edx: write test procedure for EdX instances -- edx sysadmin
+        2014-05-27 17:03: cluster: set-up accounts, etc. -- sysadmin hpc
+        2014-05-27 17:14: support: how to run statistics on Hydra? -- support hydra
+        2014-05-27 17:36: off: pause **
+        2014-05-27 17:38: email
+        2014-05-27 19:06: off: dinner & family **
+        2014-05-27 22:19: cluster: fix shmmax-shmall issue -- sysadmin hpc
+        """)
 
     def setUp(self):
         from gtimelog.timelog import TimeWindow
@@ -1136,15 +1137,15 @@ class TestTagging (unittest.TestCase):
         rp._report_tags(txt, ['meeting', 'hpc'])
         self.assertEqual(
             txt.getvalue().strip(),
-            """
-Time spent in each area:
+            textwrap.dedent("""
+            Time spent in each area:
 
-  hpc          5:04
-  meeting      1:41
+              hpc          5:04
+              meeting      1:41
 
-Note that area totals may not add up to the period totals,
-as each entry may be belong to multiple areas (or none at all).
-            """.strip())
+            Note that area totals may not add up to the period totals,
+            as each entry may be belong to multiple areas (or none at all).
+            """).strip())
 
 
 def additional_tests(): # for setup.py
