@@ -1,5 +1,6 @@
 """Tests for gtimelog"""
 
+import datetime
 import doctest
 import unittest
 import os

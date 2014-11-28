@@ -809,6 +809,9 @@ class TimeLog(object):
         self.window.items.append((now, entry))
         line = '%s: %s' % (now.strftime("%Y-%m-%d %H:%M"), entry)
         self.raw_append(line)
+        for (min, max), cached in self._cache.items():
+            if cached is not self.window and min <= now < max:
+                cached.items.append((now, entry))
 
     def valid_time(self, time):
         if time > datetime.datetime.now():
