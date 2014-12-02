@@ -184,36 +184,26 @@ show_tray_icon
     Example: ``show_tray_icon = True``
 
 
-prefer_app_indicator, prefer_old_tray_icon
+prefer_app_indicator
     what kind of tray icon do you prefer?
 
-    GTimeLog supports three kinds:
+    GTimeLog supports two kinds:
 
     - Unity application indicator
     - a standard Gtk+ status icon
-    - ancient EggTrayIcon that shows a ticking clock next to the icon
 
     Support for each is conditional on the availability of installed libraries.
 
     Example::
 
         # prefer Unity application indicators, then fall back to the Gtk+
-        # status icon, then fall back to EggTrayIcon.
+        # status icon.
         prefer_app_indicator = True
 
     Example::
 
-        # prefer the ancient EggTrayIcon, then fall back to the Gtk+
-        # status icon, then fall back to Unity app indicator.
+        # prefer the Gtk+ status icon, then fall back to Unity app indicator.
         prefer_app_indicator = False
-        prefer_old_tray_icon = True
-
-    Example::
-
-        # prefer the Gtk+ status icon, then fall back to the ancient
-        # EggTrayIcon, then fall back to Unity app indicator.
-        prefer_app_indicator = False
-        prefer_old_tray_icon = False
 
 start_in_tray
     whether GTimeLog should start minimized

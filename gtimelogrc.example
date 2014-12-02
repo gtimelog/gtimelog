@@ -26,10 +26,6 @@ gtk-completion = False
 # Do you want a systray icon?
 show_tray_icon = yes
 
-# Do you prefer the old systray icon (that shows time taken for the current
-# task next to the icon), or the new one (just the icon)?
-prefer_old_tray_icon = yes
-
 # How many hours' work in a day.
 hours = 8
 
