@@ -71,7 +71,9 @@ class IconChooser:
         color = style.get_color(Gtk.StateFlags.NORMAL)
         value = (color.red + color.green + color.blue) / 3
         filename = icon_file_bright if value >= 0.5 else icon_file_dark
-        log.debug('Menu bar color: (%g, %g, %g), averages to %g; picking %s',
+        theme_name = os.environ.get('GTK_THEME') or Gtk.Settings.get_default().props.gtk_theme_name
+        log.debug('GTK+ theme: %s', theme_name)
+        log.debug('Menu bar color: (%.3g, %.3g, %.3g), averages to %.3g; picking %s',
                   color.red, color.green, color.blue, value, filename)
         return filename
 
