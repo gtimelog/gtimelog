@@ -59,23 +59,64 @@ from gtimelog.timelog import (
 
 
 class IconChooser:
+    """Picks the right icon for dark or bright panel backgrounds.
+
+    Well, tries to pick it.  I couldn't find a way to determine the color of
+    the panel, so I cheated by assuming it'll be the same as the color of
+    the menu bar.  This is wrong for many popular themes, including:
+
+    - Adwaita
+    - Radiance
+    - Ambiance
+
+    which is why I have to maintain a list of per-theme overrides.
+    """
+
+    icon_for_background = dict(
+        # We want sufficient contrast, so:
+        # - use dark icon for bright backgrounds
+        # - use bright icon for dark backgrounds
+        bright=icon_file_dark,
+        dark=icon_file_bright,
+    )
+
+    theme_overrides = {
+        # when the menu bar color logic gets this wrong
+        'Adwaita': 'dark',  # but probably only under gnome-shell
+        'Ambiance': 'dark',
+        'Radiance': 'bright',
+    }
 
     @property
     def icon_name(self):
-        # XXX assumes the panel's color matches a menu bar's color, which is
-        # not necessarily the case!  this logic works for, say,
-        # Ambiance/Radiance, but it gets New Wave and Dark Room wrong.
+        theme_name = self.get_gtk_theme()
+        background = self.get_background()
+        if theme_name in self.theme_overrides:
+            background = self.theme_overrides[theme_name]
+            log.debug('Overriding background to %s for %s', background, theme_name)
+        filename = self.icon_for_background[background]
+        log.debug('For %s background picking icon %s', background, filename)
+        return filename
+
+    def get_gtk_theme(self):
+        theme_name = Gtk.Settings.get_default().props.gtk_theme_name
+        log.debug('GTK+ theme: %s', theme_name)
+        override = os.environ.get('GTK_THEME')
+        if override:
+            log.debug('GTK_THEME overrides the theme to %s', override)
+            theme_name = override.partition(':')[0]
+        return theme_name
+
+    def get_background(self):
         menu_bar = Gtk.MenuBar()
         # need to hold a reference to menu_bar to avoid LP#1016212
         style = menu_bar.get_style_context()
         color = style.get_color(Gtk.StateFlags.NORMAL)
         value = (color.red + color.green + color.blue) / 3
-        filename = icon_file_bright if value >= 0.5 else icon_file_dark
-        theme_name = os.environ.get('GTK_THEME') or Gtk.Settings.get_default().props.gtk_theme_name
-        log.debug('GTK+ theme: %s', theme_name)
-        log.debug('Menu bar color: (%.3g, %.3g, %.3g), averages to %.3g; picking %s',
-                  color.red, color.green, color.blue, value, filename)
-        return filename
+        background = 'bright' if value >= 0.5 else 'dark'
+        log.debug('Menu bar color: (%.3g, %.3g, %.3g), averages to %.3g (%s)',
+                  color.red, color.green, color.blue, value, background)
+        return background
 
 
 class SimpleStatusIcon(IconChooser):
@@ -1133,7 +1174,7 @@ class Application(Gtk.Application):
                                  else start_minimized)
 
         if debug:
-            print('GTK completion: %s' % ('enabled' if settings.enable_gtk_completion else 'disabled'))
+            print('GTK+ completion: %s' % ('enabled' if settings.enable_gtk_completion else 'disabled'))
 
         if not start_in_tray:
             self.main_window.on_show_activate()
