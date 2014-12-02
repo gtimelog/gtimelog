@@ -48,7 +48,7 @@ class Settings(object):
     edit_task_list_cmd = ''
 
     show_office_hours = True
-    show_tray_icon = True
+    show_tray_icon = False
     prefer_app_indicator = True
     start_in_tray = False
 

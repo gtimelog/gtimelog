@@ -25,6 +25,11 @@ Changelog
   - Drop EggTrayIcon support (it was for Gtk+ 2 only anyway).
   - Drop the --prefer-pygtk command-line option.
 
+* Disable tray icon by default for new users (existing gtimelogrc files will be
+  untouched).
+
+* Improve tray icon selection logic for best contrast (GH: #29).
+
 
 0.9.3 (unreleased)
 ~~~~~~~~~~~~~~~~~~
