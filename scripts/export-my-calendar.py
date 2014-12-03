@@ -17,7 +17,6 @@ datadir = settings.get_data_dir()
 settings_file = settings.get_config_file()
 if os.path.exists(settings_file):
     settings.load(settings_file)
-timelog = gtimelog.TimeLog(settings.get_timelog_file(),
-                           settings.virtual_midnight)
+timelog = gtimelog.TimeLog(settings, settings.get_timelog_file())
 window = timelog.window_for(d1, d2)
 window.icalendar(open(outputfile, 'w'))

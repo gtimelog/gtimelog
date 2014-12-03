@@ -130,12 +130,13 @@ class TimeWindow(object):
     oldest) timestamp in the file.
     """
 
-    def __init__(self, filename, min_timestamp, max_timestamp,
-                 virtual_midnight, callback=None):
+    def __init__(self, settings, filename, min_timestamp, max_timestamp,
+                 callback=None):
         self.filename = filename
         self.min_timestamp = min_timestamp
         self.max_timestamp = max_timestamp
-        self.virtual_midnight = virtual_midnight
+        self.settings = settings
+        self.virtual_midnight = settings.virtual_midnight
         self.reread(callback)
 
     def reread(self, callback=None):
@@ -788,9 +789,10 @@ class TimeLog(object):
     the end.
     """
 
-    def __init__(self, filename, virtual_midnight):
+    def __init__(self, settings, filename):
+        self.settings = settings
         self.filename = filename
-        self.virtual_midnight = virtual_midnight
+        self.virtual_midnight = settings.virtual_midnight
         self.reread()
 
     def virtual_today(self):
@@ -826,8 +828,7 @@ class TimeLog(object):
         min = datetime.datetime.combine(self.day, self.virtual_midnight)
         max = min + datetime.timedelta(1)
         self.history = []
-        self.window = TimeWindow(self.filename, min, max,
-                                 self.virtual_midnight,
+        self.window = TimeWindow(self.settings, self.filename, min, max,
                                  callback=self.history.append)
         self.need_space = not self.window.items
         self._cache = {(min, max): self.window}
@@ -837,7 +838,7 @@ class TimeLog(object):
         try:
             return self._cache[min, max]
         except KeyError:
-            window = TimeWindow(self.filename, min, max, self.virtual_midnight)
+            window = TimeWindow(self.settings, self.filename, min, max)
             if len(self._cache) > 1000:
                 self._cache.clear()
             self._cache[min, max] = window

@@ -253,13 +253,17 @@ def doctest_uniq():
 def doctest_TimeWindow_reread_no_file():
     """Test for TimeWindow.reread
 
-        >>> from datetime import datetime, time
+        >>> from datetime import datetime
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
         >>> min = datetime(2013, 12, 3)
         >>> max = datetime(2013, 12, 4)
-        >>> vm = time(2, 0)
 
         >>> from gtimelog.timelog import TimeWindow
-        >>> window = TimeWindow('/nosuchfile', min, max, vm)
+        >>> window = TimeWindow(settings, '/nosuchfile', min, max)
 
     There's no error.
 
@@ -273,10 +277,14 @@ def doctest_TimeWindow_reread_no_file():
 def doctest_TimeWindow_reread_bad_timestamp():
     """Test for TimeWindow.reread
 
-        >>> from datetime import datetime, time
+        >>> from datetime import datetime
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
         >>> min = datetime(2013, 12, 4)
         >>> max = datetime(2013, 12, 5)
-        >>> vm = time(2, 0)
 
         >>> sampledata = StringIO('''
         ... 2013-12-04 09:00: start **
@@ -285,7 +293,7 @@ def doctest_TimeWindow_reread_bad_timestamp():
         ... ''')
 
         >>> from gtimelog.timelog import TimeWindow
-        >>> window = TimeWindow(sampledata, min, max, vm)
+        >>> window = TimeWindow(settings, sampledata, min, max)
 
     There's no error, the line with a bad timestamp is silently skipped.
 
@@ -298,10 +306,14 @@ def doctest_TimeWindow_reread_bad_timestamp():
 def doctest_TimeWindow_reread_bad_ordering():
     """Test for TimeWindow.reread
 
-        >>> from datetime import datetime, time
+        >>> from datetime import datetime
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
         >>> min = datetime(2013, 12, 4)
         >>> max = datetime(2013, 12, 5)
-        >>> vm = time(2, 0)
 
         >>> sampledata = StringIO('''
         ... 2013-12-04 09:00: start **
@@ -311,7 +323,7 @@ def doctest_TimeWindow_reread_bad_ordering():
         ... ''')
 
         >>> from gtimelog.timelog import TimeWindow
-        >>> window = TimeWindow(sampledata, min, max, vm)
+        >>> window = TimeWindow(settings, sampledata, min, max)
 
     There's no error, the timestamps have been reordered, but note that
     order was preserved for events with the same timestamp
@@ -332,10 +344,14 @@ def doctest_TimeWindow_reread_bad_ordering():
 def doctest_TimeWindow_reread_callbacks():
     """Test for TimeWindow.reread
 
-        >>> from datetime import datetime, time
+        >>> from datetime import datetime
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
         >>> min = datetime(2013, 12, 4)
         >>> max = datetime(2013, 12, 5)
-        >>> vm = time(2, 0)
 
         >>> sampledata = StringIO('''
         ... 2013-12-03 09:00: stuff **
@@ -347,7 +363,8 @@ def doctest_TimeWindow_reread_callbacks():
         >>> l = []
 
         >>> from gtimelog.timelog import TimeWindow
-        >>> window = TimeWindow(sampledata, min, max, vm, callback=l.append)
+        >>> window = TimeWindow(settings, sampledata, min, max, 
+        ...        callback=l.append)
 
     The callback is invoked with all the entries (not just those in the
     selected time window).  We use it to populate history completion.
@@ -361,10 +378,14 @@ def doctest_TimeWindow_reread_callbacks():
 def doctest_TimeWindow_count_days():
     """Test for TimeWindow.count_days
 
-        >>> from datetime import datetime, time
+        >>> from datetime import datetime
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
         >>> min = datetime(2013, 12, 2)
         >>> max = datetime(2013, 12, 9)
-        >>> vm = time(2, 0)
 
         >>> sampledata = StringIO('''
         ... 2013-12-04 09:00: start **
@@ -380,7 +401,7 @@ def doctest_TimeWindow_count_days():
         ... ''')
 
         >>> from gtimelog.timelog import TimeWindow
-        >>> window = TimeWindow(sampledata, min, max, vm)
+        >>> window = TimeWindow(settings, sampledata, min, max)
         >>> window.count_days()
         3
 
@@ -390,11 +411,15 @@ def doctest_TimeWindow_count_days():
 def doctest_TimeWindow_last_entry():
     """Test for TimeWindow.last_entry
 
-        >>> from datetime import datetime, time
-        >>> vm = time(2, 0)
+        >>> from datetime import datetime
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
 
         >>> from gtimelog.timelog import TimeWindow
-        >>> window = TimeWindow(StringIO(), None, None, vm)
+        >>> window = TimeWindow(settings, StringIO(), None, None)
 
     Case #1: no items
 
@@ -451,10 +476,14 @@ def doctest_TimeWindow_last_entry():
 def doctest_TimeWindow_to_csv_complete():
     r"""Tests for TimeWindow.to_csv_complete
 
-        >>> from datetime import datetime, time
+        >>> from datetime import datetime
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
         >>> min = datetime(2008, 6, 1)
         >>> max = datetime(2008, 7, 1)
-        >>> vm = time(2, 0)
 
         >>> sampledata = StringIO('''
         ... 2008-06-03 12:45: start
@@ -468,7 +497,7 @@ def doctest_TimeWindow_to_csv_complete():
         ... ''')
 
         >>> from gtimelog.timelog import TimeWindow
-        >>> window = TimeWindow(sampledata, min, max, vm)
+        >>> window = TimeWindow(settings, sampledata, min, max)
 
         >>> import sys
         >>> window.to_csv_complete(sys.stdout)
@@ -483,10 +512,14 @@ def doctest_TimeWindow_to_csv_complete():
 def doctest_TimeWindow_to_csv_daily():
     r"""Tests for TimeWindow.to_csv_daily
 
-        >>> from datetime import datetime, time
+        >>> from datetime import datetime
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
         >>> min = datetime(2008, 6, 1)
         >>> max = datetime(2008, 7, 1)
-        >>> vm = time(2, 0)
 
         >>> sampledata = StringIO('''
         ... 2008-06-03 12:45: start
@@ -499,7 +532,7 @@ def doctest_TimeWindow_to_csv_daily():
         ... ''')
 
         >>> from gtimelog.timelog import TimeWindow
-        >>> window = TimeWindow(sampledata, min, max, vm)
+        >>> window = TimeWindow(settings, sampledata, min, max)
 
         >>> import sys
         >>> window.to_csv_daily(sys.stdout)
@@ -516,14 +549,18 @@ def doctest_Reports_weekly_report_categorized():
 
         >>> import sys
 
-        >>> from datetime import datetime, time
+        >>> from datetime import datetime
         >>> from gtimelog.timelog import TimeWindow, Reports
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
 
-        >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
         >>> max = datetime(2010, 1, 31)
 
-        >>> window = TimeWindow(StringIO(), min, max, vm)
+        >>> window = TimeWindow(settings, StringIO(), min, max)
         >>> reports = Reports(window)
         >>> reports.weekly_report_categorized(sys.stdout, 'foo@bar.com',
         ...                                   'Bob Jones')
@@ -540,7 +577,7 @@ def doctest_Reports_weekly_report_categorized():
         ...    '2010-01-30 23:46: misc',
         ...    '']))
 
-        >>> window = TimeWindow(fh, min, max, vm)
+        >>> window = TimeWindow(settings, fh, min, max)
         >>> reports = Reports(window)
         >>> reports.weekly_report_categorized(sys.stdout, 'foo@bar.com',
         ...                                   'Bob Jones')
@@ -581,14 +618,18 @@ def doctest_Reports_monthly_report_categorized():
 
         >>> import sys
 
-        >>> from datetime import datetime, time
+        >>> from datetime import datetime
         >>> from gtimelog.timelog import TimeWindow, Reports
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
 
-        >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
         >>> max = datetime(2010, 1, 31)
 
-        >>> window = TimeWindow(StringIO(), min, max, vm)
+        >>> window = TimeWindow(settings, StringIO(), min, max)
         >>> reports = Reports(window)
         >>> reports.monthly_report_categorized(sys.stdout, 'foo@bar.com',
         ...                                   'Bob Jones')
@@ -605,7 +646,7 @@ def doctest_Reports_monthly_report_categorized():
         ...    '2010-01-30 23:46: misc',
         ...    '']))
 
-        >>> window = TimeWindow(fh, min, max, vm)
+        >>> window = TimeWindow(settings, fh, min, max)
         >>> reports = Reports(window)
         >>> reports.monthly_report_categorized(sys.stdout, 'foo@bar.com',
         ...                                   'Bob Jones')
@@ -643,10 +684,14 @@ def doctest_Reports_report_categories():
 
         >>> import sys
 
-        >>> from datetime import datetime, time, timedelta
+        >>> from datetime import datetime, timedelta
         >>> from gtimelog.timelog import TimeWindow, Reports
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
 
-        >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
         >>> max = datetime(2010, 1, 31)
 
@@ -654,7 +699,7 @@ def doctest_Reports_report_categories():
         ...    'Bing': timedelta(2),
         ...    None: timedelta(1)}
 
-        >>> window = TimeWindow(StringIO(), min, max, vm)
+        >>> window = TimeWindow(settings, StringIO(), min, max)
         >>> reports = Reports(window)
         >>> reports._report_categories(sys.stdout, categories)
         <BLANKLINE>
@@ -672,14 +717,18 @@ def doctest_Reports_daily_report():
 
         >>> import sys
 
-        >>> from datetime import datetime, time
+        >>> from datetime import datetime
         >>> from gtimelog.timelog import TimeWindow, Reports
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
 
-        >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 30)
         >>> max = datetime(2010, 1, 31)
 
-        >>> window = TimeWindow(StringIO(), min, max, vm)
+        >>> window = TimeWindow(settings, StringIO(), min, max)
         >>> reports = Reports(window)
         >>> reports.daily_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
@@ -695,7 +744,7 @@ def doctest_Reports_daily_report():
         ...    '2010-01-30 15:46: misc',
         ...    '']))
 
-        >>> window = TimeWindow(fh, min, max, vm)
+        >>> window = TimeWindow(settings, fh, min, max)
         >>> reports = Reports(window)
         >>> reports.daily_report(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
@@ -729,14 +778,18 @@ def doctest_Reports_weekly_report_plain():
 
         >>> import sys
 
-        >>> from datetime import datetime, time
+        >>> from datetime import datetime
         >>> from gtimelog.timelog import TimeWindow, Reports
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
 
-        >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
         >>> max = datetime(2010, 1, 31)
 
-        >>> window = TimeWindow(StringIO(), min, max, vm)
+        >>> window = TimeWindow(settings, StringIO(), min, max)
         >>> reports = Reports(window)
         >>> reports.weekly_report_plain(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
@@ -752,7 +805,7 @@ def doctest_Reports_weekly_report_plain():
         ...    '2010-01-30 15:46: misc',
         ...    '']))
 
-        >>> window = TimeWindow(fh, min, max, vm)
+        >>> window = TimeWindow(settings, fh, min, max)
         >>> reports = Reports(window)
         >>> reports.weekly_report_plain(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
@@ -780,14 +833,18 @@ def doctest_Reports_monthly_report_plain():
 
         >>> import sys
 
-        >>> from datetime import datetime, time
+        >>> from datetime import datetime
         >>> from gtimelog.timelog import TimeWindow, Reports
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
 
-        >>> vm = time(2, 0)
         >>> min = datetime(2007, 9, 1)
         >>> max = datetime(2007, 10, 1)
 
-        >>> window = TimeWindow(StringIO(), min, max, vm)
+        >>> window = TimeWindow(settings, StringIO(), min, max)
         >>> reports = Reports(window)
         >>> reports.monthly_report_plain(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
@@ -803,7 +860,7 @@ def doctest_Reports_monthly_report_plain():
         ...    '2007-09-30 15:46: misc',
         ...    '']))
 
-        >>> window = TimeWindow(fh, min, max, vm)
+        >>> window = TimeWindow(settings, fh, min, max)
         >>> reports = Reports(window)
         >>> reports.monthly_report_plain(sys.stdout, 'foo@bar.com', 'Bob Jones')
         To: foo@bar.com
@@ -831,14 +888,18 @@ def doctest_Reports_custom_range_report_categorized():
 
         >>> import sys
 
-        >>> from datetime import datetime, time
+        >>> from datetime import datetime
         >>> from gtimelog.timelog import TimeWindow, Reports
+        >>> from gtimelog.settings import Settings
+        >>> settings = Settings(StringIO('''
+        ... [gtimelog]
+        ... virtual_midnight = 02:00
+        ... '''))
 
-        >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
         >>> max = datetime(2010, 2, 1)
 
-        >>> window = TimeWindow(StringIO(), min, max, vm)
+        >>> window = TimeWindow(settings, StringIO(), min, max)
         >>> reports = Reports(window)
         >>> reports.custom_range_report_categorized(sys.stdout, 'foo@bar.com',
         ...                                         'Bob Jones')
@@ -859,7 +920,7 @@ def doctest_Reports_custom_range_report_categorized():
         ...    '2010-01-30 23:46: misc',
         ...    '']))
 
-        >>> window = TimeWindow(fh, min, max, vm)
+        >>> window = TimeWindow(settings, fh, min, max)
         >>> reports = Reports(window)
         >>> reports.custom_range_report_categorized(sys.stdout, 'foo@bar.com',
         ...                                         'Bob Jones')
