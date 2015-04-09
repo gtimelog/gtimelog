@@ -1,9 +1,17 @@
 GTimeLog
 ========
 
-.. image:: https://travis-ci.org/gtimelog/gtimelog.png?branch=master
+.. image:: https://pypip.in/version/gtimelog/badge.svg?style=flat
+   :target: https://pypi.python.org/pypi/gtimelog/
+   :alt: Latest Version
+
+.. image:: https://travis-ci.org/gtimelog/gtimelog.svg?branch=master
    :target: https://travis-ci.org/gtimelog/gtimelog
    :alt: build status
+
+.. image:: https://coveralls.io/repos/gtimelog/gtimelog/badge.svg?branch=master
+   :target: https://coveralls.io/r/gtimelog/gtimelog?branch=master
+   :alt: test coverage
 
 GTimeLog is a simple app for keeping track of time.
 
