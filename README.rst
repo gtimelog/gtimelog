@@ -5,7 +5,7 @@ GTimeLog is a simple app for keeping track of time.
 
 .. image:: https://pypip.in/version/gtimelog/badge.svg?style=flat
    :target: https://pypi.python.org/pypi/gtimelog/
-   :alt: Latest Version
+   :alt: ltest version
 
 .. image:: https://travis-ci.org/gtimelog/gtimelog.svg?branch=master
    :target: https://travis-ci.org/gtimelog/gtimelog
@@ -45,7 +45,7 @@ You can run it from a source checkout without an explicit installation step::
 
 System requirements:
 
-- Python (2.7 or 3.3)
+- Python (2.7 or 3.3+)
 - PyGObject
 - gobject-introspection type libraries for GTK+, Pango
 
