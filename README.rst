@@ -1,6 +1,8 @@
 GTimeLog
 ========
 
+GTimeLog is a simple app for keeping track of time.
+
 .. image:: https://pypip.in/version/gtimelog/badge.svg?style=flat
    :target: https://pypi.python.org/pypi/gtimelog/
    :alt: Latest Version
@@ -12,8 +14,6 @@ GTimeLog
 .. image:: https://coveralls.io/repos/gtimelog/gtimelog/badge.svg?branch=master
    :target: https://coveralls.io/r/gtimelog/gtimelog?branch=master
    :alt: test coverage
-
-GTimeLog is a simple app for keeping track of time.
 
 .. contents::
 
