@@ -5,7 +5,7 @@ GTimeLog is a simple app for keeping track of time.
 
 .. image:: https://pypip.in/version/gtimelog/badge.svg?style=flat
    :target: https://pypi.python.org/pypi/gtimelog/
-   :alt: ltest version
+   :alt: latest version
 
 .. image:: https://travis-ci.org/gtimelog/gtimelog.svg?branch=master
    :target: https://travis-ci.org/gtimelog/gtimelog
