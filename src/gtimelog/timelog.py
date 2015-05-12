@@ -138,6 +138,10 @@ class TimeWindow(object):
         self.virtual_midnight = virtual_midnight
         self.reread(callback)
 
+    def __repr__(self):
+        return '<TimeWindow: {}..{}>'.format(self.min_timestamp,
+                                             self.max_timestamp)
+
     def reread(self, callback=None):
         """Parse the time log file and update self.items.
 
@@ -814,6 +818,10 @@ class TimeLog(object):
 
         Returns None if the file doesn't exist.
         """
+        # Accept any file-like object instead of a filename (for the benefit of
+        # unit tests).
+        if hasattr(self.filename, 'read'):
+            return None
         try:
             return os.stat(self.filename).st_mtime
         except OSError:
@@ -905,6 +913,10 @@ class TimeLog(object):
                 cached.items.append((now, entry))
 
     def valid_time(self, time):
+        """Is this a valid time for a correction?
+
+        Valid times are those between the last timelog entry and now.
+        """
         if time > datetime.datetime.now():
             return False
         last = self.window.last_time()

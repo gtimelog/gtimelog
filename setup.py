@@ -63,6 +63,7 @@ setup(
     package_dir={'': 'src'},
     package_data={'gtimelog': ['*.ui', '*.png']},
     test_suite='gtimelog.tests',
+    tests_require=['freezegun'],
     zip_safe=False,
     entry_points="""
     [gui_scripts]

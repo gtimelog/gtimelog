@@ -8,11 +8,14 @@ import tempfile
 import textwrap
 import unittest
 from pprint import pprint
-
 try:
     from cStringIO import StringIO
 except ImportError:
     from io import StringIO
+
+import freezegun
+
+from gtimelog.timelog import TimeLog
 
 
 def doctest_as_hours():
@@ -246,6 +249,22 @@ def doctest_uniq():
         ['a']
         >>> uniq([])
         []
+
+    """
+
+
+def doctest_TimeWindow_repr():
+    """Test for TimeWindow.__repr__
+
+        >>> from datetime import datetime, time
+        >>> min = datetime(2013, 12, 3)
+        >>> max = datetime(2013, 12, 4)
+        >>> vm = time(2, 0)
+
+        >>> from gtimelog.timelog import TimeWindow
+        >>> window = TimeWindow('/nosuchfile', min, max, vm)
+        >>> window
+        <TimeWindow: 2013-12-03 00:00:00..2013-12-04 00:00:00>
 
     """
 
@@ -962,7 +981,6 @@ class TestTimeLog(unittest.TestCase):
 
     def test_appending_clears_window_cache(self):
         # Regression test for https://github.com/gtimelog/gtimelog/issues/28
-        from gtimelog.timelog import TimeLog
         tempfile = os.path.join(self.mkdtemp(), 'timelog.txt')
         timelog = TimeLog(tempfile, datetime.time(2, 0))
 
@@ -972,6 +990,32 @@ class TestTimeLog(unittest.TestCase):
         timelog.append('started **', now=datetime.datetime(2014, 11, 12, 10, 00))
         w = timelog.window_for_day(datetime.date(2014, 11, 12))
         self.assertEqual(len(list(w.all_entries())), 1)
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_valid_time_accepts_any_time_in_the_past_when_log_is_empty(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        past = datetime.datetime(2015, 5, 12, 14, 20)
+        self.assertTrue(timelog.valid_time(past))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_valid_time_rejects_times_in_the_future(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        future = datetime.datetime(2015, 5, 12, 16, 30)
+        self.assertFalse(timelog.valid_time(future))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_valid_time_rejects_times_before_last_entry(self):
+        timelog = TimeLog(StringIO("2015-05-12 15:00: did stuff"),
+                          datetime.time(2, 0))
+        past = datetime.datetime(2015, 5, 12, 14, 20)
+        self.assertFalse(timelog.valid_time(past))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_valid_time_accepts_times_between_last_entry_and_now(self):
+        timelog = TimeLog(StringIO("2015-05-12 15:00: did stuff"),
+                          datetime.time(2, 0))
+        past = datetime.datetime(2015, 5, 12, 15, 20)
+        self.assertTrue(timelog.valid_time(past))
 
 
 class TestSettings(unittest.TestCase):
