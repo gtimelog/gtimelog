@@ -941,8 +941,8 @@ class TimeLog(object):
             h = int(date_match.group(1))
             m = int(date_match.group(2))
             if 0 <= h < 24 and 0 <= m <= 60:
-                now = datetime.datetime.now()
-                now = now.replace(hour=h, minute=m, second=0, microsecond=0)
+                now = datetime.datetime.combine(self.virtual_today(),
+                                                datetime.time(h, m))
                 if self.valid_time(now):
                     entry = entry[date_match.end():]
                 else:
