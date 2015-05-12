@@ -1046,6 +1046,8 @@ class TestTimeLog(unittest.TestCase):
         timelog = TimeLog(StringIO(), datetime.time(2, 0))
         self.assertEqual(timelog.parse_correction("19:60 did stuff"),
                          ("19:60 did stuff", None))
+        self.assertEqual(timelog.parse_correction("24:00 did stuff"),
+                         ("24:00 did stuff", None))
 
     @freezegun.freeze_time("2015-05-12 16:27")
     def test_parse_correction_ignores_absolute_times_before_last_entry(self):
