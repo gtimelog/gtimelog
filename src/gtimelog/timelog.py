@@ -943,6 +943,8 @@ class TimeLog(object):
             if 0 <= h < 24 and 0 <= m < 60:
                 now = datetime.datetime.combine(self.virtual_today(),
                                                 datetime.time(h, m))
+                if now.time() < self.virtual_midnight:
+                    now += datetime.timedelta(1)
                 if self.valid_time(now):
                     entry = entry[date_match.end():]
                 else:
