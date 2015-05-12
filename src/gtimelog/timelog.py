@@ -940,7 +940,7 @@ class TimeLog(object):
         if date_match:
             h = int(date_match.group(1))
             m = int(date_match.group(2))
-            if 0 <= h < 24 and 0 <= m <= 60:
+            if 0 <= h < 24 and 0 <= m < 60:
                 now = datetime.datetime.combine(self.virtual_today(),
                                                 datetime.time(h, m))
                 if self.valid_time(now):
