@@ -4,7 +4,6 @@
 __metaclass__ = type
 
 import os
-import re
 import sys
 import errno
 import codecs
@@ -955,29 +954,7 @@ class MainWindow:
             self.jump_to_today()
 
         entry = self._get_entry_text()
-
-        now = None
-        date_match = re.match(r'(\d\d):(\d\d)\s+', entry)
-        delta_match = re.match(r'-([1-9]\d?|1\d\d)\s+', entry)
-        if date_match:
-            h = int(date_match.group(1))
-            m = int(date_match.group(2))
-            if 0 <= h < 24 and 0 <= m <= 60:
-                now = datetime.datetime.now()
-                now = now.replace(hour=h, minute=m, second=0, microsecond=0)
-                if self.timelog.valid_time(now):
-                    entry = entry[date_match.end():]
-                else:
-                    now = None
-        if delta_match:
-            seconds = int(delta_match.group()) * 60
-            now = datetime.datetime.now().replace(second=0, microsecond=0)
-            now += datetime.timedelta(seconds=seconds)
-            if self.timelog.valid_time(now):
-                entry = entry[delta_match.end():]
-            else:
-                now = None
-
+        entry, now = self.timelog.parse_correction(entry)
         if not entry:
             return
         self.add_history(entry)

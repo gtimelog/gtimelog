@@ -924,6 +924,39 @@ class TimeLog(object):
             return False
         return True
 
+    def parse_correction(self, entry):
+        """Recognize a time correction.
+
+        Corrections are entries that begin with a timestamp (HH:MM) or a
+        relative number of minutes (-MM).
+
+        Returns a tuple (entry, timestamp).  ``timestamp`` will be None
+        if no correction was recognized.  ``entry`` will have the leading
+        timestamp stripped.
+        """
+        now = None
+        date_match = re.match(r'(\d\d):(\d\d)\s+', entry)
+        delta_match = re.match(r'-([1-9]\d?|1\d\d)\s+', entry)
+        if date_match:
+            h = int(date_match.group(1))
+            m = int(date_match.group(2))
+            if 0 <= h < 24 and 0 <= m <= 60:
+                now = datetime.datetime.now()
+                now = now.replace(hour=h, minute=m, second=0, microsecond=0)
+                if self.valid_time(now):
+                    entry = entry[date_match.end():]
+                else:
+                    now = None
+        if delta_match:
+            seconds = int(delta_match.group()) * 60
+            now = datetime.datetime.now().replace(second=0, microsecond=0)
+            now += datetime.timedelta(seconds=seconds)
+            if self.valid_time(now):
+                entry = entry[delta_match.end():]
+            else:
+                now = None
+        return entry, now
+
 
 class TaskList(object):
     """Task list.

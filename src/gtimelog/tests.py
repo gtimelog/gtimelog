@@ -1017,6 +1017,55 @@ class TestTimeLog(unittest.TestCase):
         past = datetime.datetime(2015, 5, 12, 15, 20)
         self.assertTrue(timelog.valid_time(past))
 
+    def test_parse_correction_leaves_regular_text_alone(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("did stuff"),
+                         ("did stuff", None))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_recognizes_absolute_times(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("15:20 did stuff"),
+                         ("did stuff", datetime.datetime(2015, 5, 12, 15, 20)))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_ignores_future_absolute_times(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("17:20 did stuff"),
+                         ("17:20 did stuff", None))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_ignores_bad_absolute_times(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("19:63 did stuff"),
+                         ("19:63 did stuff", None))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_ignores_absolute_times_before_last_entry(self):
+        timelog = TimeLog(StringIO("2015-05-12 16:00: stuff"),
+                          datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("15:20 did stuff"),
+                         ("15:20 did stuff", None))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_recognizes_relative_times(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("-20 did stuff"),
+                         ("did stuff", datetime.datetime(2015, 5, 12, 16, 7)))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_ignores_relative_times_before_last_entry(self):
+        timelog = TimeLog(StringIO("2015-05-12 16:00: stuff"),
+                          datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("-30 did stuff"),
+                         ("-30 did stuff", None))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_ignores_bad_relative_times(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("-200 did stuff"),
+                         ("-200 did stuff", None))
+
 
 class TestSettings(unittest.TestCase):
 
