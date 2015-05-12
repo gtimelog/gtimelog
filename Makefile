@@ -27,7 +27,11 @@ check test:
 coverage:
 	coverage run ./runtests
 	coverage report --include 'src/gtimelog/*'
-	@coverage xml && diff-cover coverage.xml 2>/dev/null
+
+.PHONY: coverage-diff
+coverage-diff: coverage
+	coverage xml
+	diff-cover coverage.xml
 
 .PHONY: clean
 clean:
