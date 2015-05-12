@@ -4,7 +4,7 @@ python:
     - 3.3
     - 3.4
 install:
-    - travis_retry pip install coverage coveralls -e .
+    - pip install freezegun coverage coveralls -e .
 script:
     - make coverage
 after_success:
