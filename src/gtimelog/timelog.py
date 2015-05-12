@@ -444,9 +444,9 @@ class TimeWindow(object):
                 dmin += datetime.timedelta(days=1)
 
         # convert to hours, and a sortable list
-        items = [(day, as_hours(start), as_hours(slacking), as_hours(work))
-                  for day, (start, slacking, work) in days.items()]
-        items.sort()
+        items = sorted(
+            (day, as_hours(start), as_hours(slacking), as_hours(work))
+            for day, (start, slacking, work) in days.items())
         writer.writerows(items)
 
 
