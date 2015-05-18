@@ -1,3 +1,8 @@
+[run]
+source = src/gtimelog
+omit = src/gtimelog/tests.py
+cover_pylib = False
+
 [report]
 exclude_lines =
     pragma: nocover

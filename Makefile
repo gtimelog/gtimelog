@@ -26,7 +26,7 @@ check test:
 .PHONY: coverage
 coverage:
 	coverage run ./runtests
-	coverage report --include 'src/gtimelog/*'
+	coverage report
 
 .PHONY: coverage-diff
 coverage-diff: coverage
