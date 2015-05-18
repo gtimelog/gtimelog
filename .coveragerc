@@ -1,6 +1,6 @@
 [run]
 source = src/gtimelog
-omit = src/gtimelog/tests.py
+omit = src/gtimelog/tests.py,src/gtimelog/main.py
 cover_pylib = False
 
 [report]
