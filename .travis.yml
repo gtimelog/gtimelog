@@ -7,7 +7,7 @@ python:
 install:
     - pip install freezegun coverage coveralls -e .
 script:
-    - make coverage
+    - coverage run -m gtimelog.tests
 after_success:
     - coveralls
 notifications:

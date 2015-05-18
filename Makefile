@@ -25,7 +25,8 @@ check test:
 
 .PHONY: coverage
 coverage:
-	coverage run ./runtests
+	detox -e coverage,coverage3 -- -p
+	coverage combine
 	coverage report
 
 .PHONY: coverage-diff
