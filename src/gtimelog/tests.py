@@ -1265,6 +1265,13 @@ class TestTagging (unittest.TestCase):
         self.assertEqual(result[0], 'read news **')
         self.assertEqual(result[1], set(['reading']))
 
+    def test_TimeWindow__split_entry_and_tags5(self):
+        """Test `TimeWindow._split_entry_and_tags` with slack-type entry"""
+        result = self.tw._split_entry_and_tags('read news -- reading ***')
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], 'read news ***')
+        self.assertEqual(result[1], set(['reading']))
+
     def test_Reports__report_tags(self):
         from gtimelog.timelog import Reports
         rp = Reports(self.tw)
