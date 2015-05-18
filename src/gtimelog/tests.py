@@ -7,6 +7,7 @@ import shutil
 import tempfile
 import textwrap
 import unittest
+import sys
 from pprint import pprint
 try:
     from cStringIO import StringIO
@@ -489,7 +490,6 @@ def doctest_TimeWindow_to_csv_complete():
         >>> from gtimelog.timelog import TimeWindow
         >>> window = TimeWindow(sampledata, min, max, vm)
 
-        >>> import sys
         >>> window.to_csv_complete(sys.stdout)
         task,time (minutes)
         etc,60
@@ -520,7 +520,6 @@ def doctest_TimeWindow_to_csv_daily():
         >>> from gtimelog.timelog import TimeWindow
         >>> window = TimeWindow(sampledata, min, max, vm)
 
-        >>> import sys
         >>> window.to_csv_daily(sys.stdout)
         date,day-start (hours),slacking (hours),work (hours)
         2008-06-03,12.75,0.0,3.0
@@ -532,8 +531,6 @@ def doctest_TimeWindow_to_csv_daily():
 
 def doctest_Reports_weekly_report_categorized():
     r"""Tests for Reports.weekly_report_categorized
-
-        >>> import sys
 
         >>> from datetime import datetime, time
         >>> from gtimelog.timelog import TimeWindow, Reports
@@ -598,8 +595,6 @@ def doctest_Reports_weekly_report_categorized():
 def doctest_Reports_monthly_report_categorized():
     r"""Tests for Reports.monthly_report_categorized
 
-        >>> import sys
-
         >>> from datetime import datetime, time
         >>> from gtimelog.timelog import TimeWindow, Reports
 
@@ -660,8 +655,6 @@ def doctest_Reports_monthly_report_categorized():
 def doctest_Reports_report_categories():
     r"""Tests for Reports._report_categories
 
-        >>> import sys
-
         >>> from datetime import datetime, time, timedelta
         >>> from gtimelog.timelog import TimeWindow, Reports
 
@@ -688,8 +681,6 @@ def doctest_Reports_report_categories():
 
 def doctest_Reports_daily_report():
     r"""Tests for Reports.daily_report
-
-        >>> import sys
 
         >>> from datetime import datetime, time
         >>> from gtimelog.timelog import TimeWindow, Reports
@@ -746,8 +737,6 @@ def doctest_Reports_daily_report():
 def doctest_Reports_weekly_report_plain():
     r"""Tests for Reports.weekly_report_plain
 
-        >>> import sys
-
         >>> from datetime import datetime, time
         >>> from gtimelog.timelog import TimeWindow, Reports
 
@@ -797,8 +786,6 @@ def doctest_Reports_weekly_report_plain():
 def doctest_Reports_monthly_report_plain():
     r"""Tests for Reports.monthly_report_plain
 
-        >>> import sys
-
         >>> from datetime import datetime, time
         >>> from gtimelog.timelog import TimeWindow, Reports
 
@@ -847,8 +834,6 @@ def doctest_Reports_monthly_report_plain():
 
 def doctest_Reports_custom_range_report_categorized():
     r"""Tests for Reports.custom_range_report_categorized
-
-        >>> import sys
 
         >>> from datetime import datetime, time
         >>> from gtimelog.timelog import TimeWindow, Reports
@@ -1303,7 +1288,7 @@ def test_suite():
 
 
 def main():
-    unittest.TextTestRunner().run(test_suite())
+    unittest.main(module='gtimelog.tests', defaultTest='test_suite')
 
 
 if __name__ == '__main__':
