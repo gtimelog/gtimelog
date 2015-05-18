@@ -6,9 +6,11 @@ import codecs
 import csv
 import datetime
 import os
+import socket
 import sys
 import re
 import urllib
+from hashlib import md5
 from operator import itemgetter
 
 
@@ -378,15 +380,13 @@ class TimeWindow(object):
         output.write("BEGIN:VCALENDAR\n")
         output.write("PRODID:-//mg.pov.lt/NONSGML GTimeLog//EN\n")
         output.write("VERSION:2.0\n")
-        try:
-            import socket
-            idhost = socket.getfqdn()
-        except: # can it actually ever fail?
-            idhost = 'localhost'
+        idhost = socket.getfqdn()
         dtstamp = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        def _hash(start, stop, entry):
+            return md5(("%s%s%s" % (start, stop, entry)).encode('UTF-8')).hexdigest()
         for start, stop, duration, tags, entry in self.all_entries():
             output.write("BEGIN:VEVENT\n")
-            output.write("UID:%s@%s\n" % (hash((start, stop, entry)), idhost))
+            output.write("UID:%s@%s\n" % (_hash(start, stop, entry), idhost))
             output.write("SUMMARY:%s\n" % (entry.replace('\\', '\\\\'))
                                                 .replace(';', '\\;')
                                                 .replace(',', '\\,'))
