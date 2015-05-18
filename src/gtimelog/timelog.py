@@ -460,8 +460,7 @@ class Reports(object):
     def __init__(self, window):
         self.window = window
 
-    def _categorizing_report(self, output, email, who, subject, period_name,
-                             estimated_column=False):
+    def _categorizing_report(self, output, email, who, subject, period_name):
         """A report that displays entries by category.
 
         Writes a report template in RFC-822 format to output.
@@ -504,10 +503,7 @@ class Reports(object):
             output.write("No work done this %s.\n" % period_name)
             return
         output.write(" " * 46)
-        if estimated_column:
-            output.write("estimated        actual\n")
-        else:
-            output.write("                   time\n")
+        output.write("                   time\n")
 
         total_work, total_slacking = window.totals()
         entries, totals = window.categorized_work_entries()
@@ -532,13 +528,8 @@ class Reports(object):
                         continue # skip empty "arrival" entries
 
                     entry = entry[:1].upper() + entry[1:]
-                    if estimated_column:
-                        output.write(u"  %-46s  %-14s  %s\n" %
-                                     (entry, '-',
-                                     format_duration_short(duration)))
-                    else:
-                        output.write(u"  %-61s  %+5s\n" %
-                                     (entry, format_duration_short(duration)))
+                    output.write(u"  %-61s  %+5s\n" %
+                                 (entry, format_duration_short(duration)))
 
                 output.write('-' * 70 + '\n')
                 output.write(u"%+70s\n" % format_duration_short(totals[cat]))
@@ -620,8 +611,7 @@ class Reports(object):
                 cat, format_duration_long(duration)))
         output.write('\n')
 
-    def _plain_report(self, output, email, who, subject, period_name,
-                      estimated_column=False):
+    def _plain_report(self, output, email, who, subject, period_name):
         """Format a report that does not categorize entries.
 
         Writes a report template in RFC-822 format to output.
@@ -636,10 +626,7 @@ class Reports(object):
             output.write("No work done this %s.\n" % period_name)
             return
         output.write(" " * 46)
-        if estimated_column:
-            output.write("estimated       actual\n")
-        else:
-            output.write("                time\n")
+        output.write("                time\n")
         work, slack = window.grouped_entries()
         total_work, total_slacking = window.totals()
         categories = {}
@@ -659,12 +646,8 @@ class Reports(object):
                         None, datetime.timedelta(0)) + duration
 
                 entry = entry[:1].upper() + entry[1:]
-                if estimated_column:
-                    output.write(u"%-46s  %-14s  %s\n" %
-                                 (entry, '-', format_duration_long(duration)))
-                else:
-                    output.write(u"%-62s  %s\n" %
-                                 (entry, format_duration_long(duration)))
+                output.write(u"%-62s  %s\n" %
+                             (entry, format_duration_long(duration)))
             output.write('\n')
         output.write("Total work done this %s: %s\n" %
                      (period_name, format_duration_long(total_work)))
@@ -676,50 +659,42 @@ class Reports(object):
         if tags:
             self._report_tags(output, tags)
 
-    def weekly_report_categorized(self, output, email, who,
-                                  estimated_column=False):
+    def weekly_report_categorized(self, output, email, who):
         """Format a weekly report with entries displayed  under categories."""
         week = self.window.min_timestamp.isocalendar()[1]
         subject = u'Weekly report for %s (week %02d)' % (who, week)
         return self._categorizing_report(output, email, who, subject,
-                                         period_name='week',
-                                         estimated_column=estimated_column)
+                                         period_name='week')
 
-    def monthly_report_categorized(self, output, email, who,
-                                   estimated_column=False):
+    def monthly_report_categorized(self, output, email, who):
         """Format a monthly report with entries displayed  under categories."""
         month = self.window.min_timestamp.strftime('%Y/%m')
         subject = u'Monthly report for %s (%s)' % (who, month)
         return self._categorizing_report(output, email, who, subject,
-                                         period_name='month',
-                                         estimated_column=estimated_column)
+                                         period_name='month')
 
-    def weekly_report_plain(self, output, email, who, estimated_column=False):
+    def weekly_report_plain(self, output, email, who):
         """Format a weekly report ."""
         week = self.window.min_timestamp.isocalendar()[1]
         subject = u'Weekly report for %s (week %02d)' % (who, week)
         return self._plain_report(output, email, who, subject,
-                                  period_name='week',
-                                  estimated_column=estimated_column)
+                                  period_name='week')
 
-    def monthly_report_plain(self, output, email, who, estimated_column=False):
+    def monthly_report_plain(self, output, email, who):
         """Format a monthly report ."""
         month = self.window.min_timestamp.strftime('%Y/%m')
         subject = u'Monthly report for %s (%s)' % (who, month)
         return self._plain_report(output, email, who, subject,
-                                  period_name='month',
-                                  estimated_column=estimated_column)
+                                  period_name='month')
 
-    def custom_range_report_categorized(self, output, email, who,
-                                        estimated_column=False):
+    def custom_range_report_categorized(self, output, email, who):
         """Format a custom range report with entries displayed  under categories."""
         min = self.window.min_timestamp.strftime('%Y-%m-%d')
         max = self.window.max_timestamp - datetime.timedelta(1)
         max = max.strftime('%Y-%m-%d')
         subject = u'Custom date range report for %s (%s - %s)' % (who, min, max)
         return self._categorizing_report(output, email, who, subject,
-                                         period_name='custom range',
-                                         estimated_column=estimated_column)
+                                         period_name='custom range')
 
     def daily_report(self, output, email, who):
         """Format a daily report.
