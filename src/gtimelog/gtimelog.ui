@@ -42,10 +42,10 @@
         </child>
         <child>
           <object class="GtkBox" id="vbox2">
-            <property name="orientation">vertical</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="border_width">16</property>
+            <property name="orientation">vertical</property>
             <child>
               <object class="GtkLabel" id="about_text">
                 <property name="visible">True</property>
@@ -97,9 +97,9 @@ GTimeLog is a time tracking application.
     </child>
     <child>
       <object class="GtkMenuItem" id="appind_quit">
-        <property name="label" translatable="yes">_Quit</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="label" translatable="yes">_Quit</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="on_quit_activate" swapped="no"/>
       </object>
@@ -187,9 +187,9 @@ GTimeLog is a time tracking application.
     <property name="icon">gtimelog.png</property>
     <child>
       <object class="GtkBox" id="vbox1">
-        <property name="orientation">vertical</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
         <child>
           <object class="GtkMenuBar" id="main_menu">
             <property name="visible">True</property>
@@ -205,9 +205,9 @@ GTimeLog is a time tracking application.
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkMenuItem" id="reload">
-                        <property name="label" translatable="yes">_Reload</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_Reload</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_reread_activate" swapped="no"/>
                         <accelerator key="R" signal="activate" modifiers="GDK_CONTROL_MASK"/>
@@ -215,9 +215,9 @@ GTimeLog is a time tracking application.
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="edit_timelog">
-                        <property name="label" translatable="yes">_Edit timelog.txt</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_Edit timelog.txt</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_edit_timelog_activate" swapped="no"/>
                         <accelerator key="E" signal="activate" modifiers="GDK_CONTROL_MASK"/>
@@ -225,9 +225,9 @@ GTimeLog is a time tracking application.
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="main_quit">
-                        <property name="label" translatable="yes">_Quit</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_Quit</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_quit_activate" swapped="no"/>
                         <accelerator key="q" signal="activate" modifiers="GDK_CONTROL_MASK"/>
@@ -312,9 +312,9 @@ GTimeLog is a time tracking application.
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkMenuItem" id="daily_report">
-                        <property name="label" translatable="yes">_Daily Report</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_Daily Report</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_daily_report_activate" swapped="no"/>
                         <accelerator key="D" signal="activate" modifiers="GDK_CONTROL_MASK"/>
@@ -322,81 +322,81 @@ GTimeLog is a time tracking application.
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="yesterdays_report">
-                        <property name="label" translatable="yes">Daily Report for _Yesterday</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Daily Report for _Yesterday</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_yesterdays_report_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="previous_day_report">
-                        <property name="label" translatable="yes">Daily Report for a _Previous Day...</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Daily Report for a _Previous Day...</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_previous_day_report_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="weekly_report">
-                        <property name="label" translatable="yes">_Weekly Report</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_Weekly Report</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_weekly_report_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="last_weeks_report">
-                        <property name="label" translatable="yes">Weekly Report for _Last Week</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Weekly Report for _Last Week</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_last_weeks_report_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="previous_week_report">
-                        <property name="label" translatable="yes">Weekly Report for a Pre_vious Week...</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Weekly Report for a Pre_vious Week...</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_previous_week_report_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="monthly_report">
-                        <property name="label" translatable="yes">_Monthly Report</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_Monthly Report</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_monthly_report_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="last_month_report">
-                        <property name="label" translatable="yes">Monthly Report for Last Month</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Monthly Report for Last Month</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_last_month_report_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="previous_month_report">
-                        <property name="label" translatable="yes">Monthly Report for a Previous Month...</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Monthly Report for a Previous Month...</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_previous_month_report_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="custom_range_report">
-                        <property name="label" translatable="yes">Report for a Custom Date Range...</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Report for a Custom Date Range...</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_custom_range_report_activate" swapped="no"/>
                       </object>
@@ -409,18 +409,18 @@ GTimeLog is a time tracking application.
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="open_complete_spreadsheet">
-                        <property name="label" translatable="yes">_Complete Report in Spreadsheet</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_Complete Report in Spreadsheet</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_open_complete_spreadsheet_activate" swapped="no"/>
                       </object>
                     </child>
                     <child>
                       <object class="GtkMenuItem" id="open_slack_spreadsheet">
-                        <property name="label" translatable="yes">Work/_Slacking stats in Spreadsheet</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Work/_Slacking stats in Spreadsheet</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_open_slack_spreadsheet_activate" swapped="no"/>
                       </object>
@@ -440,9 +440,9 @@ GTimeLog is a time tracking application.
                     <property name="can_focus">False</property>
                     <child>
                       <object class="GtkMenuItem" id="about">
-                        <property name="label" translatable="yes">_About</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">_About</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_about_activate" swapped="no"/>
                       </object>
@@ -470,16 +470,15 @@ GTimeLog is a time tracking application.
         </child>
         <child>
           <object class="GtkPaned" id="hpaned1">
-            <property name="orientation">horizontal</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="position">600</property>
             <property name="position_set">True</property>
             <child>
               <object class="GtkBox" id="vbox3">
-                <property name="orientation">vertical</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
                 <child>
                   <object class="GtkToolbar" id="toolbar">
                     <property name="visible">True</property>
@@ -585,15 +584,15 @@ GTimeLog is a time tracking application.
             </child>
             <child>
               <object class="GtkBox" id="task_list_pane">
-                <property name="orientation">vertical</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
                 <property name="spacing">6</property>
                 <child>
                   <object class="GtkBox" id="task_list_pane_outer_vbox">
-                    <property name="orientation">vertical</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkToolbar" id="task_pane_toolbar">
                         <property name="visible">True</property>
@@ -642,15 +641,14 @@ GTimeLog is a time tracking application.
                     </child>
                     <child>
                       <object class="GtkBox" id="task_pane_hbox">
-                        <property name="orientation">horizontal</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="spacing">6</property>
                         <child>
                           <object class="GtkBox" id="task_list_pane_vbox">
-                            <property name="orientation">vertical</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="orientation">vertical</property>
                             <property name="spacing">6</property>
                             <child>
                               <object class="GtkScrolledWindow" id="scrolledwindow2">
@@ -694,9 +692,9 @@ GTimeLog is a time tracking application.
                         </child>
                         <child>
                           <object class="GtkBox" id="task_list_pane_hack_vbox">
-                            <property name="orientation">vertical</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="orientation">vertical</property>
                             <child>
                               <placeholder/>
                             </child>
@@ -736,7 +734,6 @@ GTimeLog is a time tracking application.
         </child>
         <child>
           <object class="GtkBox" id="hbox1">
-            <property name="orientation">horizontal</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="border_width">4</property>
@@ -745,7 +742,7 @@ GTimeLog is a time tracking application.
               <object class="GtkLabel" id="time_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="no">00:12</property>
+                <property name="label">00:12</property>
                 <property name="mnemonic_widget">task_entry</property>
               </object>
               <packing>
@@ -799,18 +796,18 @@ GTimeLog is a time tracking application.
     <property name="can_focus">False</property>
     <child>
       <object class="GtkMenuItem" id="task_list_reload">
-        <property name="label" translatable="yes">_Reload</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="label" translatable="yes">_Reload</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="on_task_list_reload" swapped="no"/>
       </object>
     </child>
     <child>
       <object class="GtkMenuItem" id="task_list_edit">
-        <property name="label" translatable="yes">_Edit</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="label" translatable="yes">_Edit</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="on_task_list_edit" swapped="no"/>
       </object>
@@ -838,9 +835,9 @@ GTimeLog is a time tracking application.
     </child>
     <child>
       <object class="GtkMenuItem" id="popup_quit">
-        <property name="label" translatable="yes">_Quit</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="label" translatable="yes">_Quit</property>
         <property name="use_underline">True</property>
         <signal name="activate" handler="on_quit_activate" swapped="no"/>
       </object>
