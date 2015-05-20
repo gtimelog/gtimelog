@@ -634,7 +634,7 @@ GTimeLog is a time tracking application.
                           <object class="GtkToolButton" id="task_pane_close_toolbutton">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">toolbutton2</property>
+                            <property name="label" translatable="yes">Close</property>
                             <property name="use_underline">True</property>
                             <property name="stock_id">gtk-close</property>
                             <signal name="clicked" handler="on_task_pane_close_button_activate" swapped="no"/>
