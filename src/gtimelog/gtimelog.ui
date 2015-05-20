@@ -549,7 +549,7 @@ GTimeLog is a time tracking application.
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="tooltip_text" translatable="yes">Today</property>
-                        <property name="label" translatable="yes">toolbutton2</property>
+                        <property name="label" translatable="yes">Today</property>
                         <property name="use_underline">True</property>
                         <property name="stock_id">gtk-goto-last</property>
                         <signal name="clicked" handler="on_today_toolbutton_clicked" swapped="no"/>
