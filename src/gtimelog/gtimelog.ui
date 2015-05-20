@@ -490,7 +490,7 @@ GTimeLog is a time tracking application.
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Back</property>
                         <property name="use_underline">True</property>
-                        <property name="stock_id">gtk-go-back</property>
+                        <property name="icon_name">go-previous</property>
                         <signal name="clicked" handler="on_back_toolbutton_clicked" swapped="no"/>
                         <accelerator key="Left" signal="clicked" modifiers="GDK_MOD1_MASK"/>
                       </object>
@@ -522,7 +522,7 @@ GTimeLog is a time tracking application.
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">Forward</property>
                         <property name="use_underline">True</property>
-                        <property name="stock_id">gtk-go-forward</property>
+                        <property name="icon_name">go-next</property>
                         <signal name="clicked" handler="on_forward_toolbutton_clicked" swapped="no"/>
                         <accelerator key="Right" signal="clicked" modifiers="GDK_MOD1_MASK"/>
                       </object>
@@ -538,7 +538,7 @@ GTimeLog is a time tracking application.
                         <property name="tooltip_text" translatable="yes">Today</property>
                         <property name="label" translatable="yes">Today</property>
                         <property name="use_underline">True</property>
-                        <property name="stock_id">gtk-goto-last</property>
+                        <property name="icon_name">go-last</property>
                         <signal name="clicked" handler="on_today_toolbutton_clicked" swapped="no"/>
                         <accelerator key="Home" signal="clicked" modifiers="GDK_MOD1_MASK"/>
                       </object>
@@ -625,7 +625,7 @@ GTimeLog is a time tracking application.
                             <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Close</property>
                             <property name="use_underline">True</property>
-                            <property name="stock_id">gtk-close</property>
+                            <property name="icon_name">window-close</property>
                             <signal name="clicked" handler="on_task_pane_close_button_activate" swapped="no"/>
                           </object>
                           <packing>
