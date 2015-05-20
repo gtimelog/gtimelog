@@ -132,7 +132,7 @@ class SimpleStatusIcon(IconChooser):
         self.icon.connect('popup-menu', self.on_popup_menu)
         self.gtimelog_window.main_window.connect(
             'style-updated', self.on_style_set)
-        GObject.timeout_add_seconds(1, self.tick)
+        GLib.timeout_add_seconds(1, self.tick)
         self.gtimelog_window.entry_watchers.append(self.entry_added)
         self.gtimelog_window.tray_icon = self
 
@@ -305,7 +305,7 @@ class MainWindow:
         self.populate_log()
         self.update_show_checkbox()
         self.tick(True)
-        GObject.timeout_add_seconds(1, self.tick)
+        GLib.timeout_add_seconds(1, self.tick)
 
     def quit(self):
         self.main_window.destroy()
