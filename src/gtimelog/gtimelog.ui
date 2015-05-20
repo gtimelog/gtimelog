@@ -41,7 +41,8 @@
           </packing>
         </child>
         <child>
-          <object class="GtkVBox" id="vbox2">
+          <object class="GtkBox" id="vbox2">
+            <property name="orientation">vertical</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="border_width">16</property>
@@ -185,7 +186,8 @@ GTimeLog is a time tracking application.
     <property name="default_height">500</property>
     <property name="icon">gtimelog.png</property>
     <child>
-      <object class="GtkVBox" id="vbox1">
+      <object class="GtkBox" id="vbox1">
+        <property name="orientation">vertical</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <child>
@@ -467,13 +469,15 @@ GTimeLog is a time tracking application.
           </packing>
         </child>
         <child>
-          <object class="GtkHPaned" id="hpaned1">
+          <object class="GtkPaned" id="hpaned1">
+            <property name="orientation">horizontal</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="position">600</property>
             <property name="position_set">True</property>
             <child>
-              <object class="GtkVBox" id="vbox3">
+              <object class="GtkBox" id="vbox3">
+                <property name="orientation">vertical</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <child>
@@ -580,12 +584,14 @@ GTimeLog is a time tracking application.
               </packing>
             </child>
             <child>
-              <object class="GtkVBox" id="task_list_pane">
+              <object class="GtkBox" id="task_list_pane">
+                <property name="orientation">vertical</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="spacing">6</property>
                 <child>
-                  <object class="GtkVBox" id="task_list_pane_outer_vbox">
+                  <object class="GtkBox" id="task_list_pane_outer_vbox">
+                    <property name="orientation">vertical</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <child>
@@ -635,12 +641,14 @@ GTimeLog is a time tracking application.
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkHBox" id="task_pane_hbox">
+                      <object class="GtkBox" id="task_pane_hbox">
+                        <property name="orientation">horizontal</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="spacing">6</property>
                         <child>
-                          <object class="GtkVBox" id="task_list_pane_vbox">
+                          <object class="GtkBox" id="task_list_pane_vbox">
+                            <property name="orientation">vertical</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="spacing">6</property>
@@ -685,7 +693,8 @@ GTimeLog is a time tracking application.
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkVBox" id="task_list_pane_hack_vbox">
+                          <object class="GtkBox" id="task_list_pane_hack_vbox">
+                            <property name="orientation">vertical</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <child>
@@ -726,7 +735,8 @@ GTimeLog is a time tracking application.
           </packing>
         </child>
         <child>
-          <object class="GtkHBox" id="hbox1">
+          <object class="GtkBox" id="hbox1">
+            <property name="orientation">horizontal</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="border_width">4</property>
