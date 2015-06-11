@@ -1,3 +1,15 @@
+gtimelog (0.9.2-1) unstable; urgency=medium
+
+  * New upstream release. (Closes: #783023)
+  * d/control:
+    - Bump Standards-Version with no other changes necessary.
+    - Bump debhelper Build-Depends to version 9.
+  * d/compat: Bump to version 9.
+  * d/patches/i18n-setup.patch: Removed; fixed upstream.
+  * d/watch: Use the pypi.debian.net redirector.
+
+ -- Barry Warsaw <barry@debian.org>  Thu, 11 Jun 2015 10:44:28 -0400
+
 gtimelog (0.9.1-2) unstable; urgency=medium
 
   * d/control: Add python3-setuptools to Depends.  Closes: #734499
