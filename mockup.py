@@ -108,6 +108,7 @@ if __name__ == '__main__':
         app.set_accels_for_action("win.detail-level('chronological')", ["<Alt>1"])
         app.set_accels_for_action("win.detail-level('grouped')", ["<Alt>2"])
         app.set_accels_for_action("win.detail-level('summary')", ["<Alt>3"])
+        app.set_accels_for_action("win.show-task-pane", ["F9"])
     app.connect('startup', _startup)
     def _activate(app):
         window = builder.get_object('main_window')
@@ -115,6 +116,8 @@ if __name__ == '__main__':
         window.add_action(detail_level)
         time_range = Gio.SimpleAction.new_stateful("time-range", GLib.VariantType.new("s"), GLib.Variant("s", "day"))
         window.add_action(time_range)
+        task_pane = Gio.PropertyAction.new("show-task-pane", builder.get_object("task_pane"), "visible")
+        window.add_action(task_pane)
         app.add_window(window)
         window.show()
     app.connect('activate', _activate)
