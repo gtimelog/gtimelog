@@ -22,6 +22,7 @@ menu_def = '''
       <item>
         <attribute name="label">Quit</attribute>
         <attribute name="action">app.quit</attribute>
+        <attribute name="accel">&lt;Primary&gt;Q</attribute>
       </item>
     </section>
   </menu>
@@ -104,6 +105,9 @@ if __name__ == '__main__':
         quit = Gio.SimpleAction.new("quit", None)
         quit.connect('activate', lambda *args: app.quit())
         app.add_action(quit)
+        app.set_accels_for_action("win.detail-level('chronological')", ["<Alt>1"])
+        app.set_accels_for_action("win.detail-level('grouped')", ["<Alt>2"])
+        app.set_accels_for_action("win.detail-level('summary')", ["<Alt>3"])
     app.connect('startup', _startup)
     def _activate(app):
         window = builder.get_object('main_window')
