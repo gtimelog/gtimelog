@@ -1,4 +1,6 @@
 #!/usr/bin/python
+from __future__ import print_function
+
 import signal
 
 import gi
@@ -13,9 +15,11 @@ menu_def = '''
     <section>
       <item>
         <attribute name="label">Help</attribute>
+        <attribute name="action">app.help</attribute>
       </item>
       <item>
         <attribute name="label">About</attribute>
+        <attribute name="action">app.about</attribute>
       </item>
     </section>
     <section>
@@ -30,12 +34,13 @@ menu_def = '''
     <section>
       <item>
         <attribute name="label">Edit timelog.txt</attribute>
+        <attribute name="action">app.edit-log</attribute>
       </item>
     </section>
     <section>
       <item>
-        <attribute name="label">Quit</attribute>
-        <attribute name="action">app.quit</attribute>
+        <attribute name="label">Send report...</attribute>
+        <attribute name="action">win.send-report</attribute>
       </item>
     </section>
   </menu>
@@ -104,6 +109,9 @@ if __name__ == '__main__':
         quit = Gio.SimpleAction.new("quit", None)
         quit.connect('activate', lambda *args: app.quit())
         app.add_action(quit)
+        edit = Gio.SimpleAction.new("edit-log", None)
+        edit.connect('activate', lambda *args: print("Pretend-editing timelog.txt"))
+        app.add_action(edit)
         app.set_accels_for_action("win.detail-level('chronological')", ["<Alt>1"])
         app.set_accels_for_action("win.detail-level('grouped')", ["<Alt>2"])
         app.set_accels_for_action("win.detail-level('summary')", ["<Alt>3"])
@@ -111,6 +119,8 @@ if __name__ == '__main__':
         app.set_accels_for_action("win.go-back", ["<Alt>Left"])
         app.set_accels_for_action("win.go-forward", ["<Alt>Right"])
         app.set_accels_for_action("win.go-home", ["<Alt>Home"])
+        app.set_accels_for_action("app.edit-log", ["<Primary>E"])
+        app.set_accels_for_action("win.send-report", ["<Primary>D"])
     app.connect('startup', _startup)
     def _activate(app):
         window = builder.get_object('main_window')

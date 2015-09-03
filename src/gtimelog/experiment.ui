@@ -188,6 +188,7 @@ Tomaz Canabrava</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="action-name">win.add-entry</property>
               </object>
               <packing>
                 <property name="expand">False</property>
