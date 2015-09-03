@@ -95,7 +95,6 @@ builder = Gtk.Builder.new_from_file(ui_file)
 builder.add_from_string(menu_def)
 builder.get_object('menu_button').set_menu_model(builder.get_object('window_menu'))
 builder.get_object('view_button').set_menu_model(builder.get_object('view_menu'))
-builder.get_object('task_pane_button').bind_property("active", builder.get_object('task_pane'), "visible", GObject.BindingFlags.BIDIRECTIONAL)
 
 
 if __name__ == '__main__':
