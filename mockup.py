@@ -4,7 +4,7 @@ import signal
 import gi
 gi.require_version('Gtk', '3.0')
 
-from gi.repository import Gtk, GObject
+from gi.repository import Gtk, GObject, Gio
 
 ui_file = 'src/gtimelog/experiment.ui'
 menu_def = '''
@@ -21,6 +21,7 @@ menu_def = '''
     <section>
       <item>
         <attribute name="label">Quit</attribute>
+        <attribute name="action">app.quit</attribute>
       </item>
     </section>
   </menu>
@@ -33,6 +34,7 @@ menu_def = '''
     <section>
       <item>
         <attribute name="label">Quit</attribute>
+        <attribute name="action">app.quit</attribute>
       </item>
     </section>
   </menu>
@@ -80,10 +82,14 @@ builder.get_object('menu_button').set_menu_model(builder.get_object('window_menu
 builder.get_object('view_button').set_menu_model(builder.get_object('view_menu'))
 builder.get_object('task_pane_button').bind_property("active", builder.get_object('task_pane'), "visible", GObject.BindingFlags.BIDIRECTIONAL)
 
+
 if __name__ == '__main__':
     app = Gtk.Application(application_id='lt.pov.mg.gtimelog_mockup')
     def _startup(app):
         app.set_app_menu(builder.get_object('app_menu'))
+        quit = Gio.SimpleAction.new("quit", None)
+        quit.connect('activate', lambda *args: app.quit())
+        app.add_action(quit)
     app.connect('startup', _startup)
     def _activate(app):
         window = builder.get_object('main_window')
