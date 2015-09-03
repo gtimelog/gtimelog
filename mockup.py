@@ -52,6 +52,24 @@ menu_def = '''
         <attribute name="label">Summary</attribute>
       </item>
     </section>
+    <section>
+      <item>
+        <attribute name="label">Time range</attribute>
+        <attribute name="action">disabled</attribute>
+      </item>
+      <item>
+        <attribute name="label">Day</attribute>
+      </item>
+      <item>
+        <attribute name="label">Week</attribute>
+      </item>
+      <item>
+        <attribute name="label">Month</attribute>
+      </item>
+      <item>
+        <attribute name="label">Custom...</attribute>
+      </item>
+    </section>
   </menu>
 </interface>
 '''
