@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.19.0 -->
+<!-- Generated with glade 3.18.1 -->
 <interface>
   <requires lib="gtk+" version="3.16"/>
   <object class="GtkAboutDialog" id="about_dialog">
@@ -96,14 +96,6 @@ Tomaz Canabrava</property>
     <property name="can_focus">False</property>
     <property name="icon_name">view-dual-symbolic</property>
   </object>
-  <menu id="menu1">
-    <item>
-      <attribute name="label">Edit timelog.txt</attribute>
-    </item>
-    <item>
-      <attribute name="label">Quit</attribute>
-    </item>
-  </menu>
   <object class="GtkApplicationWindow" id="main_window">
     <property name="can_focus">False</property>
     <property name="default_width">800</property>
@@ -271,7 +263,6 @@ Tomaz Canabrava</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="image">image4</property>
-            <property name="menu-model">menu1</property>
           </object>
           <packing>
             <property name="pack_type">end</property>
