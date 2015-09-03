@@ -67,15 +67,23 @@ menu_def = '''
       </item>
       <item>
         <attribute name="label">Day</attribute>
+        <attribute name="action">win.time-range</attribute>
+        <attribute name="target">day</attribute>
       </item>
       <item>
         <attribute name="label">Week</attribute>
+        <attribute name="action">win.time-range</attribute>
+        <attribute name="target">week</attribute>
       </item>
       <item>
         <attribute name="label">Month</attribute>
+        <attribute name="action">win.time-range</attribute>
+        <attribute name="target">month</attribute>
       </item>
       <item>
         <attribute name="label">Custom...</attribute>
+        <attribute name="action">win.time-range</attribute>
+        <attribute name="target">custom</attribute>
       </item>
     </section>
   </menu>
@@ -101,6 +109,8 @@ if __name__ == '__main__':
         window = builder.get_object('main_window')
         detail_level = Gio.SimpleAction.new_stateful("detail-level", GLib.VariantType.new("s"), GLib.Variant("s", "chronological"))
         window.add_action(detail_level)
+        time_range = Gio.SimpleAction.new_stateful("time-range", GLib.VariantType.new("s"), GLib.Variant("s", "day"))
+        window.add_action(time_range)
         app.add_window(window)
         window.show()
     app.connect('activate', _activate)
