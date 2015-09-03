@@ -234,6 +234,7 @@ Tomaz Canabrava</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="image">image1</property>
+                <property name="action-name">win.go-back</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -247,6 +248,7 @@ Tomaz Canabrava</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="image">image2</property>
+                <property name="action-name">win.go-forward</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -260,6 +262,7 @@ Tomaz Canabrava</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="image">image3</property>
+                <property name="action-name">win.go-home</property>
               </object>
               <packing>
                 <property name="expand">False</property>

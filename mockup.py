@@ -4,7 +4,7 @@ import signal
 import gi
 gi.require_version('Gtk', '3.0')
 
-from gi.repository import Gtk, GObject, Gio, GLib
+from gi.repository import Gtk, Gio, GLib
 
 ui_file = 'src/gtimelog/experiment.ui'
 menu_def = '''
@@ -108,6 +108,9 @@ if __name__ == '__main__':
         app.set_accels_for_action("win.detail-level('grouped')", ["<Alt>2"])
         app.set_accels_for_action("win.detail-level('summary')", ["<Alt>3"])
         app.set_accels_for_action("win.show-task-pane", ["F9"])
+        app.set_accels_for_action("win.go-back", ["<Alt>Left"])
+        app.set_accels_for_action("win.go-forward", ["<Alt>Right"])
+        app.set_accels_for_action("win.go-home", ["<Alt>Home"])
     app.connect('startup', _startup)
     def _activate(app):
         window = builder.get_object('main_window')
@@ -117,6 +120,14 @@ if __name__ == '__main__':
         window.add_action(time_range)
         task_pane = Gio.PropertyAction.new("show-task-pane", builder.get_object("task_pane"), "visible")
         window.add_action(task_pane)
+        go_back = Gio.SimpleAction.new("go-back", None)
+        window.add_action(go_back)
+        go_forward = Gio.SimpleAction.new("go-forward", None)
+        go_forward.set_enabled(False)
+        window.add_action(go_forward)
+        go_home = Gio.SimpleAction.new("go-home", None)
+        go_home.set_enabled(False)
+        window.add_action(go_home)
         app.add_window(window)
         window.show()
     app.connect('activate', _activate)
