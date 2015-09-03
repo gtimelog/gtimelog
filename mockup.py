@@ -4,7 +4,7 @@ import signal
 import gi
 gi.require_version('Gtk', '3.0')
 
-from gi.repository import Gtk, GObject, Gio
+from gi.repository import Gtk, GObject, Gio, GLib
 
 ui_file = 'src/gtimelog/experiment.ui'
 menu_def = '''
@@ -46,12 +46,18 @@ menu_def = '''
       </item>
       <item>
         <attribute name="label">Chronological</attribute>
+        <attribute name="action">win.detail-level</attribute>
+        <attribute name="target">chronological</attribute>
       </item>
       <item>
         <attribute name="label">Grouped</attribute>
+        <attribute name="action">win.detail-level</attribute>
+        <attribute name="target">grouped</attribute>
       </item>
       <item>
         <attribute name="label">Summary</attribute>
+        <attribute name="action">win.detail-level</attribute>
+        <attribute name="target">summary</attribute>
       </item>
     </section>
     <section>
@@ -93,6 +99,8 @@ if __name__ == '__main__':
     app.connect('startup', _startup)
     def _activate(app):
         window = builder.get_object('main_window')
+        detail_level = Gio.SimpleAction.new_stateful("detail-level", GLib.VariantType.new("s"), GLib.Variant("s", "chronological"))
+        window.add_action(detail_level)
         app.add_window(window)
         window.show()
     app.connect('activate', _activate)
