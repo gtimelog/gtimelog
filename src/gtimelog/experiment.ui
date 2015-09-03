@@ -133,7 +133,17 @@ Tomaz Canabrava</property>
               </packing>
             </child>
             <child>
-              <placeholder/>
+              <object class="GtkBox" id="task_pane">
+                <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="resize">True</property>
+                <property name="shrink">True</property>
+              </packing>
             </child>
           </object>
           <packing>
@@ -288,10 +298,10 @@ Tomaz Canabrava</property>
         </child>
         <child>
           <object class="GtkMenuButton" id="view_button">
-            <property name="image">image6</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
+            <property name="image">image6</property>
           </object>
           <packing>
             <property name="pack_type">end</property>
