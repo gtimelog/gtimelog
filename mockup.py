@@ -17,6 +17,7 @@ pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
 
 from gtimelog.settings import Settings
+from gtimelog.timelog import format_duration
 
 
 HELP_URL = 'https://mg.pov.lt/gtimelog'
@@ -60,7 +61,7 @@ class Application(Gtk.Application):
         self.quit()
 
     def on_edit_log(self, action, parameter):
-        filename = Settings().get_timelog_file()
+        filename = Settings.get_timelog_file()
         uri = GLib.filename_to_uri(filename, None)
         Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
 
@@ -81,7 +82,10 @@ class Application(Gtk.Application):
             self.get_active_window().present()
             return
 
-        window = Window(self)
+        settings = Settings()
+        timelog = settings.get_time_log()
+
+        window = Window(self, timelog)
         self.add_window(window)
         window.show()
 
@@ -110,8 +114,10 @@ class Window(Gtk.ApplicationWindow):
                 win.add_action(action)
                 setattr(self, action_name.replace('-', '_'), action)
 
-    def __init__(self, app):
+    def __init__(self, app, timelog):
         Gtk.ApplicationWindow.__init__(self, application=app, icon_name='gtimelog')
+
+        self.timelog = timelog
 
         builder = Gtk.Builder.new_from_file(UI_FILE)
         builder.add_from_file(MENUS_UI_FILE)
@@ -131,6 +137,12 @@ class Window(Gtk.ApplicationWindow):
         builder.get_object('view_button').set_menu_model(builder.get_object('view_menu'))
 
         self.headerbar = builder.get_object('headerbar')
+        self.log_view = builder.get_object('log_view')
+        self.log_buffer = self.log_view.get_buffer()
+        self.log_buffer.create_tag('today', foreground='#204a87')     # Tango dark blue
+        self.log_buffer.create_tag('duration', foreground='#ce5c00')  # Tango dark orange
+        self.log_buffer.create_tag('time', foreground='#4e9a06')      # Tango dark green
+        self.log_buffer.create_tag('slacking', foreground='gray')
 
         self.actions = self.Actions(self, builder)
 
@@ -167,6 +179,8 @@ class Window(Gtk.ApplicationWindow):
 
         self.headerbar.set_subtitle(self.get_subtitle())
 
+        self.populate_log()
+
     def on_go_back(self, action, parameter):
         self.date = self.get_date() - datetime.timedelta(1)
 
@@ -175,6 +189,32 @@ class Window(Gtk.ApplicationWindow):
 
     def on_go_home(self, action, parameter):
         self.date = None
+
+    def populate_log(self):
+        self.log_buffer.set_text('')
+        window = self.timelog.window_for_day(self.get_date())
+        for item in window.all_entries():
+            self.write_item(item)
+
+    def write_item(self, item):
+        start, stop, duration, tags, entry = item
+        self.w(format_duration(duration), 'duration')
+        period = '\t({0}-{1})\t'.format(
+            start.strftime('%H:%M'), stop.strftime('%H:%M'))
+        self.w(period, 'time')
+        tag = ('slacking' if '**' in entry else None)
+        self.w(entry + '\n', tag)
+        where = self.log_buffer.get_end_iter()
+        where.backward_cursor_position()
+        self.log_buffer.place_cursor(where)
+
+    def w(self, text, tag=None):
+        """Write some text at the end of the log buffer."""
+        buffer = self.log_buffer
+        if tag:
+            buffer.insert_with_tags_by_name(buffer.get_end_iter(), text, tag)
+        else:
+            buffer.insert(buffer.get_end_iter(), text)
 
 
 def main():
