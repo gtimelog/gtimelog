@@ -255,12 +255,11 @@ def doctest_uniq():
     """
 
 
-def make_time_window(file=None, min=None, max=None,
-                     vm=datetime.time(2), **kwargs):
-    from gtimelog.timelog import TimeWindow
+def make_time_window(file=None, min=None, max=None, vm=datetime.time(2)):
+    from gtimelog.timelog import TimeLog
     if file is None:
         file = StringIO()
-    return TimeWindow(file, min, max, vm, **kwargs)
+    return TimeLog(file, vm).window_for(min, max)
 
 
 def doctest_TimeWindow_repr():
@@ -343,33 +342,6 @@ def doctest_TimeWindow_reread_bad_ordering():
 
         >>> window.last_time()
         datetime.datetime(2013, 12, 4, 9, 14)
-
-    """
-
-
-def doctest_TimeWindow_reread_callbacks():
-    """Test for TimeWindow.reread
-
-        >>> from datetime import datetime
-        >>> min = datetime(2013, 12, 4)
-        >>> max = datetime(2013, 12, 5)
-
-        >>> sampledata = StringIO('''
-        ... 2013-12-03 09:00: stuff **
-        ... 2013-12-04 09:00: start **
-        ... 2013-12-04 09:14: gtimelog: write some tests
-        ... 2013-12-06 09:00: future **
-        ... ''')
-
-        >>> l = []
-
-        >>> window = make_time_window(sampledata, min, max, callback=l.append)
-
-    The callback is invoked with all the entries (not just those in the
-    selected time window).  We use it to populate history completion.
-
-        >>> l
-        ['stuff **', 'start **', 'gtimelog: write some tests', 'future **']
 
     """
 
@@ -460,8 +432,8 @@ def doctest_TimeWindow_last_entry():
     """
 
 
-def doctest_TimeWindow_to_csv_complete():
-    r"""Tests for TimeWindow.to_csv_complete
+def doctest_Exports_to_csv_complete():
+    r"""Tests for Exports.to_csv_complete
 
         >>> from datetime import datetime, time
         >>> min = datetime(2008, 6, 1)
@@ -481,7 +453,8 @@ def doctest_TimeWindow_to_csv_complete():
 
         >>> window = make_time_window(sampledata, min, max, vm)
 
-        >>> window.to_csv_complete(sys.stdout)
+        >>> from gtimelog.timelog import Exports
+        >>> Exports(window).to_csv_complete(sys.stdout)
         task,time (minutes)
         etc,60
         something,45
@@ -490,8 +463,8 @@ def doctest_TimeWindow_to_csv_complete():
     """
 
 
-def doctest_TimeWindow_to_csv_daily():
-    r"""Tests for TimeWindow.to_csv_daily
+def doctest_Exports_to_csv_daily():
+    r"""Tests for Exports.to_csv_daily
 
         >>> from datetime import datetime, time
         >>> min = datetime(2008, 6, 1)
@@ -510,7 +483,8 @@ def doctest_TimeWindow_to_csv_daily():
 
         >>> window = make_time_window(sampledata, min, max, vm)
 
-        >>> window.to_csv_daily(sys.stdout)
+        >>> from gtimelog.timelog import Exports
+        >>> Exports(window).to_csv_daily(sys.stdout)
         date,day-start (hours),slacking (hours),work (hours)
         2008-06-03,12.75,0.0,3.0
         2008-06-04,0.0,0.0,0.0
@@ -519,8 +493,8 @@ def doctest_TimeWindow_to_csv_daily():
     """
 
 
-def doctest_TimeWindow_icalendar():
-    r"""Tests for TimeWindow.icalendar
+def doctest_Exports_icalendar():
+    r"""Tests for Exports.icalendar
 
         >>> from datetime import datetime, time
         >>> min = datetime(2008, 6, 1)
@@ -538,10 +512,12 @@ def doctest_TimeWindow_icalendar():
 
         >>> window = make_time_window(sampledata, min, max, vm)
 
+        >>> from gtimelog.timelog import Exports
+
         >>> with freezegun.freeze_time("2015-05-18 15:40"):
         ...     with mock.patch('socket.getfqdn') as mock_getfqdn:
         ...         mock_getfqdn.return_value = 'localhost'
-        ...         window.icalendar(sys.stdout)
+        ...         Exports(window).icalendar(sys.stdout)
         ... # doctest: +REPORT_NDIFF
         BEGIN:VCALENDAR
         PRODID:-//mg.pov.lt/NONSGML GTimeLog//EN

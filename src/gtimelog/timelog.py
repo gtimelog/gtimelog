@@ -3,6 +3,7 @@ Non-GUI bits of gtimelog.
 """
 
 import codecs
+import collections
 import csv
 import datetime
 import os
@@ -110,12 +111,11 @@ def uniq(l):
     return result
 
 
-class TimeWindow(object):
-    """A window into a time log.
+Entry = collections.namedtuple('Entry', 'start dtop duration tags entry')
 
-    Reads a time log file and remembers all events that took place between
-    min_timestamp and max_timestamp.  Includes events that took place at
-    min_timestamp, but excludes events that took place at max_timestamp.
+
+class TimeCollection(object):
+    """A collection of timestamped events.
 
     self.items is a list of (timestamp, event_title) tuples.
 
@@ -123,77 +123,78 @@ class TimeWindow(object):
     a start time, a stop time, and a duration.  Entry title is the title of the
     event that occurred at the stop time.
 
-    The first event also creates a special "arrival" entry of zero duration.
+    The first event of each day also creates a special "start" entry of zero
+    duration.
 
     Entries that span virtual midnight boundaries are also converted to
-    "arrival" entries at their end point.
-
-    The earliest_timestamp attribute contains the first (which should be the
-    oldest) timestamp in the file.
+    "start" entries at their end point.
     """
 
-    def __init__(self, filename, min_timestamp, max_timestamp,
-                 virtual_midnight, callback=None):
-        self.filename = filename
-        self.min_timestamp = min_timestamp
-        self.max_timestamp = max_timestamp
+    def __init__(self, virtual_midnight):
+        self.items = []
         self.virtual_midnight = virtual_midnight
-        self.reread(callback)
 
     def __repr__(self):
-        return '<TimeWindow: {}..{}>'.format(self.min_timestamp,
-                                             self.max_timestamp)
+        return '<TimeCollection ({} items)>'.format(len(self.items))
 
-    def reread(self, callback=None):
-        """Parse the time log file and update self.items.
+    def first_time(self):
+        """Return the time of the first entry.
 
-        Also updates self.earliest_timestamp.
+        Returns a datetime.datetime instance or None, if the window is empty.
         """
-        self.items = []
-        self.earliest_timestamp = None
-        try:
-            # accept any file-like object
-            # this is a hook for unit tests, really
-            if hasattr(self.filename, 'read'):
-                f = self.filename
-                f.seek(0)
-            else:
-                f = codecs.open(self.filename, encoding='UTF-8')
-        except IOError:
-            return
-        line = ''
-        for line in f:
-            if ': ' not in line:
-                continue
-            time, entry = line.split(': ', 1)
-            try:
-                time = parse_datetime(time)
-            except ValueError:
-                continue
-            else:
-                entry = entry.strip()
-                if callback:
-                    callback(entry)
-                if self.earliest_timestamp is None:
-                    self.earliest_timestamp = time
-                if self.min_timestamp <= time < self.max_timestamp:
-                    self.items.append((time, entry))
-        # There's code that relies on entries being sorted.  The entries really
-        # should be already sorted in the file, but sometimes the user edits
-        # timelog.txt directly and introduces errors.
-        # XXX: instead of quietly resorting them we should inform the user if
-        # there are errors
-        # Note that we must preserve the relative order of entries with
-        # the same timestamp: https://bugs.launchpad.net/gtimelog/+bug/708825
-        self.items.sort(key=itemgetter(0))
-        f.close()
+        if not self.items:
+            return None
+        return self.items[0][0]
 
     def last_time(self):
-        """Return the time of the last event (or None if there are no events).
+        """Return the time of the last entry.
+
+        Returns a datetime.datetime instance or None, if the window is empty.
         """
         if not self.items:
             return None
         return self.items[-1][0]
+
+    def last_entry(self):
+        """Return the last entry (or None if there are no events).
+
+        It is always true that
+
+            self.last_entry() == list(self.all_entries())[-1]
+
+        if self.items it not empty.
+        """
+        if not self.items:
+            return None
+        stop = self.items[-1][0]
+        entry = self.items[-1][1]
+        if len(self.items) == 1:
+            start = stop
+        else:
+            start = self.items[-2][0]
+        if different_days(start, stop, self.virtual_midnight):
+            start = stop
+        duration = stop - start
+        entry, tags = self._split_entry_and_tags(entry)
+        return Entry(start, stop, duration, tags, entry)
+
+    def all_entries(self):
+        """Iterate over all entries.
+
+        Yields Entry tuples.  The first entry in each day has a duration
+        of 0.
+        """
+        stop = None
+        for item in self.items:
+            start = stop
+            stop = item[0]
+            entry = item[1]
+            if start is None or different_days(start, stop,
+                                               self.virtual_midnight):
+                start = stop
+            duration = stop - start
+            entry, tags = self._split_entry_and_tags(entry)
+            yield Entry(start, stop, duration, tags, entry)
 
     @staticmethod
     def _split_entry_and_tags(entry):
@@ -222,71 +223,28 @@ class TimeWindow(object):
             tags = set()
         return entry, tags
 
-    def all_entries(self):
-        """Iterate over all entries.
-
-        Yields (start, stop, duration, tags, entry) tuples.  The first entry
-        has a duration of 0.
-        """
-        stop = None
-        for item in self.items:
-            start = stop
-            stop = item[0]
-            entry = item[1]
-            if start is None or different_days(start, stop,
-                                               self.virtual_midnight):
-                start = stop
-            duration = stop - start
-            # tags are appended to the entry title, separated by ' -- '
-            entry, tags = self._split_entry_and_tags(entry)
-            yield start, stop, duration, tags, entry
-
     def set_of_all_tags(self):
-        """
-        Return set of all tags mentioned in entries.
-        """
+        """Return the set of all tags mentioned in entries."""
         all_tags = set()
-        for _, _, _, entry_tags, _ in self.all_entries():
-            all_tags.update(entry_tags)
+        for entry in self.all_entries():
+            all_tags.update(entry.tags)
         return all_tags
 
     def count_days(self):
         """Count days that have entries."""
         count = 0
         last = None
-        for start, stop, duration, tags, entry in self.all_entries():
-            if last is None or different_days(last, start,
+        for entry in self.all_entries():
+            if last is None or different_days(last, entry.start,
                                               self.virtual_midnight):
-                last = start
+                last = entry.start
                 count += 1
         return count
-
-    def last_entry(self):
-        """Return the last entry (or None if there are no events).
-
-        It is always true that
-
-            self.last_entry() == list(self.all_entries())[-1]
-
-        """
-        if not self.items:
-            return None
-        stop = self.items[-1][0]
-        entry = self.items[-1][1]
-        if len(self.items) == 1:
-            start = stop
-        else:
-            start = self.items[-2][0]
-        if different_days(start, stop, self.virtual_midnight):
-            start = stop
-        duration = stop - start
-        entry, tags = self._split_entry_and_tags(entry)
-        return start, stop, duration, tags, entry
 
     def grouped_entries(self, skip_first=True):
         """Return consolidated entries (grouped by entry title).
 
-        Returns two list: work entries and slacking entries.  Slacking
+        Returns two lists: work entries and slacking entries.  Slacking
         entries are identified by finding two asterisks in the title.
         Entry lists are sorted, and contain (start, entry, duration) tuples.
         """
@@ -294,6 +252,8 @@ class TimeWindow(object):
         slack = {}
         for start, stop, duration, tags, entry in self.all_entries():
             if skip_first:
+                # XXX: in case of for multi-day windows, this should skip
+                # the 1st entry of each day
                 skip_first = False
                 continue
             if '***' in entry:
@@ -375,6 +335,33 @@ class TimeWindow(object):
                 total_work += duration
         return total_work, total_slacking
 
+
+class TimeWindow(TimeCollection):
+    """A window into a time log.
+
+    Includes all events that took place between min_timestamp and
+    max_timestamp.  Includes events that took place at min_timestamp, but
+    excludes events that took place at max_timestamp.
+    """
+
+    def __init__(self, original, min_timestamp, max_timestamp):
+        super(TimeWindow, self).__init__(original.virtual_midnight)
+        self.min_timestamp = min_timestamp
+        self.max_timestamp = max_timestamp
+        self.items = [item for item in original.items
+                      if min_timestamp <= item[0] < max_timestamp]
+
+    def __repr__(self):
+        return '<TimeWindow: {}..{}>'.format(self.min_timestamp,
+                                             self.max_timestamp)
+
+
+class Exports(object):
+    """Exporting of events."""
+
+    def __init__(self, window):
+        self.window = window
+
     def icalendar(self, output):
         """Create an iCalendar file with activities."""
         output.write("BEGIN:VCALENDAR\n")
@@ -384,7 +371,7 @@ class TimeWindow(object):
         dtstamp = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
         def _hash(start, stop, entry):
             return md5(("%s%s%s" % (start, stop, entry)).encode('UTF-8')).hexdigest()
-        for start, stop, duration, tags, entry in self.all_entries():
+        for start, stop, duration, tags, entry in self.window.all_entries():
             output.write("BEGIN:VEVENT\n")
             output.write("UID:%s@%s\n" % (_hash(start, stop, entry), idhost))
             output.write("SUMMARY:%s\n" % (entry.replace('\\', '\\\\'))
@@ -404,7 +391,7 @@ class TimeWindow(object):
         writer = CSVWriter(output)
         if title_row:
             writer.writerow(["task", "time (minutes)"])
-        work, slack = self.grouped_entries()
+        work, slack = self.window.grouped_entries()
         work = [(entry, as_minutes(duration))
                 for start, entry, duration in work
                 if duration] # skip empty "arrival" entries
@@ -428,7 +415,7 @@ class TimeWindow(object):
         d0 = datetime.timedelta(0)
         days = {} # date -> [time_started, slacking, work]
         dmin = None
-        for start, stop, duration, tags, entry in self.all_entries():
+        for start, stop, duration, tags, entry in self.window.all_entries():
             if dmin is None:
                 dmin = start.date()
             day = days.setdefault(start.date(),
@@ -760,7 +747,7 @@ class Reports(object):
             self._report_tags(output, tags)
 
 
-class TimeLog(object):
+class TimeLog(TimeCollection):
     """Time log.
 
     A time log contains a time window for today, and can add new entries at
@@ -768,8 +755,8 @@ class TimeLog(object):
     """
 
     def __init__(self, filename, virtual_midnight):
+        super(TimeLog, self).__init__(virtual_midnight)
         self.filename = filename
-        self.virtual_midnight = virtual_midnight
         self.reread()
 
     def virtual_today(self):
@@ -803,28 +790,53 @@ class TimeLog(object):
             return None
 
     def reread(self):
-        """Reload today's log."""
-        self.last_mtime = self.get_mtime()
+        """Reload the log file."""
         self.day = self.virtual_today()
-        min = datetime.datetime.combine(self.day, self.virtual_midnight)
-        max = min + datetime.timedelta(1)
-        self.history = []
-        self.window = TimeWindow(self.filename, min, max,
-                                 self.virtual_midnight,
-                                 callback=self.history.append)
-        self.need_space = not self.window.items
-        self._cache = {(min, max): self.window}
+        self.last_mtime = self.get_mtime()
+        try:
+            if hasattr(self.filename, 'read'):
+                # accept any file-like object
+                # this is a hook for unit tests, really
+                self.filename.seek(0)
+                self.items = self._read(self.filename)
+            else:
+                with codecs.open(self.filename, encoding='UTF-8') as f:
+                    self.items = self._read(f)
+        except IOError:
+            self.items = []
+        self.window = self.window_for_day(self.day)
+
+    def _read(self, f):
+        items = []
+        line = ''
+        for line in f:
+            if ': ' not in line:
+                continue
+            time, entry = line.split(': ', 1)
+            try:
+                time = parse_datetime(time)
+            except ValueError:
+                continue
+            else:
+                entry = entry.strip()
+                items.append((time, entry))
+        # There's code that relies on entries being sorted.  The entries really
+        # should be already sorted in the file, but sometimes the user edits
+        # timelog.txt directly and introduces errors.
+        # XXX: instead of quietly resorting them we should inform the user if
+        # there are errors
+        # Note that we must preserve the relative order of entries with
+        # the same timestamp: https://bugs.launchpad.net/gtimelog/+bug/708825
+        items.sort(key=itemgetter(0))
+        return items
 
     def window_for(self, min, max):
-        """Return a TimeWindow for a specified time interval."""
-        try:
-            return self._cache[min, max]
-        except KeyError:
-            window = TimeWindow(self.filename, min, max, self.virtual_midnight)
-            if len(self._cache) > 1000:
-                self._cache.clear()
-            self._cache[min, max] = window
-            return window
+        """Return a TimeWindow for a specified time interval.
+
+        ``min`` and ``max`` should be datetime.datetime instances.  The
+        interval is half-open (inclusive at ``min``, exclusive at ``max``).
+        """
+        return TimeWindow(self, min, max)
 
     def window_for_day(self, date):
         """Return a TimeWindow for the specified day."""
@@ -850,23 +862,20 @@ class TimeLog(object):
         return self.window_for(min, max)
 
     def window_for_date_range(self, min, max):
+        """Return a TimeWindow for a specified time interval.
+
+        ``min`` and ``max`` should be datetime.date instances.  The
+        interval is closed.
+        """
         min = datetime.datetime.combine(min, self.virtual_midnight)
         max = datetime.datetime.combine(max, self.virtual_midnight)
         max = max + datetime.timedelta(1)
         return self.window_for(min, max)
 
-    def whole_history(self):
-        """Return a TimeWindow for the whole history."""
-        # XXX I don't like this solution.  Better make the min/max filtering
-        # arguments optional in TimeWindow.reread
-        return self.window_for(self.window.earliest_timestamp,
-                               datetime.datetime.now())
-
-    def raw_append(self, line):
+    def raw_append(self, line, need_space):
         """Append a line to the time log file."""
         f = codecs.open(self.filename, "a", encoding='UTF-8')
-        if self.need_space:
-            self.need_space = False
+        if need_space:
             f.write('\n')
         f.write(line + '\n')
         f.close()
@@ -876,16 +885,15 @@ class TimeLog(object):
         """Append a new entry to the time log."""
         if not now:
             now = datetime.datetime.now().replace(second=0, microsecond=0)
-        last = self.window.last_time()
+        self.check_reload()
+        need_space = False
+        last = self.last_time()
         if last and different_days(now, last, self.virtual_midnight):
-            # next day: reset self.window
-            self.reread()
+            need_space = True
+        self.items.append((now, entry))
         self.window.items.append((now, entry))
         line = '%s: %s' % (now.strftime("%Y-%m-%d %H:%M"), entry)
-        self.raw_append(line)
-        for (min, max), cached in self._cache.items():
-            if cached is not self.window and min <= now < max:
-                cached.items.append((now, entry))
+        self.raw_append(line, need_space)
 
     def valid_time(self, time):
         """Is this a valid time for a correction?
@@ -894,7 +902,7 @@ class TimeLog(object):
         """
         if time > datetime.datetime.now():
             return False
-        last = self.window.last_time()
+        last = self.last_time()
         if last and time < last:
             return False
         return True

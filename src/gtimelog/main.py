@@ -54,7 +54,7 @@ if not os.path.exists(icon_file_bright):
 from gtimelog.settings import Settings
 from gtimelog.timelog import (
     format_duration, uniq,
-    Reports, TaskList, RemoteTaskList)
+    Reports, Exports, TaskList, RemoteTaskList)
 
 
 class IconChooser:
@@ -494,7 +494,7 @@ class MainWindow:
 
     def set_up_history(self):
         """Set up history."""
-        self.history = self.timelog.history
+        self.history = [item[1] for item in self.timelog.items]
         self.filtered_history = []
         self.history_pos = 0
         self.history_undo = ''
@@ -797,14 +797,14 @@ class MainWindow:
         """Report -> Complete Report in Spreadsheet"""
         tempfn = tempfile.mktemp(prefix='gtimelog-', suffix='.csv') # XXX unsafe!
         with open(tempfn, 'w') as f:
-            self.timelog.whole_history().to_csv_complete(f)
+            Exports(self.timelog.whole_history()).to_csv_complete(f)
         self.spawn(self.settings.spreadsheet, tempfn)
 
     def on_open_slack_spreadsheet_activate(self, widget):
         """Report -> Work/_Slacking stats in Spreadsheet"""
         tempfn = tempfile.mktemp(prefix='gtimelog-', suffix='.csv') # XXX unsafe!
         with open(tempfn, 'w') as f:
-            self.timelog.whole_history().to_csv_daily(f)
+            Exports(self.timelog.whole_history()).to_csv_daily(f)
         self.spawn(self.settings.spreadsheet, tempfn)
 
     def on_edit_timelog_activate(self, widget):
@@ -963,7 +963,7 @@ class MainWindow:
         same_day = self.timelog.day == previous_day
         if self.chronological and same_day:
             self.delete_footer()
-            self.write_item(self.timelog.window.last_entry())
+            self.write_item(self.timelog.last_entry())
             self.add_footer()
             self.scroll_to_end()
         else:

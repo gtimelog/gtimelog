@@ -38,8 +38,7 @@ comments.  This is likely to change in the future, so please use '#' to
 indicate real comments if you find you need them.
 
 All lines should be sorted by time.  Currently GTimeLog won't complain if
-they're not, and it will sort them to compensate (but there are probably bugs
-lurking with the computation of ``earliest_timestamp``).
+they're not, and it will sort them to compensate.
 
 GTimeLog doesn't re-write the file, it only appends to it.
 
