@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from __future__ import print_function
 
+import datetime
 import gettext
 import locale
 import os
@@ -10,7 +11,7 @@ from gettext import gettext as _
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, Gio, GLib
+from gi.repository import Gtk, Gdk, Gio, GLib, GObject
 
 pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
@@ -80,23 +81,48 @@ class Application(Gtk.Application):
             self.get_active_window().present()
             return
 
-        # The __class__ trick is a bit iffy, but I don't see how else I
-        # can define the entire window object in the .ui file.
-        builder = Gtk.Builder.new_from_file(UI_FILE)
-        builder.add_from_file(MENUS_UI_FILE)
-        window = builder.get_object('main_window')
-        window.__class__ = Window
-        window._init(self, builder)
+        window = Window(self)
         self.add_window(window)
         window.show()
 
 
 class Window(Gtk.ApplicationWindow):
 
-    def _init(self, app, builder):
-        # Should I do this?  Nothing bad seems to happen if I don't.
-        self.set_application(app)
-        self.set_icon_name('gtimelog')
+    date = GObject.Property(
+        type=object, default=None, nick='Date',
+        blurb='Currently visible date')
+
+    class Actions(object):
+
+        def __init__(self, win, builder):
+            self.detail_level = Gio.SimpleAction.new_stateful("detail-level", GLib.VariantType.new("s"), GLib.Variant("s", "chronological"))
+            win.add_action(self.detail_level)
+
+            self.time_range = Gio.SimpleAction.new_stateful("time-range", GLib.VariantType.new("s"), GLib.Variant("s", "day"))
+            win.add_action(self.time_range)
+
+            self.show_task_pane = Gio.PropertyAction.new("show-task-pane", builder.get_object("task_pane"), "visible")
+            win.add_action(self.show_task_pane)
+
+            for action_name in ['go-back', 'go-forward', 'go-home']:
+                action = Gio.SimpleAction.new(action_name, None)
+                action.connect('activate', getattr(win, 'on_' + action_name.replace('-', '_')))
+                win.add_action(action)
+                setattr(self, action_name.replace('-', '_'), action)
+
+    def __init__(self, app):
+        Gtk.ApplicationWindow.__init__(self, application=app, icon_name='gtimelog')
+
+        builder = Gtk.Builder.new_from_file(UI_FILE)
+        builder.add_from_file(MENUS_UI_FILE)
+        main_window = builder.get_object('main_window')
+        main_box = builder.get_object('main_box')
+        headerbar = builder.get_object('headerbar')
+        main_window.set_titlebar(None)
+        main_window.remove(main_box)
+        self.add(main_box)
+        self.set_titlebar(headerbar)
+        self.set_default_size(800, 500)
 
         # Cannot store these in the same .ui file nor hook them up in the
         # .ui because glade doesn't support that and strips both the
@@ -104,25 +130,51 @@ class Window(Gtk.ApplicationWindow):
         builder.get_object('menu_button').set_menu_model(builder.get_object('window_menu'))
         builder.get_object('view_button').set_menu_model(builder.get_object('view_menu'))
 
-        detail_level = Gio.SimpleAction.new_stateful("detail-level", GLib.VariantType.new("s"), GLib.Variant("s", "chronological"))
-        self.add_action(detail_level)
+        self.headerbar = builder.get_object('headerbar')
 
-        time_range = Gio.SimpleAction.new_stateful("time-range", GLib.VariantType.new("s"), GLib.Variant("s", "day"))
-        self.add_action(time_range)
+        self.actions = self.Actions(self, builder)
 
-        task_pane = Gio.PropertyAction.new("show-task-pane", builder.get_object("task_pane"), "visible")
-        self.add_action(task_pane)
+        self.connect('notify::date', self.date_changed)
+        self.date = None  # trigger action updates
 
-        go_back = Gio.SimpleAction.new("go-back", None)
-        self.add_action(go_back)
+    def get_today(self):
+        # TODO: handle virtual_midnight
+        return datetime.date.today()
 
-        go_forward = Gio.SimpleAction.new("go-forward", None)
-        go_forward.set_enabled(False)
-        self.add_action(go_forward)
+    def get_date(self):
+        return self.get_today() if self.date is None else self.date
 
-        go_home = Gio.SimpleAction.new("go-home", None)
-        go_home.set_enabled(False)
-        self.add_action(go_home)
+    def get_subtitle(self):
+        date = self.get_date()
+        return _("{date:%A, %Y-%m-%d} (week {week:0>2})").format(
+            date=date, week=date.isocalendar()[1])
+
+    def date_changed(self, obj, param_spec):
+        # Enforce strict typing
+        if self.date is not None and not isinstance(self.date, datetime.date):
+            self.date = None
+
+        # Going back to today clears the date field
+        if self.date is not None and self.date >= self.get_today():
+            self.date = None
+
+        if self.date is None:
+            self.actions.go_home.set_enabled(False)
+            self.actions.go_forward.set_enabled(False)
+        else:
+            self.actions.go_home.set_enabled(True)
+            self.actions.go_forward.set_enabled(True)
+
+        self.headerbar.set_subtitle(self.get_subtitle())
+
+    def on_go_back(self, action, parameter):
+        self.date = self.get_date() - datetime.timedelta(1)
+
+    def on_go_forward(self, action, parameter):
+        self.date = self.get_date() + datetime.timedelta(1)
+
+    def on_go_home(self, action, parameter):
+        self.date = None
 
 
 def main():
