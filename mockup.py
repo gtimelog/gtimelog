@@ -1,12 +1,18 @@
 #!/usr/bin/python
 from __future__ import print_function
 
+import os
 import signal
 import sys
 
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, Gio, GLib
+
+pkgdir = os.path.join(os.path.dirname(__file__), 'src')
+sys.path.insert(0, pkgdir)
+
+from gtimelog.settings import Settings
 
 
 HELP_URL = 'https://mg.pov.lt/gtimelog'
@@ -48,7 +54,10 @@ class Application(Gtk.Application):
         self.quit()
 
     def on_edit_log(self, action, parameter):
-        print("Pretend-editing timelog.txt")
+        settings = Settings()
+        filename = settings.get_timelog_file()
+        uri = GLib.filename_to_uri(filename, None)
+        Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
 
     def on_help(self, action, parameter):
         Gtk.show_uri(None, HELP_URL, Gdk.CURRENT_TIME)
