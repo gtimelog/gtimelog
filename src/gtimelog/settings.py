@@ -121,7 +121,9 @@ class Settings(object):
         def _unicode(self, value):
             return value.decode(self._encoding)
 
-    def load(self, filename):
+    def load(self, filename=None):
+        if filename is None:
+            filename = self.get_config_file()
         config = self._config()
         config.read([filename])
         self.email = config.get('gtimelog', 'list-email')
@@ -147,7 +149,9 @@ class Settings(object):
         self.report_style = config.get('gtimelog', 'report_style')
         self.start_in_tray = config.getboolean('gtimelog', 'start_in_tray')
 
-    def save(self, filename):
+    def save(self, filename=None):
+        if filename is None:
+            filename = self.get_config_file()
         config = self._config()
         with open(filename, 'w') as f:
             config.write(f)

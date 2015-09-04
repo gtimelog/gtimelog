@@ -118,7 +118,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="text_entry">
+              <object class="GtkEntry" id="task_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
               </object>

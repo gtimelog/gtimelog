@@ -187,6 +187,7 @@ class Window(Gtk.ApplicationWindow):
         builder.get_object('view_button').set_menu_model(builder.get_object('view_menu'))
 
         self.headerbar = builder.get_object('headerbar')
+        self.task_entry = builder.get_object('task_entry')
         self.log_view = builder.get_object('log_view')
         self.log_buffer = self.log_view.get_buffer()
         self.log_buffer.create_tag('today', foreground='#204a87')     # Tango dark blue
@@ -204,11 +205,15 @@ class Window(Gtk.ApplicationWindow):
         self.date = None  # trigger action updates
         mark_time('window ready')
 
+        self.settings = Settings()
+        self.settings.load()
+        mark_time('settings loaded')
+
         GLib.idle_add(self.load_log)
 
     def load_log(self):
         mark_time("loading timelog")
-        self.timelog = Settings().get_time_log()
+        self.timelog = self.settings.get_time_log()
         mark_time("timelog loaded")
         self.populate_log()
         mark_time("timelog presented")
@@ -230,6 +235,22 @@ class Window(Gtk.ApplicationWindow):
                 date, date.isocalendar()[1])
         elif self.time_range == 'month':
             return _("{0:%B %Y}").format(date)
+
+    def time_left_at_work(self, total_work):
+        """Calculate time left to work."""
+        last_time = self.timelog.window.last_time()
+        if last_time is None:
+            return None
+        now = datetime.datetime.now()
+        # NB: works with UTF-8-encoded binary strings on Python 2.  This
+        # seems harmless for now.
+        current_task = self.task_entry.get_text()
+        current_task_time = now - last_time
+        if '**' in current_task:
+            total_time = total_work
+        else:
+            total_time = total_work + current_task_time
+        return datetime.timedelta(hours=self.settings.hours) - total_time
 
     def date_changed(self, obj, param_spec):
         # Enforce strict typing
@@ -315,11 +336,19 @@ class Window(Gtk.ApplicationWindow):
         else:
             return # bug!
         self.reposition_cursor()
+        self.add_footer()
+        self.scroll_to_end()
 
     def reposition_cursor(self):
         where = self.log_buffer.get_end_iter()
         where.backward_cursor_position()
         self.log_buffer.place_cursor(where)
+
+    def scroll_to_end(self):
+        buffer = self.log_view.get_buffer()
+        end_mark = buffer.create_mark('end', buffer.get_end_iter())
+        self.log_view.scroll_to_mark(end_mark, 0, False, 0, 0)
+        buffer.delete_mark(end_mark)
 
     def write_item(self, item):
         start, stop, duration, tags, entry = item
@@ -342,6 +371,68 @@ class Window(Gtk.ApplicationWindow):
             buffer.insert_with_tags_by_name(buffer.get_end_iter(), text, tag)
         else:
             buffer.insert(buffer.get_end_iter(), text)
+
+    def add_footer(self):
+        buffer = self.log_buffer
+        self.footer_mark = buffer.create_mark(
+            'footer', buffer.get_end_iter(), True)
+        window = self.timelog.window_for_day(self.get_date())
+        total_work, total_slacking = window.totals()
+        weekly_window = self.timelog.window_for_week(self.get_date())
+        week_total_work, week_total_slacking = weekly_window.totals()
+        work_days_this_week = weekly_window.count_days()
+
+        self.w('\n')
+        self.w('Total work done: ')
+        self.w(format_duration(total_work), 'duration')
+        self.w(' (')
+        self.w(format_duration(week_total_work), 'duration')
+        self.w(' this week')
+        if work_days_this_week:
+            per_diem = week_total_work / work_days_this_week
+            self.w(', ')
+            self.w(format_duration(per_diem), 'duration')
+            self.w(' per day')
+        self.w(')\n')
+        self.w('Total slacking: ')
+        self.w(format_duration(total_slacking), 'duration')
+        self.w(' (')
+        self.w(format_duration(week_total_slacking), 'duration')
+        self.w(' this week')
+        if work_days_this_week:
+            per_diem = week_total_slacking / work_days_this_week
+            self.w(', ')
+            self.w(format_duration(per_diem), 'duration')
+            self.w(' per day')
+        self.w(')\n')
+
+        if self.date is None:
+            time_left = self.time_left_at_work(total_work)
+        else:
+            time_left = None
+        if time_left is not None:
+            time_to_leave = datetime.datetime.now() + time_left
+            if time_left < datetime.timedelta(0):
+                time_left = datetime.timedelta(0)
+            self.w('Time left at work: ')
+            self.w(format_duration(time_left), 'duration')
+            self.w(' (till ')
+            self.w(time_to_leave.strftime('%H:%M'), 'time')
+            self.w(')')
+
+        if self.settings.show_office_hours and self.date is None:
+            self.w('\nAt office today: ')
+            hours = datetime.timedelta(hours=self.settings.hours)
+            total = total_slacking + total_work
+            self.w("%s " % format_duration(total), 'duration')
+            self.w('(')
+            if total > hours:
+                self.w(format_duration(total - hours), 'duration')
+                self.w(' overtime')
+            else:
+                self.w(format_duration(hours - total), 'duration')
+                self.w(' left')
+            self.w(')')
 
 
 def main():
