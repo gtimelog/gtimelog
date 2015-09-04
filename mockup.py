@@ -223,7 +223,16 @@ class Window(Gtk.ApplicationWindow):
         return datetime.date.today()
 
     def get_date(self):
+        # XXX: shouldn't use clock, should ask timelog!
         return self.get_today() if self.date is None else self.date
+
+    def get_time_window(self):
+        if self.time_range == 'day':
+            return self.timelog.window_for_day(self.get_date())
+        elif self.time_range == 'week':
+            return self.timelog.window_for_week(self.get_date())
+        elif self.time_range == 'month':
+            return self.timelog.window_for_month(self.get_date())
 
     def get_subtitle(self):
         date = self.get_date()
@@ -304,14 +313,7 @@ class Window(Gtk.ApplicationWindow):
         self.log_buffer.set_text('')
         if self.timelog is None:
             return # not loaded yet
-        if self.time_range == 'day':
-            window = self.timelog.window_for_day(self.get_date())
-        elif self.time_range == 'week':
-            window = self.timelog.window_for_week(self.get_date())
-        elif self.time_range == 'month':
-            window = self.timelog.window_for_month(self.get_date())
-        else:
-            return # bug!
+        window = self.get_time_window()
         if self.detail_level == 'chronological':
             prev = None
             for item in window.all_entries():
@@ -385,43 +387,56 @@ class Window(Gtk.ApplicationWindow):
         buffer = self.log_buffer
         self.footer_mark = buffer.create_mark(
             'footer', buffer.get_end_iter(), True)
-        window = self.timelog.window_for_day(self.get_date())
+        window = self.get_time_window()
         total_work, total_slacking = window.totals()
-        weekly_window = self.timelog.window_for_week(self.get_date())
-        week_total_work, week_total_slacking = weekly_window.totals()
-        work_days_this_week = weekly_window.count_days()
 
         self.w('\n')
-        if work_days_this_week:
-            per_diem = week_total_work / work_days_this_week
-            self.wfmt(
-                _('Total work done: {0} ({1} this week, {2} per day)'),
-                (format_duration(total_work), 'duration'),
-                (format_duration(week_total_work), 'duration'),
-                (format_duration(per_diem), 'duration'),
-            )
+        if self.time_range == 'day':
+            fmt1 = _('Total work done: {0} ({1} this week, {2} per day)')
+            fmt2 = _('Total work done: {0} ({1} this week)')
+        elif self.time_range == 'week':
+            fmt1 = _('Total work done this week: {0} ({1} per day)')
+            fmt2 = _('Total work done this week: {0}')
+        elif self.time_range == 'month':
+            fmt1 = _('Total work done this month: {0} ({1} per day)')
+            fmt2 = _('Total work done this month: {0}')
+        args = [(format_duration(total_work), 'duration')]
+        if self.time_range == 'day':
+            weekly_window = self.timelog.window_for_week(self.get_date())
+            week_total_work, week_total_slacking = weekly_window.totals()
+            work_days = weekly_window.count_days()
+            args.append((format_duration(week_total_work), 'duration'))
+            per_diem = week_total_work / max(1, work_days)
         else:
-            self.wfmt(
-                _('Total work done: {0} ({1} this week)'),
-                (format_duration(total_work), 'duration'),
-                (format_duration(week_total_work), 'duration'),
-            )
+            work_days = window.count_days()
+            per_diem = total_work / max(1, work_days)
+        if work_days:
+            args.append((format_duration(per_diem), 'duration'))
+            self.wfmt(fmt1, *args)
+        else:
+            self.wfmt(fmt2, *args)
 
         self.w('\n')
-        if work_days_this_week:
-            per_diem = week_total_slacking / work_days_this_week
-            self.wfmt(
-                _('Total slacking: {0} ({1} this week, {2} per day)'),
-                (format_duration(total_slacking), 'duration'),
-                (format_duration(week_total_slacking), 'duration'),
-                (format_duration(per_diem), 'duration'),
-            )
+        if self.time_range == 'day':
+            fmt1 = _('Total slacking: {0} ({1} this week, {2} per day)')
+            fmt2 = _('Total slacking: {0} ({1} this week)')
+        elif self.time_range == 'week':
+            fmt1 = _('Total slacking this week: {0} ({1} per day)')
+            fmt2 = _('Total slacking this week: {0}')
+        elif self.time_range == 'month':
+            fmt1 = _('Total slacking this month: {0} ({1} per day)')
+            fmt2 = _('Total slacking this month: {0}')
+        args = [(format_duration(total_slacking), 'duration')]
+        if self.time_range == 'day':
+            args.append((format_duration(week_total_slacking), 'duration'))
+            per_diem = week_total_slacking / max(1, work_days)
         else:
-            self.wfmt(
-                _('Total slacking: {0} ({1} this week)'),
-                (format_duration(total_slacking), 'duration'),
-                (format_duration(week_total_slacking), 'duration'),
-            )
+            per_diem = total_slacking / max(1, work_days)
+        if work_days:
+            args.append((format_duration(per_diem), 'duration'))
+            self.wfmt(fmt1, *args)
+        else:
+            self.wfmt(fmt2, *args)
 
         if self.date is not None or self.time_range != 'day':
             return
@@ -450,9 +465,9 @@ class Window(Gtk.ApplicationWindow):
                 )
             else:
                 self.wfmt(
-                    _('At office today: {0} ({1} overtime)'),
+                    _('At office today: {0} ({1} left)'),
                     (format_duration(total), 'duration'),
-                    (format_duration(hours - total), 'left'),
+                    (format_duration(hours - total), 'duration'),
                 )
 
 
