@@ -261,8 +261,8 @@ class Window(Gtk.ApplicationWindow):
             return _("{0:%A, %Y-%m-%d} (week {1:0>2})").format(
                 date, date.isocalendar()[1])
         elif self.time_range == 'week':
-            return _("{0:%Y}, week {1:0>2}").format(
-                date, date.isocalendar()[1])
+            return _("{0:%Y}, week {1:0>2} ({0:%B %-d}-{2:%-d})").format(
+                date, date.isocalendar()[1], date + datetime.timedelta(6))
         elif self.time_range == 'month':
             return _("{0:%B %Y}").format(date)
 
