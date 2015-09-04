@@ -814,18 +814,16 @@ class TimeLog(TimeCollection):
 
     def _read(self, f):
         items = []
-        line = ''
         for line in f:
-            if ': ' not in line:
+            time, sep, entry = line.partition(': ')
+            if not sep:
                 continue
-            time, entry = line.split(': ', 1)
             try:
                 time = parse_datetime(time)
             except ValueError:
                 continue
-            else:
-                entry = entry.strip()
-                items.append((time, entry))
+            entry = entry.strip()
+            items.append((time, entry))
         # There's code that relies on entries being sorted.  The entries really
         # should be already sorted in the file, but sometimes the user edits
         # timelog.txt directly and introduces errors.
