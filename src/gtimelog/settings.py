@@ -54,7 +54,8 @@ class Settings(object):
 
     report_style = 'plain'
 
-    def check_legacy_config(self):
+    @classmethod
+    def check_legacy_config(cls):
         envar_home = os.environ.get('GTIMELOG_HOME')
         if envar_home is not None:
             return os.path.expanduser(envar_home)
@@ -64,25 +65,29 @@ class Settings(object):
 
     # http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
 
-    def get_config_dir(self):
-        legacy = self.check_legacy_config()
+    @classmethod
+    def get_config_dir(cls):
+        legacy = cls.check_legacy_config()
         if legacy:
             return legacy
         xdg = os.environ.get('XDG_CONFIG_HOME') or default_config_home
         return os.path.join(os.path.expanduser(xdg), 'gtimelog')
 
-    def get_data_dir(self):
-        legacy = self.check_legacy_config()
+    @classmethod
+    def get_data_dir(cls):
+        legacy = cls.check_legacy_config()
         if legacy:
             return legacy
         xdg = os.environ.get('XDG_DATA_HOME') or default_data_home
         return os.path.join(os.path.expanduser(xdg), 'gtimelog')
 
-    def get_config_file(self):
-        return os.path.join(self.get_config_dir(), 'gtimelogrc')
+    @classmethod
+    def get_config_file(cls):
+        return os.path.join(cls.get_config_dir(), 'gtimelogrc')
 
-    def get_timelog_file(self):
-        return os.path.join(self.get_data_dir(), 'timelog.txt')
+    @classmethod
+    def get_timelog_file(cls):
+        return os.path.join(cls.get_data_dir(), 'timelog.txt')
 
     def _config(self):
         config = RawConfigParser()
