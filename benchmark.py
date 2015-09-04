@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 from __future__ import print_function
 import gc
 import os
@@ -18,6 +18,10 @@ fns = []
 
 def mark(fn):
     fns.append(fn)
+    return fn
+
+
+def unmark(fn):
     return fn
 
 
@@ -47,13 +51,13 @@ def benchmark(fn, correct_output):
     print("\rmin {:.3f}s avg {:.3f}s (n={})\n".format(m, tot / n, n))
 
 
-@mark
+@unmark
 def just_read():
     filename = Settings().get_timelog_file()
     open(filename).readlines()
 
 
-#@mark
+@unmark
 def split():
     filename = Settings().get_timelog_file()
     for line in open(filename):
@@ -62,7 +66,7 @@ def split():
         time, entry = line.split(': ', 1)
 
 
-#@mark
+@unmark
 def parse_one():
     filename = Settings().get_timelog_file()
     for line in open(filename):
@@ -75,7 +79,7 @@ def parse_one():
             continue
 
 
-#@mark
+@unmark
 def parse_two():  # slower than parse_one
     filename = Settings().get_timelog_file()
     for line in open(filename):
@@ -86,7 +90,7 @@ def parse_two():  # slower than parse_one
             continue
 
 
-#@mark
+@unmark
 def parse_three():  # fastest
     filename = Settings().get_timelog_file()
     for line in open(filename):
@@ -99,7 +103,7 @@ def parse_three():  # fastest
             continue
 
 
-#@mark
+@unmark
 def parse_and_strip():
     filename = Settings().get_timelog_file()
     for line in open(filename):
@@ -113,7 +117,7 @@ def parse_and_strip():
         entry = entry.strip()
 
 
-@mark
+@unmark
 def parse_and_collect():
     items = []
     filename = Settings().get_timelog_file()
@@ -130,7 +134,7 @@ def parse_and_collect():
     return items
 
 
-#@mark
+@unmark
 def parse_and_sort_incorrectly():
     items = []
     filename = Settings().get_timelog_file()
@@ -149,7 +153,7 @@ def parse_and_sort_incorrectly():
 
 
 @mark
-def parse_and_sort_correctly():
+def parse_and_sort():
     items = []
     filename = Settings().get_timelog_file()
     for line in open(filename):
@@ -179,6 +183,24 @@ def parse_and_sort_unicode():
         except ValueError:
             continue
         entry = entry.strip()
+        items.append((time, entry))
+    items.sort(key=itemgetter(0))
+    return items
+
+
+@mark
+def parse_and_sort_unicode_piecemeal():
+    items = []
+    filename = Settings().get_timelog_file()
+    for line in open(filename, 'rb'):
+        time, sep, entry = line.partition(b': ')
+        if not sep:
+            continue
+        try:
+            time = parse_datetime(time.decode('ASCII'))
+        except (ValueError, UnicodeError):
+            continue
+        entry = entry.strip().decode('UTF-8')
         items.append((time, entry))
     items.sort(key=itemgetter(0))
     return items
