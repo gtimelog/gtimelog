@@ -100,6 +100,14 @@ def first_of_month(date):
     return date.replace(day=1)
 
 
+def prev_month(date):
+    """Return the first day of the previous month."""
+    if date.month == 1:
+        return datetime.date(date.year - 1, 12, 1)
+    else:
+        return datetime.date(date.year, date.month - 1, 1)
+
+
 def next_month(date):
     """Return the first day of the next month."""
     if date.month == 12:

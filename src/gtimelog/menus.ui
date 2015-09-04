@@ -73,11 +73,6 @@
         <attribute name="action">win.time-range</attribute>
         <attribute name="target">month</attribute>
       </item>
-      <item>
-        <attribute name="label" translatable="yes">Custom...</attribute>
-        <attribute name="action">win.time-range</attribute>
-        <attribute name="target">custom</attribute>
-      </item>
     </section>
   </menu>
 </interface>

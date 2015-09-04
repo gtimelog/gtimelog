@@ -42,7 +42,7 @@ pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
 
 from gtimelog.settings import Settings
-from gtimelog.timelog import format_duration
+from gtimelog.timelog import format_duration, different_days, prev_month, next_month
 
 mark_time("gtimelog imports done")
 
@@ -78,6 +78,9 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.detail-level('chronological')", ["<Alt>1"])
         self.set_accels_for_action("win.detail-level('grouped')", ["<Alt>2"])
         self.set_accels_for_action("win.detail-level('summary')", ["<Alt>3"])
+        self.set_accels_for_action("win.time-range('day')", ["<Alt>4"])
+        self.set_accels_for_action("win.time-range('week')", ["<Alt>5"])
+        self.set_accels_for_action("win.time-range('month')", ["<Alt>6"])
         self.set_accels_for_action("win.show-task-pane", ["F9"])
         self.set_accels_for_action("win.go-back", ["<Alt>Left"])
         self.set_accels_for_action("win.go-forward", ["<Alt>Right"])
@@ -134,7 +137,11 @@ class Window(Gtk.ApplicationWindow):
 
     detail_level = GObject.Property(
         type=str, default='chronological', nick='Detail level',
-        blurb='Detail level (chronological/grouped/summary)')
+        blurb='Detail level to show (chronological/grouped/summary)')
+
+    time_range = GObject.Property(
+        type=str, default='day', nick='Time range',
+        blurb='Time range to show (day/week/month)')
 
     class Actions(object):
 
@@ -142,7 +149,7 @@ class Window(Gtk.ApplicationWindow):
             self.detail_level = Gio.PropertyAction.new("detail-level", win, "detail-level")
             win.add_action(self.detail_level)
 
-            self.time_range = Gio.SimpleAction.new_stateful("time-range", GLib.VariantType.new("s"), GLib.Variant("s", "day"))
+            self.time_range = Gio.PropertyAction.new("time-range", win, "time-range")
             win.add_action(self.time_range)
 
             self.show_task_pane = Gio.PropertyAction.new("show-task-pane", builder.get_object("task_pane"), "visible")
@@ -193,6 +200,7 @@ class Window(Gtk.ApplicationWindow):
 
         self.connect('notify::date', self.date_changed)
         self.connect('notify::detail-level', self.detail_level_changed)
+        self.connect('notify::time-range', self.time_range_changed)
         self.date = None  # trigger action updates
         mark_time('window ready')
 
@@ -214,8 +222,14 @@ class Window(Gtk.ApplicationWindow):
 
     def get_subtitle(self):
         date = self.get_date()
-        return _("{0:%A, %Y-%m-%d} (week {1:0>2})").format(
-            date, date.isocalendar()[1])
+        if self.time_range == 'day':
+            return _("{0:%A, %Y-%m-%d} (week {1:0>2})").format(
+                date, date.isocalendar()[1])
+        elif self.time_range == 'week':
+            return _("{0:%Y}, week {1:0>2}").format(
+                date, date.isocalendar()[1])
+        elif self.time_range == 'month':
+            return _("{0:%B %Y}").format(date)
 
     def date_changed(self, obj, param_spec):
         # Enforce strict typing
@@ -238,13 +252,29 @@ class Window(Gtk.ApplicationWindow):
         self.populate_log()
 
     def detail_level_changed(self, obj, param_spec):
+        assert self.detail_level in {'chronological', 'grouped', 'summary'}
         self.populate_log()
 
+    def time_range_changed(self, obj, param_spec):
+        assert self.time_range in {'day', 'week', 'month'}
+        self.populate_log()
+        self.headerbar.set_subtitle(self.get_subtitle())
+
     def on_go_back(self, action, parameter):
-        self.date = self.get_date() - datetime.timedelta(1)
+        if self.time_range == 'day':
+            self.date = self.get_date() - datetime.timedelta(1)
+        elif self.time_range == 'week':
+            self.date = self.get_date() - datetime.timedelta(7)
+        elif self.time_range == 'month':
+            self.date = prev_month(self.get_date())
 
     def on_go_forward(self, action, parameter):
-        self.date = self.get_date() + datetime.timedelta(1)
+        if self.time_range == 'day':
+            self.date = self.get_date() + datetime.timedelta(1)
+        elif self.time_range == 'week':
+            self.date = self.get_date() + datetime.timedelta(7)
+        elif self.time_range == 'month':
+            self.date = next_month(self.get_date())
 
     def on_go_home(self, action, parameter):
         self.date = None
@@ -253,10 +283,24 @@ class Window(Gtk.ApplicationWindow):
         self.log_buffer.set_text('')
         if self.timelog is None:
             return # not loaded yet
-        window = self.timelog.window_for_day(self.get_date())
+        if self.time_range == 'day':
+            window = self.timelog.window_for_day(self.get_date())
+        elif self.time_range == 'week':
+            window = self.timelog.window_for_week(self.get_date())
+        elif self.time_range == 'month':
+            window = self.timelog.window_for_month(self.get_date())
+        else:
+            return # bug!
         if self.detail_level == 'chronological':
+            prev = None
             for item in window.all_entries():
+                first_of_day = prev is None or different_days(prev, item.start, self.timelog.virtual_midnight)
+                if first_of_day and prev is not None:
+                    self.w("\n")
+                if self.time_range != 'day' and first_of_day:
+                    self.w(_("{0:%A, %Y-%m-%d}\n").format(item.start))
                 self.write_item(item)
+                prev = item.start
         elif self.detail_level == 'grouped':
             work, slack = window.grouped_entries()
             for start, entry, duration in work + slack:
@@ -268,6 +312,8 @@ class Window(Gtk.ApplicationWindow):
                 self.write_group('no category', no_cat)
             for category, duration in sorted(totals.items()):
                 self.write_group(category, duration)
+        else:
+            return # bug!
         self.reposition_cursor()
 
     def reposition_cursor(self):

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-04 12:33+0300\n"
+"POT-Creation-Date: 2015-09-04 21:39+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../gtimelog.desktop.in.h:1 ../mockup.py:34 ../src/gtimelog/about.ui.h:1
+#: ../gtimelog.desktop.in.h:1 ../mockup.py:61 ../src/gtimelog/about.ui.h:1
 #: ../src/gtimelog/experiment.ui.h:2
 msgid "Time Log"
 msgstr ""
@@ -26,8 +26,20 @@ msgstr ""
 msgid "Track and time daily activities"
 msgstr ""
 
-#: ../mockup.py:149
+#: ../mockup.py:226
 msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
+msgstr ""
+
+#: ../mockup.py:229
+msgid "{0:%Y}, week {1:0>2}"
+msgstr ""
+
+#: ../mockup.py:232
+msgid "{0:%B %Y}"
+msgstr ""
+
+#: ../mockup.py:301
+msgid "{0:%A, %Y-%m-%d}\n"
 msgstr ""
 
 #: ../src/gtimelog/about.ui.h:2
@@ -92,8 +104,4 @@ msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:13
 msgid "Month"
-msgstr ""
-
-#: ../src/gtimelog/menus.ui.h:14
-msgid "Custom..."
 msgstr ""
