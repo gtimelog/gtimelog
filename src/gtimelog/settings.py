@@ -58,8 +58,7 @@ class Settings(object):
         if load:
             self.load(self.get_config_file())
 
-    @classmethod
-    def check_legacy_config(cls):
+    def check_legacy_config(self):
         envar_home = os.environ.get('GTIMELOG_HOME')
         if envar_home is not None:
             return os.path.expanduser(envar_home)
@@ -69,29 +68,25 @@ class Settings(object):
 
     # http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
 
-    @classmethod
-    def get_config_dir(cls):
-        legacy = cls.check_legacy_config()
+    def get_config_dir(self):
+        legacy = self.check_legacy_config()
         if legacy:
             return legacy
         xdg = os.environ.get('XDG_CONFIG_HOME') or default_config_home
         return os.path.join(os.path.expanduser(xdg), 'gtimelog')
 
-    @classmethod
-    def get_data_dir(cls):
-        legacy = cls.check_legacy_config()
+    def get_data_dir(self):
+        legacy = self.check_legacy_config()
         if legacy:
             return legacy
         xdg = os.environ.get('XDG_DATA_HOME') or default_data_home
         return os.path.join(os.path.expanduser(xdg), 'gtimelog')
 
-    @classmethod
-    def get_config_file(cls):
-        return os.path.join(cls.get_config_dir(), 'gtimelogrc')
+    def get_config_file(self):
+        return os.path.join(self.get_config_dir(), 'gtimelogrc')
 
-    @classmethod
-    def get_timelog_file(cls):
-        return os.path.join(cls.get_data_dir(), 'timelog.txt')
+    def get_timelog_file(self):
+        return os.path.join(self.get_data_dir(), 'timelog.txt')
 
     def get_time_log(self):
         return TimeLog(self.get_timelog_file(), self.virtual_midnight)
