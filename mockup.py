@@ -114,11 +114,7 @@ class Application(Gtk.Application):
             self.get_active_window().present()
             return
 
-        settings = Settings()
-        timelog = settings.get_time_log()
-        mark_time("timelog loaded")
-
-        window = Window(self, timelog)
+        window = Window(self)
         mark_time("have window")
         self.add_window(window)
         mark_time("added window")
@@ -154,10 +150,10 @@ class Window(Gtk.ApplicationWindow):
                 win.add_action(action)
                 setattr(self, action_name.replace('-', '_'), action)
 
-    def __init__(self, app, timelog):
+    def __init__(self, app):
         Gtk.ApplicationWindow.__init__(self, application=app, icon_name='gtimelog')
 
-        self.timelog = timelog
+        self.timelog = None
 
         mark_time("loading ui")
         builder = Gtk.Builder.new_from_file(UI_FILE)
@@ -194,6 +190,15 @@ class Window(Gtk.ApplicationWindow):
         self.connect('notify::date', self.date_changed)
         self.date = None  # trigger action updates
         mark_time('window ready')
+
+        GLib.idle_add(self.load_log)
+
+    def load_log(self):
+        mark_time("loading timelog")
+        self.timelog = Settings().get_time_log()
+        mark_time("timelog loaded")
+        self.populate_log()
+        mark_time("timelog presented")
 
     def get_today(self):
         # TODO: handle virtual_midnight
@@ -238,6 +243,8 @@ class Window(Gtk.ApplicationWindow):
 
     def populate_log(self):
         self.log_buffer.set_text('')
+        if self.timelog is None:
+            return # not loaded yet
         window = self.timelog.window_for_day(self.get_date())
         for item in window.all_entries():
             self.write_item(item)
