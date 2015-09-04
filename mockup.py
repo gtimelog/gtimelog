@@ -132,10 +132,14 @@ class Window(Gtk.ApplicationWindow):
         type=object, default=None, nick='Date',
         blurb='Currently visible date')
 
+    detail_level = GObject.Property(
+        type=str, default='chronological', nick='Detail level',
+        blurb='Detail level (chronological/grouped/summary)')
+
     class Actions(object):
 
         def __init__(self, win, builder):
-            self.detail_level = Gio.SimpleAction.new_stateful("detail-level", GLib.VariantType.new("s"), GLib.Variant("s", "chronological"))
+            self.detail_level = Gio.PropertyAction.new("detail-level", win, "detail-level")
             win.add_action(self.detail_level)
 
             self.time_range = Gio.SimpleAction.new_stateful("time-range", GLib.VariantType.new("s"), GLib.Variant("s", "day"))
@@ -188,6 +192,7 @@ class Window(Gtk.ApplicationWindow):
         mark_time('window created')
 
         self.connect('notify::date', self.date_changed)
+        self.connect('notify::detail-level', self.detail_level_changed)
         self.date = None  # trigger action updates
         mark_time('window ready')
 
@@ -232,6 +237,9 @@ class Window(Gtk.ApplicationWindow):
 
         self.populate_log()
 
+    def detail_level_changed(self, obj, param_spec):
+        self.populate_log()
+
     def on_go_back(self, action, parameter):
         self.date = self.get_date() - datetime.timedelta(1)
 
@@ -246,8 +254,26 @@ class Window(Gtk.ApplicationWindow):
         if self.timelog is None:
             return # not loaded yet
         window = self.timelog.window_for_day(self.get_date())
-        for item in window.all_entries():
-            self.write_item(item)
+        if self.detail_level == 'chronological':
+            for item in window.all_entries():
+                self.write_item(item)
+        elif self.detail_level == 'grouped':
+            work, slack = window.grouped_entries()
+            for start, entry, duration in work + slack:
+                self.write_group(entry, duration)
+        elif self.detail_level == 'summary':
+            entries, totals = window.categorized_work_entries()
+            no_cat = totals.pop(None, None)
+            if no_cat is not None:
+                self.write_group('no category', no_cat)
+            for category, duration in sorted(totals.items()):
+                self.write_group(category, duration)
+        self.reposition_cursor()
+
+    def reposition_cursor(self):
+        where = self.log_buffer.get_end_iter()
+        where.backward_cursor_position()
+        self.log_buffer.place_cursor(where)
 
     def write_item(self, item):
         start, stop, duration, tags, entry = item
@@ -257,9 +283,11 @@ class Window(Gtk.ApplicationWindow):
         self.w(period, 'time')
         tag = ('slacking' if '**' in entry else None)
         self.w(entry + '\n', tag)
-        where = self.log_buffer.get_end_iter()
-        where.backward_cursor_position()
-        self.log_buffer.place_cursor(where)
+
+    def write_group(self, entry, duration):
+        self.w(format_duration(duration), 'duration')
+        tag = ('slacking' if '**' in entry else None)
+        self.w('\t' + entry + '\n', tag)
 
     def w(self, text, tag=None):
         """Write some text at the end of the log buffer."""
