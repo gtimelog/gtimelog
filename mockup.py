@@ -42,7 +42,7 @@ pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
 
 from gtimelog.settings import Settings
-from gtimelog.timelog import format_duration, different_days, prev_month, next_month
+from gtimelog.timelog import as_minutes, different_days, prev_month, next_month
 
 mark_time("gtimelog imports done")
 
@@ -52,6 +52,12 @@ UI_FILE = 'src/gtimelog/experiment.ui'
 ABOUT_DIALOG_UI_FILE = 'src/gtimelog/about.ui'
 MENUS_UI_FILE = 'src/gtimelog/menus.ui'
 LOCALE_DIR = 'locale'
+
+
+def format_duration(duration):
+    """Format a datetime.timedelta with minute precision."""
+    h, m = divmod(as_minutes(duration), 60)
+    return _('{0} h {1} min').format(h, m)
 
 
 class Application(Gtk.Application):
