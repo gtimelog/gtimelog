@@ -2,17 +2,17 @@
   <menu id="app_menu">
     <section>
       <item>
-        <attribute name="label">Help</attribute>
+        <attribute name="label" translatable="yes">Help</attribute>
         <attribute name="action">app.help</attribute>
       </item>
       <item>
-        <attribute name="label">About</attribute>
+        <attribute name="label" translatable="yes">About</attribute>
         <attribute name="action">app.about</attribute>
       </item>
     </section>
     <section>
       <item>
-        <attribute name="label">Quit</attribute>
+        <attribute name="label" translatable="yes">Quit</attribute>
         <attribute name="action">app.quit</attribute>
       </item>
     </section>
@@ -20,13 +20,13 @@
   <menu id="window_menu">
     <section>
       <item>
-        <attribute name="label">Edit timelog.txt</attribute>
+        <attribute name="label" translatable="yes">Edit log</attribute>
         <attribute name="action">app.edit-log</attribute>
       </item>
     </section>
     <section>
       <item>
-        <attribute name="label">Report...</attribute>
+        <attribute name="label" translatable="yes">Report...</attribute>
         <attribute name="action">win.send-report</attribute>
       </item>
     </section>
@@ -34,47 +34,47 @@
   <menu id="view_menu">
     <section>
       <item>
-        <attribute name="label">Detail level</attribute>
+        <attribute name="label" translatable="yes">Detail level</attribute>
         <attribute name="action">disabled</attribute>
       </item>
       <item>
-        <attribute name="label">Chronological</attribute>
+        <attribute name="label" translatable="yes">Chronological</attribute>
         <attribute name="action">win.detail-level</attribute>
         <attribute name="target">chronological</attribute>
       </item>
       <item>
-        <attribute name="label">Grouped</attribute>
+        <attribute name="label" translatable="yes">Grouped</attribute>
         <attribute name="action">win.detail-level</attribute>
         <attribute name="target">grouped</attribute>
       </item>
       <item>
-        <attribute name="label">Summary</attribute>
+        <attribute name="label" translatable="yes">Summary</attribute>
         <attribute name="action">win.detail-level</attribute>
         <attribute name="target">summary</attribute>
       </item>
     </section>
     <section>
       <item>
-        <attribute name="label">Time range</attribute>
+        <attribute name="label" translatable="yes">Time range</attribute>
         <attribute name="action">disabled</attribute>
       </item>
       <item>
-        <attribute name="label">Day</attribute>
+        <attribute name="label" translatable="yes">Day</attribute>
         <attribute name="action">win.time-range</attribute>
         <attribute name="target">day</attribute>
       </item>
       <item>
-        <attribute name="label">Week</attribute>
+        <attribute name="label" translatable="yes">Week</attribute>
         <attribute name="action">win.time-range</attribute>
         <attribute name="target">week</attribute>
       </item>
       <item>
-        <attribute name="label">Month</attribute>
+        <attribute name="label" translatable="yes">Month</attribute>
         <attribute name="action">win.time-range</attribute>
         <attribute name="target">month</attribute>
       </item>
       <item>
-        <attribute name="label">Custom...</attribute>
+        <attribute name="label" translatable="yes">Custom...</attribute>
         <attribute name="action">win.time-range</attribute>
         <attribute name="target">custom</attribute>
       </item>

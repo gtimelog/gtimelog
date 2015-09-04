@@ -1,9 +1,12 @@
 #!/usr/bin/python
 from __future__ import print_function
 
+import gettext
+import locale
 import os
 import signal
 import sys
+from gettext import gettext as _
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -16,16 +19,18 @@ from gtimelog.settings import Settings
 
 
 HELP_URL = 'https://mg.pov.lt/gtimelog'
+
 UI_FILE = 'src/gtimelog/experiment.ui'
 ABOUT_DIALOG_UI_FILE = 'src/gtimelog/about.ui'
 MENUS_UI_FILE = 'src/gtimelog/menus.ui'
+LOCALE_DIR = 'locale'
 
 
 class Application(Gtk.Application):
 
     def __init__(self):
         super(Application, self).__init__(application_id='lt.pov.mg.gtimelog_mockup')
-        GLib.set_application_name("Time Log")
+        GLib.set_application_name(_("Time Log"))
         GLib.set_prgname('gtimelog')
 
     def do_startup(self):
@@ -111,6 +116,11 @@ class Window(Gtk.ApplicationWindow):
 
 
 def main():
+    locale.bindtextdomain('gtimelog', LOCALE_DIR)
+    locale.textdomain('gtimelog')
+    gettext.bindtextdomain('gtimelog', LOCALE_DIR)
+    gettext.textdomain('gtimelog')
+
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     app = Application()
     sys.exit(app.run(sys.argv))
