@@ -2,9 +2,12 @@
 from __future__ import print_function
 
 import time
+import os
+DEBUG = os.getenv('DEBUG')
 def mark_time(what, _prev=[0]):
     t = time.clock()
-    print("{:.3f} ({:+.3f}) {}".format(t, t-_prev[0], what))
+    if DEBUG:
+        print("{:.3f} ({:+.3f}) {}".format(t, t-_prev[0], what))
     _prev[0] = t
 mark_time("in script")
 
