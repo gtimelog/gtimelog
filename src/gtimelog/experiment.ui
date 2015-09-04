@@ -121,6 +121,8 @@
               <object class="GtkEntry" id="task_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="has_focus">True</property>
+                <property name="activates_default">True</property>
               </object>
               <packing>
                 <property name="expand">True</property>

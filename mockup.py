@@ -194,6 +194,7 @@ class Window(Gtk.ApplicationWindow):
 
         self.headerbar = builder.get_object('headerbar')
         self.task_entry = builder.get_object('task_entry')
+        self.task_entry.grab_focus()
         self.log_view = builder.get_object('log_view')
         self.log_buffer = self.log_view.get_buffer()
         self.log_buffer.create_tag('today', foreground='#204a87')     # Tango dark blue
