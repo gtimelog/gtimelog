@@ -188,7 +188,7 @@ def parse_and_sort_unicode():
     return items
 
 
-@mark
+@unmark
 def parse_and_sort_unicode_piecemeal():
     items = []
     filename = Settings().get_timelog_file()
