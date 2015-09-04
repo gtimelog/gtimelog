@@ -33,10 +33,7 @@
   </menu>
   <menu id="view_menu">
     <section>
-      <item>
-        <attribute name="label" translatable="yes">Detail level</attribute>
-        <attribute name="action">disabled</attribute>
-      </item>
+      <attribute name="label" translatable="yes">Detail level</attribute>
       <item>
         <attribute name="label" translatable="yes">Chronological</attribute>
         <attribute name="action">win.detail-level</attribute>
@@ -54,10 +51,7 @@
       </item>
     </section>
     <section>
-      <item>
-        <attribute name="label" translatable="yes">Time range</attribute>
-        <attribute name="action">disabled</attribute>
-      </item>
+      <attribute name="label" translatable="yes">Time range</attribute>
       <item>
         <attribute name="label" translatable="yes">Day</attribute>
         <attribute name="action">win.time-range</attribute>
