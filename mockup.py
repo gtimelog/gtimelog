@@ -1,5 +1,12 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 from __future__ import print_function
+
+import time
+def mark_time(what, _prev=[0]):
+    t = time.clock()
+    print("{:.3f} ({:+.3f}) {}".format(t, t-_prev[0], what))
+    _prev[0] = t
+mark_time("in script")
 
 import datetime
 import gettext
@@ -9,9 +16,14 @@ import signal
 import sys
 from gettext import gettext as _
 
+mark_time("Python imports done")
+
+
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, Gio, GLib, GObject
+
+mark_time("GTK+ imports done")
 
 pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
@@ -19,6 +31,7 @@ sys.path.insert(0, pkgdir)
 from gtimelog.settings import Settings
 from gtimelog.timelog import format_duration
 
+mark_time("gtimelog imports done")
 
 HELP_URL = 'https://mg.pov.lt/gtimelog'
 
@@ -36,6 +49,7 @@ class Application(Gtk.Application):
         GLib.set_prgname('gtimelog')
 
     def do_startup(self):
+        mark_time("in app startup")
         Gtk.Application.do_startup(self)
 
         builder = Gtk.Builder.new_from_file(MENUS_UI_FILE)
@@ -56,6 +70,8 @@ class Application(Gtk.Application):
         self.set_accels_for_action("app.edit-log", ["<Primary>E"])
         self.set_accels_for_action("app.quit", ["<Primary>Q"])
         self.set_accels_for_action("win.send-report", ["<Primary>D"])
+
+        mark_time("app startup done")
 
     def on_quit(self, action, parameter):
         self.quit()
@@ -78,6 +94,7 @@ class Application(Gtk.Application):
         about_dialog.show()
 
     def do_activate(self):
+        mark_time("in app activate")
         if self.get_active_window() is not None:
             self.get_active_window().present()
             return
@@ -88,6 +105,10 @@ class Application(Gtk.Application):
         window = Window(self, timelog)
         self.add_window(window)
         window.show()
+
+        GLib.idle_add(mark_time, "in main loop")
+
+        mark_time("app activate done")
 
 
 class Window(Gtk.ApplicationWindow):
@@ -218,6 +239,7 @@ class Window(Gtk.ApplicationWindow):
 
 
 def main():
+    mark_time("in main()")
     # Tell GTK+ to use out translations
     locale.bindtextdomain('gtimelog', LOCALE_DIR)
     locale.textdomain('gtimelog')
@@ -230,6 +252,7 @@ def main():
 
     # Run the app
     app = Application()
+    mark_time("app created")
     sys.exit(app.run(sys.argv))
 
 
