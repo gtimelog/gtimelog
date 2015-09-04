@@ -1,0 +1,95 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-09-04 10:47+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../gtimelog.desktop.in.h:1 ../mockup.py:33 ../src/gtimelog/about.ui.h:1
+#: ../src/gtimelog/experiment.ui.h:2
+msgid "Time Log"
+msgstr ""
+
+#: ../gtimelog.desktop.in.h:2
+msgid "Track and time daily activities"
+msgstr ""
+
+#: ../src/gtimelog/about.ui.h:2
+msgid "Copyright © 2004–2015 Marius Gedminas and contributors."
+msgstr ""
+
+#: ../src/gtimelog/about.ui.h:3
+msgid "A simple time tracking application."
+msgstr ""
+
+#: ../src/gtimelog/experiment.ui.h:1
+msgid "Add"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:1
+msgid "Help"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:2
+msgid "About"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:3
+msgid "Quit"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:4
+msgid "Edit log"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:5
+msgid "Report..."
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:6
+msgid "Detail level"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:7
+msgid "Chronological"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:8
+msgid "Grouped"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:9
+msgid "Summary"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:10
+msgid "Time range"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:11
+msgid "Day"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:12
+msgid "Week"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:13
+msgid "Month"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:14
+msgid "Custom..."
+msgstr ""

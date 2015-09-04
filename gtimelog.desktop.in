@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=Time Log
-Comment=Track and time daily activities
+_Name=Time Log
+_Comment=Track and time daily activities
 Exec=gtimelog
 Terminal=false
 Type=Application
