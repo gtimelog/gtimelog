@@ -14,14 +14,23 @@ from gtimelog.timelog import parse_datetime
 
 
 fns = []
-mark = fns.append
 
 
-def benchmark(fn):
+def mark(fn):
+    fns.append(fn)
+    return fn
+
+
+def benchmark(fn, correct_output):
     gc.collect()
-    print("{}:".format(fn.__name__))
+    print("{}:".format(fn.__name__), end="")
     m = float("inf")
     n = 0
+    output = fn()
+    if output != correct_output:
+        print(" [NB incorrect output]")
+    else:
+        print()
     t00 = time.time()
     while n < 3 or time.time() - t00 < 3:
         t0 = time.time()
@@ -44,7 +53,7 @@ def just_read():
     open(filename).readlines()
 
 
-@mark
+#@mark
 def split():
     filename = Settings().get_timelog_file()
     for line in open(filename):
@@ -77,7 +86,7 @@ def parse_two():  # slower than parse_one
             continue
 
 
-@mark
+#@mark
 def parse_three():  # fastest
     filename = Settings().get_timelog_file()
     for line in open(filename):
@@ -90,7 +99,7 @@ def parse_three():  # fastest
             continue
 
 
-@mark
+#@mark
 def parse_and_strip():
     filename = Settings().get_timelog_file()
     for line in open(filename):
@@ -118,6 +127,7 @@ def parse_and_collect():
             continue
         entry = entry.strip()
         items.append((time, entry))
+    return items
 
 
 #@mark
@@ -135,6 +145,7 @@ def parse_and_sort_incorrectly():
         entry = entry.strip()
         items.append((time, entry))
     items.sort()  # XXX: can reorder lines
+    return items
 
 
 @mark
@@ -152,6 +163,7 @@ def parse_and_sort_correctly():
         entry = entry.strip()
         items.append((time, entry))
     items.sort(key=itemgetter(0))
+    return items
 
 
 @mark
@@ -169,16 +181,18 @@ def parse_and_sort_unicode():
         entry = entry.strip()
         items.append((time, entry))
     items.sort(key=itemgetter(0))
+    return items
 
 
 @mark
 def full():
-    Settings().get_time_log()
+    return Settings().get_time_log().items
 
 
 def main():
+    correct = full()
     for fn in fns:
-        benchmark(fn)
+        benchmark(fn, correct)
 
 
 if __name__ == '__main__':
