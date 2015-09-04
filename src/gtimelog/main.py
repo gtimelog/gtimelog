@@ -54,7 +54,7 @@ if not os.path.exists(icon_file_bright):
 from gtimelog.settings import Settings
 from gtimelog.timelog import (
     format_duration, uniq,
-    Reports, TimeLog, TaskList, RemoteTaskList)
+    Reports, TaskList, RemoteTaskList)
 
 
 class IconChooser:
@@ -1115,8 +1115,7 @@ class Application(Gtk.Application):
         if debug:
             print('Assuming date changes at %s' % settings.virtual_midnight)
             print('Loading time log from %s' % settings.get_timelog_file())
-        timelog = TimeLog(settings.get_timelog_file(),
-                          settings.virtual_midnight)
+        timelog = settings.get_time_log()
         if settings.task_list_url:
             if debug:
                 print('Loading cached remote tasks from %s' %

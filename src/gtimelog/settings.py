@@ -14,7 +14,7 @@ except ImportError:
     PY3 = False
 
 
-from gtimelog.timelog import parse_time
+from gtimelog.timelog import parse_time, TimeLog
 
 
 legacy_default_home = os.path.normpath('~/.gtimelog')
@@ -88,6 +88,9 @@ class Settings(object):
     @classmethod
     def get_timelog_file(cls):
         return os.path.join(cls.get_data_dir(), 'timelog.txt')
+
+    def get_time_log(self):
+        return TimeLog(self.get_timelog_file(), self.virtual_midnight)
 
     def _config(self):
         config = RawConfigParser()
