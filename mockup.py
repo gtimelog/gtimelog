@@ -20,10 +20,20 @@ mark_time("Python imports done")
 
 
 import gi
+mark_time("gi import done")
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, Gio, GLib, GObject
+mark_time("gi.require_version done")
 
-mark_time("GTK+ imports done")
+from gi.repository import GLib
+mark_time("GLib import done")
+from gi.repository import GObject
+mark_time("GObject import done")
+from gi.repository import Gio
+mark_time("Gio import done")
+from gi.repository import Gdk
+mark_time("Gdk import done")
+from gi.repository import Gtk
+mark_time("Gtk import done")
 
 pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
@@ -52,7 +62,9 @@ class Application(Gtk.Application):
         mark_time("in app startup")
         Gtk.Application.do_startup(self)
 
+        mark_time("loading menus")
         builder = Gtk.Builder.new_from_file(MENUS_UI_FILE)
+        mark_time("menus loaded")
         self.set_app_menu(builder.get_object('app_menu'))
 
         for action_name in ['help', 'about', 'quit', 'edit-log']:
@@ -101,10 +113,14 @@ class Application(Gtk.Application):
 
         settings = Settings()
         timelog = settings.get_time_log()
+        mark_time("timelog loaded")
 
         window = Window(self, timelog)
+        mark_time("have window")
         self.add_window(window)
+        mark_time("added window")
         window.show()
+        mark_time("showed window")
 
         GLib.idle_add(mark_time, "in main loop")
 
@@ -140,8 +156,11 @@ class Window(Gtk.ApplicationWindow):
 
         self.timelog = timelog
 
+        mark_time("loading ui")
         builder = Gtk.Builder.new_from_file(UI_FILE)
+        mark_time("main ui loaded")
         builder.add_from_file(MENUS_UI_FILE)
+        mark_time("menus loaded")
         main_window = builder.get_object('main_window')
         main_box = builder.get_object('main_box')
         headerbar = builder.get_object('headerbar')
@@ -167,8 +186,11 @@ class Window(Gtk.ApplicationWindow):
 
         self.actions = self.Actions(self, builder)
 
+        mark_time('window created')
+
         self.connect('notify::date', self.date_changed)
         self.date = None  # trigger action updates
+        mark_time('window ready')
 
     def get_today(self):
         # TODO: handle virtual_midnight
