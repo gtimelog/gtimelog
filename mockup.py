@@ -59,8 +59,7 @@ class Application(Gtk.Application):
         self.quit()
 
     def on_edit_log(self, action, parameter):
-        settings = Settings()
-        filename = settings.get_timelog_file()
+        filename = Settings().get_timelog_file()
         uri = GLib.filename_to_uri(filename, None)
         Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
 
@@ -68,6 +67,8 @@ class Application(Gtk.Application):
         Gtk.show_uri(None, HELP_URL, Gdk.CURRENT_TIME)
 
     def on_about(self, action, parameter):
+        # Note: must create a new dialog (which means a new Gtk.Builder)
+        # on every invocation.
         builder = Gtk.Builder.new_from_file(ABOUT_DIALOG_UI_FILE)
         about_dialog = builder.get_object('about_dialog')
         about_dialog.set_transient_for(self.get_active_window())
@@ -79,18 +80,27 @@ class Application(Gtk.Application):
             self.get_active_window().present()
             return
 
+        # The __class__ trick is a bit iffy, but I don't see how else I
+        # can define the entire window object in the .ui file.
         builder = Gtk.Builder.new_from_file(UI_FILE)
         builder.add_from_file(MENUS_UI_FILE)
         window = builder.get_object('main_window')
         window.__class__ = Window
-        window._init(builder)
+        window._init(self, builder)
         self.add_window(window)
         window.show()
 
 
 class Window(Gtk.ApplicationWindow):
 
-    def _init(self, builder):
+    def _init(self, app, builder):
+        # Should I do this?  Nothing bad seems to happen if I don't.
+        self.set_application(app)
+        self.set_icon_name('gtimelog')
+
+        # Cannot store these in the same .ui file nor hook them up in the
+        # .ui because glade doesn't support that and strips both the
+        # <menu> and the menu-model property on save.
         builder.get_object('menu_button').set_menu_model(builder.get_object('window_menu'))
         builder.get_object('view_button').set_menu_model(builder.get_object('view_menu'))
 
@@ -116,12 +126,17 @@ class Window(Gtk.ApplicationWindow):
 
 
 def main():
+    # Tell GTK+ to use out translations
     locale.bindtextdomain('gtimelog', LOCALE_DIR)
     locale.textdomain('gtimelog')
+    # Tell Python's gettext.gettext() to use our translations
     gettext.bindtextdomain('gtimelog', LOCALE_DIR)
     gettext.textdomain('gtimelog')
 
+    # Make ^C terminate the process
     signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+    # Run the app
     app = Application()
     sys.exit(app.run(sys.argv))
 
