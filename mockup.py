@@ -61,7 +61,7 @@ class Application(Gtk.Application):
         self.quit()
 
     def on_edit_log(self, action, parameter):
-        filename = Settings.get_timelog_file()
+        filename = Settings().get_timelog_file()
         uri = GLib.filename_to_uri(filename, None)
         Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
 
