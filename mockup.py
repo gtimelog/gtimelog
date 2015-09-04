@@ -14,7 +14,7 @@ mark_time("in script")
 import datetime
 import gettext
 import locale
-import os
+import re
 import signal
 import sys
 from gettext import gettext as _
@@ -372,6 +372,15 @@ class Window(Gtk.ApplicationWindow):
         else:
             buffer.insert(buffer.get_end_iter(), text)
 
+    def wfmt(self, fmt, *args):
+        for bit in re.split('({\d+})', fmt):
+            if bit.startswith('{'):
+                idx = int(bit[1:-1])
+                value, tag = args[idx]
+                self.w(value, tag)
+            else:
+                self.w(bit)
+
     def add_footer(self):
         buffer = self.log_buffer
         self.footer_mark = buffer.create_mark(
@@ -383,56 +392,68 @@ class Window(Gtk.ApplicationWindow):
         work_days_this_week = weekly_window.count_days()
 
         self.w('\n')
-        self.w('Total work done: ')
-        self.w(format_duration(total_work), 'duration')
-        self.w(' (')
-        self.w(format_duration(week_total_work), 'duration')
-        self.w(' this week')
         if work_days_this_week:
             per_diem = week_total_work / work_days_this_week
-            self.w(', ')
-            self.w(format_duration(per_diem), 'duration')
-            self.w(' per day')
-        self.w(')\n')
-        self.w('Total slacking: ')
-        self.w(format_duration(total_slacking), 'duration')
-        self.w(' (')
-        self.w(format_duration(week_total_slacking), 'duration')
-        self.w(' this week')
+            self.wfmt(
+                _('Total work done: {0} ({1} this week, {2} per day)'),
+                (format_duration(total_work), 'duration'),
+                (format_duration(week_total_work), 'duration'),
+                (format_duration(per_diem), 'duration'),
+            )
+        else:
+            self.wfmt(
+                _('Total work done: {0} ({1} this week)'),
+                (format_duration(total_work), 'duration'),
+                (format_duration(week_total_work), 'duration'),
+            )
+
+        self.w('\n')
         if work_days_this_week:
             per_diem = week_total_slacking / work_days_this_week
-            self.w(', ')
-            self.w(format_duration(per_diem), 'duration')
-            self.w(' per day')
-        self.w(')\n')
-
-        if self.date is None:
-            time_left = self.time_left_at_work(total_work)
+            self.wfmt(
+                _('Total slacking: {0} ({1} this week, {2} per day)'),
+                (format_duration(total_slacking), 'duration'),
+                (format_duration(week_total_slacking), 'duration'),
+                (format_duration(per_diem), 'duration'),
+            )
         else:
-            time_left = None
+            self.wfmt(
+                _('Total slacking: {0} ({1} this week)'),
+                (format_duration(total_slacking), 'duration'),
+                (format_duration(week_total_slacking), 'duration'),
+            )
+
+        if self.date is not None or self.time_range != 'day':
+            return
+
+        time_left = self.time_left_at_work(total_work)
         if time_left is not None:
+            self.w('\n')
             time_to_leave = datetime.datetime.now() + time_left
             if time_left < datetime.timedelta(0):
                 time_left = datetime.timedelta(0)
-            self.w('Time left at work: ')
-            self.w(format_duration(time_left), 'duration')
-            self.w(' (till ')
-            self.w(time_to_leave.strftime('%H:%M'), 'time')
-            self.w(')')
+            self.wfmt(
+                _('Time left at work: {0} (till {1})'),
+                (format_duration(time_left), 'duration'),
+                (time_to_leave.strftime('%H:%M'), 'time'),
+            )
 
-        if self.settings.show_office_hours and self.date is None:
-            self.w('\nAt office today: ')
+        if self.settings.show_office_hours:
+            self.w('\n')
             hours = datetime.timedelta(hours=self.settings.hours)
             total = total_slacking + total_work
-            self.w("%s " % format_duration(total), 'duration')
-            self.w('(')
             if total > hours:
-                self.w(format_duration(total - hours), 'duration')
-                self.w(' overtime')
+                self.wfmt(
+                    _('At office today: {0} ({1} overtime)'),
+                    (format_duration(total), 'duration'),
+                    (format_duration(total - hours), 'duration'),
+                )
             else:
-                self.w(format_duration(hours - total), 'duration')
-                self.w(' left')
-            self.w(')')
+                self.wfmt(
+                    _('At office today: {0} ({1} overtime)'),
+                    (format_duration(total), 'duration'),
+                    (format_duration(hours - total), 'left'),
+                )
 
 
 def main():
