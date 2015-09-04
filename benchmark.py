@@ -53,7 +53,7 @@ def split():
         time, entry = line.split(': ', 1)
 
 
-@mark
+#@mark
 def parse_one():
     filename = Settings().get_timelog_file()
     for line in open(filename):
@@ -66,7 +66,7 @@ def parse_one():
             continue
 
 
-@mark
+#@mark
 def parse_two():  # slower than parse_one
     filename = Settings().get_timelog_file()
     for line in open(filename):
@@ -120,7 +120,7 @@ def parse_and_collect():
         items.append((time, entry))
 
 
-@mark
+#@mark
 def parse_and_sort_incorrectly():
     items = []
     filename = Settings().get_timelog_file()
@@ -142,6 +142,23 @@ def parse_and_sort_correctly():
     items = []
     filename = Settings().get_timelog_file()
     for line in open(filename):
+        time, sep, entry = line.partition(': ')
+        if not sep:
+            continue
+        try:
+            time = parse_datetime(time)
+        except ValueError:
+            continue
+        entry = entry.strip()
+        items.append((time, entry))
+    items.sort(key=itemgetter(0))
+
+
+@mark
+def parse_and_sort_unicode():
+    items = []
+    filename = Settings().get_timelog_file()
+    for line in open(filename, 'rb').read().decode('UTF-8').splitlines():
         time, sep, entry = line.partition(': ')
         if not sep:
             continue
