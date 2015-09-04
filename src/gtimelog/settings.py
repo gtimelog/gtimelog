@@ -54,10 +54,6 @@ class Settings(object):
 
     report_style = 'plain'
 
-    def __init__(self, load=True):
-        if load:
-            self.load(self.get_config_file())
-
     def check_legacy_config(self):
         envar_home = os.environ.get('GTIMELOG_HOME')
         if envar_home is not None:

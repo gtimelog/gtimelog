@@ -1037,7 +1037,7 @@ class Application(Gtk.Application):
             print(gtimelog.__version__)
             return 0
         if options.contains('sample-config'):
-            settings = Settings(load=False)
+            settings = Settings()
             settings.save("gtimelogrc.sample")
             print("Sample configuration file written to gtimelogrc.sample")
             print("Edit it and save as %s" % settings.get_config_file())
@@ -1086,7 +1086,7 @@ class Application(Gtk.Application):
             print('Config directory: %s' % Settings().get_config_dir())
             print('Data directory: %s' % Settings().get_data_dir())
 
-        settings = Settings(load=False)
+        settings = Settings()
         configdir = settings.get_config_dir()
         datadir = settings.get_data_dir()
         try:
