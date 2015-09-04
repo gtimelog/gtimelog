@@ -37,6 +37,8 @@ from gi.repository import Gdk
 mark_time("Gdk import done")
 from gi.repository import Gtk
 mark_time("Gtk import done")
+from gi.repository import Pango
+mark_time("Pango import done")
 
 pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
@@ -196,6 +198,7 @@ class Window(Gtk.ApplicationWindow):
         self.task_entry = builder.get_object('task_entry')
         self.task_entry.grab_focus()
         self.log_view = builder.get_object('log_view')
+        self.set_up_log_view_columns()
         self.log_buffer = self.log_view.get_buffer()
         self.log_buffer.create_tag('today', foreground='#204a87')     # Tango dark blue
         self.log_buffer.create_tag('duration', foreground='#ce5c00')  # Tango dark orange
@@ -217,6 +220,17 @@ class Window(Gtk.ApplicationWindow):
         mark_time('settings loaded')
 
         GLib.idle_add(self.load_log)
+
+    def set_up_log_view_columns(self):
+        """Set up tab stops in the log view."""
+        # we can't get a Pango context for unrealized widgets
+        self.log_view.realize()
+        pango_context = self.log_view.get_pango_context()
+        em = pango_context.get_font_description().get_size()
+        tabs = Pango.TabArray.new(2, False)
+        tabs.set_tab(0, Pango.TabAlign.LEFT, 9 * em)
+        tabs.set_tab(1, Pango.TabAlign.LEFT, 12.5 * em)
+        self.log_view.set_tabs(tabs)
 
     def load_log(self):
         mark_time("loading timelog")
