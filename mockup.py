@@ -61,6 +61,10 @@ class Application(Gtk.Application):
         about_dialog.show()
 
     def do_activate(self):
+        if self.get_active_window() is not None:
+            self.get_active_window().present()
+            return
+
         builder = Gtk.Builder.new_from_file(UI_FILE)
         builder.add_from_file(MENUS_UI_FILE)
         window = builder.get_object('main_window')
