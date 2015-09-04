@@ -146,8 +146,8 @@ class Window(Gtk.ApplicationWindow):
 
     def get_subtitle(self):
         date = self.get_date()
-        return _("{date:%A, %Y-%m-%d} (week {week:0>2})").format(
-            date=date, week=date.isocalendar()[1])
+        return _("{0:%A, %Y-%m-%d} (week {1:0>2})").format(
+            date, date.isocalendar()[1])
 
     def date_changed(self, obj, param_spec):
         # Enforce strict typing

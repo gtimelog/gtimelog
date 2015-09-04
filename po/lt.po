@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
-"Report-Msgid-Bugs-To: https://github.com/gtimelog/gtimelog/issues\n"
-"POT-Creation-Date: 2015-09-04 10:47+0300\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-09-04 12:31+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
 "%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: ../gtimelog.desktop.in.h:1 ../mockup.py:33 ../src/gtimelog/about.ui.h:1
+#: ../gtimelog.desktop.in.h:1 ../mockup.py:34 ../src/gtimelog/about.ui.h:1
 #: ../src/gtimelog/experiment.ui.h:2
 msgid "Time Log"
 msgstr "Laiko žurnalas"
@@ -27,6 +27,10 @@ msgstr "Laiko žurnalas"
 #: ../gtimelog.desktop.in.h:2
 msgid "Track and time daily activities"
 msgstr "Sekti kasdieninus darbus"
+
+#: ../mockup.py:149
+msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
+msgstr "{0:%A, %Y-%m-%d} ({1:0>2} savaitė)"
 
 #: ../src/gtimelog/about.ui.h:2
 msgid "Copyright © 2004–2015 Marius Gedminas and contributors."

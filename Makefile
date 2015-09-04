@@ -34,6 +34,13 @@ coverage-diff: coverage
 	coverage xml
 	diff-cover coverage.xml
 
+.PHONY: update-translations
+update-translations:
+	cd po && intltool-update -g gtimelog -p
+	msgmerge -U po/lt.po po/gtimelog.pot
+	mkdir -p locale/lt/LC_MESSAGES
+	msgfmt -o locale/lt/LC_MESSAGES/gtimelog.mo po/lt.po
+
 .PHONY: clean
 clean:
 	rm -rf temp tmp build gtimelog.egg-info
