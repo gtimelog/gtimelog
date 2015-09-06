@@ -177,6 +177,7 @@ class Window(Gtk.ApplicationWindow):
         Gtk.ApplicationWindow.__init__(self, application=app, icon_name='gtimelog')
 
         self.timelog = None
+        self._extended_footer = False
 
         mark_time("loading ui")
         builder = Gtk.Builder.new_from_file(UI_FILE)
@@ -292,6 +293,10 @@ class Window(Gtk.ApplicationWindow):
             total_time = total_work + current_task_time
         return datetime.timedelta(hours=self.settings.hours) - total_time
 
+    @property
+    def showing_today(self):
+        return self._showing_today
+
     @date.getter
     def date(self):
         return self._date
@@ -310,9 +315,11 @@ class Window(Gtk.ApplicationWindow):
         self._date = new_date
 
         if new_date == today:
+            self._showing_today = True
             self.actions.go_home.set_enabled(False)
             self.actions.go_forward.set_enabled(False)
         else:
+            self._showing_today = False
             self.actions.go_home.set_enabled(True)
             self.actions.go_forward.set_enabled(True)
 
@@ -506,8 +513,11 @@ class Window(Gtk.ApplicationWindow):
         else:
             self.wfmt(fmt2, *args)
 
-        if self.date is not None or self.time_range != 'day':
+        if not self.showing_today or self.time_range != 'day':
+            self._extended_footer = False
             return
+
+        self._extended_footer = True
 
         time_left = self.time_left_at_work(total_work)
         if time_left is not None:
