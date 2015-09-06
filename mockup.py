@@ -238,6 +238,10 @@ class Window(Gtk.ApplicationWindow):
         mark_time("timelog loaded")
         self.populate_log()
         mark_time("timelog presented")
+        gf = Gio.File.new_for_path(self.timelog.filename)
+        gfm = gf.monitor_file(Gio.FileMonitorFlags.NONE, None)
+        gfm.connect('changed', self.on_timelog_file_changed)
+        self._gfm = gfm  # keep a reference so it doesn't get garbage collected
 
     def get_today(self):
         # TODO: handle virtual_midnight
@@ -329,6 +333,27 @@ class Window(Gtk.ApplicationWindow):
 
     def on_go_home(self, action, parameter):
         self.date = None
+
+    def on_timelog_file_changed(self, monitor, file, other_file, event_type):
+        # When I edit timelog.txt with vim, I get a series of notifications:
+        # - Gio.FileMonitorEvent.DELETED
+        # - Gio.FileMonitorEvent.CREATED
+        # - Gio.FileMonitorEvent.CHANGED
+        # - Gio.FileMonitorEvent.CHANGED
+        # - Gio.FileMonitorEvent.CHANGES_DONE_HINT
+        # - Gio.FileMonitorEvent.ATTRIBUTE_CHANGED
+        # So, plan: react to CHANGES_DONE_HINT at once, but in case some
+        # systems/OSes don't ever send it, react to other events after a
+        # short delay, so we wouldn't have to reload the file more than
+        # once.
+        if event_type == Gio.FileMonitorEvent.CHANGES_DONE_HINT:
+            self.check_reload()
+        else:
+            GLib.timeout_add_seconds(1, self.check_reload)
+
+    def check_reload(self):
+        if self.timelog.check_reload():
+            self.populate_log()
 
     def populate_log(self):
         self.log_buffer.set_text('')
