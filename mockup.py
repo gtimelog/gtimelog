@@ -53,7 +53,7 @@ sys.path.insert(0, pkgdir)
 
 from gtimelog.settings import Settings
 from gtimelog.timelog import (
-    as_minutes, virtual_day, different_days, prev_month, next_month)
+    as_minutes, virtual_day, different_days, prev_month, next_month, uniq)
 
 mark_time("gtimelog imports done")
 
@@ -494,8 +494,17 @@ class TaskEntry(Gtk.Entry):
 
     def __init__(self):
         Gtk.Entry.__init__(self)
+        self.set_up_history()
         self.set_up_completion()
         self.connect('notify::timelog', self.timelog_changed)
+        self.connect('key_press_event', self.on_key_press)
+        self.connect('changed', self.on_changed)
+
+    def set_up_history(self):
+        self.history = []
+        self.filtered_history = []
+        self.history_pos = 0
+        self.history_undo = ''
 
     def set_up_completion(self):
         completion = Gtk.EntryCompletion()
@@ -503,7 +512,6 @@ class TaskEntry(Gtk.Entry):
         self.completion_choices_as_set = set()
         completion.set_model(self.completion_choices)
         completion.set_text_column(0)
-        completion.set_inline_completion(True)
         self.set_completion(completion)
 
     def timelog_changed(self, *args):
@@ -511,11 +519,12 @@ class TaskEntry(Gtk.Entry):
         self.completion_choices.clear()
         if self.timelog is None:
             return
+        self.history = [item[1] for item in self.timelog.items]
         # if there are duplicate entries, we want to keep the last one
         # e.g. if timelog.items contains [a, b, a, c], we want
         # self.completion_choices to be [b, a, c].
         entries = []
-        for timestamp, entry in reversed(self.timelog.items):
+        for entry in reversed(self.history):
             if entry not in self.completion_choices_as_set:
                 entries.append(entry)
                 self.completion_choices_as_set.add(entry)
@@ -529,6 +538,37 @@ class TaskEntry(Gtk.Entry):
         if entry not in self.completion_choices_as_set:
             self.completion_choices.append([entry])
             self.completion_choices_as_set.add(entry)
+
+    def on_changed(self, widget):
+        self.history_pos = 0
+
+    def on_key_press(self, widget, event):
+        if event.keyval == Gdk.keyval_from_name('Prior'):
+            self._do_history(1)
+            return True
+        if event.keyval == Gdk.keyval_from_name('Next'):
+            self._do_history(-1)
+            return True
+        return False
+
+    def _do_history(self, delta):
+        """Handle movement in history."""
+        if not self.history:
+            return
+        if self.history_pos == 0:
+            self.history_undo = self.get_text()
+            self.filtered_history = uniq([
+                l for l in self.history if l.startswith(self.history_undo)])
+        history = self.filtered_history
+        new_pos = max(0, min(self.history_pos + delta, len(history)))
+        if new_pos == 0:
+            self.set_text(self.history_undo)
+            self.set_position(-1)
+        else:
+            self.set_text(history[-new_pos])
+            self.select_region(len(self.history_undo), -1)
+        # Do this after on_changed reset history_pos to 0
+        self.history_pos = new_pos
 
 
 class LogView(Gtk.TextView):
