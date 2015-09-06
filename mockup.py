@@ -201,6 +201,11 @@ class Window(Gtk.ApplicationWindow):
         mark_time("main ui loaded")
         builder.add_from_file(MENUS_UI_FILE)
         mark_time("menus loaded")
+
+        # I want to use a custom Gtk.ApplicationWindow subclass, but I
+        # also want to be able to edit the .ui file with Glade.  So I use
+        # a regular ApplicationWindow in the .ui file, then steal its
+        # children and add them into my custom window instance.
         main_window = builder.get_object('main_window')
         main_box = builder.get_object('main_box')
         headerbar = builder.get_object('headerbar')
