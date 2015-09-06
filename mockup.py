@@ -125,7 +125,7 @@ class Application(Gtk.Application):
         self.set_accels_for_action("app.edit-log", ["<Primary>E"])
         self.set_accels_for_action("app.edit-tasks", ["<Primary>T"])
         self.set_accels_for_action("app.quit", ["<Primary>Q"])
-        self.set_accels_for_action("win.send-report", ["<Primary>D"])
+        self.set_accels_for_action("win.report", ["<Primary>D"])
 
         mark_time("app startup done")
 
@@ -239,7 +239,7 @@ class Window(Gtk.ApplicationWindow):
             self.show_menu = Gio.PropertyAction.new("show-menu", win.menu_button, "active")
             win.add_action(self.show_menu)
 
-            for action_name in ['go-back', 'go-forward', 'go-home', 'add-entry']:
+            for action_name in ['go-back', 'go-forward', 'go-home', 'add-entry', 'report']:
                 action = Gio.SimpleAction.new(action_name, None)
                 action.connect('activate', getattr(win, 'on_' + action_name.replace('-', '_')))
                 win.add_action(action)
@@ -265,12 +265,12 @@ class Window(Gtk.ApplicationWindow):
         # a regular ApplicationWindow in the .ui file, then steal its
         # children and add them into my custom window instance.
         main_window = builder.get_object('main_window')
-        main_box = builder.get_object('main_box')
+        main_stack = builder.get_object('main_stack')
         headerbar = builder.get_object('headerbar')
         copy_properties(main_window, self)
         main_window.set_titlebar(None)
-        main_window.remove(main_box)
-        self.add(main_box)
+        main_window.remove(main_stack)
+        self.add(main_stack)
         self.set_titlebar(headerbar)
         main_window.destroy()
 
@@ -279,6 +279,8 @@ class Window(Gtk.ApplicationWindow):
         # <menu> and the menu-model property on save.
         builder.get_object('menu_button').set_menu_model(builder.get_object('window_menu'))
         builder.get_object('view_button').set_menu_model(builder.get_object('view_menu'))
+
+        self.main_stack = main_stack
 
         self.headerbar = builder.get_object('headerbar')
         self.time_label = builder.get_object('time_label')
@@ -309,6 +311,11 @@ class Window(Gtk.ApplicationWindow):
 
         self.actions = self.Actions(self)
         self.actions.add_entry.set_enabled(False)
+
+        # couldn't figure out how to set action targets in the .ui file
+        builder.get_object('daily_report_toggle').set_detailed_action_name('win.time-range::day')
+        builder.get_object('weekly_report_toggle').set_detailed_action_name('win.time-range::week')
+        builder.get_object('monthly_report_toggle').set_detailed_action_name('win.time-range::month')
 
         mark_time('window created')
 
@@ -489,6 +496,13 @@ class Window(Gtk.ApplicationWindow):
         mark_time("focus grabbed")
         self.tick(True)
         mark_time("label updated")
+
+    def on_report(self, action, parameter):
+        if self.main_stack.get_visible_child_name() == 'report':
+            # Temporary way to get back
+            self.main_stack.set_visible_child_name('entry')
+        else:
+            self.main_stack.set_visible_child_name('report')
 
     def on_timelog_file_changed(self, monitor, file, other_file, event_type):
         # When I edit timelog.txt with vim, I get a series of notifications:
