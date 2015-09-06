@@ -531,14 +531,13 @@ class Window(Gtk.ApplicationWindow):
         buffer.delete_mark(end_mark)
 
     def write_item(self, item):
-        start, stop, duration, tags, entry = item
-        self.w(format_duration(duration), 'duration')
+        self.w(format_duration(item.duration), 'duration')
         self.w('\t')
-        period = _('({0:%H:%M}-{1:%H:%M})').format(start, stop)
+        period = _('({0:%H:%M}-{1:%H:%M})').format(item.start, item.stop)
         self.w(period, 'time')
         self.w('\t')
-        tag = ('slacking' if '**' in entry else None)
-        self.w(entry + '\n', tag)
+        tag = ('slacking' if '**' in item.entry else None)
+        self.w(item.entry + '\n', tag)
 
     def write_group(self, entry, duration):
         self.w(format_duration(duration), 'duration')

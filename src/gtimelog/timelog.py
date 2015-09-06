@@ -125,7 +125,7 @@ def uniq(l):
     return result
 
 
-Entry = collections.namedtuple('Entry', 'start dtop duration tags entry')
+Entry = collections.namedtuple('Entry', 'start stop duration tags entry')
 
 
 class TimeCollection(object):
