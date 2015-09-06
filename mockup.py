@@ -497,7 +497,6 @@ class TaskEntry(Gtk.Entry):
         self.set_up_history()
         self.set_up_completion()
         self.connect('notify::timelog', self.timelog_changed)
-        self.connect('key_press_event', self.on_key_press)
         self.connect('changed', self.on_changed)
 
     def set_up_history(self):
@@ -542,14 +541,14 @@ class TaskEntry(Gtk.Entry):
     def on_changed(self, widget):
         self.history_pos = 0
 
-    def on_key_press(self, widget, event):
+    def do_key_press_event(self, event):
         if event.keyval == Gdk.keyval_from_name('Prior'):
             self._do_history(1)
             return True
         if event.keyval == Gdk.keyval_from_name('Next'):
             self._do_history(-1)
             return True
-        return False
+        return Gtk.Entry.do_key_press_event(self, event)
 
     def _do_history(self, delta):
         """Handle movement in history."""
