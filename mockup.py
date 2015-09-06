@@ -401,10 +401,19 @@ class Window(Gtk.ApplicationWindow):
             self.date = None  # jump to today
             mark_time("jumped to today")
 
+        previous_day = self.timelog.day
         self.timelog.append(entry, now)
         mark_time("appended")
-        self.populate_log()
-        mark_time("populate_log done")
+        same_day = self.timelog.day == previous_day
+        if self.detail_level == 'chronological' and same_day:
+            self.delete_footer()
+            self.write_item(self.timelog.last_entry())
+            self.add_footer()
+            self.scroll_to_end()
+            mark_time("optimized update done")
+        else:
+            self.populate_log()
+            mark_time("populate_log done")
         self.task_entry.set_text('')
         self.task_entry.grab_focus()
         mark_time("focus grabbed")
