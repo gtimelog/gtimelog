@@ -633,12 +633,14 @@ class LogView(Gtk.TextView):
         self.get_buffer().place_cursor(where)
 
     def scroll_to_end(self):
-        # XXX: seems to be buggy: switch to a month view and add a new
-        # entry -- it will scroll a bit, but not to the very end
+        # If I do the scrolling immediatelly, it won't scroll to the end, usually.
+        # If I delay the scrolling, it works every time.
+        # I only wish I knew how to disable the scroll animation.
+        GLib.idle_add(self._scroll_to_end)
+
+    def _scroll_to_end(self):
         buffer = self.get_buffer()
-        end_mark = buffer.create_mark('end', buffer.get_end_iter())
-        self.scroll_to_mark(end_mark, 0, False, 0, 0)
-        buffer.delete_mark(end_mark)
+        self.scroll_to_iter(buffer.get_end_iter(), 0, False, 0, 0)
 
     def write_item(self, item):
         self.w(format_duration(item.duration), 'duration')
