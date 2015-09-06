@@ -942,9 +942,12 @@ class LogView(Gtk.TextView):
             time_left = self.time_left_at_work(total_work)
             time_to_leave = self.now + time_left
             if time_left < datetime.timedelta(0):
+                fmt = _("Time left at work: {0} (should've finished at {1:%H:%M})")
                 time_left = datetime.timedelta(0)
+            else:
+                fmt = _('Time left at work: {0} (till {1:%H:%M})')
             self.wfmt(
-                _('Time left at work: {0} (till {1:%H:%M})'),
+                fmt,
                 (format_duration(time_left), 'duration'),
                 (time_to_leave, 'time'),
             )
