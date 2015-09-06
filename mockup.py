@@ -191,6 +191,10 @@ class Window(Gtk.ApplicationWindow):
         type=object, default=None, nick='Time log',
         blurb='Time log object')
 
+    tasks = GObject.Property(
+        type=object, default=None, nick='Tasks',
+        blurb='Task list object')
+
     date = GObject.Property(
         type=object, default=None, nick='Date',
         blurb='Date to show (None tracks today)')
@@ -224,9 +228,11 @@ class Window(Gtk.ApplicationWindow):
     def __init__(self, app):
         Gtk.ApplicationWindow.__init__(self, application=app, icon_name='gtimelog')
 
+        self._watches = []
         self._date = None
         self._showing_today = None
         self.timelog = None
+        self.tasks = None
 
         mark_time("loading ui")
         builder = Gtk.Builder.new_from_file(UI_FILE)
@@ -276,6 +282,7 @@ class Window(Gtk.ApplicationWindow):
         self.task_list = TaskList()
         swap_widget(builder, 'task_list', self.task_list)
         self.task_list.connect('row-activated', self.task_list_row_activated)
+        self.bind_property('tasks', self.task_list, 'tasks', GObject.BindingFlags.DEFAULT)
 
         self.actions = self.Actions(self, builder)
         self.actions.add_entry.set_enabled(False)
@@ -287,7 +294,6 @@ class Window(Gtk.ApplicationWindow):
         self.log_view.hours = self.settings.hours
         self.log_view.office_hours = self.settings.hours
         mark_time('settings loaded')
-        self.task_list.tasks = self.settings.get_task_list()
 
         self.date = None  # initialize today's date
 
@@ -297,6 +303,7 @@ class Window(Gtk.ApplicationWindow):
         mark_time('window ready')
 
         GLib.idle_add(self.load_log)
+        GLib.idle_add(self.load_tasks)
         self.tick(True)
         # In theory we could wake up once every 60 seconds.  Shame that
         # there's no timeout_add_minutes.  I don't want to use
@@ -310,14 +317,24 @@ class Window(Gtk.ApplicationWindow):
         timelog = self.settings.get_time_log()
         mark_time("timelog loaded")
         self.timelog = timelog
-        mark_time("components updated")
         self.tick(True)
         self.enable_add_entry()
         mark_time("timelog presented")
-        gf = Gio.File.new_for_path(self.timelog.filename)
+        self.watch_file(self.timelog.filename, self.on_timelog_file_changed)
+
+    def load_tasks(self):
+        mark_time("loading tasks")
+        tasks = self.settings.get_task_list()
+        mark_time("tasks loaded")
+        self.tasks = tasks
+        mark_time("tasks presented")
+        self.watch_file(self.tasks.filename, self.on_tasks_file_changed)
+
+    def watch_file(self, filename, callback):
+        gf = Gio.File.new_for_path(filename)
         gfm = gf.monitor_file(Gio.FileMonitorFlags.NONE, None)
-        gfm.connect('changed', self.on_timelog_file_changed)
-        self._gfm = gfm  # keep a reference so it doesn't get garbage collected
+        gfm.connect('changed', callback)
+        self._watches.append(gfm) # keep a reference so it doesn't get garbage collected
 
     def get_last_time(self):
         if self.timelog is None:
@@ -465,10 +482,20 @@ class Window(Gtk.ApplicationWindow):
         else:
             GLib.timeout_add_seconds(1, self.check_reload)
 
+    def on_tasks_file_changed(self, monitor, file, other_file, event_type):
+        if event_type == Gio.FileMonitorEvent.CHANGES_DONE_HINT:
+            self.check_reload_tasks()
+        else:
+            GLib.timeout_add_seconds(1, self.check_reload_tasks)
+
     def check_reload(self):
         if self.timelog.check_reload():
             self.notify('timelog')
             self.tick(True)
+
+    def check_reload_tasks(self):
+        if self.tasks.check_reload():
+            self.notify('tasks')
 
     def enable_add_entry(self):
         enabled = self.timelog is not None and self.get_current_task()
