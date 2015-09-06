@@ -116,7 +116,9 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.time-range::day", ["<Alt>4"])
         self.set_accels_for_action("win.time-range::week", ["<Alt>5"])
         self.set_accels_for_action("win.time-range::month", ["<Alt>6"])
+        self.set_accels_for_action("win.show-view-menu", ["F8"])
         self.set_accels_for_action("win.show-task-pane", ["F9"])
+        self.set_accels_for_action("win.show-menu", ["F10"])
         self.set_accels_for_action("win.go-back", ["<Alt>Left"])
         self.set_accels_for_action("win.go-forward", ["<Alt>Right"])
         self.set_accels_for_action("win.go-home", ["<Alt>Home"])
@@ -228,8 +230,14 @@ class Window(Gtk.ApplicationWindow):
             self.time_range = Gio.PropertyAction.new("time-range", win, "time-range")
             win.add_action(self.time_range)
 
+            self.show_view_menu = Gio.PropertyAction.new("show-view-menu", win.view_button, "active")
+            win.add_action(self.show_view_menu)
+
             self.show_task_pane = Gio.PropertyAction.new("show-task-pane", win.task_pane, "visible")
             win.add_action(self.show_task_pane)
+
+            self.show_menu = Gio.PropertyAction.new("show-menu", win.menu_button, "active")
+            win.add_action(self.show_menu)
 
             for action_name in ['go-back', 'go-forward', 'go-home', 'add-entry']:
                 action = Gio.SimpleAction.new(action_name, None)
@@ -295,6 +303,9 @@ class Window(Gtk.ApplicationWindow):
         swap_widget(builder, 'task_list', self.task_list)
         self.task_list.connect('row-activated', self.task_list_row_activated)
         self.bind_property('tasks', self.task_list, 'tasks', GObject.BindingFlags.DEFAULT)
+
+        self.view_button = builder.get_object("view_button")
+        self.menu_button = builder.get_object("menu_button")
 
         self.actions = self.Actions(self)
         self.actions.add_entry.set_enabled(False)
