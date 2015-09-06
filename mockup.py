@@ -220,14 +220,14 @@ class Window(Gtk.ApplicationWindow):
 
     class Actions(object):
 
-        def __init__(self, win, builder):
+        def __init__(self, win):
             self.detail_level = Gio.PropertyAction.new("detail-level", win, "detail-level")
             win.add_action(self.detail_level)
 
             self.time_range = Gio.PropertyAction.new("time-range", win, "time-range")
             win.add_action(self.time_range)
 
-            self.show_task_pane = Gio.PropertyAction.new("show-task-pane", builder.get_object("task_pane"), "visible")
+            self.show_task_pane = Gio.PropertyAction.new("show-task-pane", win.task_pane, "visible")
             win.add_action(self.show_task_pane)
 
             for action_name in ['go-back', 'go-forward', 'go-home', 'add-entry']:
@@ -289,12 +289,13 @@ class Window(Gtk.ApplicationWindow):
         self.task_entry.bind_property('text', self.log_view, 'current_task', GObject.BindingFlags.DEFAULT)
         self.bind_property('title', self.headerbar, 'subtitle', GObject.BindingFlags.DEFAULT)
 
+        self.task_pane = builder.get_object("task_pane")
         self.task_list = TaskList()
         swap_widget(builder, 'task_list', self.task_list)
         self.task_list.connect('row-activated', self.task_list_row_activated)
         self.bind_property('tasks', self.task_list, 'tasks', GObject.BindingFlags.DEFAULT)
 
-        self.actions = self.Actions(self, builder)
+        self.actions = self.Actions(self)
         self.actions.add_entry.set_enabled(False)
 
         mark_time('window created')
@@ -304,6 +305,7 @@ class Window(Gtk.ApplicationWindow):
         self.log_view.hours = self.settings.hours
         self.log_view.office_hours = self.settings.hours
         app.actions.edit_tasks.set_enabled(not self.settings.task_list_url)
+        self.task_pane.set_visible(self.settings.show_tasks)
         mark_time('settings loaded')
 
         self.date = None  # initialize today's date
