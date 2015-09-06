@@ -211,6 +211,7 @@ class Window(Gtk.ApplicationWindow):
         headerbar = builder.get_object('headerbar')
         main_window.set_titlebar(None)
         main_window.remove(main_box)
+        main_window.destroy()
         self.add(main_box)
         self.set_titlebar(headerbar)
         self.set_default_size(800, 500)
