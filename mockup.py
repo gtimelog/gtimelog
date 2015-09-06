@@ -199,6 +199,7 @@ class Window(Gtk.ApplicationWindow):
         builder.get_object('view_button').set_menu_model(builder.get_object('view_menu'))
 
         self.headerbar = builder.get_object('headerbar')
+        self.time_label = builder.get_object('time_label')
         self.task_entry = builder.get_object('task_entry')
         self.task_entry.grab_focus()
         self.log_view = builder.get_object('log_view')
@@ -224,6 +225,13 @@ class Window(Gtk.ApplicationWindow):
         mark_time('window ready')
 
         GLib.idle_add(self.load_log)
+        self.tick(True)
+        # In theory we could wake up once every 60 seconds.  Shame that
+        # there's no timeout_add_minutes.  I don't want to use
+        # timeout_add_seconds(60) because that wouldn't be aligned to a
+        # minute boundary, so we would delay updating the current time
+        # unnecessarily.
+        GLib.timeout_add_seconds(1, self.tick)
 
     def set_up_log_view_columns(self):
         """Set up tab stops in the log view."""
@@ -357,6 +365,16 @@ class Window(Gtk.ApplicationWindow):
     def check_reload(self):
         if self.timelog.check_reload():
             self.populate_log()
+
+    def tick(self, force_update=False):
+        now = datetime.datetime.now().replace(second=0, microsecond=0)
+        if not force_update and now == self.last_tick:
+            # Do not eat CPU unnecessarily: update the time ticker only when
+            # the minute changes.
+            return True
+        self.last_tick = now
+        self.time_label.set_text(now.strftime(_('%H:%M')))
+        return True
 
     def populate_log(self):
         self.headerbar.set_subtitle(self.get_subtitle())
