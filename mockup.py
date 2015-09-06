@@ -221,6 +221,7 @@ class Window(Gtk.ApplicationWindow):
 
         self.date = None  # initialize today's date
 
+        self.task_entry.connect('changed', self.task_entry_changed)
         self.connect('notify::detail-level', self.detail_level_changed)
         self.connect('notify::time-range', self.time_range_changed)
         mark_time('window ready')
@@ -250,11 +251,17 @@ class Window(Gtk.ApplicationWindow):
         self.timelog = self.settings.get_time_log()
         mark_time("timelog loaded")
         self.populate_log()
+        self.tick(True)
         mark_time("timelog presented")
         gf = Gio.File.new_for_path(self.timelog.filename)
         gfm = gf.monitor_file(Gio.FileMonitorFlags.NONE, None)
         gfm.connect('changed', self.on_timelog_file_changed)
         self._gfm = gfm  # keep a reference so it doesn't get garbage collected
+
+    def get_last_time(self):
+        if self.timelog is None:
+            return None
+        return self.timelog.window.last_time()
 
     def get_time_window(self):
         if self.time_range == 'day':
@@ -282,7 +289,7 @@ class Window(Gtk.ApplicationWindow):
         last_time = self.timelog.window.last_time()
         if last_time is None:
             return None
-        now = datetime.datetime.now()
+        now = datetime.datetime.now().replace(second=0, microsecond=0)
         # NB: works with UTF-8-encoded binary strings on Python 2.  This
         # seems harmless for now.
         current_task = self.task_entry.get_text()
@@ -372,6 +379,13 @@ class Window(Gtk.ApplicationWindow):
     def check_reload(self):
         if self.timelog.check_reload():
             self.populate_log()
+            self.tick(True)
+
+    def task_entry_changed(self, widget):
+        if self._extended_footer:
+            # Update "time left to work" in case we added/deleted '**'
+            self.delete_footer()
+            self.add_footer()
 
     def tick(self, force_update=False):
         now = datetime.datetime.now().replace(second=0, microsecond=0)
@@ -380,7 +394,15 @@ class Window(Gtk.ApplicationWindow):
             # the minute changes.
             return True
         self.last_tick = now
-        self.time_label.set_text(now.strftime(_('%H:%M')))
+        last_time = self.get_last_time()
+        if last_time is None:
+            self.time_label.set_text(now.strftime(_('%H:%M')))
+        else:
+            self.time_label.set_text(format_duration(now - last_time))
+            if self._extended_footer:
+                # Update "time left to work"
+                self.delete_footer()
+                self.add_footer()
         return True
 
     def populate_log(self):
@@ -457,6 +479,13 @@ class Window(Gtk.ApplicationWindow):
                 self.w(value, tag)
             else:
                 self.w(bit)
+
+    def delete_footer(self):
+        buffer = self.log_buffer
+        buffer.delete(
+            buffer.get_iter_at_mark(self.footer_mark), buffer.get_end_iter())
+        buffer.delete_mark(self.footer_mark)
+        self.footer_mark = None
 
     def add_footer(self):
         buffer = self.log_buffer
