@@ -158,7 +158,32 @@ class Application(Gtk.Application):
         mark_time("app activate done")
 
 
+def copy_properties(src, dest):
+    blacklist = ('events', 'child', 'parent', 'input-hints', 'buffer', 'tabs')
+    for prop in src.props:
+        if prop.flags & GObject.ParamFlags.DEPRECATED != 0:
+            continue
+        if prop.flags & GObject.ParamFlags.READWRITE != GObject.ParamFlags.READWRITE:
+            continue
+        if prop.name in blacklist:
+            continue
+        setattr(dest.props, prop.name, getattr(src.props, prop.name))
+
+
+def swap_widget(builder, name, replacement):
+    original = builder.get_object(name)
+    copy_properties(original, replacement)
+    parent = original.get_parent()
+    parent.remove(original)
+    parent.add(replacement)
+    original.destroy()
+
+
 class Window(Gtk.ApplicationWindow):
+
+    timelog = GObject.Property(
+        type=object, default=None, nick='Time log',
+        blurb='Time log object')
 
     date = GObject.Property(
         type=object, default=None, nick='Date',
@@ -193,8 +218,9 @@ class Window(Gtk.ApplicationWindow):
     def __init__(self, app):
         Gtk.ApplicationWindow.__init__(self, application=app, icon_name='gtimelog')
 
+        self._date = None
+        self._showing_today = None
         self.timelog = None
-        self._extended_footer = False
 
         mark_time("loading ui")
         builder = Gtk.Builder.new_from_file(UI_FILE)
@@ -229,13 +255,14 @@ class Window(Gtk.ApplicationWindow):
         self.task_entry.grab_focus() # I specified this in the .ui file but it gets ignored
         self.add_button = builder.get_object('add_button')
         self.add_button.props.has_default = True # I specified this in the .ui file but it gets ignored
-        self.log_view = builder.get_object('log_view')
-        self.set_up_log_view_columns()
-        self.log_buffer = self.log_view.get_buffer()
-        self.log_buffer.create_tag('today', foreground='#204a87')     # Tango dark blue
-        self.log_buffer.create_tag('duration', foreground='#ce5c00')  # Tango dark orange
-        self.log_buffer.create_tag('time', foreground='#4e9a06')      # Tango dark green
-        self.log_buffer.create_tag('slacking', foreground='gray')
+        self.log_view = LogView()
+        swap_widget(builder, 'log_view', self.log_view)
+        self.bind_property('timelog', self.log_view, 'timelog', GObject.BindingFlags.DEFAULT)
+        self.bind_property('showing_today', self.log_view, 'showing_today', GObject.BindingFlags.DEFAULT)
+        self.bind_property('date', self.log_view, 'date', GObject.BindingFlags.DEFAULT)
+        self.bind_property('detail_level', self.log_view, 'detail_level', GObject.BindingFlags.SYNC_CREATE)
+        self.bind_property('time_range', self.log_view, 'time_range', GObject.BindingFlags.SYNC_CREATE)
+        self.bind_property('title', self.headerbar, 'subtitle', GObject.BindingFlags.DEFAULT)
 
         self.actions = self.Actions(self, builder)
         self.actions.add_entry.set_enabled(False)
@@ -244,6 +271,8 @@ class Window(Gtk.ApplicationWindow):
 
         self.settings = Settings()
         self.settings.load()
+        self.log_view.hours = self.settings.hours
+        self.log_view.office_hours = self.settings.hours
         mark_time('settings loaded')
 
         self.date = None  # initialize today's date
@@ -262,22 +291,10 @@ class Window(Gtk.ApplicationWindow):
         # unnecessarily.
         GLib.timeout_add_seconds(1, self.tick)
 
-    def set_up_log_view_columns(self):
-        """Set up tab stops in the log view."""
-        # we can't get a Pango context for unrealized widgets
-        self.log_view.realize()
-        pango_context = self.log_view.get_pango_context()
-        em = pango_context.get_font_description().get_size()
-        tabs = Pango.TabArray.new(2, False)
-        tabs.set_tab(0, Pango.TabAlign.LEFT, 9 * em)
-        tabs.set_tab(1, Pango.TabAlign.LEFT, 12.5 * em)
-        self.log_view.set_tabs(tabs)
-
     def load_log(self):
         mark_time("loading timelog")
         self.timelog = self.settings.get_time_log()
         mark_time("timelog loaded")
-        self.populate_log()
         self.tick(True)
         self.enable_add_entry()
         mark_time("timelog presented")
@@ -299,19 +316,6 @@ class Window(Gtk.ApplicationWindow):
         elif self.time_range == 'month':
             return self.timelog.window_for_month(self.date)
 
-    def get_subtitle(self):
-        date = self.date
-        if not date:
-            return ''
-        if self.time_range == 'day':
-            return _("{0:%A, %Y-%m-%d} (week {1:0>2})").format(
-                date, date.isocalendar()[1])
-        elif self.time_range == 'week':
-            return _("{0:%Y}, week {1:0>2} ({0:%B %-d}-{2:%-d})").format(
-                date, date.isocalendar()[1], date + datetime.timedelta(6))
-        elif self.time_range == 'month':
-            return _("{0:%B %Y}").format(date)
-
     def get_now(self):
         return datetime.datetime.now().replace(second=0, microsecond=0)
 
@@ -320,32 +324,7 @@ class Window(Gtk.ApplicationWindow):
         entry = self.task_entry.get_text()
         if isinstance(entry, bytes):
             entry = entry.decode('UTF-8')
-        return entry
-
-    def get_current_task_time(self, now=None):
-        last_time = self.get_last_time()
-        if last_time is None:
-            return datetime.timedelta(0)
-        if now is None:
-            now = self.get_now()
-        current_task_time = now - last_time
-        return current_task_time
-
-    def get_current_task_work_time(self, now=None):
-        current_task = self.get_current_task()
-        if '**' in current_task:
-            return datetime.timedelta(0)
-        else:
-            return self.get_current_task_time(now)
-
-    def time_left_at_work(self, total_work, now=None):
-        """Calculate time left to work."""
-        total_time = total_work + self.get_current_task_work_time(now)
-        return datetime.timedelta(hours=self.settings.hours) - total_time
-
-    @property
-    def showing_today(self):
-        return self._showing_today
+        return entry.strip()
 
     @date.getter
     def date(self):
@@ -362,6 +341,8 @@ class Window(Gtk.ApplicationWindow):
         if new_date is None or new_date >= today:
             new_date = today
 
+        old_date = self._date
+        old_showing_today = self._showing_today
         self._date = new_date
 
         if new_date == today:
@@ -373,15 +354,40 @@ class Window(Gtk.ApplicationWindow):
             self.actions.go_home.set_enabled(True)
             self.actions.go_forward.set_enabled(True)
 
-        self.populate_log()
+        if old_showing_today != self._showing_today:
+            self.notify('showing_today')
+        if old_date != self._date:
+            self.notify('title')
+
+    @GObject.Property(
+        type=bool, default=True, nick='Showing today',
+        blurb='Currently visible time range includes today')
+    def showing_today(self):
+        return self._showing_today
+
+    @GObject.Property(
+        type=str, nick='Title',
+        blurb='Description of the visible time range')
+    def title(self):
+        date = self.date
+        if not date:
+            return ''
+        if self.time_range == 'day':
+            return _("{0:%A, %Y-%m-%d} (week {1:0>2})").format(
+                date, date.isocalendar()[1])
+        elif self.time_range == 'week':
+            return _("{0:%Y}, week {1:0>2} ({0:%B %-d}-{2:%-d})").format(
+                date, date.isocalendar()[1], date + datetime.timedelta(6))
+        elif self.time_range == 'month':
+            return _("{0:%B %Y}").format(date)
 
     def detail_level_changed(self, obj, param_spec):
         assert self.detail_level in {'chronological', 'grouped', 'summary'}
-        self.populate_log()
+        self.notify('title')
 
     def time_range_changed(self, obj, param_spec):
         assert self.time_range in {'day', 'week', 'month'}
-        self.populate_log()
+        self.notify('title')
 
     def on_go_back(self, action, parameter):
         if self.time_range == 'day':
@@ -418,15 +424,8 @@ class Window(Gtk.ApplicationWindow):
         self.timelog.append(entry, now)
         mark_time("appended")
         same_day = self.timelog.day == previous_day
-        if self.detail_level == 'chronological' and same_day:
-            self.delete_footer()
-            self.write_item(self.timelog.last_entry())
-            self.add_footer()
-            self.scroll_to_end()
-            mark_time("optimized update done")
-        else:
-            self.populate_log()
-            mark_time("populate_log done")
+        self.log_view.entry_added(same_day)
+        mark_time("log_view updated")
         self.task_entry.set_text('')
         self.task_entry.grab_focus()
         mark_time("focus grabbed")
@@ -452,19 +451,16 @@ class Window(Gtk.ApplicationWindow):
 
     def check_reload(self):
         if self.timelog.check_reload():
-            self.populate_log()
+            self.notify('timelog')
             self.tick(True)
 
     def enable_add_entry(self):
-        enabled = self.timelog is not None and self.get_current_task().strip()
+        enabled = self.timelog is not None and self.get_current_task()
         self.actions.add_entry.set_enabled(enabled)
 
     def task_entry_changed(self, widget):
         self.enable_add_entry()
-        if self._extended_footer:
-            # Update "time left to work" in case we added/deleted '**'
-            self.delete_footer()
-            self.add_footer()
+        self.log_view.current_task = self.get_current_task()
 
     def tick(self, force_update=False):
         now = self.get_now()
@@ -478,15 +474,120 @@ class Window(Gtk.ApplicationWindow):
             self.time_label.set_text(now.strftime(_('%H:%M')))
         else:
             self.time_label.set_text(format_duration(now - last_time))
-            if self._extended_footer:
-                # Update "time left to work"
-                self.delete_footer()
-                self.add_footer()
+        self.log_view.now = now
         return True
 
+
+class LogView(Gtk.TextView):
+
+    timelog = GObject.Property(
+        type=object, default=None, nick='Time log',
+        blurb='Time log object')
+
+    date = GObject.Property(
+        type=object, default=None, nick='Date',
+        blurb='Date to show (None tracks today)')
+
+    showing_today = GObject.Property(
+        type=bool, default=True, nick='Showing today',
+        blurb='Currently visible time range includes today')
+
+    detail_level = GObject.Property(
+        type=str, default='chronological', nick='Detail level',
+        blurb='Detail level to show (chronological/grouped/summary)')
+
+    time_range = GObject.Property(
+        type=str, default='day', nick='Time range',
+        blurb='Time range to show (day/week/month)')
+
+    hours = GObject.Property(
+        type=int, default=0, nick='Hours',
+        blurb='Target number of work hours per day')
+
+    office_hours = GObject.Property(
+        type=int, default=0, nick='Office Hours',
+        blurb='Target number of office hours per day')
+
+    current_task = GObject.Property(
+        type=str, nick='Current task',
+        blurb='Current task in progress')
+
+    now = GObject.Property(
+        type=object, default=None, nick='Now',
+        blurb='Current date and time')
+
+    def __init__(self):
+        Gtk.TextView.__init__(self)
+        self._extended_footer = False
+        self._footer_mark = None
+        self._update_pending = False
+        self._footer_update_pending = False
+        self.set_up_tabs()
+        self.set_up_tags()
+        self.connect('notify::timelog', self.queue_update)
+        self.connect('notify::date', self.queue_update)
+        self.connect('notify::showing-today', self.queue_update)
+        self.connect('notify::detail-level', self.queue_update)
+        self.connect('notify::time-range', self.queue_update)
+        self.connect('notify::hours', self.queue_footer_update)
+        self.connect('notify::office-hours', self.queue_footer_update)
+        self.connect('notify::current-task', self.queue_footer_update)
+        self.connect('notify::now', self.queue_footer_update)
+
+    def queue_update(self, *args):
+        if not self._update_pending:
+            self._update_pending = True
+            GLib.idle_add(self.populate_log)
+
+    def queue_footer_update(self, *args):
+        if not self._footer_update_pending:
+            self._footer_update_pending = True
+            GLib.idle_add(self.update_footer)
+
+    def set_up_tabs(self):
+        pango_context = self.get_pango_context()
+        em = pango_context.get_font_description().get_size()
+        tabs = Pango.TabArray.new(2, False)
+        tabs.set_tab(0, Pango.TabAlign.LEFT, 9 * em)
+        tabs.set_tab(1, Pango.TabAlign.LEFT, 12.5 * em)
+        self.set_tabs(tabs)
+
+    def set_up_tags(self):
+        buffer = self.get_buffer()
+        buffer.create_tag('today', foreground='#204a87')     # Tango dark blue
+        buffer.create_tag('duration', foreground='#ce5c00')  # Tango dark orange
+        buffer.create_tag('time', foreground='#4e9a06')      # Tango dark green
+        buffer.create_tag('slacking', foreground='gray')
+
+    def get_time_window(self):
+        assert self.timelog is not None
+        if self.time_range == 'day':
+            return self.timelog.window_for_day(self.date)
+        elif self.time_range == 'week':
+            return self.timelog.window_for_week(self.date)
+        elif self.time_range == 'month':
+            return self.timelog.window_for_month(self.date)
+
+    def get_last_time(self):
+        assert self.timelog is not None
+        return self.timelog.window.last_time()
+
+    def get_current_task_time(self):
+        return self.now - self.get_last_time()
+
+    def get_current_task_work_time(self):
+        if '**' in self.current_task:
+            return datetime.timedelta(0)
+        else:
+            return self.get_current_task_time()
+
+    def time_left_at_work(self, total_work):
+        total_time = total_work + self.get_current_task_work_time()
+        return datetime.timedelta(hours=self.hours) - total_time
+
     def populate_log(self):
-        self.headerbar.set_subtitle(self.get_subtitle())
-        self.log_buffer.set_text('')
+        self._update_pending = False
+        self.get_buffer().set_text('')
         if self.timelog is None:
             return # not loaded yet
         window = self.get_time_window()
@@ -517,17 +618,26 @@ class Window(Gtk.ApplicationWindow):
         self.add_footer()
         self.scroll_to_end()
 
+    def entry_added(self, same_day):
+        if self.detail_level == 'chronological' and same_day:
+            self.delete_footer()
+            self.write_item(self.timelog.last_entry())
+            self.add_footer()
+            self.scroll_to_end()
+        else:
+            self.populate_log()
+
     def reposition_cursor(self):
-        where = self.log_buffer.get_end_iter()
+        where = self.get_buffer().get_end_iter()
         where.backward_cursor_position()
-        self.log_buffer.place_cursor(where)
+        self.get_buffer().place_cursor(where)
 
     def scroll_to_end(self):
         # XXX: seems to be buggy: switch to a month view and add a new
         # entry -- it will scroll a bit, but not to the very end
-        buffer = self.log_view.get_buffer()
+        buffer = self.get_buffer()
         end_mark = buffer.create_mark('end', buffer.get_end_iter())
-        self.log_view.scroll_to_mark(end_mark, 0, False, 0, 0)
+        self.scroll_to_mark(end_mark, 0, False, 0, 0)
         buffer.delete_mark(end_mark)
 
     def write_item(self, item):
@@ -546,7 +656,7 @@ class Window(Gtk.ApplicationWindow):
 
     def w(self, text, tag=None):
         """Write some text at the end of the log buffer."""
-        buffer = self.log_buffer
+        buffer = self.get_buffer()
         if tag:
             buffer.insert_with_tags_by_name(buffer.get_end_iter(), text, tag)
         else:
@@ -571,16 +681,28 @@ class Window(Gtk.ApplicationWindow):
             else:
                 self.w(bit)
 
+    def should_have_extended_footer(self):
+        return self.showing_today and self.time_range == 'day'
+
+    def update_footer(self):
+        self._footer_update_pending = False
+        if self._footer_mark is None:
+            return
+        if self._extended_footer or self.should_have_extended_footer():
+            # Update "time left to work"/"at office today"
+            self.delete_footer()
+            self.add_footer()
+
     def delete_footer(self):
-        buffer = self.log_buffer
+        buffer = self.get_buffer()
         buffer.delete(
-            buffer.get_iter_at_mark(self.footer_mark), buffer.get_end_iter())
-        buffer.delete_mark(self.footer_mark)
-        self.footer_mark = None
+            buffer.get_iter_at_mark(self._footer_mark), buffer.get_end_iter())
+        buffer.delete_mark(self._footer_mark)
+        self._footer_mark = None
 
     def add_footer(self):
-        buffer = self.log_buffer
-        self.footer_mark = buffer.create_mark(
+        buffer = self.get_buffer()
+        self._footer_mark = buffer.create_mark(
             'footer', buffer.get_end_iter(), True)
         window = self.get_time_window()
         total_work, total_slacking = window.totals()
@@ -633,17 +755,16 @@ class Window(Gtk.ApplicationWindow):
         else:
             self.wfmt(fmt2, *args)
 
-        if not self.showing_today or self.time_range != 'day':
+        if not self.should_have_extended_footer():
             self._extended_footer = False
             return
 
         self._extended_footer = True
 
-        now = self.get_now()
-        time_left = self.time_left_at_work(total_work, now)
-        if time_left is not None:
+        if self.hours:
             self.w('\n')
-            time_to_leave = now + time_left
+            time_left = self.time_left_at_work(total_work)
+            time_to_leave = self.now + time_left
             if time_left < datetime.timedelta(0):
                 time_left = datetime.timedelta(0)
             self.wfmt(
@@ -652,11 +773,11 @@ class Window(Gtk.ApplicationWindow):
                 (time_to_leave, 'time'),
             )
 
-        if self.settings.show_office_hours:
+        if self.office_hours:
             self.w('\n')
-            hours = datetime.timedelta(hours=self.settings.hours)
+            hours = datetime.timedelta(hours=self.office_hours)
             total = total_slacking + total_work
-            total += self.get_current_task_time(now)
+            total += self.get_current_task_time()
             if total > hours:
                 self.wfmt(
                     _('At office today: {0} ({1} overtime)'),
