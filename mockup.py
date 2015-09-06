@@ -25,6 +25,7 @@ import locale
 import re
 import signal
 import sys
+from io import StringIO
 from gettext import gettext as _
 
 mark_time("Python imports done")
@@ -53,7 +54,8 @@ sys.path.insert(0, pkgdir)
 
 from gtimelog.settings import Settings
 from gtimelog.timelog import (
-    as_minutes, virtual_day, different_days, prev_month, next_month, uniq)
+    as_minutes, virtual_day, different_days, prev_month, next_month, uniq,
+    Reports)
 
 mark_time("gtimelog imports done")
 
@@ -253,6 +255,7 @@ class Window(Gtk.ApplicationWindow):
         self._showing_today = None
         self.timelog = None
         self.tasks = None
+        self.app = app
 
         mark_time("loading ui")
         builder = Gtk.Builder.new_from_file(UI_FILE)
@@ -287,6 +290,7 @@ class Window(Gtk.ApplicationWindow):
         self.forward_button = builder.get_object("forward_button")
         self.today_button = builder.get_object("today_button")
         self.cancel_report_button = builder.get_object("cancel_report_button")
+        self.recipient_entry = builder.get_object("recipient_entry")
         self.headerbar = builder.get_object('headerbar')
         self.time_label = builder.get_object('time_label')
         self.task_entry = TaskEntry()
@@ -319,15 +323,16 @@ class Window(Gtk.ApplicationWindow):
         builder.get_object('weekly_report_toggle').set_detailed_action_name('win.time-range::week')
         builder.get_object('monthly_report_toggle').set_detailed_action_name('win.time-range::month')
 
+        self.report_view = ReportView()
+        swap_widget(builder, 'report_view', self.report_view)
+        self.bind_property('timelog', self.report_view, 'timelog', GObject.BindingFlags.DEFAULT)
+        self.bind_property('date', self.report_view, 'date', GObject.BindingFlags.DEFAULT)
+        self.bind_property('time_range', self.report_view, 'time_range', GObject.BindingFlags.SYNC_CREATE)
+        self.recipient_entry.bind_property('text', self.report_view, 'recipient', GObject.BindingFlags.SYNC_CREATE)
+
         mark_time('window created')
 
-        self.settings = Settings()
-        self.settings.load()
-        self.log_view.hours = self.settings.hours
-        self.log_view.office_hours = self.settings.hours
-        app.actions.edit_tasks.set_enabled(not self.settings.task_list_url)
-        self.task_pane.set_visible(self.settings.show_tasks)
-        mark_time('settings loaded')
+        self.load_settings()
 
         self.date = None  # initialize today's date
 
@@ -345,6 +350,17 @@ class Window(Gtk.ApplicationWindow):
         # minute boundary, so we would delay updating the current time
         # unnecessarily.
         GLib.timeout_add_seconds(1, self.tick)
+
+    def load_settings(self):
+        self.settings = Settings()
+        self.settings.load()
+        self.log_view.hours = self.settings.hours
+        self.log_view.office_hours = self.settings.hours
+        self.app.actions.edit_tasks.set_enabled(not self.settings.task_list_url)
+        self.task_pane.set_visible(self.settings.show_tasks)
+        self.recipient_entry.set_text(self.settings.email)
+        self.report_view.name = self.settings.name
+        mark_time('settings loaded')
 
     def load_log(self):
         mark_time("loading timelog")
@@ -508,6 +524,7 @@ class Window(Gtk.ApplicationWindow):
             self.task_pane_button.hide()
             self.menu_button.hide()
             self.cancel_report_button.show()
+            self.report_view.show()
             self.set_title(_("Report"))
 
     def on_cancel_report(self, action=None, parameter=None):
@@ -517,6 +534,7 @@ class Window(Gtk.ApplicationWindow):
         self.task_pane_button.show()
         self.menu_button.show()
         self.cancel_report_button.hide()
+        self.report_view.hide()
         self.set_title(_("Time Log"))
 
     def on_timelog_file_changed(self, monitor, file, other_file, event_type):
@@ -998,6 +1016,69 @@ class LogView(Gtk.TextView):
                     (format_duration(total), 'duration'),
                     (format_duration(hours - total), 'duration'),
                 )
+
+
+class ReportView(Gtk.TextView):
+
+    timelog = GObject.Property(
+        type=object, default=None, nick='Time log',
+        blurb='Time log object')
+
+    name = GObject.Property(
+        type=str, nick='Name',
+        blurb='Name of report sender')
+
+    recipient = GObject.Property(
+        type=str, nick='Recipient email',
+        blurb='Email of the report recipient')
+
+    date = GObject.Property(
+        type=object, default=None, nick='Date',
+        blurb='Date to show (None tracks today)')
+
+    time_range = GObject.Property(
+        type=str, default='day', nick='Time range',
+        blurb='Time range to show (day/week/month)')
+
+    def __init__(self):
+        Gtk.TextView.__init__(self)
+        self._update_pending = False
+        self.connect('notify::timelog', self.queue_update)
+        self.connect('notify::name', self.queue_update)
+        self.connect('notify::recipient', self.queue_update)
+        self.connect('notify::date', self.queue_update)
+        self.connect('notify::time-range', self.queue_update)
+        self.connect('notify::visible', self.queue_update)
+
+    def queue_update(self, *args):
+        if not self._update_pending:
+            self._update_pending = True
+            GLib.idle_add(self.populate_report)
+
+    def get_time_window(self):
+        assert self.timelog is not None
+        if self.time_range == 'day':
+            return self.timelog.window_for_day(self.date)
+        elif self.time_range == 'week':
+            return self.timelog.window_for_week(self.date)
+        elif self.time_range == 'month':
+            return self.timelog.window_for_month(self.date)
+
+    def populate_report(self):
+        self._update_pending = False
+        self.get_buffer().set_text('')
+        if self.timelog is None or not self.get_visible():
+            return # not loaded yet
+        window = self.get_time_window()
+        reports = Reports(window)
+        output = StringIO()
+        if self.time_range == 'day':
+            reports.daily_report(output, self.recipient, self.name)
+        elif self.time_range == 'week':
+            reports.weekly_report_plain(output, self.recipient, self.name)
+        elif self.time_range == 'month':
+            reports.monthly_report_plain(output, self.recipient, self.name)
+        self.get_buffer().set_text(output.getvalue())
 
 
 class TaskList(Gtk.TreeView):

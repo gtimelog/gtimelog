@@ -63,6 +63,7 @@
                         <property name="can_focus">True</property>
                         <property name="pixels_above_lines">2</property>
                         <property name="editable">False</property>
+                        <property name="monospace">False</property>
                         <property name="wrap_mode">word</property>
                         <property name="left_margin">6</property>
                         <property name="right_margin">6</property>
@@ -262,9 +263,14 @@
                 <property name="can_focus">True</property>
                 <property name="shadow_type">in</property>
                 <child>
-                  <object class="GtkTextView" id="textview1">
-                    <property name="visible">True</property>
+                  <object class="GtkTextView" id="report_view">
+                    <property name="visible">False</property>
                     <property name="can_focus">True</property>
+                    <property name="editable">False</property>
+                    <property name="monospace">True</property>
+                    <property name="wrap_mode">none</property>
+                    <property name="left_margin">6</property>
+                    <property name="right_margin">6</property>
                   </object>
                 </child>
               </object>
@@ -288,6 +294,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Recipient</property>
+                    <property name="mnemonic_widget">recipient_entry</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -296,7 +303,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="entry1">
+                  <object class="GtkEntry" id="recipient_entry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                   </object>
@@ -312,6 +319,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
+                    <property name="action_name">win.send-report</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
