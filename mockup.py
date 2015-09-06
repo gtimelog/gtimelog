@@ -145,7 +145,7 @@ class Window(Gtk.ApplicationWindow):
 
     date = GObject.Property(
         type=object, default=None, nick='Date',
-        blurb='Currently visible date')
+        blurb='Date to show (None tracks today)')
 
     detail_level = GObject.Property(
         type=str, default='chronological', nick='Detail level',
@@ -213,15 +213,15 @@ class Window(Gtk.ApplicationWindow):
 
         mark_time('window created')
 
-        self.connect('notify::date', self.date_changed)
-        self.connect('notify::detail-level', self.detail_level_changed)
-        self.connect('notify::time-range', self.time_range_changed)
-        self.date = None  # trigger action updates
-        mark_time('window ready')
-
         self.settings = Settings()
         self.settings.load()
         mark_time('settings loaded')
+
+        self.date = None  # initialize today's date
+
+        self.connect('notify::detail-level', self.detail_level_changed)
+        self.connect('notify::time-range', self.time_range_changed)
+        mark_time('window ready')
 
         GLib.idle_add(self.load_log)
 
@@ -247,23 +247,18 @@ class Window(Gtk.ApplicationWindow):
         gfm.connect('changed', self.on_timelog_file_changed)
         self._gfm = gfm  # keep a reference so it doesn't get garbage collected
 
-    def get_today(self):
-        return virtual_day(datetime.date.now(), self.settings.virtual_midnight)
-
-    def get_date(self):
-        # XXX: shouldn't use clock, should ask timelog!
-        return self.get_today() if self.date is None else self.date
-
     def get_time_window(self):
         if self.time_range == 'day':
-            return self.timelog.window_for_day(self.get_date())
+            return self.timelog.window_for_day(self.date)
         elif self.time_range == 'week':
-            return self.timelog.window_for_week(self.get_date())
+            return self.timelog.window_for_week(self.date)
         elif self.time_range == 'month':
-            return self.timelog.window_for_month(self.get_date())
+            return self.timelog.window_for_month(self.date)
 
     def get_subtitle(self):
-        date = self.get_date()
+        date = self.date
+        if not date:
+            return ''
         if self.time_range == 'day':
             return _("{0:%A, %Y-%m-%d} (week {1:0>2})").format(
                 date, date.isocalendar()[1])
@@ -289,23 +284,29 @@ class Window(Gtk.ApplicationWindow):
             total_time = total_work + current_task_time
         return datetime.timedelta(hours=self.settings.hours) - total_time
 
-    def date_changed(self, obj, param_spec):
+    @date.getter
+    def date(self):
+        return self._date
+
+    @date.setter
+    def date(self, new_date):
         # Enforce strict typing
-        if self.date is not None and not isinstance(self.date, datetime.date):
-            self.date = None
+        if new_date is not None and not isinstance(new_date, datetime.date):
+            new_date = None
 
-        # Going back to today clears the date field
-        if self.date is not None and self.date >= self.get_today():
-            self.date = None
+        # Going back to today is the same as going home
+        today = virtual_day(datetime.datetime.now(), self.settings.virtual_midnight)
+        if new_date is None or new_date >= today:
+            new_date = today
 
-        if self.date is None:
+        self._date = new_date
+
+        if new_date == today:
             self.actions.go_home.set_enabled(False)
             self.actions.go_forward.set_enabled(False)
         else:
             self.actions.go_home.set_enabled(True)
             self.actions.go_forward.set_enabled(True)
-
-        self.headerbar.set_subtitle(self.get_subtitle())
 
         self.populate_log()
 
@@ -316,23 +317,22 @@ class Window(Gtk.ApplicationWindow):
     def time_range_changed(self, obj, param_spec):
         assert self.time_range in {'day', 'week', 'month'}
         self.populate_log()
-        self.headerbar.set_subtitle(self.get_subtitle())
 
     def on_go_back(self, action, parameter):
         if self.time_range == 'day':
-            self.date = self.get_date() - datetime.timedelta(1)
+            self.date -= datetime.timedelta(1)
         elif self.time_range == 'week':
-            self.date = self.get_date() - datetime.timedelta(7)
+            self.date -= datetime.timedelta(7)
         elif self.time_range == 'month':
-            self.date = prev_month(self.get_date())
+            self.date = prev_month(self.date)
 
     def on_go_forward(self, action, parameter):
         if self.time_range == 'day':
-            self.date = self.get_date() + datetime.timedelta(1)
+            self.date += datetime.timedelta(1)
         elif self.time_range == 'week':
-            self.date = self.get_date() + datetime.timedelta(7)
+            self.date += datetime.timedelta(7)
         elif self.time_range == 'month':
-            self.date = next_month(self.get_date())
+            self.date = next_month(self.date)
 
     def on_go_home(self, action, parameter):
         self.date = None
@@ -359,6 +359,7 @@ class Window(Gtk.ApplicationWindow):
             self.populate_log()
 
     def populate_log(self):
+        self.headerbar.set_subtitle(self.get_subtitle())
         self.log_buffer.set_text('')
         if self.timelog is None:
             return # not loaded yet
@@ -451,7 +452,7 @@ class Window(Gtk.ApplicationWindow):
             fmt2 = _('Total work done this month: {0}')
         args = [(format_duration(total_work), 'duration')]
         if self.time_range == 'day':
-            weekly_window = self.timelog.window_for_week(self.get_date())
+            weekly_window = self.timelog.window_for_week(self.date)
             week_total_work, week_total_slacking = weekly_window.totals()
             work_days = weekly_window.count_days()
             args.append((format_duration(week_total_work), 'duration'))
