@@ -87,17 +87,17 @@ class Application(Gtk.Application):
         mark_time("in app startup")
         Gtk.Application.do_startup(self)
 
-        mark_time("loading CSS")
+        mark_time("basic app startup done")
         css = Gtk.CssProvider()
         css.load_from_path(CSS_FILE)
         screen = Gdk.Screen.get_default()
         Gtk.StyleContext.add_provider_for_screen(
             screen, css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        mark_time("CSS loaded")
 
-        mark_time("loading menus")
         builder = Gtk.Builder.new_from_file(MENUS_UI_FILE)
-        mark_time("menus loaded")
         self.set_app_menu(builder.get_object('app_menu'))
+        mark_time("menus loaded")
 
         for action_name in ['help', 'about', 'quit', 'edit-log']:
             action = Gio.SimpleAction.new(action_name, None)
@@ -302,8 +302,10 @@ class Window(Gtk.ApplicationWindow):
 
     def load_log(self):
         mark_time("loading timelog")
-        self.timelog = self.settings.get_time_log()
+        timelog = self.settings.get_time_log()
         mark_time("timelog loaded")
+        self.timelog = timelog
+        mark_time("components updated")
         self.tick(True)
         self.enable_add_entry()
         mark_time("timelog presented")
@@ -492,11 +494,16 @@ class TaskEntry(Gtk.Entry):
         type=object, default=None, nick='Time log',
         blurb='Time log object')
 
+    completion_limit = GObject.Property(
+        type=int, default=1000, nick='Completion limit',
+        blurb='Maximum number of items in the completion popup')
+
     def __init__(self):
         Gtk.Entry.__init__(self)
         self.set_up_history()
         self.set_up_completion()
         self.connect('notify::timelog', self.timelog_changed)
+        self.connect('notify::completion-limit', self.timelog_changed)
         self.connect('changed', self.on_changed)
 
     def set_up_history(self):
@@ -514,11 +521,14 @@ class TaskEntry(Gtk.Entry):
         self.set_completion(completion)
 
     def timelog_changed(self, *args):
+        mark_time('about to initialize history completion')
         self.completion_choices_as_set.clear()
         self.completion_choices.clear()
         if self.timelog is None:
+            mark_time('no history')
             return
         self.history = [item[1] for item in self.timelog.items]
+        mark_time('history prepared')
         # if there are duplicate entries, we want to keep the last one
         # e.g. if timelog.items contains [a, b, a, c], we want
         # self.completion_choices to be [b, a, c].
@@ -527,8 +537,10 @@ class TaskEntry(Gtk.Entry):
             if entry not in self.completion_choices_as_set:
                 entries.append(entry)
                 self.completion_choices_as_set.add(entry)
-        for entry in reversed(entries):
+        mark_time('unique items selected')
+        for entry in reversed(entries[:self.completion_limit]):
             self.completion_choices.append([entry])
+        mark_time('history completion initialized')
 
     def entry_added(self):
         if self.timelog is None:
