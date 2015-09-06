@@ -215,6 +215,7 @@ class Window(Gtk.ApplicationWindow):
         self.add(main_box)
         self.set_titlebar(headerbar)
         self.set_default_size(800, 500)
+        self.props.window_position = Gtk.WindowPosition.CENTER
 
         # Cannot store these in the same .ui file nor hook them up in the
         # .ui because glade doesn't support that and strips both the
