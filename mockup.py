@@ -159,7 +159,7 @@ class Application(Gtk.Application):
 
 
 def copy_properties(src, dest):
-    blacklist = ('events', 'child', 'parent', 'input-hints', 'buffer', 'tabs')
+    blacklist = ('events', 'child', 'parent', 'input-hints', 'buffer', 'tabs', 'completion')
     for prop in src.props:
         if prop.flags & GObject.ParamFlags.DEPRECATED != 0:
             continue
@@ -174,8 +174,14 @@ def swap_widget(builder, name, replacement):
     original = builder.get_object(name)
     copy_properties(original, replacement)
     parent = original.get_parent()
+    if isinstance(parent, Gtk.Box):
+        expand, fill, padding, pack_type = parent.query_child_packing(original)
+        position = parent.get_children().index(original)
     parent.remove(original)
     parent.add(replacement)
+    if isinstance(parent, Gtk.Box):
+        parent.set_child_packing(replacement, expand, fill, padding, pack_type)
+        parent.reorder_child(replacement, position)
     original.destroy()
 
 
@@ -251,17 +257,20 @@ class Window(Gtk.ApplicationWindow):
 
         self.headerbar = builder.get_object('headerbar')
         self.time_label = builder.get_object('time_label')
-        self.task_entry = builder.get_object('task_entry')
+        self.task_entry = TaskEntry()
+        swap_widget(builder, 'task_entry', self.task_entry)
         self.task_entry.grab_focus() # I specified this in the .ui file but it gets ignored
         self.add_button = builder.get_object('add_button')
-        self.add_button.props.has_default = True # I specified this in the .ui file but it gets ignored
+        self.add_button.grab_default() # I specified this in the .ui file but it gets ignored
         self.log_view = LogView()
         swap_widget(builder, 'log_view', self.log_view)
+        self.bind_property('timelog', self.task_entry, 'timelog', GObject.BindingFlags.DEFAULT)
         self.bind_property('timelog', self.log_view, 'timelog', GObject.BindingFlags.DEFAULT)
         self.bind_property('showing_today', self.log_view, 'showing_today', GObject.BindingFlags.DEFAULT)
         self.bind_property('date', self.log_view, 'date', GObject.BindingFlags.DEFAULT)
         self.bind_property('detail_level', self.log_view, 'detail_level', GObject.BindingFlags.SYNC_CREATE)
         self.bind_property('time_range', self.log_view, 'time_range', GObject.BindingFlags.SYNC_CREATE)
+        self.task_entry.bind_property('text', self.log_view, 'current_task', GObject.BindingFlags.DEFAULT)
         self.bind_property('title', self.headerbar, 'subtitle', GObject.BindingFlags.DEFAULT)
 
         self.actions = self.Actions(self, builder)
@@ -460,7 +469,6 @@ class Window(Gtk.ApplicationWindow):
 
     def task_entry_changed(self, widget):
         self.enable_add_entry()
-        self.log_view.current_task = self.get_current_task()
 
     def tick(self, force_update=False):
         now = self.get_now()
@@ -476,6 +484,50 @@ class Window(Gtk.ApplicationWindow):
             self.time_label.set_text(format_duration(now - last_time))
         self.log_view.now = now
         return True
+
+
+class TaskEntry(Gtk.Entry):
+
+    timelog = GObject.Property(
+        type=object, default=None, nick='Time log',
+        blurb='Time log object')
+
+    def __init__(self):
+        Gtk.Entry.__init__(self)
+        self.set_up_completion()
+        self.connect('notify::timelog', self.timelog_changed)
+
+    def set_up_completion(self):
+        completion = Gtk.EntryCompletion()
+        self.completion_choices = Gtk.ListStore(str)
+        self.completion_choices_as_set = set()
+        completion.set_model(self.completion_choices)
+        completion.set_text_column(0)
+        self.set_completion(completion)
+
+    def timelog_changed(self, *args):
+        self.completion_choices_as_set.clear()
+        self.completion_choices.clear()
+        if self.timelog is None:
+            return
+        # if there are duplicate entries, we want to keep the last one
+        # e.g. if timelog.items contains [a, b, a, c], we want
+        # self.completion_choices to be [b, a, c].
+        entries = []
+        for timestamp, entry in reversed(self.timelog.items):
+            if entry not in self.completion_choices_as_set:
+                entries.append(entry)
+                self.completion_choices_as_set.add(entry)
+        for entry in reversed(entries):
+            self.completion_choices.append([entry])
+
+    def entry_added(self):
+        if self.timelog is None:
+            return
+        entry = self.timelog.last_entry().entry
+        if entry not in self.completion_choices_as_set:
+            self.completion_choices.append([entry])
+            self.completion_choices_as_set.add(entry)
 
 
 class LogView(Gtk.TextView):
