@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-04 22:45+0300\n"
+"POT-Creation-Date: 2015-09-06 13:24+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -33,93 +33,93 @@ msgstr "Sekti kasdieninus darbus"
 msgid "{0} h {1} min"
 msgstr "{0} val {1} min"
 
-#: ../mockup.py:261
+#: ../mockup.py:265
 msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
 msgstr "{0:%A, %Y-%m-%d} ({1} savaitė)"
 
-#: ../mockup.py:264
+#: ../mockup.py:268
 msgid "{0:%Y}, week {1:0>2} ({0:%B %-d}-{2:%-d})"
 msgstr "{0:%Y}, {1} savaitė ({0:%B %-d}–{2:%-d})"
 
-#: ../mockup.py:267
+#: ../mockup.py:271
 msgid "{0:%B %Y}"
 msgstr "{0:%Y %B} mėn."
 
-#: ../mockup.py:345
+#: ../mockup.py:370
 msgid "{0:%A, %Y-%m-%d}\n"
 msgstr "{0:%A, %Y-%m-%d}\n"
 
-#: ../mockup.py:416
+#: ../mockup.py:441
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week, {2} per day)"
 msgstr "Iš viso dirbta: {0} (šią savaitę {1}, po {2} per dieną)"
 
-#: ../mockup.py:417
+#: ../mockup.py:442
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week)"
 msgstr "Iš viso dirbta: {0} (šią savaitę {1})"
 
-#: ../mockup.py:419
+#: ../mockup.py:444
 #, python-brace-format
 msgid "Total work done this week: {0} ({1} per day)"
 msgstr "Iš viso dirbta šią savaitę: {0} (po {1} per dieną)"
 
-#: ../mockup.py:420
+#: ../mockup.py:445
 #, python-brace-format
 msgid "Total work done this week: {0}"
 msgstr "Iš viso dirbta šią savaitę: {0}"
 
-#: ../mockup.py:422
+#: ../mockup.py:447
 #, python-brace-format
 msgid "Total work done this month: {0} ({1} per day)"
 msgstr "Iš viso dirbta šį mėnesį: {0} (po {1} per dieną)"
 
-#: ../mockup.py:423
+#: ../mockup.py:448
 #, python-brace-format
 msgid "Total work done this month: {0}"
 msgstr "Iš viso dirbta šį mėnesį: {0}"
 
-#: ../mockup.py:442
+#: ../mockup.py:467
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week, {2} per day)"
 msgstr "Iš viso nedirbta: {0} (šią savaitę {1}, po {2} per dieną)"
 
-#: ../mockup.py:443
+#: ../mockup.py:468
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week)"
 msgstr "Iš viso nedirbta: {0} (šią savaitę {1})"
 
-#: ../mockup.py:445
+#: ../mockup.py:470
 #, python-brace-format
 msgid "Total slacking this week: {0} ({1} per day)"
 msgstr "Iš viso nedirbta šią savaitę: {0} (po {1} per dieną)"
 
-#: ../mockup.py:446
+#: ../mockup.py:471
 #, python-brace-format
 msgid "Total slacking this week: {0}"
 msgstr "Iš viso nedirbta šią savaitę: {0}"
 
-#: ../mockup.py:448
+#: ../mockup.py:473
 #, python-brace-format
 msgid "Total slacking this month: {0} ({1} per day)"
 msgstr "Iš viso nedirbta šį mėnesį: {0} (po {1} per dieną)"
 
-#: ../mockup.py:449
+#: ../mockup.py:474
 #, python-brace-format
 msgid "Total slacking this month: {0}"
 msgstr "Iš viso nedirbta šį mėnesį: {0}"
 
-#: ../mockup.py:472
+#: ../mockup.py:497
 #, python-brace-format
 msgid "Time left at work: {0} (till {1})"
 msgstr "Liko dirbti: {0} (iki {1})"
 
-#: ../mockup.py:483
+#: ../mockup.py:508
 #, python-brace-format
 msgid "At office today: {0} ({1} overtime)"
 msgstr "Šiandien darbe: {0} ({1} per daug)"
 
-#: ../mockup.py:489
+#: ../mockup.py:514
 #, python-brace-format
 msgid "At office today: {0} ({1} left)"
 msgstr "Šiandien darbe: {0} (liko {1})"
@@ -129,8 +129,8 @@ msgid "Copyright © 2004–2015 Marius Gedminas and contributors."
 msgstr "Autorinės teisės © 2004–2015 Marius Gedminas ir kiti."
 
 #: ../src/gtimelog/about.ui.h:3
-msgid "A time tracking application."
-msgstr "Programa darbo laiko sekimui."
+msgid "A time tracking application"
+msgstr "Programa darbo laiko sekimui"
 
 #: ../src/gtimelog/experiment.ui.h:1
 msgid "Add"
