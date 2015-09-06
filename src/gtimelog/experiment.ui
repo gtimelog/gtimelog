@@ -137,7 +137,10 @@
                 <property name="label" translatable="yes">Add</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="can_default">True</property>
+                <property name="has_default">True</property>
+                <property name="receives_default">False</property>
+                <property name="focus_on_click">False</property>
                 <property name="action-name">win.add-entry</property>
               </object>
               <packing>

@@ -6,10 +6,13 @@ import os
 DEBUG = os.getenv('DEBUG')
 
 
-def mark_time(what, _prev=[0]):
+def mark_time(what=None, _prev=[0]):
     t = time.clock()
     if DEBUG:
-        print("{:.3f} ({:+.3f}) {}".format(t, t - _prev[0], what))
+        if what:
+            print("{:.3f} ({:+.3f}) {}".format(t, t - _prev[0], what))
+        else:
+            print()
     _prev[0] = t
 
 mark_time("in script")
@@ -57,6 +60,7 @@ HELP_URL = 'https://mg.pov.lt/gtimelog'
 UI_FILE = 'src/gtimelog/experiment.ui'
 ABOUT_DIALOG_UI_FILE = 'src/gtimelog/about.ui'
 MENUS_UI_FILE = 'src/gtimelog/menus.ui'
+CSS_FILE = 'src/gtimelog/gtimelog.css'
 LOCALE_DIR = 'locale'
 
 
@@ -76,6 +80,13 @@ class Application(Gtk.Application):
     def do_startup(self):
         mark_time("in app startup")
         Gtk.Application.do_startup(self)
+
+        mark_time("loading CSS")
+        css = Gtk.CssProvider()
+        css.load_from_path(CSS_FILE)
+        screen = Gdk.Screen.get_default()
+        Gtk.StyleContext.add_provider_for_screen(
+            screen, css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 
         mark_time("loading menus")
         builder = Gtk.Builder.new_from_file(MENUS_UI_FILE)
@@ -167,7 +178,7 @@ class Window(Gtk.ApplicationWindow):
             self.show_task_pane = Gio.PropertyAction.new("show-task-pane", builder.get_object("task_pane"), "visible")
             win.add_action(self.show_task_pane)
 
-            for action_name in ['go-back', 'go-forward', 'go-home']:
+            for action_name in ['go-back', 'go-forward', 'go-home', 'add-entry']:
                 action = Gio.SimpleAction.new(action_name, None)
                 action.connect('activate', getattr(win, 'on_' + action_name.replace('-', '_')))
                 win.add_action(action)
@@ -202,7 +213,9 @@ class Window(Gtk.ApplicationWindow):
         self.headerbar = builder.get_object('headerbar')
         self.time_label = builder.get_object('time_label')
         self.task_entry = builder.get_object('task_entry')
-        self.task_entry.grab_focus()
+        self.task_entry.grab_focus() # I specified this in the .ui file but it gets ignored
+        self.add_button = builder.get_object('add_button')
+        self.add_button.props.has_default = True # I specified this in the .ui file but it gets ignored
         self.log_view = builder.get_object('log_view')
         self.set_up_log_view_columns()
         self.log_buffer = self.log_view.get_buffer()
@@ -212,6 +225,7 @@ class Window(Gtk.ApplicationWindow):
         self.log_buffer.create_tag('slacking', foreground='gray')
 
         self.actions = self.Actions(self, builder)
+        self.actions.add_entry.set_enabled(False)
 
         mark_time('window created')
 
@@ -252,6 +266,7 @@ class Window(Gtk.ApplicationWindow):
         mark_time("timelog loaded")
         self.populate_log()
         self.tick(True)
+        self.enable_add_entry()
         mark_time("timelog presented")
         gf = Gio.File.new_for_path(self.timelog.filename)
         gfm = gf.monitor_file(Gio.FileMonitorFlags.NONE, None)
@@ -287,6 +302,13 @@ class Window(Gtk.ApplicationWindow):
     def get_now(self):
         return datetime.datetime.now().replace(second=0, microsecond=0)
 
+    def get_current_task(self):
+        """Return the current task entry text (as Unicode)."""
+        entry = self.task_entry.get_text()
+        if isinstance(entry, bytes):
+            entry = entry.decode('UTF-8')
+        return entry
+
     def get_current_task_time(self, now=None):
         last_time = self.get_last_time()
         if last_time is None:
@@ -297,7 +319,7 @@ class Window(Gtk.ApplicationWindow):
         return current_task_time
 
     def get_current_task_work_time(self, now=None):
-        current_task = self.task_entry.get_text()
+        current_task = self.get_current_task()
         if '**' in current_task:
             return datetime.timedelta(0)
         else:
@@ -367,6 +389,28 @@ class Window(Gtk.ApplicationWindow):
     def on_go_home(self, action, parameter):
         self.date = None
 
+    def on_add_entry(self, action, parameter):
+        mark_time()
+        mark_time("on_add_entry")
+        entry = self.get_current_task()
+        entry, now = self.timelog.parse_correction(entry)
+        if not entry:
+            return
+        mark_time("adding the entry")
+        if not self.showing_today:
+            self.date = None  # jump to today
+            mark_time("jumped to today")
+
+        self.timelog.append(entry, now)
+        mark_time("appended")
+        self.populate_log()
+        mark_time("populate_log done")
+        self.task_entry.set_text('')
+        self.task_entry.grab_focus()
+        mark_time("focus grabbed")
+        self.tick(True)
+        mark_time("label updated")
+
     def on_timelog_file_changed(self, monitor, file, other_file, event_type):
         # When I edit timelog.txt with vim, I get a series of notifications:
         # - Gio.FileMonitorEvent.DELETED
@@ -389,7 +433,12 @@ class Window(Gtk.ApplicationWindow):
             self.populate_log()
             self.tick(True)
 
+    def enable_add_entry(self):
+        enabled = self.timelog is not None and self.get_current_task().strip()
+        self.actions.add_entry.set_enabled(enabled)
+
     def task_entry_changed(self, widget):
+        self.enable_add_entry()
         if self._extended_footer:
             # Update "time left to work" in case we added/deleted '**'
             self.delete_footer()
@@ -452,6 +501,8 @@ class Window(Gtk.ApplicationWindow):
         self.log_buffer.place_cursor(where)
 
     def scroll_to_end(self):
+        # XXX: seems to be buggy: switch to a month view and add a new
+        # entry -- it will scroll a bit, but not to the very end
         buffer = self.log_view.get_buffer()
         end_mark = buffer.create_mark('end', buffer.get_end_iter())
         self.log_view.scroll_to_mark(end_mark, 0, False, 0, 0)
