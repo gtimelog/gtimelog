@@ -67,7 +67,11 @@ LOCALE_DIR = 'locale'
 
 
 def format_duration(duration):
-    """Format a datetime.timedelta with minute precision."""
+    """Format a datetime.timedelta with minute precision.
+
+    The difference from gtimelog.timelog.format_duration() is that this
+    one is internationalized.
+    """
     h, m = divmod(as_minutes(duration), 60)
     return _('{0} h {1} min').format(h, m)
 
