@@ -452,9 +452,10 @@ class Window(Gtk.ApplicationWindow):
     def write_item(self, item):
         start, stop, duration, tags, entry = item
         self.w(format_duration(duration), 'duration')
-        period = '\t({0}-{1})\t'.format(
-            start.strftime('%H:%M'), stop.strftime('%H:%M'))
+        self.w('\t')
+        period = _('({0:%H:%M}-{1:%H:%M})').format(start, stop)
         self.w(period, 'time')
+        self.w('\t')
         tag = ('slacking' if '**' in entry else None)
         self.w(entry + '\n', tag)
 
@@ -472,10 +473,13 @@ class Window(Gtk.ApplicationWindow):
             buffer.insert(buffer.get_end_iter(), text)
 
     def wfmt(self, fmt, *args):
-        for bit in re.split('({\d+})', fmt):
+        for bit in re.split('({\d+(?::[^}]*)?})', fmt):
             if bit.startswith('{'):
-                idx = int(bit[1:-1])
-                value, tag = args[idx]
+                spec = bit[1:-1]
+                idx, colon, fmt = spec.partition(':')
+                value, tag = args[int(idx)]
+                if fmt:
+                    value = format(value, fmt)
                 self.w(value, tag)
             else:
                 self.w(bit)
@@ -555,9 +559,9 @@ class Window(Gtk.ApplicationWindow):
             if time_left < datetime.timedelta(0):
                 time_left = datetime.timedelta(0)
             self.wfmt(
-                _('Time left at work: {0} (till {1})'),
+                _('Time left at work: {0} (till {1:%H:%M})'),
                 (format_duration(time_left), 'duration'),
-                (time_to_leave.strftime('%H:%M'), 'time'),
+                (time_to_leave, 'time'),
             )
 
         if self.settings.show_office_hours:

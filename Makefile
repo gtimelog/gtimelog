@@ -38,6 +38,7 @@ coverage-diff: coverage
 update-translations:
 	cd po && intltool-update -g gtimelog -p
 	msgmerge -U po/lt.po po/gtimelog.pot
+	msgmerge -U po/en.po po/gtimelog.pot
 	mkdir -p locale/lt/LC_MESSAGES
 	msgfmt -o locale/lt/LC_MESSAGES/gtimelog.mo po/lt.po
 	mkdir -p locale/en/LC_MESSAGES

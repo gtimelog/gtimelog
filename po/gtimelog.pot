@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-06 13:24+0300\n"
+"POT-Creation-Date: 2015-09-06 14:46+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../gtimelog.desktop.in.h:1 ../mockup.py:69 ../src/gtimelog/about.ui.h:1
+#: ../gtimelog.desktop.in.h:1 ../mockup.py:73 ../src/gtimelog/about.ui.h:1
 #: ../src/gtimelog/experiment.ui.h:2
 msgid "Time Log"
 msgstr ""
@@ -26,98 +26,105 @@ msgstr ""
 msgid "Track and time daily activities"
 msgstr ""
 
-#: ../mockup.py:62
+#: ../mockup.py:66
 #, python-brace-format
 msgid "{0} h {1} min"
 msgstr ""
 
-#: ../mockup.py:265
+#: ../mockup.py:279
 msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
 msgstr ""
 
-#: ../mockup.py:268
+#: ../mockup.py:282
 msgid "{0:%Y}, week {1:0>2} ({0:%B %-d}-{2:%-d})"
 msgstr ""
 
-#: ../mockup.py:271
+#: ../mockup.py:285
 msgid "{0:%B %Y}"
 msgstr ""
 
-#: ../mockup.py:370
+#: ../mockup.py:399
+msgid "%H:%M"
+msgstr ""
+
+#: ../mockup.py:421
 msgid "{0:%A, %Y-%m-%d}\n"
 msgstr ""
 
-#: ../mockup.py:441
+#: ../mockup.py:456
+msgid "({0:%H:%M}-{1:%H:%M})"
+msgstr ""
+
+#: ../mockup.py:500
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week, {2} per day)"
 msgstr ""
 
-#: ../mockup.py:442
+#: ../mockup.py:501
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week)"
 msgstr ""
 
-#: ../mockup.py:444
+#: ../mockup.py:503
 #, python-brace-format
 msgid "Total work done this week: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:445
+#: ../mockup.py:504
 #, python-brace-format
 msgid "Total work done this week: {0}"
 msgstr ""
 
-#: ../mockup.py:447
+#: ../mockup.py:506
 #, python-brace-format
 msgid "Total work done this month: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:448
+#: ../mockup.py:507
 #, python-brace-format
 msgid "Total work done this month: {0}"
 msgstr ""
 
-#: ../mockup.py:467
+#: ../mockup.py:526
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week, {2} per day)"
 msgstr ""
 
-#: ../mockup.py:468
+#: ../mockup.py:527
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week)"
 msgstr ""
 
-#: ../mockup.py:470
+#: ../mockup.py:529
 #, python-brace-format
 msgid "Total slacking this week: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:471
+#: ../mockup.py:530
 #, python-brace-format
 msgid "Total slacking this week: {0}"
 msgstr ""
 
-#: ../mockup.py:473
+#: ../mockup.py:532
 #, python-brace-format
 msgid "Total slacking this month: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:474
+#: ../mockup.py:533
 #, python-brace-format
 msgid "Total slacking this month: {0}"
 msgstr ""
 
-#: ../mockup.py:497
-#, python-brace-format
-msgid "Time left at work: {0} (till {1})"
+#: ../mockup.py:559
+msgid "Time left at work: {0} (till {1:%H:%M})"
 msgstr ""
 
-#: ../mockup.py:508
+#: ../mockup.py:570
 #, python-brace-format
 msgid "At office today: {0} ({1} overtime)"
 msgstr ""
 
-#: ../mockup.py:514
+#: ../mockup.py:576
 #, python-brace-format
 msgid "At office today: {0} ({1} left)"
 msgstr ""
