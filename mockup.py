@@ -159,7 +159,7 @@ class Application(Gtk.Application):
 
 
 def copy_properties(src, dest):
-    blacklist = ('events', 'child', 'parent', 'input-hints', 'buffer', 'tabs', 'completion')
+    blacklist = ('events', 'child', 'parent', 'input-hints', 'buffer', 'tabs', 'completion', 'model')
     for prop in src.props:
         if prop.flags & GObject.ParamFlags.DEPRECATED != 0:
             continue
@@ -273,6 +273,10 @@ class Window(Gtk.ApplicationWindow):
         self.task_entry.bind_property('text', self.log_view, 'current_task', GObject.BindingFlags.DEFAULT)
         self.bind_property('title', self.headerbar, 'subtitle', GObject.BindingFlags.DEFAULT)
 
+        self.task_list = TaskList()
+        swap_widget(builder, 'task_list', self.task_list)
+        self.task_list.connect('row-activated', self.task_list_row_activated)
+
         self.actions = self.Actions(self, builder)
         self.actions.add_entry.set_enabled(False)
 
@@ -283,6 +287,7 @@ class Window(Gtk.ApplicationWindow):
         self.log_view.hours = self.settings.hours
         self.log_view.office_hours = self.settings.hours
         mark_time('settings loaded')
+        self.task_list.tasks = self.settings.get_task_list()
 
         self.date = None  # initialize today's date
 
@@ -471,6 +476,19 @@ class Window(Gtk.ApplicationWindow):
 
     def task_entry_changed(self, widget):
         self.enable_add_entry()
+
+    def task_list_row_activated(self, treeview, path, view_column):
+        task = self.task_list.get_task_for_row(path)
+        self.task_entry.set_text(task)
+        # There's a race here: sometimes the GDK_2BUTTON_PRESS signal is
+        # handled _after_ row-activated, which makes the tree control steal
+        # the focus back from the task entry.  To avoid this, wait until all
+        # the events have been handled.
+        GObject.idle_add(self._focus_task_entry)
+
+    def _focus_task_entry(self):
+        self.task_entry.grab_focus()
+        self.task_entry.set_position(-1)
 
     def tick(self, force_update=False):
         now = self.get_now()
@@ -896,6 +914,44 @@ class LogView(Gtk.TextView):
                     (format_duration(total), 'duration'),
                     (format_duration(hours - total), 'duration'),
                 )
+
+
+class TaskList(Gtk.TreeView):
+
+    tasks = GObject.Property(
+        type=object, nick='Tasks',
+        blurb='The task list (an instance of TaskList)')
+
+    def __init__(self):
+        Gtk.TreeView.__init__(self)
+        self.task_store = Gtk.TreeStore(str, str)
+        self.set_model(self.task_store)
+        column = Gtk.TreeViewColumn(_('Tasks'), Gtk.CellRendererText(), text=0)
+        self.append_column(column)
+        self.connect('notify::tasks', self.tasks_changed)
+
+    def get_task_for_row(self, path):
+        return self.task_store[path][1]
+
+    def tasks_changed(self, *args):
+        mark_time('loading task list')
+        self.task_store.clear()
+        if self.tasks is None:
+            mark_time('task list empty')
+            return
+        for group_name, group_items in self.tasks.groups:
+            if group_name == self.tasks.other_title:
+                t = self.task_store.append(None, [_("Other"), ""])
+            else:
+                t = self.task_store.append(None, [group_name, group_name + ': '])
+            for item in group_items:
+                if group_name == self.tasks.other_title:
+                    task = item
+                else:
+                    task = group_name + ': ' + item
+                self.task_store.append(t, [item, task])
+        self.expand_all()
+        mark_time('task list loaded')
 
 
 def main():
