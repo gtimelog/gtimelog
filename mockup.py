@@ -525,6 +525,7 @@ class Window(Gtk.ApplicationWindow):
             self.menu_button.hide()
             self.cancel_report_button.show()
             self.report_view.show()
+            self.headerbar.set_show_close_button(False)
             self.set_title(_("Report"))
 
     def on_cancel_report(self, action=None, parameter=None):
@@ -535,6 +536,7 @@ class Window(Gtk.ApplicationWindow):
         self.menu_button.show()
         self.cancel_report_button.hide()
         self.report_view.hide()
+        self.headerbar.set_show_close_button(True)
         self.set_title(_("Time Log"))
 
     def on_timelog_file_changed(self, monitor, file, other_file, event_type):
