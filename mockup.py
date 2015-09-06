@@ -78,6 +78,15 @@ def format_duration(duration):
 
 class Application(Gtk.Application):
 
+    class Actions(object):
+
+        def __init__(self, app):
+            for action_name in ['help', 'about', 'quit', 'edit-log', 'edit-tasks']:
+                action = Gio.SimpleAction.new(action_name, None)
+                action.connect('activate', getattr(app, 'on_' + action_name.replace('-', '_')))
+                app.add_action(action)
+                setattr(self, action_name.replace('-', '_'), action)
+
     def __init__(self):
         super(Application, self).__init__(application_id='lt.pov.mg.gtimelog_mockup')
         GLib.set_application_name(_("Time Log"))
@@ -99,10 +108,7 @@ class Application(Gtk.Application):
         self.set_app_menu(builder.get_object('app_menu'))
         mark_time("menus loaded")
 
-        for action_name in ['help', 'about', 'quit', 'edit-log']:
-            action = Gio.SimpleAction.new(action_name, None)
-            action.connect('activate', getattr(self, 'on_' + action_name.replace('-', '_')))
-            self.add_action(action)
+        self.actions = self.Actions(self)
 
         self.set_accels_for_action("win.detail-level::chronological", ["<Alt>1"])
         self.set_accels_for_action("win.detail-level::grouped", ["<Alt>2"])
@@ -125,6 +131,11 @@ class Application(Gtk.Application):
 
     def on_edit_log(self, action, parameter):
         filename = Settings().get_timelog_file()
+        uri = GLib.filename_to_uri(filename, None)
+        Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
+
+    def on_edit_tasks(self, action, parameter):
+        filename = Settings().get_task_list_file()
         uri = GLib.filename_to_uri(filename, None)
         Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
 
@@ -292,6 +303,7 @@ class Window(Gtk.ApplicationWindow):
         self.settings.load()
         self.log_view.hours = self.settings.hours
         self.log_view.office_hours = self.settings.hours
+        app.actions.edit_tasks.set_enabled(not self.settings.task_list_url)
         mark_time('settings loaded')
 
         self.date = None  # initialize today's date

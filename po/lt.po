@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-06 20:44+0300\n"
+"POT-Creation-Date: 2015-09-06 21:23+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
 "%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: ../gtimelog.desktop.in.h:1 ../mockup.py:83 ../src/gtimelog/about.ui.h:1
+#: ../gtimelog.desktop.in.h:1 ../mockup.py:92 ../src/gtimelog/about.ui.h:1
 #: ../src/gtimelog/experiment.ui.h:2
 msgid "Time Log"
 msgstr "Laiko žurnalas"
@@ -33,109 +33,109 @@ msgstr "Sekti kasdieninus darbus"
 msgid "{0} h {1} min"
 msgstr "{0} val {1} min"
 
-#: ../mockup.py:391
+#: ../mockup.py:422
 msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
 msgstr "{0:%A, %Y-%m-%d} ({1} savaitė)"
 
-#: ../mockup.py:394
+#: ../mockup.py:425
 msgid "{0:%Y}, week {1:0>2} ({0:%B %-d}-{2:%-d})"
 msgstr "{0:%Y}, {1} savaitė ({0:%B %-d}–{2:%-d})"
 
-#: ../mockup.py:397
+#: ../mockup.py:428
 msgid "{0:%B %Y}"
 msgstr "{0:%Y %B} mėn."
 
-#: ../mockup.py:488
+#: ../mockup.py:542
 msgid "%H:%M"
 msgstr ""
 
-#: ../mockup.py:709
+#: ../mockup.py:763
 msgid "{0:%A, %Y-%m-%d}\n"
 msgstr "{0:%A, %Y-%m-%d}\n"
 
-#: ../mockup.py:756
+#: ../mockup.py:810
 msgid "({0:%H:%M}-{1:%H:%M})"
 msgstr "({0:%H:%M}–{1:%H:%M})"
 
-#: ../mockup.py:822
+#: ../mockup.py:876
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week, {2} per day)"
 msgstr "Iš viso dirbta: {0} (šią savaitę {1}, po {2} per dieną)"
 
-#: ../mockup.py:823
+#: ../mockup.py:877
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week)"
 msgstr "Iš viso dirbta: {0} (šią savaitę {1})"
 
-#: ../mockup.py:825
+#: ../mockup.py:879
 #, python-brace-format
 msgid "Total work done this week: {0} ({1} per day)"
 msgstr "Iš viso dirbta šią savaitę: {0} (po {1} per dieną)"
 
-#: ../mockup.py:826
+#: ../mockup.py:880
 #, python-brace-format
 msgid "Total work done this week: {0}"
 msgstr "Iš viso dirbta šią savaitę: {0}"
 
-#: ../mockup.py:828
+#: ../mockup.py:882
 #, python-brace-format
 msgid "Total work done this month: {0} ({1} per day)"
 msgstr "Iš viso dirbta šį mėnesį: {0} (po {1} per dieną)"
 
-#: ../mockup.py:829
+#: ../mockup.py:883
 #, python-brace-format
 msgid "Total work done this month: {0}"
 msgstr "Iš viso dirbta šį mėnesį: {0}"
 
-#: ../mockup.py:848
+#: ../mockup.py:902
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week, {2} per day)"
 msgstr "Iš viso nedirbta: {0} (šią savaitę {1}, po {2} per dieną)"
 
-#: ../mockup.py:849
+#: ../mockup.py:903
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week)"
 msgstr "Iš viso nedirbta: {0} (šią savaitę {1})"
 
-#: ../mockup.py:851
+#: ../mockup.py:905
 #, python-brace-format
 msgid "Total slacking this week: {0} ({1} per day)"
 msgstr "Iš viso nedirbta šią savaitę: {0} (po {1} per dieną)"
 
-#: ../mockup.py:852
+#: ../mockup.py:906
 #, python-brace-format
 msgid "Total slacking this week: {0}"
 msgstr "Iš viso nedirbta šią savaitę: {0}"
 
-#: ../mockup.py:854
+#: ../mockup.py:908
 #, python-brace-format
 msgid "Total slacking this month: {0} ({1} per day)"
 msgstr "Iš viso nedirbta šį mėnesį: {0} (po {1} per dieną)"
 
-#: ../mockup.py:855
+#: ../mockup.py:909
 #, python-brace-format
 msgid "Total slacking this month: {0}"
 msgstr "Iš viso nedirbta šį mėnesį: {0}"
 
-#: ../mockup.py:881
+#: ../mockup.py:935
 msgid "Time left at work: {0} (till {1:%H:%M})"
 msgstr "Liko dirbti: {0} (iki {1:%H:%M})"
 
-#: ../mockup.py:893
+#: ../mockup.py:947
 #, python-brace-format
 msgid "At office today: {0} ({1} overtime)"
 msgstr "Šiandien darbe: {0} ({1} per daug)"
 
-#: ../mockup.py:899
+#: ../mockup.py:953
 #, python-brace-format
 msgid "At office today: {0} ({1} left)"
 msgstr "Šiandien darbe: {0} (liko {1})"
 
-#: ../mockup.py:915
+#: ../mockup.py:969
 msgid "Tasks"
 msgstr "Užduotys"
 
-#: ../mockup.py:926
+#: ../mockup.py:984
 msgid "Other"
 msgstr "Kitos"
 
@@ -168,38 +168,42 @@ msgid "Edit log"
 msgstr "Taisyti žurnalą"
 
 #: ../src/gtimelog/menus.ui.h:5
+msgid "Edit tasks"
+msgstr "Tvarkyti užduotis"
+
+#: ../src/gtimelog/menus.ui.h:6
 msgid "Report..."
 msgstr "Ataskaita..."
 
-#: ../src/gtimelog/menus.ui.h:6
+#: ../src/gtimelog/menus.ui.h:7
 msgid "Detail level"
 msgstr "Detalumas"
 
-#: ../src/gtimelog/menus.ui.h:7
+#: ../src/gtimelog/menus.ui.h:8
 msgid "Chronological"
 msgstr "Chronologinis"
 
-#: ../src/gtimelog/menus.ui.h:8
+#: ../src/gtimelog/menus.ui.h:9
 msgid "Grouped"
 msgstr "Sugrupuotas"
 
-#: ../src/gtimelog/menus.ui.h:9
+#: ../src/gtimelog/menus.ui.h:10
 msgid "Summary"
 msgstr "Apžvalga"
 
-#: ../src/gtimelog/menus.ui.h:10
+#: ../src/gtimelog/menus.ui.h:11
 msgid "Time range"
 msgstr "Laiko intervalas"
 
-#: ../src/gtimelog/menus.ui.h:11
+#: ../src/gtimelog/menus.ui.h:12
 msgid "Day"
 msgstr "Diena"
 
-#: ../src/gtimelog/menus.ui.h:12
+#: ../src/gtimelog/menus.ui.h:13
 msgid "Week"
 msgstr "Savaitė"
 
-#: ../src/gtimelog/menus.ui.h:13
+#: ../src/gtimelog/menus.ui.h:14
 msgid "Month"
 msgstr "Mėnuo"
 

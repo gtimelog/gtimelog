@@ -23,6 +23,10 @@
         <attribute name="label" translatable="yes">Edit log</attribute>
         <attribute name="action">app.edit-log</attribute>
       </item>
+      <item>
+        <attribute name="label" translatable="yes">Edit tasks</attribute>
+        <attribute name="action">app.edit-tasks</attribute>
+      </item>
     </section>
     <section>
       <item>
