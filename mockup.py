@@ -577,6 +577,7 @@ class Window(Gtk.ApplicationWindow):
             self.w('\n')
             hours = datetime.timedelta(hours=self.settings.hours)
             total = total_slacking + total_work
+            total += self.get_current_task_time(now)
             if total > hours:
                 self.wfmt(
                     _('At office today: {0} ({1} overtime)'),
