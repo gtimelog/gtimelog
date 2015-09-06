@@ -272,7 +272,6 @@ class Window(Gtk.ApplicationWindow):
         main_window.remove(main_stack)
         self.add(main_stack)
         self.set_titlebar(headerbar)
-        main_window.destroy()
 
         # Cannot store these in the same .ui file nor hook them up in the
         # .ui because glade doesn't support that and strips both the
