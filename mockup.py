@@ -553,6 +553,13 @@ class Window(Gtk.ApplicationWindow):
             buffer.insert(buffer.get_end_iter(), text)
 
     def wfmt(self, fmt, *args):
+        """Write formatted text at the end of the log buffer.
+
+        Accepts the same kind of format string as Python's str.format(),
+        e.g. "Hello, {0}".
+
+        Each argument should be a tuple (value, tag_name).
+        """
         for bit in re.split('({\d+(?::[^}]*)?})', fmt):
             if bit.startswith('{'):
                 spec = bit[1:-1]
