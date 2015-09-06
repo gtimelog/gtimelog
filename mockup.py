@@ -47,7 +47,8 @@ pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
 
 from gtimelog.settings import Settings
-from gtimelog.timelog import as_minutes, different_days, prev_month, next_month
+from gtimelog.timelog import (
+    as_minutes, virtual_day, different_days, prev_month, next_month)
 
 mark_time("gtimelog imports done")
 
@@ -247,8 +248,7 @@ class Window(Gtk.ApplicationWindow):
         self._gfm = gfm  # keep a reference so it doesn't get garbage collected
 
     def get_today(self):
-        # TODO: handle virtual_midnight
-        return datetime.date.today()
+        return virtual_day(datetime.date.now(), self.settings.virtual_midnight)
 
     def get_date(self):
         # XXX: shouldn't use clock, should ask timelog!
