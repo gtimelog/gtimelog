@@ -284,20 +284,28 @@ class Window(Gtk.ApplicationWindow):
         elif self.time_range == 'month':
             return _("{0:%B %Y}").format(date)
 
-    def time_left_at_work(self, total_work):
-        """Calculate time left to work."""
-        last_time = self.timelog.window.last_time()
+    def get_now(self):
+        return datetime.datetime.now().replace(second=0, microsecond=0)
+
+    def get_current_task_time(self, now=None):
+        last_time = self.get_last_time()
         if last_time is None:
-            return None
-        now = datetime.datetime.now().replace(second=0, microsecond=0)
-        # NB: works with UTF-8-encoded binary strings on Python 2.  This
-        # seems harmless for now.
-        current_task = self.task_entry.get_text()
+            return datetime.timedelta(0)
+        if now is None:
+            now = self.get_now()
         current_task_time = now - last_time
+        return current_task_time
+
+    def get_current_task_work_time(self, now=None):
+        current_task = self.task_entry.get_text()
         if '**' in current_task:
-            total_time = total_work
+            return datetime.timedelta(0)
         else:
-            total_time = total_work + current_task_time
+            return self.get_current_task_time(now)
+
+    def time_left_at_work(self, total_work, now=None):
+        """Calculate time left to work."""
+        total_time = total_work + self.get_current_task_work_time(now)
         return datetime.timedelta(hours=self.settings.hours) - total_time
 
     @property
@@ -388,7 +396,7 @@ class Window(Gtk.ApplicationWindow):
             self.add_footer()
 
     def tick(self, force_update=False):
-        now = datetime.datetime.now().replace(second=0, microsecond=0)
+        now = self.get_now()
         if not force_update and now == self.last_tick:
             # Do not eat CPU unnecessarily: update the time ticker only when
             # the minute changes.
@@ -552,10 +560,11 @@ class Window(Gtk.ApplicationWindow):
 
         self._extended_footer = True
 
-        time_left = self.time_left_at_work(total_work)
+        now = self.get_now()
+        time_left = self.time_left_at_work(total_work, now)
         if time_left is not None:
             self.w('\n')
-            time_to_leave = datetime.datetime.now() + time_left
+            time_to_leave = now + time_left
             if time_left < datetime.timedelta(0):
                 time_left = datetime.timedelta(0)
             self.wfmt(
