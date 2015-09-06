@@ -159,7 +159,7 @@ class Application(Gtk.Application):
 
 
 def copy_properties(src, dest):
-    blacklist = ('events', 'child', 'parent', 'input-hints', 'buffer', 'tabs', 'completion', 'model')
+    blacklist = ('events', 'child', 'parent', 'input-hints', 'buffer', 'tabs', 'completion', 'model', 'type')
     for prop in src.props:
         if prop.flags & GObject.ParamFlags.DEPRECATED != 0:
             continue
@@ -247,13 +247,12 @@ class Window(Gtk.ApplicationWindow):
         main_window = builder.get_object('main_window')
         main_box = builder.get_object('main_box')
         headerbar = builder.get_object('headerbar')
+        copy_properties(main_window, self)
         main_window.set_titlebar(None)
         main_window.remove(main_box)
-        main_window.destroy()
         self.add(main_box)
         self.set_titlebar(headerbar)
-        self.set_default_size(800, 500)
-        self.props.window_position = Gtk.WindowPosition.CENTER
+        main_window.destroy()
 
         # Cannot store these in the same .ui file nor hook them up in the
         # .ui because glade doesn't support that and strips both the
