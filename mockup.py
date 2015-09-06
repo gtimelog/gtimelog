@@ -239,7 +239,7 @@ class Window(Gtk.ApplicationWindow):
             self.show_menu = Gio.PropertyAction.new("show-menu", win.menu_button, "active")
             win.add_action(self.show_menu)
 
-            for action_name in ['go-back', 'go-forward', 'go-home', 'add-entry', 'report']:
+            for action_name in ['go-back', 'go-forward', 'go-home', 'add-entry', 'report', 'cancel-report']:
                 action = Gio.SimpleAction.new(action_name, None)
                 action.connect('activate', getattr(win, 'on_' + action_name.replace('-', '_')))
                 win.add_action(action)
@@ -277,11 +277,17 @@ class Window(Gtk.ApplicationWindow):
         # Cannot store these in the same .ui file nor hook them up in the
         # .ui because glade doesn't support that and strips both the
         # <menu> and the menu-model property on save.
-        builder.get_object('menu_button').set_menu_model(builder.get_object('window_menu'))
-        builder.get_object('view_button').set_menu_model(builder.get_object('view_menu'))
+        self.view_button = builder.get_object("view_button")
+        self.menu_button = builder.get_object("menu_button")
+        self.menu_button.set_menu_model(builder.get_object('window_menu'))
+        self.view_button.set_menu_model(builder.get_object('view_menu'))
 
         self.main_stack = main_stack
-
+        self.task_pane_button = builder.get_object("task_pane_button")
+        self.back_button = builder.get_object("back_button")
+        self.forward_button = builder.get_object("forward_button")
+        self.today_button = builder.get_object("today_button")
+        self.cancel_report_button = builder.get_object("cancel_report_button")
         self.headerbar = builder.get_object('headerbar')
         self.time_label = builder.get_object('time_label')
         self.task_entry = TaskEntry()
@@ -298,16 +304,13 @@ class Window(Gtk.ApplicationWindow):
         self.bind_property('detail_level', self.log_view, 'detail_level', GObject.BindingFlags.SYNC_CREATE)
         self.bind_property('time_range', self.log_view, 'time_range', GObject.BindingFlags.SYNC_CREATE)
         self.task_entry.bind_property('text', self.log_view, 'current_task', GObject.BindingFlags.DEFAULT)
-        self.bind_property('title', self.headerbar, 'subtitle', GObject.BindingFlags.DEFAULT)
+        self.bind_property('subtitle', self.headerbar, 'subtitle', GObject.BindingFlags.DEFAULT)
 
         self.task_pane = builder.get_object("task_pane")
         self.task_list = TaskList()
         swap_widget(builder, 'task_list', self.task_list)
         self.task_list.connect('row-activated', self.task_list_row_activated)
         self.bind_property('tasks', self.task_list, 'tasks', GObject.BindingFlags.DEFAULT)
-
-        self.view_button = builder.get_object("view_button")
-        self.menu_button = builder.get_object("menu_button")
 
         self.actions = self.Actions(self)
         self.actions.add_entry.set_enabled(False)
@@ -422,7 +425,7 @@ class Window(Gtk.ApplicationWindow):
         if old_showing_today != self._showing_today:
             self.notify('showing_today')
         if old_date != self._date:
-            self.notify('title')
+            self.notify('subtitle')
 
     @GObject.Property(
         type=bool, default=True, nick='Showing today',
@@ -431,9 +434,9 @@ class Window(Gtk.ApplicationWindow):
         return self._showing_today
 
     @GObject.Property(
-        type=str, nick='Title',
+        type=str, nick='Subtitle',
         blurb='Description of the visible time range')
-    def title(self):
+    def subtitle(self):
         date = self.date
         if not date:
             return ''
@@ -448,11 +451,11 @@ class Window(Gtk.ApplicationWindow):
 
     def detail_level_changed(self, obj, param_spec):
         assert self.detail_level in {'chronological', 'grouped', 'summary'}
-        self.notify('title')
+        self.notify('subtitle')
 
     def time_range_changed(self, obj, param_spec):
         assert self.time_range in {'day', 'week', 'month'}
-        self.notify('title')
+        self.notify('subtitle')
 
     def on_go_back(self, action, parameter):
         if self.time_range == 'day':
@@ -499,10 +502,23 @@ class Window(Gtk.ApplicationWindow):
 
     def on_report(self, action, parameter):
         if self.main_stack.get_visible_child_name() == 'report':
-            # Temporary way to get back
-            self.main_stack.set_visible_child_name('entry')
+            self.on_cancel_report()
         else:
             self.main_stack.set_visible_child_name('report')
+            self.view_button.hide()
+            self.task_pane_button.hide()
+            self.menu_button.hide()
+            self.cancel_report_button.show()
+            self.set_title(_("Report"))
+
+    def on_cancel_report(self, action=None, parameter=None):
+        self.main_stack.set_visible_child_name('entry')
+        self.headerbar.get_style_context().remove_class('selection-mode')
+        self.view_button.show()
+        self.task_pane_button.show()
+        self.menu_button.show()
+        self.cancel_report_button.hide()
+        self.set_title(_("Time Log"))
 
     def on_timelog_file_changed(self, monitor, file, other_file, event_type):
         # When I edit timelog.txt with vim, I get a series of notifications:

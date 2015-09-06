@@ -430,6 +430,17 @@
             <property name="position">3</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkButton" id="cancel_report_button">
+            <property name="visible">False</property>
+            <property name="label" translatable="yes">Cancel</property>
+            <property name="action_name">win.cancel-report</property>
+          </object>
+          <packing>
+            <property name="pack_type">end</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
       </object>
     </child>
   </object>
