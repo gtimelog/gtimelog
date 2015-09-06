@@ -6,15 +6,17 @@ import os
 DEBUG = os.getenv('DEBUG')
 
 
-def mark_time(what=None, _prev=[0]):
-    t = time.clock()
+def mark_time(what=None, _prev=[0, 0]):
+    t = time.time()
     if DEBUG:
         if what:
-            print("{:.3f} ({:+.3f}) {}".format(t, t - _prev[0], what))
+            print("{:.3f} ({:+.3f}) {}".format(t - _prev[1], t - _prev[0], what))
         else:
             print()
+            _prev[1] = t
     _prev[0] = t
 
+mark_time()
 mark_time("in script")
 
 import datetime
