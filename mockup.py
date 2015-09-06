@@ -503,6 +503,7 @@ class TaskEntry(Gtk.Entry):
         self.completion_choices_as_set = set()
         completion.set_model(self.completion_choices)
         completion.set_text_column(0)
+        completion.set_inline_completion(True)
         self.set_completion(completion)
 
     def timelog_changed(self, *args):
