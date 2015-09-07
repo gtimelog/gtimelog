@@ -130,6 +130,7 @@ class Application(Gtk.Application):
         self.set_accels_for_action("app.edit-tasks", ["<Primary>T"])
         self.set_accels_for_action("app.quit", ["<Primary>Q"])
         self.set_accels_for_action("win.report", ["<Primary>D"])
+        self.set_accels_for_action("win.cancel-report", ["Escape"])
         self.set_accels_for_action("win.send-report", ["<Primary>Return"])
 
         mark_time("app startup done")
