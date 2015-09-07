@@ -24,6 +24,7 @@ import gettext
 import locale
 import re
 import signal
+import subprocess
 import sys
 from io import StringIO
 from gettext import gettext as _
@@ -634,15 +635,15 @@ class Window(Gtk.ApplicationWindow):
         if sender_address:
             command += ['-f', sender_address]
         command.append(recipient_address)
-        sendmail = Gio.Subprocess.new(
+        sendmail = subprocess.Popen(
             command,
-            Gio.SubprocessFlags.STDIN_PIPE |
-            Gio.SubprocessFlags.STDOUT_SILENCE |
-            Gio.SubprocessFlags.STDERR_MERGE,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
         )
-        stdin_buf = GLib.Bytes.new(msg.as_string().encode('UTF-8'))
-        success, stdout_buf, stderr_buf = sendmail.communicate(stdin_buf, None)
-        return success
+        stdin = msg.as_string().encode('UTF-8')
+        stdout, stderr = sendmail.communicate(stdin)
+        return sendmail.returncode == 0
 
 
 class TaskEntry(Gtk.Entry):
