@@ -1,10 +1,9 @@
-#!/usr/bin/python3
+#!/usr/bin/python3 -Wall
 from __future__ import print_function
 
 import time
 import os
 DEBUG = os.getenv('DEBUG')
-
 
 def mark_time(what=None, _prev=[0, 0]):
     t = time.time()
@@ -18,6 +17,8 @@ def mark_time(what=None, _prev=[0, 0]):
 
 mark_time()
 mark_time("in script")
+
+os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
 
 import datetime
 import gettext
