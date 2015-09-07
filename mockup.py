@@ -796,7 +796,11 @@ class LogView(Gtk.TextView):
         return self.timelog.window.last_time()
 
     def get_current_task_time(self):
-        return self.now - self.get_last_time()
+        last_time = self.get_last_time()
+        if last_time is None:
+            return datetime.timedelta(0)
+        else:
+            return self.now - last_time
 
     def get_current_task_work_time(self):
         if '**' in self.current_task:
