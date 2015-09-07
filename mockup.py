@@ -516,6 +516,7 @@ class Window(Gtk.ApplicationWindow):
         same_day = self.timelog.day == previous_day
         self.log_view.entry_added(same_day)
         mark_time("log_view updated")
+        self.task_entry.entry_added()
         self.task_entry.set_text('')
         self.task_entry.grab_focus()
         mark_time("focus grabbed")
@@ -704,6 +705,8 @@ class TaskEntry(Gtk.Entry):
         if self.timelog is None:
             return
         entry = self.timelog.last_entry().entry
+        self.history.append(entry)
+        self.history_pos = 0
         if entry not in self.completion_choices_as_set:
             self.completion_choices.append([entry])
             self.completion_choices_as_set.add(entry)
