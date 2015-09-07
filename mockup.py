@@ -27,6 +27,8 @@ import signal
 import sys
 from io import StringIO
 from gettext import gettext as _
+from email.utils import parseaddr
+from email import message_from_string
 
 mark_time("Python imports done")
 
@@ -128,6 +130,7 @@ class Application(Gtk.Application):
         self.set_accels_for_action("app.edit-tasks", ["<Primary>T"])
         self.set_accels_for_action("app.quit", ["<Primary>Q"])
         self.set_accels_for_action("win.report", ["<Primary>D"])
+        self.set_accels_for_action("win.send-report", ["<Primary>Return"])
 
         mark_time("app startup done")
 
@@ -241,7 +244,7 @@ class Window(Gtk.ApplicationWindow):
             self.show_menu = Gio.PropertyAction.new("show-menu", win.menu_button, "active")
             win.add_action(self.show_menu)
 
-            for action_name in ['go-back', 'go-forward', 'go-home', 'add-entry', 'report', 'cancel-report']:
+            for action_name in ['go-back', 'go-forward', 'go-home', 'add-entry', 'report', 'send-report', 'cancel-report']:
                 action = Gio.SimpleAction.new(action_name, None)
                 action.connect('activate', getattr(win, 'on_' + action_name.replace('-', '_')))
                 win.add_action(action)
@@ -317,6 +320,7 @@ class Window(Gtk.ApplicationWindow):
 
         self.actions = self.Actions(self)
         self.actions.add_entry.set_enabled(False)
+        self.actions.send_report.set_enabled(True)
 
         # couldn't figure out how to set action targets in the .ui file
         builder.get_object('daily_report_toggle').set_detailed_action_name('win.time-range::day')
@@ -360,6 +364,7 @@ class Window(Gtk.ApplicationWindow):
         self.task_pane.set_visible(self.settings.show_tasks)
         self.recipient_entry.set_text(self.settings.email)
         self.report_view.name = self.settings.name
+        self.report_view.sender = self.settings.sender
         mark_time('settings loaded')
 
     def load_log(self):
@@ -527,6 +532,18 @@ class Window(Gtk.ApplicationWindow):
             self.report_view.show()
             self.headerbar.set_show_close_button(False)
             self.set_title(_("Report"))
+            self.actions.send_report.set_enabled(True)
+
+    def on_send_report(self, action, parameter):
+        if self.main_stack.get_visible_child_name() != 'report':
+            return
+        sender = self.report_view.sender
+        recipient = self.report_view.recipient
+        body = self.report_view.get_report_text()
+        if not body:
+            return
+        if self.email(sender, recipient, body):
+            self.on_cancel_report()
 
     def on_cancel_report(self, action=None, parameter=None):
         self.main_stack.set_visible_child_name('entry')
@@ -538,6 +555,7 @@ class Window(Gtk.ApplicationWindow):
         self.report_view.hide()
         self.headerbar.set_show_close_button(True)
         self.set_title(_("Time Log"))
+        self.actions.send_report.set_enabled(False)
 
     def on_timelog_file_changed(self, monitor, file, other_file, event_type):
         # When I edit timelog.txt with vim, I get a series of notifications:
@@ -605,6 +623,24 @@ class Window(Gtk.ApplicationWindow):
             self.time_label.set_text(format_duration(now - last_time))
         self.log_view.now = now
         return True
+
+    def email(self, sender, recipient, body):
+        sender_address = parseaddr(sender)[1]
+        recipient_address = parseaddr(recipient)[1]
+        msg = message_from_string(body)
+        command = ['/usr/sbin/sendmail']
+        if sender_address:
+            command += ['-f', sender_address]
+        command.append(recipient_address)
+        sendmail = Gio.Subprocess.new(
+            command,
+            Gio.SubprocessFlags.STDIN_PIPE |
+            Gio.SubprocessFlags.STDOUT_SILENCE |
+            Gio.SubprocessFlags.STDERR_MERGE,
+        )
+        stdin_buf = GLib.Bytes.new(msg.as_string().encode('UTF-8'))
+        success, stdout_buf, stderr_buf = sendmail.communicate(stdin_buf, None)
+        return success
 
 
 class TaskEntry(Gtk.Entry):
@@ -1034,6 +1070,10 @@ class ReportView(Gtk.TextView):
         type=str, nick='Name',
         blurb='Name of report sender')
 
+    sender = GObject.Property(
+        type=str, nick='Sender email',
+        blurb='Email of the report sender')
+
     recipient = GObject.Property(
         type=str, nick='Recipient email',
         blurb='Email of the report recipient')
@@ -1051,6 +1091,7 @@ class ReportView(Gtk.TextView):
         self._update_pending = False
         self.connect('notify::timelog', self.queue_update)
         self.connect('notify::name', self.queue_update)
+        self.connect('notify::sender', self.queue_update)
         self.connect('notify::recipient', self.queue_update)
         self.connect('notify::date', self.queue_update)
         self.connect('notify::time-range', self.queue_update)
@@ -1070,6 +1111,9 @@ class ReportView(Gtk.TextView):
         elif self.time_range == 'month':
             return self.timelog.window_for_month(self.date)
 
+    def get_report_text(self):
+        return self.get_buffer().props.text
+
     def populate_report(self):
         self._update_pending = False
         self.get_buffer().set_text('')
@@ -1078,6 +1122,8 @@ class ReportView(Gtk.TextView):
         window = self.get_time_window()
         reports = Reports(window)
         output = StringIO()
+        if self.sender:
+            output.write("From: {}\n".format(self.sender))
         if self.time_range == 'day':
             reports.daily_report(output, self.recipient, self.name)
         elif self.time_range == 'week':

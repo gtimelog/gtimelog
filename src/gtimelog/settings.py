@@ -31,6 +31,7 @@ class Settings(object):
     # Insane defaults
     email = 'activity-list@example.com'
     name = 'Anonymous'
+    sender = ''
 
     editor = 'xdg-open'
     mailer = 'x-terminal-emulator -e "mutt -H %s"'
@@ -105,6 +106,7 @@ class Settings(object):
         config.add_section('gtimelog')
         config.set('gtimelog', 'list-email', self.email)
         config.set('gtimelog', 'name', self.name.encode(self._encoding))
+        config.set('gtimelog', 'sender', self.sender.encode(self._encoding))
         config.set('gtimelog', 'editor', self.editor)
         config.set('gtimelog', 'mailer', self.mailer)
         config.set('gtimelog', 'spreadsheet', self.spreadsheet)
@@ -141,6 +143,7 @@ class Settings(object):
         config.read([filename])
         self.email = config.get('gtimelog', 'list-email')
         self.name = self._unicode(config.get('gtimelog', 'name'))
+        self.sender = self._unicode(config.get('gtimelog', 'sender'))
         self.editor = config.get('gtimelog', 'editor')
         self.mailer = config.get('gtimelog', 'mailer')
         self.spreadsheet = config.get('gtimelog', 'spreadsheet')
