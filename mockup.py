@@ -556,6 +556,7 @@ class Window(Gtk.ApplicationWindow):
         self.headerbar.set_show_close_button(True)
         self.set_title(_("Time Log"))
         self.actions.send_report.set_enabled(False)
+        self.add_button.grab_default() # huh
 
     def on_timelog_file_changed(self, monitor, file, other_file, event_type):
         # When I edit timelog.txt with vim, I get a series of notifications:
