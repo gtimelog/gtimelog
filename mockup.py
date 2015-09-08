@@ -390,7 +390,7 @@ class Window(Gtk.ApplicationWindow):
         mark_time("timelog presented")
         self.watch_file(self.timelog.filename, self.on_timelog_file_changed)
 
-    def load_tasks(self):
+    def load_tasks(self, *args):
         mark_time("loading tasks")
         if self.gsettings.get_boolean('remote-task-list'):
             url = self.gsettings.get_string('task-list-url')
