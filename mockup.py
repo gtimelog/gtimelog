@@ -349,7 +349,7 @@ class Window(Gtk.ApplicationWindow):
         self.settings = Settings()
         self.settings.load()
         self.log_view.hours = self.settings.hours
-        self.log_view.office_hours = self.settings.hours
+        self.log_view.office_hours = self.settings.office_hours
         self.app.actions.edit_tasks.set_enabled(not self.settings.task_list_url)
         self.task_pane.set_visible(self.settings.show_tasks)
         self.recipient_entry.set_text(self.settings.email)
@@ -754,11 +754,11 @@ class LogView(Gtk.TextView):
         blurb='Time range to show (day/week/month)')
 
     hours = GObject.Property(
-        type=int, default=0, nick='Hours',
+        type=float, default=0, nick='Hours',
         blurb='Target number of work hours per day')
 
     office_hours = GObject.Property(
-        type=int, default=0, nick='Office Hours',
+        type=float, default=0, nick='Office Hours',
         blurb='Target number of office hours per day')
 
     current_task = GObject.Property(

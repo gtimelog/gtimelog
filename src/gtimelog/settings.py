@@ -43,6 +43,7 @@ class Settings(object):
     enable_gtk_completion = True  # False enables gvim-style completion
 
     hours = 8
+    office_hours = 9
     virtual_midnight = datetime.time(2, 0)
 
     task_list_url = ''
@@ -116,6 +117,7 @@ class Settings(object):
         config.set('gtimelog', 'gtk-completion',
                    str(self.enable_gtk_completion))
         config.set('gtimelog', 'hours', str(self.hours))
+        config.set('gtimelog', 'office-hours', str(self.office_hours))
         config.set('gtimelog', 'virtual_midnight',
                    self.virtual_midnight.strftime('%H:%M'))
         config.set('gtimelog', 'task_list_url', self.task_list_url)
@@ -153,6 +155,7 @@ class Settings(object):
         self.enable_gtk_completion = config.getboolean('gtimelog',
                                                        'gtk-completion')
         self.hours = config.getfloat('gtimelog', 'hours')
+        self.office_hours = config.getfloat('gtimelog', 'office-hours')
         self.virtual_midnight = parse_time(config.get('gtimelog',
                                                       'virtual_midnight'))
         self.task_list_url = config.get('gtimelog', 'task_list_url')
