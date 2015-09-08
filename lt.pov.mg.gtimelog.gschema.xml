@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<schemalist>
+
+    <schema path="/lt/pov/mg/gtimelog/" id="lt.pov.mg.gtimelog">
+
+        <key name="settings-migrated" type="b">
+            <default>false</default>
+            <summary>Settings migrated</summary>
+            <description>Set to true after copying old settings from a gtimelogrc file.  If false, and if a gtimelogrc exists, settings from the gtimelogrc will be copied into GSettings.</description>
+        </key>
+
+        <key name="show-task-pane" type="b">
+            <default>false</default>
+            <summary>Show task pane</summary>
+            <description>If true, the sidebar with a list of tasks is shown.</description>
+        </key>
+
+        <key name="hours" type="d">
+            <default>8</default>
+            <summary>Work hours</summary>
+            <description>Target hours of work, to be used for estimating time left to work.</description>
+        </key>
+
+        <key name="office-hours" type="d">
+            <default>9</default>
+            <summary>Office hours</summary>
+            <description>Target hours of work (including breaks), to be used for estimating time left at the office.</description>
+        </key>
+
+        <key name="virtual-midnight" type="(ii)">
+            <default>(2, 0)</default>
+            <summary>Virtual midnight</summary>
+            <description>Hour and minute that say when a work day ends and another begins.</description>
+        </key>
+
+        <key name="name" type="s">
+            <default>"Anonymous"</default>
+            <summary>Name</summary>
+            <description>Your name in activity reports.</description>
+        </key>
+
+        <key name="sender" type="s">
+            <default>"Anonymous &lt;me@example.com&gt;"</default>
+            <summary>Sender email</summary>
+            <description>Sender email for activity reports.</description>
+        </key>
+
+        <key name="list-email" type="s">
+            <default>"activity@example.com"</default>
+            <summary>Recipient email</summary>
+            <description>Email to send activity reports to.</description>
+        </key>
+
+        <key name="remote-task-list" type="b">
+            <default>false</default>
+            <summary>Use remote task list</summary>
+            <description>If true, the task sidebar will show tasks fetched from a specified task list URL.</description>
+        </key>
+
+        <key name="task-list-url" type="s">
+            <default>""</default>
+            <summary>Task list URL</summary>
+            <description>URL for fetching tasks for the task pane.  Expects a plain text response with one task name per line, with an optional category in front (delimited with a ':').</description>
+        </key>
+
+    </schema>
+
+</schemalist>

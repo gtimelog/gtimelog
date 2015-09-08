@@ -13,7 +13,7 @@ FILE_WITH_CHANGELOG = NEWS.rst
 manpages = gtimelog.1 gtimelogrc.5
 
 .PHONY: all
-all: $(manpages)
+all: $(manpages) gschemas.compiled
 
 .PHONY: run
 run:
@@ -43,6 +43,9 @@ update-translations:
 	msgfmt -o locale/lt/LC_MESSAGES/gtimelog.mo po/lt.po
 	mkdir -p locale/en/LC_MESSAGES
 	msgfmt -o locale/en/LC_MESSAGES/gtimelog.mo po/en.po
+
+gschemas.compiled: lt.pov.mg.gtimelog.gschema.xml
+	glib-compile-schemas .
 
 .PHONY: clean
 clean:

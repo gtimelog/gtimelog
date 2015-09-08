@@ -5,6 +5,7 @@ import time
 import os
 DEBUG = os.getenv('DEBUG')
 
+
 def mark_time(what=None, _prev=[0, 0]):
     t = time.time()
     if DEBUG:
@@ -34,6 +35,10 @@ from email import message_from_string
 
 mark_time("Python imports done")
 
+SCHEMA_DIR = os.path.abspath(os.path.dirname(__file__))
+if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
+    os.environ['GSETTINGS_SCHEMA_DIR'] = SCHEMA_DIR
+
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -46,7 +51,7 @@ sys.path.insert(0, pkgdir)
 from gtimelog.settings import Settings
 from gtimelog.timelog import (
     as_minutes, virtual_day, different_days, prev_month, next_month, uniq,
-    Reports)
+    Reports, TaskList as LocalTaskList, RemoteTaskList, TimeLog)
 
 mark_time("gtimelog imports done")
 
@@ -243,7 +248,7 @@ class Window(Gtk.ApplicationWindow):
     def __init__(self, app):
         Gtk.ApplicationWindow.__init__(self, application=app, icon_name='gtimelog')
 
-        self._watches = []
+        self._watches = {}
         self._date = None
         self._showing_today = None
         self.timelog = None
@@ -346,20 +351,38 @@ class Window(Gtk.ApplicationWindow):
         GLib.timeout_add_seconds(1, self.tick)
 
     def load_settings(self):
-        self.settings = Settings()
-        self.settings.load()
-        self.log_view.hours = self.settings.hours
-        self.log_view.office_hours = self.settings.office_hours
-        self.app.actions.edit_tasks.set_enabled(not self.settings.task_list_url)
-        self.task_pane.set_visible(self.settings.show_tasks)
-        self.recipient_entry.set_text(self.settings.email)
-        self.report_view.name = self.settings.name
-        self.report_view.sender = self.settings.sender
+        self.gsettings = Gio.Settings.new("lt.pov.mg.gtimelog")
+        self.gsettings.bind('show-task-pane', self.task_pane, 'visible', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('hours', self.log_view, 'hours', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('office-hours', self.log_view, 'office-hours', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('name', self.report_view, 'name', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('sender', self.report_view, 'sender', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('list-email', self.recipient_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('remote-task-list', self.app.actions.edit_tasks, 'enabled', Gio.SettingsBindFlags.INVERT_BOOLEAN)
+        self.gsettings.connect('changed::remote-task-list', self.load_tasks)
+        self.gsettings.connect('changed::task-list-url', self.load_tasks)
+        self.gsettings.connect('changed::virtual-midnight', self.virtual_midnight_changed)
+
+        if not self.gsettings.get_boolean('settings-migrated'):
+            old_settings = Settings()
+            old_settings.load()
+            self.gsettings.set_boolean('show-task-pane', old_settings.show_tasks)
+            self.gsettings.set_double('hours', old_settings.hours)
+            self.gsettings.set_double('office-hours', old_settings.office_hours)
+            self.gsettings.set_string('name', old_settings.name)
+            self.gsettings.set_string('sender', old_settings.sender)
+            self.gsettings.set_string('list-email', old_settings.email)
+            self.gsettings.set_boolean('remote-task-list', bool(old_settings.task_list_url))
+            self.gsettings.set_string('task-list-url', old_settings.task_list_url)
+            vm = old_settings.virtual_midnight
+            self.gsettings.set_value('virtual-midnight', GLib.Variant('(ii)', (vm.hour, vm.minute)))
+            self.gsettings.set_boolean('settings-migrated', True)
+
         mark_time('settings loaded')
 
     def load_log(self):
         mark_time("loading timelog")
-        timelog = self.settings.get_time_log()
+        timelog = TimeLog(Settings().get_timelog_file(), self.get_virtual_midnight())
         mark_time("timelog loaded")
         self.timelog = timelog
         self.tick(True)
@@ -369,17 +392,36 @@ class Window(Gtk.ApplicationWindow):
 
     def load_tasks(self):
         mark_time("loading tasks")
-        tasks = self.settings.get_task_list()
+        if self.gsettings.get_boolean('remote-task-list'):
+            url = self.gsettings.get_string('task-list-url')
+            filename = Settings().get_task_list_cache_file()
+            tasks = RemoteTaskList(url, filename)
+            # TODO: initiate a refresh now
+        else:
+            filename = Settings().get_task_list_file()
+            tasks = LocalTaskList(filename)
         mark_time("tasks loaded")
+        if self.tasks:
+            self.unwatch_file(self.tasks.filename)
         self.tasks = tasks
         mark_time("tasks presented")
         self.watch_file(self.tasks.filename, self.on_tasks_file_changed)
+
+    def virtual_midnight_changed(self, *args):
+        if self.timelog:
+            # This is only partially correct: we're not reloading old logs.
+            # (Reloading old logs would also be partially incorrect.)
+            self.timelog.virtual_midnight = self.get_virtual_midnight()
 
     def watch_file(self, filename, callback):
         gf = Gio.File.new_for_path(filename)
         gfm = gf.monitor_file(Gio.FileMonitorFlags.NONE, None)
         gfm.connect('changed', callback)
-        self._watches.append(gfm) # keep a reference so it doesn't get garbage collected
+        self._watches[filename] = gfm  # keep a reference so it doesn't get garbage collected
+
+    def unwatch_file(self, filename):
+        if filename in self._watches:
+            del self._watches[filename]
 
     def get_last_time(self):
         if self.timelog is None:
@@ -396,6 +438,13 @@ class Window(Gtk.ApplicationWindow):
 
     def get_now(self):
         return datetime.datetime.now().replace(second=0, microsecond=0)
+
+    def get_virtual_midnight(self):
+        h, m = self.gsettings.get_value('virtual-midnight')
+        return datetime.time(h, m)
+
+    def get_today(self):
+        return virtual_day(datetime.datetime.now(), self.get_virtual_midnight())
 
     def get_current_task(self):
         """Return the current task entry text (as Unicode)."""
@@ -415,7 +464,7 @@ class Window(Gtk.ApplicationWindow):
             new_date = None
 
         # Going back to today is the same as going home
-        today = virtual_day(datetime.datetime.now(), self.settings.virtual_midnight)
+        today = self.get_today()
         if new_date is None or new_date >= today:
             new_date = today
 
