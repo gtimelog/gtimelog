@@ -36,22 +36,9 @@ mark_time("Python imports done")
 
 
 import gi
-mark_time("gi import done")
 gi.require_version('Gtk', '3.0')
-mark_time("gi.require_version done")
-
-from gi.repository import GLib
-mark_time("GLib import done")
-from gi.repository import GObject
-mark_time("GObject import done")
-from gi.repository import Gio
-mark_time("Gio import done")
-from gi.repository import Gdk
-mark_time("Gdk import done")
-from gi.repository import Gtk
-mark_time("Gtk import done")
-from gi.repository import Pango
-mark_time("Pango import done")
+from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango
+mark_time("Gtk imports done")
 
 pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
