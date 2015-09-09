@@ -86,7 +86,7 @@ class Application(Gtk.Application):
                 setattr(self, action_name.replace('-', '_'), action)
 
     def __init__(self):
-        super(Application, self).__init__(application_id='lt.pov.mg.gtimelog_mockup')
+        super(Application, self).__init__(application_id='org.gtimelog')
         GLib.set_application_name(_("Time Log"))
         GLib.set_prgname('gtimelog')
 
@@ -353,7 +353,7 @@ class Window(Gtk.ApplicationWindow):
         GLib.timeout_add_seconds(1, self.tick)
 
     def load_settings(self):
-        self.gsettings = Gio.Settings.new("lt.pov.mg.gtimelog")
+        self.gsettings = Gio.Settings.new("org.gtimelog")
         self.gsettings.bind('show-task-pane', self.task_pane, 'visible', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('hours', self.log_view, 'hours', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('office-hours', self.log_view, 'office-hours', Gio.SettingsBindFlags.DEFAULT)

@@ -44,7 +44,7 @@ update-translations:
 	mkdir -p locale/en/LC_MESSAGES
 	msgfmt -o locale/en/LC_MESSAGES/gtimelog.mo po/en.po
 
-gschemas.compiled: lt.pov.mg.gtimelog.gschema.xml
+gschemas.compiled: org.gtimelog.gschema.xml
 	glib-compile-schemas .
 
 .PHONY: clean

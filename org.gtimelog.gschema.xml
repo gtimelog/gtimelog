@@ -2,7 +2,7 @@
 
 <schemalist>
 
-    <schema path="/lt/pov/mg/gtimelog/" id="lt.pov.mg.gtimelog">
+    <schema path="/org/gtimelog/" id="org.gtimelog">
 
         <key name="settings-migrated" type="b">
             <default>false</default>
