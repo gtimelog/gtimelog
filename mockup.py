@@ -55,7 +55,7 @@ from gtimelog.timelog import (
 
 mark_time("gtimelog imports done")
 
-HELP_URL = 'https://mg.pov.lt/gtimelog'
+HELP_URL = 'https://gtimelog.org'
 
 UI_FILE = 'src/gtimelog/experiment.ui'
 ABOUT_DIALOG_UI_FILE = 'src/gtimelog/about.ui'

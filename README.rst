@@ -65,10 +65,10 @@ This is work in progress:
 Resources
 ---------
 
-Website: http://mg.pov.lt/gtimelog
+Website: https://gtimelog.org
 
 Mailing list: gtimelog@googlegroups.com
-(archive at http://groups.google.com/group/gtimelog)
+(archive at https://groups.google.com/group/gtimelog)
 
 IRC: #gtimelog on irc.freenode.net
 
@@ -81,7 +81,7 @@ There's an old bugtracker at https://bugs.launchpad.net/gtimelog
 I sometimes also browse distribution bugs:
 
 - Ubuntu https://bugs.launchpad.net/ubuntu/+source/gtimelog
-- Debian http://bugs.debian.org/gtimelog
+- Debian https://bugs.debian.org/gtimelog
 
 
 Credits

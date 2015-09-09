@@ -9,7 +9,7 @@
     <property name="version">0.10.dev0</property>
     <property name="copyright" translatable="yes">Copyright © 2004–2015 Marius Gedminas and contributors.</property>
     <property name="comments" translatable="yes">A time tracking application</property>
-    <property name="website">https://mg.pov.lt/gtimelog/</property>
+    <property name="website">https://gtimelog.org/</property>
     <property name="authors">Marius Gedminas
 Adomas Paltanavičius
 Barry Warsaw

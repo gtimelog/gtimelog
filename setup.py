@@ -45,7 +45,7 @@ setup(
     version=version,
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
-    url='http://mg.pov.lt/gtimelog/',
+    url='https://gtimelog.org/',
     description=short_description,
     long_description=long_description,
     license='GPL',

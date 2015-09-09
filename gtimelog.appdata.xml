@@ -10,8 +10,8 @@
         <p>GTimeLog is a small GTK+ app for keeping track of your time. Its main goal is to be as unobtrusive as possible.</p>
     </description>
     <screenshots>
-        <screenshot width="802" height="533" type="default">https://mg.pov.lt/gtimelog/gtimelog-gtk3.png</screenshot>
+        <screenshot width="802" height="533" type="default">https://gtimelog.org/gtimelog-gtk3.png</screenshot>
     </screenshots>
-    <url type="homepage">https://mg.pov.lt/gtimelog/</url>
+    <url type="homepage">https://gtimelog.org/</url>
     <updatecontact>marius@gedmin.as</updatecontact>
 </application>

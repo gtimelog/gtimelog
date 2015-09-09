@@ -520,7 +520,7 @@ def doctest_Exports_icalendar():
         ...         Exports(window).icalendar(sys.stdout)
         ... # doctest: +REPORT_NDIFF
         BEGIN:VCALENDAR
-        PRODID:-//mg.pov.lt/NONSGML GTimeLog//EN
+        PRODID:-//gtimelog.org/NONSGML GTimeLog//EN
         VERSION:2.0
         BEGIN:VEVENT
         UID:be5f9be205c2308f7f1a30d6c399d6bd@localhost

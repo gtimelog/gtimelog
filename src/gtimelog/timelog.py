@@ -379,7 +379,7 @@ class Exports(object):
     def icalendar(self, output):
         """Create an iCalendar file with activities."""
         output.write("BEGIN:VCALENDAR\n")
-        output.write("PRODID:-//mg.pov.lt/NONSGML GTimeLog//EN\n")
+        output.write("PRODID:-//gtimelog.org/NONSGML GTimeLog//EN\n")
         output.write("VERSION:2.0\n")
         idhost = socket.getfqdn()
         dtstamp = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")

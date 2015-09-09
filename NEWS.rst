@@ -301,7 +301,7 @@ from gtimelog.gtimelog, you'll have to change them.
 
 0.2.2
 ~~~~~
-* Tweak setup.py to get a sane page at http://pypi.python.org/pypi/gtimelog/
+* Tweak setup.py to get a sane page at https://pypi.python.org/pypi/gtimelog/
 
 
 0.2.1
