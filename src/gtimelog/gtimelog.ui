@@ -345,6 +345,7 @@ GTimeLog is a time tracking application.
                         <property name="label" translatable="yes">_Weekly Report</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_weekly_report_activate" swapped="no"/>
+                        <accelerator key="W" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
@@ -372,6 +373,7 @@ GTimeLog is a time tracking application.
                         <property name="label" translatable="yes">_Monthly Report</property>
                         <property name="use_underline">True</property>
                         <signal name="activate" handler="on_monthly_report_activate" swapped="no"/>
+                        <accelerator key="M" signal="activate" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                     </child>
                     <child>
