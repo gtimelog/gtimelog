@@ -63,7 +63,6 @@
                         <property name="can_focus">True</property>
                         <property name="pixels_above_lines">2</property>
                         <property name="editable">False</property>
-                        <property name="monospace">False</property>
                         <property name="wrap_mode">word</property>
                         <property name="left_margin">6</property>
                         <property name="right_margin">6</property>
@@ -267,10 +266,9 @@
                     <property name="visible">False</property>
                     <property name="can_focus">True</property>
                     <property name="editable">False</property>
-                    <property name="monospace">True</property>
-                    <property name="wrap_mode">none</property>
                     <property name="left_margin">6</property>
                     <property name="right_margin">6</property>
+                    <property name="monospace">True</property>
                   </object>
                 </child>
               </object>
