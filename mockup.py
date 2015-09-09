@@ -607,7 +607,19 @@ class Window(Gtk.ApplicationWindow):
         if not body:
             return
         if self.email(sender, recipient, body):
+            self.record_sent_email(self.report_view.get_report_kind(),
+                                   self.report_view.get_report_id(),
+                                   recipient)
             self.on_cancel_report()
+
+    def record_sent_email(self, report_kind, report_id, recipient):
+        filename = Settings().get_report_log_file()
+        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        try:
+            with open(filename, 'a') as f:
+                f.write("{},{},{},{}\n".format(timestamp, report_kind, report_id, recipient))
+        except IOError as e:
+            self.complain("Couldn't append to {}: {}".format(filename, e))
 
     def on_cancel_report(self, action=None, parameter=None):
         self.main_stack.set_visible_child_name('entry')
@@ -1180,6 +1192,25 @@ class ReportView(Gtk.TextView):
 
     def get_report_text(self):
         return self.get_buffer().props.text
+
+    def get_report_id(self):
+        if self.time_range == 'day':
+            return self.date.strftime('%Y-%m-%d')
+        elif self.time_range == 'week':
+            # I'd prefer the ISO 8601 format (2015-W31 instead of 2015/31), but
+            # let's be compatible with https://github.com/ProgrammersOfVilnius/gtimesheet
+            return '{}/{}'.format(self.date.year, self.date.isocalendar()[1])
+        elif self.time_range == 'month':
+            return self.date.strftime('%Y-%m')
+
+    def get_report_kind(self):
+        # Let's be compatible with https://github.com/ProgrammersOfVilnius/gtimesheet
+        if self.time_range == 'day':
+            return 'daily'
+        elif self.time_range == 'week':
+            return 'weekly'
+        elif self.time_range == 'month':
+            return 'monthly'
 
     def populate_report(self):
         self._update_pending = False

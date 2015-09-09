@@ -89,6 +89,9 @@ class Settings(object):
     def get_time_log(self):
         return TimeLog(self.get_timelog_file(), self.virtual_midnight)
 
+    def get_report_log_file(self):
+        return os.path.join(self.get_data_dir(), 'sentreports.log')
+
     def get_task_list_file(self):
         return os.path.join(self.get_data_dir(), 'tasks.txt')
 
