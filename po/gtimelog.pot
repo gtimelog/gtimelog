@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-09 13:53+0300\n"
+"POT-Creation-Date: 2015-09-09 15:38+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../gtimelog.desktop.in.h:1 ../mockup.py:94 ../mockup.py:644
-#: ../src/gtimelog/about.ui.h:1
+#: ../src/gtimelog/about.ui.h:1 ../src/gtimelog/experiment.ui.h:7
 msgid "Time Log"
 msgstr ""
 
@@ -43,7 +43,7 @@ msgstr ""
 msgid "{0:%B %Y}"
 msgstr ""
 
-#: ../mockup.py:605 ../src/gtimelog/experiment.ui.h:8
+#: ../mockup.py:605
 msgid "Report"
 msgstr ""
 
@@ -162,30 +162,26 @@ msgid "Add"
 msgstr ""
 
 #: ../src/gtimelog/experiment.ui.h:2
-msgid "Record Entry"
-msgstr ""
-
-#: ../src/gtimelog/experiment.ui.h:3
 msgid "Daily"
 msgstr ""
 
-#: ../src/gtimelog/experiment.ui.h:4
+#: ../src/gtimelog/experiment.ui.h:3
 msgid "Weekly"
 msgstr ""
 
-#: ../src/gtimelog/experiment.ui.h:5
+#: ../src/gtimelog/experiment.ui.h:4
 msgid "Monthly"
 msgstr ""
 
-#: ../src/gtimelog/experiment.ui.h:6
+#: ../src/gtimelog/experiment.ui.h:5
 msgid "Recipient"
 msgstr ""
 
-#: ../src/gtimelog/experiment.ui.h:7
+#: ../src/gtimelog/experiment.ui.h:6
 msgid "Send"
 msgstr ""
 
-#: ../src/gtimelog/experiment.ui.h:9
+#: ../src/gtimelog/experiment.ui.h:8
 msgid "Cancel"
 msgstr ""
 

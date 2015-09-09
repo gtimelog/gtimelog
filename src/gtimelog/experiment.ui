@@ -183,7 +183,7 @@
           </object>
           <packing>
             <property name="name">entry</property>
-            <property name="title" translatable="yes">Record Entry</property>
+            <property name="title" translatable="yes"></property>
           </packing>
         </child>
         <child>
@@ -384,7 +384,7 @@
           </object>
           <packing>
             <property name="name">report</property>
-            <property name="title" translatable="yes">Report</property>
+            <property name="title" translatable="yes"></property>
             <property name="position">1</property>
           </packing>
         </child>

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-09 13:52+0300\n"
+"POT-Creation-Date: 2015-09-09 15:38+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -20,7 +20,7 @@ msgstr ""
 "%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: ../gtimelog.desktop.in.h:1 ../mockup.py:94 ../mockup.py:644
-#: ../src/gtimelog/about.ui.h:1
+#: ../src/gtimelog/about.ui.h:1 ../src/gtimelog/experiment.ui.h:7
 msgid "Time Log"
 msgstr "Laiko žurnalas"
 
@@ -45,7 +45,7 @@ msgstr "{0:%Y}, {1} savaitė ({0:%B %-d}–{2:%-d})"
 msgid "{0:%B %Y}"
 msgstr "{0:%Y %B} mėn."
 
-#: ../mockup.py:605 ../src/gtimelog/experiment.ui.h:8
+#: ../mockup.py:605
 msgid "Report"
 msgstr "Ataskaita"
 
@@ -55,7 +55,7 @@ msgstr "Nepavyko išsiųsti laiško {}."
 
 #: ../mockup.py:709
 msgid "%H:%M"
-msgstr ""
+msgstr "%H:%M"
 
 #: ../mockup.py:962
 msgid "{0:%A, %Y-%m-%d}\n"
@@ -164,30 +164,26 @@ msgid "Add"
 msgstr "Pridėti"
 
 #: ../src/gtimelog/experiment.ui.h:2
-msgid "Record Entry"
-msgstr ""
-
-#: ../src/gtimelog/experiment.ui.h:3
 msgid "Daily"
 msgstr "Dienos"
 
-#: ../src/gtimelog/experiment.ui.h:4
+#: ../src/gtimelog/experiment.ui.h:3
 msgid "Weekly"
 msgstr "Savaitės"
 
-#: ../src/gtimelog/experiment.ui.h:5
+#: ../src/gtimelog/experiment.ui.h:4
 msgid "Monthly"
 msgstr "Mėnesio"
 
-#: ../src/gtimelog/experiment.ui.h:6
+#: ../src/gtimelog/experiment.ui.h:5
 msgid "Recipient"
 msgstr "Gavėjas"
 
-#: ../src/gtimelog/experiment.ui.h:7
+#: ../src/gtimelog/experiment.ui.h:6
 msgid "Send"
 msgstr "Siųsti"
 
-#: ../src/gtimelog/experiment.ui.h:9
+#: ../src/gtimelog/experiment.ui.h:8
 msgid "Cancel"
 msgstr "Atšaukti"
 
