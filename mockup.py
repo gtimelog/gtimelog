@@ -251,6 +251,7 @@ class Window(Gtk.ApplicationWindow):
         self._watches = {}
         self._date = None
         self._showing_today = None
+        self._window_size_update_timeout = None
         self.timelog = None
         self.tasks = None
         self.app = app
@@ -283,6 +284,7 @@ class Window(Gtk.ApplicationWindow):
         self.view_button.set_menu_model(builder.get_object('view_menu'))
 
         self.main_stack = main_stack
+        self.paned = builder.get_object("paned")
         self.task_pane_button = builder.get_object("task_pane_button")
         self.back_button = builder.get_object("back_button")
         self.forward_button = builder.get_object("forward_button")
@@ -363,6 +365,11 @@ class Window(Gtk.ApplicationWindow):
         self.gsettings.connect('changed::task-list-url', self.load_tasks)
         self.gsettings.connect('changed::virtual-midnight', self.virtual_midnight_changed)
 
+        w, h = self.gsettings.get_value('window-size')
+        self.resize(w, h)
+        self.connect("configure-event", self.on_configure_event)
+        self.gsettings.bind('task-pane-position', self.paned, 'position', Gio.SettingsBindFlags.DEFAULT)
+
         if not self.gsettings.get_boolean('settings-migrated'):
             old_settings = Settings()
             old_settings.load()
@@ -412,6 +419,19 @@ class Window(Gtk.ApplicationWindow):
             # This is only partially correct: we're not reloading old logs.
             # (Reloading old logs would also be partially incorrect.)
             self.timelog.virtual_midnight = self.get_virtual_midnight()
+
+    def on_configure_event(self, widget, event):
+        # Delaying the save to avoid performance problems that gnome-music had
+        # (see https://bugzilla.gnome.org/show_bug.cgi?id=745651)
+        if self._window_size_update_timeout is None:
+            self._window_size_update_timeout = GLib.timeout_add(500, self.store_window_size)
+
+    def store_window_size(self):
+        w, h = self.get_size()
+        self.gsettings.set_value('window-size', GLib.Variant('(ii)', (w, h)))
+        GLib.source_remove(self._window_size_update_timeout)
+        self._window_size_update_timeout = None
+        return False
 
     def watch_file(self, filename, callback):
         gf = Gio.File.new_for_path(filename)

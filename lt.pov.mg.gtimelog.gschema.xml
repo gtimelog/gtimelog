@@ -16,6 +16,18 @@
             <description>If true, the sidebar with a list of tasks is shown.</description>
         </key>
 
+        <key name="task-pane-position" type="i">
+            <default>600</default>
+            <summary>Task pane position</summary>
+            <description>The width of the time log area to the left of the task pane.</description>
+        </key>
+
+        <key name="window-size" type="(ii)">
+            <default>(850, 550)</default>
+            <summary>Window size</summary>
+            <description>Size of the application window (width and height).</description>
+        </key>
+
         <key name="hours" type="d">
             <default>8</default>
             <summary>Work hours</summary>
