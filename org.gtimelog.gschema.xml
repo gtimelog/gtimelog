@@ -32,12 +32,14 @@
             <default>8</default>
             <summary>Work hours</summary>
             <description>Target hours of work, to be used for estimating time left to work.</description>
+            <range min="0" max="24" />
         </key>
 
         <key name="office-hours" type="d">
             <default>9</default>
             <summary>Office hours</summary>
             <description>Target hours of work (including breaks), to be used for estimating time left at the office.</description>
+            <range min="0" max="24" />
         </key>
 
         <key name="virtual-midnight" type="(ii)">
