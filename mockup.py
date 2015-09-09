@@ -1315,9 +1315,11 @@ class PreferencesDialog(Gtk.Dialog):
         vbox = builder.get_object('dialog-vbox')
         self.get_content_area().add(vbox)
 
-        virtual_midnight_entry = builder.get_object('virtual_midnight_entry')
-        virtual_midnight_entry.connect('input', self.virtual_midnight_input)
-        virtual_midnight_entry.connect('output', self.virtual_midnight_output)
+##      virtual_midnight_entry = builder.get_object('virtual_midnight_entry')
+##      virtual_midnight_entry.connect('input', self.virtual_midnight_input)
+##      virtual_midnight_entry.connect('output', self.virtual_midnight_output)
+        virtual_midnight_entry = MySpinButton()
+        swap_widget(builder, 'virtual_midnight_entry', virtual_midnight_entry)
         self.virtual_midnight_entry = virtual_midnight_entry
 
         hours_entry = builder.get_object('hours_entry')
@@ -1346,17 +1348,19 @@ class PreferencesDialog(Gtk.Dialog):
 ##      self.gsettings.set_value('virtual-midnight', GLib.Variant('(ii)', (h, m)))
 
     def virtual_midnight_input(self, spin_button, *args):
+        s = spin_button.get_text()
         try:
-            vm = parse_time(spin_button.get_text())
+            vm = parse_time(s)
         except ValueError:
             res = Gtk.INPUT_ERROR
             val = spin_button.get_value()
         else:
             res = True
             val = float(vm.hour * 60 + vm.minute)
+            print("INPUT: %s -> (%d, %d)" % (s, vm.hour, vm.minute))
         if args:
             # https://bugzilla.gnome.org/show_bug.cgi?id=644927 :(
-            spin_button.set_value(val)  # doesn't work either :(
+            GLib.idle_add(lambda: spin_button.set_value(val))
             return res
         else:
             return (res, val)
@@ -1364,7 +1368,28 @@ class PreferencesDialog(Gtk.Dialog):
     def virtual_midnight_output(self, spin_button):
         h, m = divmod(int(spin_button.get_value()), 60)
         spin_button.set_text('{0:d}:{1:02d}'.format(h, m))
+        print("OUTPUT: (%d, %d)" % (h, m))
         return True
+
+
+class MySpinButton(Gtk.SpinButton):
+
+    def do_output(self, *args):
+        print("OUTPUT", args)
+        h, m = divmod(int(self.get_value()), 60)
+        self.set_text('{0:d}:{1:02d}'.format(h, m))
+        return True
+
+    def do_input(self, *args):
+        print("INPUT", *args)
+        try:
+            vm = parse_time(self.get_text())
+        except ValueError:
+            return Gtk.INPUT_ERROR
+        val = float(vm.hour * 60 + vm.minute)
+        self.set_value(val)
+        return True
+        return Gtk.SpinButton.do_input(self, *args)
 
 
 def main():
