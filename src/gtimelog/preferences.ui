@@ -2,6 +2,16 @@
 <!-- Generated with glade 3.18.1 -->
 <interface>
   <requires lib="gtk+" version="3.16"/>
+  <object class="GtkAdjustment" id="hours_adjustment">
+    <property name="upper">24</property>
+    <property name="step_increment">0.5</property>
+    <property name="page_increment">1</property>
+  </object>
+  <object class="GtkAdjustment" id="office_hours_adjustment">
+    <property name="upper">24</property>
+    <property name="step_increment">0.5</property>
+    <property name="page_increment">1</property>
+  </object>
   <object class="GtkBox" id="dialog-vbox">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -141,13 +151,15 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="hours_entry">
+                  <object class="GtkSpinButton" id="hours_entry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="digits">1</property>
                     <property name="width_chars">5</property>
                     <property name="max_width_chars">5</property>
                     <property name="text" translatable="yes">8</property>
                     <property name="xalign">1</property>
+                    <property name="adjustment">hours_adjustment</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -155,13 +167,15 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkEntry" id="office_hours_entry">
+                  <object class="GtkSpinButton" id="office_hours_entry">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <property name="digits">1</property>
                     <property name="width_chars">5</property>
                     <property name="max_width_chars">5</property>
                     <property name="text" translatable="yes">9</property>
                     <property name="xalign">1</property>
+                    <property name="adjustment">office_hours_adjustment</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>

@@ -1315,6 +1315,19 @@ class PreferencesDialog(Gtk.Dialog):
         vbox = builder.get_object('dialog-vbox')
         self.get_content_area().add(vbox)
 
+        hours_entry = builder.get_object('hours_entry')
+        office_hours_entry = builder.get_object('office_hours_entry')
+        name_entry = builder.get_object('name_entry')
+        sender_entry = builder.get_object('sender_entry')
+        recipient_entry = builder.get_object('recipient_entry')
+
+        self.gsettings = Gio.Settings.new("org.gtimelog")
+        self.gsettings.bind('hours', hours_entry, 'value', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('office-hours', office_hours_entry, 'value', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('name', name_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('sender', sender_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('list-email', recipient_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
+
 
 def main():
     mark_time("in main()")
