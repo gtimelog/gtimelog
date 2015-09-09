@@ -366,9 +366,11 @@ class Window(Gtk.ApplicationWindow):
         self.gsettings.connect('changed::virtual-midnight', self.virtual_midnight_changed)
 
         w, h = self.gsettings.get_value('window-size')
+        tpw = self.gsettings.get_int('task-pane-width')
         self.resize(w, h)
-        self.connect("configure-event", self.on_configure_event)
-        self.gsettings.bind('task-pane-position', self.paned, 'position', Gio.SettingsBindFlags.DEFAULT)
+        self.paned.set_position(w - tpw)
+        self.paned.connect('notify::position', self.delay_store_window_size)
+        self.connect("configure-event", self.delay_store_window_size)
 
         if not self.gsettings.get_boolean('settings-migrated'):
             old_settings = Settings()
@@ -420,7 +422,7 @@ class Window(Gtk.ApplicationWindow):
             # (Reloading old logs would also be partially incorrect.)
             self.timelog.virtual_midnight = self.get_virtual_midnight()
 
-    def on_configure_event(self, widget, event):
+    def delay_store_window_size(self, *args):
         # Delaying the save to avoid performance problems that gnome-music had
         # (see https://bugzilla.gnome.org/show_bug.cgi?id=745651)
         if self._window_size_update_timeout is None:
@@ -428,7 +430,9 @@ class Window(Gtk.ApplicationWindow):
 
     def store_window_size(self):
         w, h = self.get_size()
+        tpw = w - self.paned.get_position()
         self.gsettings.set_value('window-size', GLib.Variant('(ii)', (w, h)))
+        self.gsettings.set_int('task-pane-width', tpw)
         GLib.source_remove(self._window_size_update_timeout)
         self._window_size_update_timeout = None
         return False
