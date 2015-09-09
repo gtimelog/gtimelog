@@ -664,7 +664,7 @@ class Window(Gtk.ApplicationWindow):
         # handled _after_ row-activated, which makes the tree control steal
         # the focus back from the task entry.  To avoid this, wait until all
         # the events have been handled.
-        GObject.idle_add(self._focus_task_entry)
+        GLib.idle_add(self._focus_task_entry)
 
     def _focus_task_entry(self):
         self.task_entry.grab_focus()
