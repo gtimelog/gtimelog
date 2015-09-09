@@ -185,7 +185,7 @@
                   <object class="GtkLabel" id="after_office_hours_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="label" translatable="yes">(including breaks)</property>
+                    <property name="label" translatable="yes">(including lunch break)</property>
                     <property name="xalign">0</property>
                   </object>
                   <packing>
@@ -217,7 +217,7 @@
               <object class="GtkLabel" id="ireports_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="label" translatable="yes">Reports</property>
+                <property name="label" translatable="yes">Reports by email</property>
                 <property name="lines">5</property>
                 <property name="xalign">0</property>
                 <attributes>

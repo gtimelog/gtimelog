@@ -1309,7 +1309,7 @@ class PreferencesDialog(Gtk.Dialog):
         Gtk.Dialog.__init__(self, transient_for=transient_for,
                             use_header_bar=True,
                             title=_("Preferences"))
-        self.set_default_size(450, -1)
+        self.set_default_size(500, -1)
 
         builder = Gtk.Builder.new_from_file(PREFERENCES_UI_FILE)
         vbox = builder.get_object('dialog-vbox')
