@@ -16,8 +16,8 @@ manpages = gtimelog.1 gtimelogrc.5
 all: $(manpages) gschemas.compiled
 
 .PHONY: run
-run:
-	./gtimelog
+run: gschemas.compiled
+	./mockup.py
 
 .PHONY: check test
 check test:
