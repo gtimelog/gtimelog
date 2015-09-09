@@ -62,6 +62,7 @@ HELP_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'help'))
 
 UI_FILE = 'src/gtimelog/experiment.ui'
 ABOUT_DIALOG_UI_FILE = 'src/gtimelog/about.ui'
+PREFERENCES_UI_FILE = 'src/gtimelog/preferences.ui'
 MENUS_UI_FILE = 'src/gtimelog/menus.ui'
 CSS_FILE = 'src/gtimelog/gtimelog.css'
 LOCALE_DIR = 'locale'
@@ -85,7 +86,7 @@ class Application(Gtk.Application):
     class Actions(object):
 
         def __init__(self, app):
-            for action_name in ['help', 'about', 'quit', 'edit-log', 'edit-tasks']:
+            for action_name in ['preferences', 'help', 'about', 'quit', 'edit-log', 'edit-tasks']:
                 action = Gio.SimpleAction.new(action_name, None)
                 action.connect('activate', getattr(app, 'on_' + action_name.replace('-', '_')))
                 app.add_action(action)
@@ -129,6 +130,7 @@ class Application(Gtk.Application):
         self.set_accels_for_action("app.edit-log", ["<Primary>E"])
         self.set_accels_for_action("app.edit-tasks", ["<Primary>T"])
         self.set_accels_for_action("app.help", ["F1"])
+        self.set_accels_for_action("app.preferences", ["<Primary>P"])
         self.set_accels_for_action("app.quit", ["<Primary>Q"])
         self.set_accels_for_action("win.report", ["<Primary>D"])
         self.set_accels_for_action("win.cancel-report", ["Escape"])
@@ -165,6 +167,11 @@ class Application(Gtk.Application):
         about_dialog.set_transient_for(self.get_active_window())
         about_dialog.connect("response", lambda *args: about_dialog.destroy())
         about_dialog.show()
+
+    def on_preferences(self, action, parameter):
+        preferences = PreferencesDialog(self.get_active_window())
+        preferences.connect("response", lambda *args: preferences.destroy())
+        preferences.run()
 
     def do_activate(self):
         mark_time("in app activate")
@@ -1294,6 +1301,19 @@ class TaskList(Gtk.TreeView):
                 self.task_store.append(t, [item, task])
         self.expand_all()
         mark_time('task list loaded')
+
+
+class PreferencesDialog(Gtk.Dialog):
+
+    def __init__(self, transient_for):
+        Gtk.Dialog.__init__(self, transient_for=transient_for,
+                            use_header_bar=True,
+                            title=_("Preferences"))
+        self.set_default_size(450, -1)
+
+        builder = Gtk.Builder.new_from_file(PREFERENCES_UI_FILE)
+        vbox = builder.get_object('dialog-vbox')
+        self.get_content_area().add(vbox)
 
 
 def main():
