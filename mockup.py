@@ -24,6 +24,7 @@ os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
 import datetime
 import gettext
 import locale
+import logging
 import re
 import signal
 import subprocess
@@ -62,6 +63,9 @@ ABOUT_DIALOG_UI_FILE = 'src/gtimelog/about.ui'
 MENUS_UI_FILE = 'src/gtimelog/menus.ui'
 CSS_FILE = 'src/gtimelog/gtimelog.css'
 LOCALE_DIR = 'locale'
+
+
+log = logging.getLogger('gtimelog')
 
 
 def format_duration(duration):
@@ -619,7 +623,7 @@ class Window(Gtk.ApplicationWindow):
             with open(filename, 'a') as f:
                 f.write("{},{},{},{}\n".format(timestamp, report_kind, report_id, recipient))
         except IOError as e:
-            self.complain("Couldn't append to {}: {}".format(filename, e))
+            log.error("Couldn't append to {}: {}".format(filename, e))
 
     def on_cancel_report(self, action=None, parameter=None):
         self.main_stack.set_visible_child_name('entry')
@@ -709,15 +713,23 @@ class Window(Gtk.ApplicationWindow):
         if sender_address:
             command += ['-f', sender_address]
         command.append(recipient_address)
-        sendmail = subprocess.Popen(
-            command,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT,
-        )
-        stdin = msg.as_string().encode('UTF-8')
-        stdout, stderr = sendmail.communicate(stdin)
-        return sendmail.returncode == 0
+        try:
+            sendmail = subprocess.Popen(
+                command,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.STDOUT,
+            )
+            stdin = msg.as_string().encode('UTF-8')
+            stdout, stderr = sendmail.communicate(stdin)
+        except OSError as e:
+            log.error("Couldn't execute %s: %s", command, e)
+            return False
+        else:
+            if sendmail.returncode != 0:
+                log.error("Couldn't send email: %s returned code %d",
+                          command, sendmail.returncode)
+            return sendmail.returncode == 0
 
 
 class TaskEntry(Gtk.Entry):
@@ -1271,6 +1283,11 @@ class TaskList(Gtk.TreeView):
 
 def main():
     mark_time("in main()")
+
+    root_logger = logging.getLogger()
+    root_logger.addHandler(logging.StreamHandler())
+    root_logger.setLevel(logging.ERROR)
+
     # Tell GTK+ to use out translations
     locale.bindtextdomain('gtimelog', LOCALE_DIR)
     locale.textdomain('gtimelog')
