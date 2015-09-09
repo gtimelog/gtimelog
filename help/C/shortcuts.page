@@ -1,0 +1,195 @@
+<page xmlns="http://projectmallard.org/1.0/"
+      xmlns:ui="http://projectmallard.org/ui/1.0"
+      xmlns:its="http://www.w3.org/2005/11/its"
+      type="task"
+      id="shortcuts">
+
+  <info>
+    <link type="guide" xref="index" group="#first"/>
+    <revision pkgversion="0.10" date="2015-09-09" status="review"/>
+
+    <credit type="author">
+      <name>Marius Gedminas</name>
+      <email its:translate="no">marius@gedmin.as</email>
+      <years>2015</years>
+    </credit>
+
+    <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude"/>
+
+    <desc>Keyboard shortcuts.</desc>
+  </info>
+
+  <title>Keyboard Shortcuts</title>
+
+  <section id="time-navigation-shortcuts">
+    <title>Time navigation shortcuts</title>
+
+    <table rules="rows" frame="top bottom" ui:expanded="true">
+      <thead>
+        <tr>
+          <td><p>Action</p></td>
+          <td><p>Keyboard Shortcut</p></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><p>Go back in time</p></td>
+          <td><p><keyseq><key>Alt</key><key>Left</key></keyseq></p></td>
+        </tr>
+        <tr>
+          <td><p>Go forward in time</p></td>
+          <td><p><keyseq><key>Alt</key><key>Right</key></keyseq></p></td>
+        </tr>
+        <tr>
+          <td><p>Go back to today</p></td>
+          <td><p><keyseq><key>Alt</key><key>Home</key></keyseq></p></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="detail-level-shortcuts">
+    <title>Detail level shortcuts</title>
+
+    <table rules="rows" frame="top bottom" ui:expanded="true">
+      <thead>
+        <tr>
+          <td><p>Action</p></td>
+          <td><p>Keyboard Shortcut</p></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><p>View chronological task list</p></td>
+          <td><p><keyseq><key>Alt</key><key>1</key></keyseq></p></td>
+        </tr>
+        <tr>
+          <td><p>View time spent on each task</p></td>
+          <td><p><keyseq><key>Alt</key><key>2</key></keyseq></p></td>
+        </tr>
+        <tr>
+          <td><p>View time spent on each task category</p></td>
+          <td><p><keyseq><key>Alt</key><key>3</key></keyseq></p></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="time-range-shortcuts">
+    <title>Time range shortcuts</title>
+
+    <table rules="rows" frame="top bottom" ui:expanded="true">
+      <thead>
+        <tr>
+          <td><p>Action</p></td>
+          <td><p>Keyboard Shortcut</p></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><p>View one day</p></td>
+          <td><p><keyseq><key>Alt</key><key>4</key></keyseq></p></td>
+        </tr>
+        <tr>
+          <td><p>View one week</p></td>
+          <td><p><keyseq><key>Alt</key><key>5</key></keyseq></p></td>
+        </tr>
+        <tr>
+          <td><p>View one month</p></td>
+          <td><p><keyseq><key>Alt</key><key>6</key></keyseq></p></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="menu-shortcuts">
+    <title>Menu shortcuts</title>
+
+    <table rules="rows" frame="top bottom" ui:expanded="true">
+      <thead>
+        <tr>
+          <td><p>Action</p></td>
+          <td><p>Keyboard Shortcut</p></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><p>Open view menu</p></td>
+          <td><p><keyseq><key>F8</key></keyseq></p></td>
+        </tr>
+        <tr>
+          <td><p>Show/hide task pane</p></td>
+          <td><p><keyseq><key>F9</key></keyseq></p></td>
+        </tr>
+        <tr>
+          <td><p>Open action menu</p></td>
+          <td><p><keyseq><key>F10</key></keyseq></p></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="action-shortcuts">
+    <title>Action shortcuts</title>
+
+    <table rules="rows" frame="top bottom" ui:expanded="true">
+      <thead>
+        <tr>
+          <td><p>Action</p></td>
+          <td><p>Keyboard Shortcut</p></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><p>Edit task log</p></td>
+          <td><p><keyseq><key>Ctrl</key><key>E</key></keyseq></p></td>
+        </tr>
+        <tr>
+          <td><p>Edit task list</p></td>
+          <td><p><keyseq><key>Ctrl</key><key>T</key></keyseq></p></td>
+        </tr>
+        <tr>
+          <td><p>Help</p></td>
+          <td><p><keyseq><key>F1</key></keyseq></p></td>
+        </tr>
+        <tr>
+          <td><p>Quit</p></td>
+          <td><p><keyseq><key>Ctrl</key><key>Q</key></keyseq></p></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="report-shortcuts">
+    <title>Report shortcuts</title>
+
+    <p>You can continue to use <link
+    xref="shortcuts#time-navigation-shortcuts">time navigation</link> and
+    <link xref="shortcuts#time-range-shortcuts">time range</link>
+    shortcuts while in report mode.</p>
+
+    <table rules="rows" frame="top bottom" ui:expanded="true">
+      <thead>
+        <tr>
+          <td><p>Action</p></td>
+          <td><p>Keyboard Shortcut</p></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><p>Switch to report mode</p></td>
+          <td><p><keyseq><key>Ctrl</key><key>D</key></keyseq></p></td>
+        </tr>
+        <tr>
+          <td><p>Send report via email</p></td>
+          <td><p><keyseq><key>Ctrl</key><key>Enter</key></keyseq></p></td>
+        </tr>
+        <tr>
+          <td><p>Return to task entry mode</p></td>
+          <td><p><keyseq><key>Esc</key></keyseq></p></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</page>

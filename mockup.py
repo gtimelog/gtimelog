@@ -56,7 +56,9 @@ from gtimelog.timelog import (
 
 mark_time("gtimelog imports done")
 
-HELP_URL = 'https://gtimelog.org'
+#HELP_URI = 'help:gtimelog'
+HELP_URI = ''
+HELP_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'help'))
 
 UI_FILE = 'src/gtimelog/experiment.ui'
 ABOUT_DIALOG_UI_FILE = 'src/gtimelog/about.ui'
@@ -126,6 +128,7 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.go-home", ["<Alt>Home"])
         self.set_accels_for_action("app.edit-log", ["<Primary>E"])
         self.set_accels_for_action("app.edit-tasks", ["<Primary>T"])
+        self.set_accels_for_action("app.help", ["F1"])
         self.set_accels_for_action("app.quit", ["<Primary>Q"])
         self.set_accels_for_action("win.report", ["<Primary>D"])
         self.set_accels_for_action("win.cancel-report", ["Escape"])
@@ -147,7 +150,12 @@ class Application(Gtk.Application):
         Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
 
     def on_help(self, action, parameter):
-        Gtk.show_uri(None, HELP_URL, Gdk.CURRENT_TIME)
+        if HELP_URI:
+            uri = HELP_URI
+        else:
+            filename = os.path.join(HELP_DIR, 'C', 'index.page')
+            uri = 'ghelp:' + GLib.filename_to_uri(filename, None).partition(':')[-1]
+        Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
 
     def on_about(self, action, parameter):
         # Note: must create a new dialog (which means a new Gtk.Builder)
