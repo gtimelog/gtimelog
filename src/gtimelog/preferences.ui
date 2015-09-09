@@ -331,4 +331,15 @@
       </packing>
     </child>
   </object>
+  <object class="GtkSizeGroup">
+    <property name="mode">GTK_SIZE_GROUP_HORIZONTAL</property>
+    <widgets>
+      <widget name="virtual_midnight_label"/>
+      <widget name="hours_label"/>
+      <widget name="office_hours_label"/>
+      <widget name="sender_label"/>
+      <widget name="recipient_label"/>
+      <widget name="name_label"/>
+    </widgets>
+  </object>
 </interface>
