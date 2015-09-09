@@ -295,6 +295,9 @@ class Window(Gtk.ApplicationWindow):
         self.today_button = builder.get_object("today_button")
         self.cancel_report_button = builder.get_object("cancel_report_button")
         self.recipient_entry = builder.get_object("recipient_entry")
+        self.infobar = builder.get_object("report_infobar")
+        self.infobar.connect('response', lambda *args: self.infobar.hide())
+        self.infobar_label = builder.get_object("infobar_label")
         self.headerbar = builder.get_object('headerbar')
         self.time_label = builder.get_object('time_label')
         self.task_entry = TaskEntry()
@@ -615,6 +618,9 @@ class Window(Gtk.ApplicationWindow):
                                    self.report_view.get_report_id(),
                                    recipient)
             self.on_cancel_report()
+        else:
+            self.infobar_label.set_text(_("Couldn't send email to {}.").format(recipient))
+            self.infobar.show()
 
     def record_sent_email(self, report_kind, report_id, recipient):
         filename = Settings().get_report_log_file()
@@ -633,6 +639,7 @@ class Window(Gtk.ApplicationWindow):
         self.menu_button.show()
         self.cancel_report_button.hide()
         self.report_view.hide()
+        self.infobar.hide()
         self.headerbar.set_show_close_button(True)
         self.set_title(_("Time Log"))
         self.actions.send_report.set_enabled(False)
