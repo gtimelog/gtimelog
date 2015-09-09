@@ -400,6 +400,18 @@
           </object>
         </child>
         <child>
+          <object class="GtkButton" id="cancel_report_button">
+            <property name="label" translatable="yes">Cancel</property>
+            <property name="can_focus">False</property>
+            <property name="receives_default">False</property>
+            <property name="action_name">win.cancel-report</property>
+          </object>
+          <packing>
+            <property name="pack_type">end</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
           <object class="GtkMenuButton" id="menu_button">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
@@ -434,17 +446,6 @@
           <packing>
             <property name="pack_type">end</property>
             <property name="position">3</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkButton" id="cancel_report_button">
-            <property name="visible">False</property>
-            <property name="label" translatable="yes">Cancel</property>
-            <property name="action_name">win.cancel-report</property>
-          </object>
-          <packing>
-            <property name="pack_type">end</property>
-            <property name="position">1</property>
           </packing>
         </child>
       </object>
