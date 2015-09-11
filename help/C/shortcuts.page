@@ -153,6 +153,10 @@
           <td><p><keyseq><key>F1</key></keyseq></p></td>
         </tr>
         <tr>
+          <td><p>Preferences</p></td>
+          <td><p><keyseq><key>Ctrl</key><key>P</key></keyseq></p></td>
+        </tr>
+        <tr>
           <td><p>Quit</p></td>
           <td><p><keyseq><key>Ctrl</key><key>Q</key></keyseq></p></td>
         </tr>
