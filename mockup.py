@@ -55,6 +55,7 @@ mark_time("Gtk imports done")
 pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
 
+from gtimelog import __version__
 from gtimelog.settings import Settings
 from gtimelog.timelog import (
     as_minutes, virtual_day, different_days, prev_month, next_month, uniq, parse_time,
@@ -102,6 +103,20 @@ def format_duration(duration):
     return _('{0} h {1} min').format(h, m)
 
 
+def make_option(long_name, short_name=None, flags=0, arg=GLib.OptionArg.NONE,
+                arg_data=None, description=None, arg_description=None):
+    # surely something like this should exist inside PyGObject itself?!
+    option = GLib.OptionEntry()
+    option.long_name = long_name.lstrip('-')
+    option.short_name = 0 if not short_name else short_name.lstrip('-')
+    option.flags = flags
+    option.arg = arg
+    option.arg_data = arg_data
+    option.description = description
+    option.arg_description = arg_description
+    return option
+
+
 class Application(Gtk.Application):
 
     class Actions(object):
@@ -114,9 +129,25 @@ class Application(Gtk.Application):
                 setattr(self, action_name.replace('-', '_'), action)
 
     def __init__(self):
-        super(Application, self).__init__(application_id='org.gtimelog')
+        super(Application, self).__init__(
+            application_id='org.gtimelog',
+            flags=Gio.ApplicationFlags.HANDLES_COMMAND_LINE,
+        )
         GLib.set_application_name(_("Time Log"))
         GLib.set_prgname('gtimelog')
+        self.add_main_option_entries([
+            make_option("--version", description=_("Show version number and exit")),
+        ])
+
+    def do_handle_local_options(self, options):
+        if options.contains('version'):
+            print(__version__)
+            return 0
+        return -1  # send the args to the remote instance for processing
+
+    def do_command_line(self, command_line):
+        self.do_activate()
+        return 0
 
     def do_startup(self):
         mark_time("in app startup")
