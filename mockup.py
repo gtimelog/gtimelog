@@ -51,7 +51,7 @@ sys.path.insert(0, pkgdir)
 
 from gtimelog.settings import Settings
 from gtimelog.timelog import (
-    as_minutes, virtual_day, different_days, prev_month, next_month, uniq,
+    as_minutes, virtual_day, different_days, prev_month, next_month, uniq, parse_time,
     Reports, TaskList as LocalTaskList, RemoteTaskList, TimeLog)
 
 mark_time("gtimelog imports done")
@@ -1315,6 +1315,9 @@ class PreferencesDialog(Gtk.Dialog):
         vbox = builder.get_object('dialog-vbox')
         self.get_content_area().add(vbox)
 
+        virtual_midnight_entry = builder.get_object('virtual_midnight_entry')
+        self.virtual_midnight_entry = virtual_midnight_entry
+
         hours_entry = builder.get_object('hours_entry')
         office_hours_entry = builder.get_object('office_hours_entry')
         name_entry = builder.get_object('name_entry')
@@ -1327,6 +1330,23 @@ class PreferencesDialog(Gtk.Dialog):
         self.gsettings.bind('name', name_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('sender', sender_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('list-email', recipient_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.connect('changed::virtual-midnight', self.virtual_midnight_changed)
+        self.virtual_midnight_changed()
+        self.virtual_midnight_entry.connect('focus-out-event', self.virtual_midnight_set)
+
+    def virtual_midnight_changed(self, *args):
+        h, m = self.gsettings.get_value('virtual-midnight')
+        self.virtual_midnight_entry.set_text('{:d}:{:02d}'.format(h, m))
+
+    def virtual_midnight_set(self, *args):
+        try:
+            vm = parse_time(self.virtual_midnight_entry.get_text())
+        except ValueError:
+            self.virtual_midnight_changed()
+        else:
+            h, m = self.gsettings.get_value('virtual-midnight')
+            if (h, m) != (vm.hour, vm.minute):
+                self.gsettings.set_value('virtual-midnight', GLib.Variant('(ii)', (vm.hour, vm.minute)))
 
 
 def main():
