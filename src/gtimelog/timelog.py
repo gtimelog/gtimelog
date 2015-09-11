@@ -2,6 +2,8 @@
 Non-GUI bits of gtimelog.
 """
 
+from __future__ import unicode_literals
+
 import codecs
 import collections
 import csv

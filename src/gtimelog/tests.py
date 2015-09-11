@@ -3,6 +3,7 @@
 import datetime
 import doctest
 import os
+import re
 import shutil
 import tempfile
 import textwrap
@@ -18,6 +19,15 @@ import freezegun
 import mock
 
 from gtimelog.timelog import TimeLog
+
+
+class Checker(doctest.OutputChecker):
+    """Doctest output checker that can deal with unicode literals."""
+
+    def check_output(self, want, got, optionflags):
+        # u'...' -> '...'; u"..." -> "..."
+        got = re.sub(r'''\bu('[^']*'|"[^"]*")''', r'\1', got)
+        return doctest.OutputChecker.check_output(self, want, got, optionflags)
 
 
 def doctest_as_hours():
@@ -1315,7 +1325,8 @@ class TestTagging (unittest.TestCase):
 
 
 def additional_tests(): # for setup.py
-    return doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE)
+    return doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE,
+                                checker=Checker())
 
 
 def test_suite():

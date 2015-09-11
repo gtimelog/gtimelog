@@ -29,10 +29,16 @@ import re
 import signal
 import subprocess
 import sys
-from io import StringIO
 from gettext import gettext as _
 from email.utils import parseaddr
 from email import message_from_string
+from io import StringIO
+
+try:
+    from subprocess import DEVNULL
+except ImportError:
+    DEVNULL = open(os.devnull, 'w')
+
 
 mark_time("Python imports done")
 
@@ -54,9 +60,24 @@ from gtimelog.timelog import (
     as_minutes, virtual_day, different_days, prev_month, next_month, uniq, parse_time,
     Reports, TaskList as LocalTaskList, RemoteTaskList, TimeLog)
 
+
+if str is bytes:
+    # Python 2: GTK+ gives us back UTF-8 strings
+    def to_unicode(s):
+        return s.decode('UTF-8')
+    def to_bytes(s):
+        return s
+else:
+    # Python 3: GTK+ gives us Unicode strings
+    def to_unicode(s):
+        return s
+    def to_bytes(s):
+        return s.encode('UTF-8')
+
+
 mark_time("gtimelog imports done")
 
-#HELP_URI = 'help:gtimelog'
+# When the app is properly installed, use HELP_URI = 'help:gtimelog'
 HELP_URI = ''
 HELP_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'help'))
 
@@ -738,10 +759,10 @@ class Window(Gtk.ApplicationWindow):
             sendmail = subprocess.Popen(
                 command,
                 stdin=subprocess.PIPE,
-                stdout=subprocess.DEVNULL,
+                stdout=DEVNULL,
                 stderr=subprocess.STDOUT,
             )
-            stdin = msg.as_string().encode('UTF-8')
+            stdin = to_bytes(msg.as_string())
             stdout, stderr = sendmail.communicate(stdin)
         except OSError as e:
             log.error("Couldn't execute %s: %s", command, e)
@@ -1253,14 +1274,17 @@ class ReportView(Gtk.TextView):
         window = self.get_time_window()
         reports = Reports(window)
         output = StringIO()
+        sender = to_unicode(self.sender)
+        recipient = to_unicode(self.recipient)
+        name = to_unicode(self.name)
         if self.sender:
-            output.write("From: {}\n".format(self.sender))
+            output.write(u"From: {}\n".format(sender))
         if self.time_range == 'day':
-            reports.daily_report(output, self.recipient, self.name)
+            reports.daily_report(output, recipient, name)
         elif self.time_range == 'week':
-            reports.weekly_report_plain(output, self.recipient, self.name)
+            reports.weekly_report_plain(output, recipient, name)
         elif self.time_range == 'month':
-            reports.monthly_report_plain(output, self.recipient, self.name)
+            reports.monthly_report_plain(output, recipient, name)
         self.get_buffer().set_text(output.getvalue())
 
 
