@@ -86,7 +86,6 @@ UI_FILE = 'src/gtimelog/experiment.ui'
 ABOUT_DIALOG_UI_FILE = 'src/gtimelog/about.ui'
 PREFERENCES_UI_FILE = 'src/gtimelog/preferences.ui'
 MENUS_UI_FILE = 'src/gtimelog/menus.ui'
-CSS_FILE = 'src/gtimelog/gtimelog.css'
 LOCALE_DIR = 'locale'
 
 
@@ -163,12 +162,6 @@ class Application(Gtk.Application):
         Gtk.Application.do_startup(self)
 
         mark_time("basic app startup done")
-        css = Gtk.CssProvider()
-        css.load_from_path(CSS_FILE)
-        screen = Gdk.Screen.get_default()
-        Gtk.StyleContext.add_provider_for_screen(
-            screen, css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-        mark_time("CSS loaded")
 
         builder = Gtk.Builder.new_from_file(MENUS_UI_FILE)
         self.set_app_menu(builder.get_object('app_menu'))
