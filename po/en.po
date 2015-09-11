@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-09 15:38+0300\n"
+"POT-Creation-Date: 2015-09-11 19:23+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../gtimelog.desktop.in.h:1 ../mockup.py:94 ../mockup.py:644
+#: ../gtimelog.desktop.in.h:1 ../mockup.py:97 ../mockup.py:659
 #: ../src/gtimelog/about.ui.h:1 ../src/gtimelog/experiment.ui.h:7
 msgid "Time Log"
 msgstr ""
@@ -27,127 +27,131 @@ msgstr ""
 msgid "Track and time daily activities"
 msgstr ""
 
-#: ../mockup.py:78
+#: ../mockup.py:81
 #, python-brace-format
 msgid "{0} h {1} min"
 msgstr ""
 
-#: ../mockup.py:534
+#: ../mockup.py:549
 msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
 msgstr ""
 
-#: ../mockup.py:537
+#: ../mockup.py:552
 msgid "{0:%Y}, week {1:0>2} ({0:%B %-d}-{2:%-d})"
 msgstr "{0:%Y}, week {1:0>2} ({0:%B %-d}–{2:%-d})"
 
-#: ../mockup.py:540
+#: ../mockup.py:555
 msgid "{0:%B %Y}"
 msgstr ""
 
-#: ../mockup.py:605
+#: ../mockup.py:620
 msgid "Report"
 msgstr ""
 
-#: ../mockup.py:622
+#: ../mockup.py:637
 msgid "Couldn't send email to {}."
 msgstr ""
 
-#: ../mockup.py:709
+#: ../mockup.py:724
 msgid "%H:%M"
 msgstr ""
 
-#: ../mockup.py:962
+#: ../mockup.py:977
 msgid "{0:%A, %Y-%m-%d}\n"
 msgstr ""
 
-#: ../mockup.py:1009
+#: ../mockup.py:1024
 msgid "({0:%H:%M}-{1:%H:%M})"
 msgstr "({0:%H:%M}–{1:%H:%M})"
 
-#: ../mockup.py:1075
+#: ../mockup.py:1090
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week, {2} per day)"
 msgstr ""
 
-#: ../mockup.py:1076
+#: ../mockup.py:1091
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week)"
 msgstr ""
 
-#: ../mockup.py:1078
+#: ../mockup.py:1093
 #, python-brace-format
 msgid "Total work done this week: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:1079
+#: ../mockup.py:1094
 #, python-brace-format
 msgid "Total work done this week: {0}"
 msgstr ""
 
-#: ../mockup.py:1081
+#: ../mockup.py:1096
 #, python-brace-format
 msgid "Total work done this month: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:1082
+#: ../mockup.py:1097
 #, python-brace-format
 msgid "Total work done this month: {0}"
 msgstr ""
 
-#: ../mockup.py:1101
+#: ../mockup.py:1116
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week, {2} per day)"
 msgstr ""
 
-#: ../mockup.py:1102
+#: ../mockup.py:1117
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week)"
 msgstr ""
 
-#: ../mockup.py:1104
+#: ../mockup.py:1119
 #, python-brace-format
 msgid "Total slacking this week: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:1105
+#: ../mockup.py:1120
 #, python-brace-format
 msgid "Total slacking this week: {0}"
 msgstr ""
 
-#: ../mockup.py:1107
+#: ../mockup.py:1122
 #, python-brace-format
 msgid "Total slacking this month: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:1108
+#: ../mockup.py:1123
 #, python-brace-format
 msgid "Total slacking this month: {0}"
 msgstr ""
 
-#: ../mockup.py:1132
+#: ../mockup.py:1147
 msgid "Time left at work: {0} (should've finished at {1:%H:%M})"
 msgstr ""
 
-#: ../mockup.py:1135
+#: ../mockup.py:1150
 msgid "Time left at work: {0} (till {1:%H:%M})"
 msgstr ""
 
-#: ../mockup.py:1149
+#: ../mockup.py:1164
 #, python-brace-format
 msgid "At office today: {0} ({1} overtime)"
 msgstr ""
 
-#: ../mockup.py:1155
+#: ../mockup.py:1170
 #, python-brace-format
 msgid "At office today: {0} ({1} left)"
 msgstr ""
 
-#: ../mockup.py:1263
+#: ../mockup.py:1278
 msgid "Tasks"
 msgstr ""
 
-#: ../mockup.py:1278
+#: ../mockup.py:1293
 msgid "Other"
+msgstr ""
+
+#: ../mockup.py:1311 ../src/gtimelog/menus.ui.h:1
+msgid "Preferences"
 msgstr ""
 
 #: ../src/gtimelog/about.ui.h:2
@@ -186,58 +190,114 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: ../src/gtimelog/menus.ui.h:1
-msgid "Help"
+#: ../src/gtimelog/preferences.ui.h:1
+msgid "Data entry"
+msgstr ""
+
+#: ../src/gtimelog/preferences.ui.h:2
+msgid "Virtual midnight"
+msgstr ""
+
+#: ../src/gtimelog/preferences.ui.h:3
+msgid "Goals"
+msgstr ""
+
+#: ../src/gtimelog/preferences.ui.h:4
+msgid "Work hours"
+msgstr ""
+
+#: ../src/gtimelog/preferences.ui.h:5
+msgid "Office hours"
+msgstr ""
+
+#: ../src/gtimelog/preferences.ui.h:6
+msgid "per day"
+msgstr ""
+
+#: ../src/gtimelog/preferences.ui.h:7
+msgid "(including lunch break)"
+msgstr ""
+
+#: ../src/gtimelog/preferences.ui.h:8
+msgid "Reports by email"
+msgstr ""
+
+#: ../src/gtimelog/preferences.ui.h:9
+msgid "Name"
+msgstr ""
+
+#: ../src/gtimelog/preferences.ui.h:10
+msgid "From"
+msgstr ""
+
+#: ../src/gtimelog/preferences.ui.h:11
+msgid "To"
+msgstr ""
+
+#: ../src/gtimelog/preferences.ui.h:12
+msgid "activity@example.com"
+msgstr ""
+
+#: ../src/gtimelog/preferences.ui.h:13
+msgid "J. Random Hacker <jrh@example.com>"
+msgstr ""
+
+#: ../src/gtimelog/preferences.ui.h:14
+msgid "JRH"
 msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:2
-msgid "About"
+msgid "Help"
 msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:3
-msgid "Quit"
+msgid "About"
 msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:4
-msgid "Edit log"
+msgid "Quit"
 msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:5
-msgid "Edit tasks"
+msgid "Edit log"
 msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:6
-msgid "Report..."
+msgid "Edit tasks"
 msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:7
-msgid "Detail level"
+msgid "Report..."
 msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:8
-msgid "Chronological"
+msgid "Detail level"
 msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:9
-msgid "Grouped"
+msgid "Chronological"
 msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:10
-msgid "Summary"
+msgid "Grouped"
 msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:11
-msgid "Time range"
+msgid "Summary"
 msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:12
-msgid "Day"
+msgid "Time range"
 msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:13
-msgid "Week"
+msgid "Day"
 msgstr ""
 
 #: ../src/gtimelog/menus.ui.h:14
+msgid "Week"
+msgstr ""
+
+#: ../src/gtimelog/menus.ui.h:15
 msgid "Month"
 msgstr ""

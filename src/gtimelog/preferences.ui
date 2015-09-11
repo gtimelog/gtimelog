@@ -74,7 +74,7 @@
                     <property name="can_focus">True</property>
                     <property name="width_chars">5</property>
                     <property name="max_width_chars">5</property>
-                    <property name="text" translatable="yes">02:00</property>
+                    <property name="text">02:00</property>
                     <property name="xalign">1</property>
                   </object>
                   <packing>
@@ -157,7 +157,7 @@
                     <property name="digits">1</property>
                     <property name="width_chars">5</property>
                     <property name="max_width_chars">5</property>
-                    <property name="text" translatable="yes">8</property>
+                    <property name="text">8</property>
                     <property name="xalign">1</property>
                     <property name="adjustment">hours_adjustment</property>
                   </object>
@@ -173,7 +173,7 @@
                     <property name="digits">1</property>
                     <property name="width_chars">5</property>
                     <property name="max_width_chars">5</property>
-                    <property name="text" translatable="yes">9</property>
+                    <property name="text">9</property>
                     <property name="xalign">1</property>
                     <property name="adjustment">office_hours_adjustment</property>
                   </object>
