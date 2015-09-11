@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-11 20:13+0300\n"
+"POT-Creation-Date: 2015-09-11 20:23+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../gtimelog.desktop.in.h:1 ../mockup.py:136 ../mockup.py:706
+#: ../gtimelog.desktop.in.h:1 ../mockup.py:136 ../mockup.py:719
 #: ../src/gtimelog/about.ui.h:1 ../src/gtimelog/experiment.ui.h:7
 msgid "Time Log"
 msgstr ""
@@ -35,125 +35,153 @@ msgstr ""
 msgid "Show version number and exit"
 msgstr ""
 
-#: ../mockup.py:596
+#: ../mockup.py:144
+msgid "GTimeLog version: {}"
+msgstr ""
+
+#: ../mockup.py:145
+msgid "Python version: {}"
+msgstr ""
+
+#: ../mockup.py:146
+msgid "GTK+ version: {}.{}.{}"
+msgstr ""
+
+#: ../mockup.py:147
+msgid "Data directory: {}"
+msgstr ""
+
+#: ../mockup.py:149
+msgid "Legacy config directory: {}"
+msgstr ""
+
+#: ../mockup.py:151
+msgid "Settings will be migrated to gsettings (org.gtimelog) on first launch"
+msgstr ""
+
+#: ../mockup.py:153
+msgid "Settings already migrated to gsettings (org.gtimelog)"
+msgstr ""
+
+#: ../mockup.py:609
 msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
 msgstr ""
 
-#: ../mockup.py:599
+#: ../mockup.py:612
 msgid "{0:%Y}, week {1:0>2} ({0:%B %-d}-{2:%-d})"
 msgstr ""
 
-#: ../mockup.py:602
+#: ../mockup.py:615
 msgid "{0:%B %Y}"
 msgstr ""
 
-#: ../mockup.py:667
+#: ../mockup.py:680
 msgid "Report"
 msgstr ""
 
-#: ../mockup.py:684
+#: ../mockup.py:697
 msgid "Couldn't send email to {}."
 msgstr ""
 
-#: ../mockup.py:771
+#: ../mockup.py:784
 msgid "%H:%M"
 msgstr ""
 
-#: ../mockup.py:1024
+#: ../mockup.py:1037
 msgid "{0:%A, %Y-%m-%d}\n"
 msgstr ""
 
-#: ../mockup.py:1071
+#: ../mockup.py:1084
 msgid "({0:%H:%M}-{1:%H:%M})"
 msgstr ""
 
-#: ../mockup.py:1137
+#: ../mockup.py:1150
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week, {2} per day)"
 msgstr ""
 
-#: ../mockup.py:1138
+#: ../mockup.py:1151
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week)"
 msgstr ""
 
-#: ../mockup.py:1140
+#: ../mockup.py:1153
 #, python-brace-format
 msgid "Total work done this week: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:1141
+#: ../mockup.py:1154
 #, python-brace-format
 msgid "Total work done this week: {0}"
 msgstr ""
 
-#: ../mockup.py:1143
+#: ../mockup.py:1156
 #, python-brace-format
 msgid "Total work done this month: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:1144
+#: ../mockup.py:1157
 #, python-brace-format
 msgid "Total work done this month: {0}"
 msgstr ""
 
-#: ../mockup.py:1163
+#: ../mockup.py:1176
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week, {2} per day)"
 msgstr ""
 
-#: ../mockup.py:1164
+#: ../mockup.py:1177
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week)"
 msgstr ""
 
-#: ../mockup.py:1166
+#: ../mockup.py:1179
 #, python-brace-format
 msgid "Total slacking this week: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:1167
+#: ../mockup.py:1180
 #, python-brace-format
 msgid "Total slacking this week: {0}"
 msgstr ""
 
-#: ../mockup.py:1169
+#: ../mockup.py:1182
 #, python-brace-format
 msgid "Total slacking this month: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:1170
+#: ../mockup.py:1183
 #, python-brace-format
 msgid "Total slacking this month: {0}"
 msgstr ""
 
-#: ../mockup.py:1194
+#: ../mockup.py:1207
 msgid "Time left at work: {0} (should've finished at {1:%H:%M})"
 msgstr ""
 
-#: ../mockup.py:1197
+#: ../mockup.py:1210
 msgid "Time left at work: {0} (till {1:%H:%M})"
 msgstr ""
 
-#: ../mockup.py:1211
+#: ../mockup.py:1224
 #, python-brace-format
 msgid "At office today: {0} ({1} overtime)"
 msgstr ""
 
-#: ../mockup.py:1217
+#: ../mockup.py:1230
 #, python-brace-format
 msgid "At office today: {0} ({1} left)"
 msgstr ""
 
-#: ../mockup.py:1328
+#: ../mockup.py:1341
 msgid "Tasks"
 msgstr ""
 
-#: ../mockup.py:1343
+#: ../mockup.py:1356
 msgid "Other"
 msgstr ""
 
-#: ../mockup.py:1361 ../src/gtimelog/menus.ui.h:1
+#: ../mockup.py:1374 ../src/gtimelog/menus.ui.h:1
 msgid "Preferences"
 msgstr ""
 

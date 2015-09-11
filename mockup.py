@@ -141,7 +141,16 @@ class Application(Gtk.Application):
 
     def do_handle_local_options(self, options):
         if options.contains('version'):
-            print(__version__)
+            print(_('GTimeLog version: {}').format(__version__))
+            print(_('Python version: {}').format(sys.version.replace('\n', '')))
+            print(_('GTK+ version: {}.{}.{}').format(Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION))
+            print(_('Data directory: {}').format(Settings().get_data_dir()))
+            gsettings = Gio.Settings.new("org.gtimelog")
+            print(_('Legacy config directory: {}').format(Settings().get_config_dir()))
+            if not gsettings.get_boolean('settings-migrated'):
+                print(_('Settings will be migrated to gsettings (org.gtimelog) on first launch'))
+            else:
+                print(_('Settings already migrated to gsettings (org.gtimelog)'))
             return 0
         return -1  # send the args to the remote instance for processing
 
