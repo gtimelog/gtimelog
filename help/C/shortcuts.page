@@ -114,10 +114,6 @@
       </thead>
       <tbody>
         <tr>
-          <td><p>Open view menu</p></td>
-          <td><p><keyseq><key>F8</key></keyseq></p></td>
-        </tr>
-        <tr>
           <td><p>Show/hide task pane</p></td>
           <td><p><keyseq><key>F9</key></keyseq></p></td>
         </tr>

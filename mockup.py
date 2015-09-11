@@ -121,7 +121,6 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.time-range::day", ["<Alt>4"])
         self.set_accels_for_action("win.time-range::week", ["<Alt>5"])
         self.set_accels_for_action("win.time-range::month", ["<Alt>6"])
-        self.set_accels_for_action("win.show-view-menu", ["F8"])
         self.set_accels_for_action("win.show-task-pane", ["F9"])
         self.set_accels_for_action("win.show-menu", ["F10"])
         self.set_accels_for_action("win.go-back", ["<Alt>Left"])
