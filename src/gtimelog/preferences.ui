@@ -292,7 +292,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="expand">True</property>
-                    <property name="text" translatable="yes">activity@example.com</property>
+                    <property name="text">activity@example.com</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -304,7 +304,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="expand">True</property>
-                    <property name="text" translatable="yes">J. Random Hacker &lt;jrh@example.com&gt;</property>
+                    <property name="text">J. Random Hacker &lt;jrh@example.com&gt;</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -316,7 +316,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="expand">True</property>
-                    <property name="text" translatable="yes">JRH</property>
+                    <property name="text">JRH</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
