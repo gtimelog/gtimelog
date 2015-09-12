@@ -179,6 +179,7 @@ class Application(Gtk.Application):
         mark_time("in app startup")
 
         self.check_schema()
+        self.create_data_directory()
 
         Gtk.Application.do_startup(self)
 
