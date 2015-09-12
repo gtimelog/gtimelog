@@ -345,7 +345,7 @@
       </packing>
     </child>
   </object>
-  <object class="GtkSizeGroup">
+  <object class="GtkSizeGroup" id="labels">
     <property name="mode">GTK_SIZE_GROUP_HORIZONTAL</property>
     <widgets>
       <widget name="virtual_midnight_label"/>
