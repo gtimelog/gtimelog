@@ -147,9 +147,9 @@ class Application(Gtk.Application):
             gsettings = Gio.Settings.new("org.gtimelog")
             print(_('Legacy config directory: {}').format(Settings().get_config_dir()))
             if not gsettings.get_boolean('settings-migrated'):
-                print(_('Settings will be migrated to gsettings (org.gtimelog) on first launch'))
+                print(_('Settings will be migrated to GSettings (org.gtimelog) on first launch'))
             else:
-                print(_('Settings already migrated to gsettings (org.gtimelog)'))
+                print(_('Settings already migrated to GSettings (org.gtimelog)'))
             return 0
         return -1  # send the args to the remote instance for processing
 
@@ -461,6 +461,7 @@ class Window(Gtk.ApplicationWindow):
             vm = old_settings.virtual_midnight
             self.gsettings.set_value('virtual-midnight', GLib.Variant('(ii)', (vm.hour, vm.minute)))
             self.gsettings.set_boolean('settings-migrated', True)
+            print(_('Settings from {filename} migrated to GSettings (org.gtimelog)').format(filename=old_settings.get_config_file()))
 
         mark_time('settings loaded')
 
