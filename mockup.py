@@ -179,6 +179,9 @@ class Application(Gtk.Application):
 
         self.actions = self.Actions(self)
 
+        if not hasattr(self, 'set_accels_for_action'):
+            self.set_accels_for_action = self.fallback_set_accels
+
         self.set_accels_for_action("win.detail-level::chronological", ["<Alt>1"])
         self.set_accels_for_action("win.detail-level::grouped", ["<Alt>2"])
         self.set_accels_for_action("win.detail-level::summary", ["<Alt>3"])
@@ -200,6 +203,15 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.send-report", ["<Primary>Return"])
 
         mark_time("app startup done")
+
+    def fallback_set_accels(self, detailed_action_name, accels):
+        if '::' in detailed_action_name:
+            action_name, parameter = detailed_action_name.split('::', 1)
+            parameter = GLib.Variant('s', parameter)
+        else:
+            action_name, parameter = detailed_action_name, None
+        for accel in accels:
+            self.add_accelerator(accel, action_name, parameter)
 
     def on_quit(self, action, parameter):
         self.quit()
