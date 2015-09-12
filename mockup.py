@@ -27,6 +27,7 @@ import locale
 import logging
 import re
 import signal
+import shutil
 import subprocess
 import sys
 from gettext import gettext as _
@@ -143,6 +144,16 @@ class Application(Gtk.Application):
         if schema_source.lookup("org.gtimelog", False) is None:
             sys.exit(_("\nWARNING: GSettings schema for org.gtimelog is missing!  If you're running from a source checkout, be sure to run 'make'."))
 
+    def create_data_directory(self):
+        data_dir = Settings().get_data_dir()
+        if not os.path.exists(data_dir):
+            try:
+                shutil.makedirs(data_dir)
+            except OSError as e:
+                print(_("Could not create {directory}: {error}").format(directory=data_dir, error=e), file=sys.stderr)
+            else:
+                print(_("Created {directory}").format(directory=data_dir))
+
     def do_handle_local_options(self, options):
         if options.contains('version'):
             print(_('GTimeLog version: {}').format(__version__))
@@ -219,12 +230,18 @@ class Application(Gtk.Application):
     def on_edit_log(self, action, parameter):
         filename = Settings().get_timelog_file()
         uri = GLib.filename_to_uri(filename, None)
+        self.create_if_missing(filename)
         Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
 
     def on_edit_tasks(self, action, parameter):
         filename = Settings().get_task_list_file()
         uri = GLib.filename_to_uri(filename, None)
+        self.create_if_missing(filename)
         Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
+
+    def create_if_missing(self, filename):
+        if not os.path.exists(filename):
+            open(filename, 'a').close()
 
     def on_help(self, action, parameter):
         if HELP_URI:
