@@ -1212,6 +1212,7 @@ class TestSettings(unittest.TestCase):
 
     def test_load(self):
         self.settings.load('/dev/null')
+        self.assertEqual(self.settings.name, 'Anonymous')
 
     def test_save(self):
         tempdir = self.mkdtemp()
