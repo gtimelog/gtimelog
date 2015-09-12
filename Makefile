@@ -39,7 +39,7 @@ coverage-diff: coverage
 .PHONY: update-translations
 update-translations:
 	cd po && intltool-update -g gtimelog -p
-	for po in $(po_file); do msgmerge -U $$po po/gtimelog.pot; done
+	for po in $(po_files); do msgmerge -U $$po po/gtimelog.pot; done
 
 locale/%/LC_MESSAGES/gtimelog.mo: po/%.po
 	mkdir -p $(@D)
