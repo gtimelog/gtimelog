@@ -461,15 +461,15 @@
           </packing>
         </child>
         <child>
-          <object class="GtkMenuButton" id="menu_button">
+          <object class="GtkMenuButton" id="view_button">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="image">image4</property>
+            <property name="image">image6</property>
           </object>
           <packing>
             <property name="pack_type">end</property>
-            <property name="position">1</property>
+            <property name="position">3</property>
           </packing>
         </child>
         <child>
@@ -486,15 +486,15 @@
           </packing>
         </child>
         <child>
-          <object class="GtkMenuButton" id="view_button">
+          <object class="GtkMenuButton" id="menu_button">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="image">image6</property>
+            <property name="image">image4</property>
           </object>
           <packing>
             <property name="pack_type">end</property>
-            <property name="position">3</property>
+            <property name="position">1</property>
           </packing>
         </child>
       </object>
