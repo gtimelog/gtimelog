@@ -27,7 +27,6 @@ import locale
 import logging
 import re
 import signal
-import shutil
 import subprocess
 import sys
 from gettext import gettext as _
@@ -148,7 +147,7 @@ class Application(Gtk.Application):
         data_dir = Settings().get_data_dir()
         if not os.path.exists(data_dir):
             try:
-                shutil.makedirs(data_dir)
+                os.makedirs(data_dir)
             except OSError as e:
                 print(_("Could not create {directory}: {error}").format(directory=data_dir, error=e), file=sys.stderr)
             else:
