@@ -11,12 +11,14 @@ FILE_WITH_CHANGELOG = NEWS.rst
 #
 
 manpages = gtimelog.1 gtimelogrc.5
+po_files = $(wildcard po/*.po)
+mo_files = $(patsubst po/%.po,locale/%/LC_MESSAGES/gtimelog.mo,$(po_files))
 
 .PHONY: all
-all: $(manpages) gschemas.compiled
+all: $(manpages) $(mo_files) gschemas.compiled
 
 .PHONY: run
-run: gschemas.compiled
+run: gschemas.compiled $(mo_files)
 	./mockup.py
 
 .PHONY: check test
@@ -37,12 +39,11 @@ coverage-diff: coverage
 .PHONY: update-translations
 update-translations:
 	cd po && intltool-update -g gtimelog -p
-	msgmerge -U po/lt.po po/gtimelog.pot
-	msgmerge -U po/en.po po/gtimelog.pot
-	mkdir -p locale/lt/LC_MESSAGES
-	msgfmt -o locale/lt/LC_MESSAGES/gtimelog.mo po/lt.po
-	mkdir -p locale/en/LC_MESSAGES
-	msgfmt -o locale/en/LC_MESSAGES/gtimelog.mo po/en.po
+	for po in $(po_file); do msgmerge -U $$po po/gtimelog.pot; done
+
+locale/%/LC_MESSAGES/gtimelog.mo: po/%.po
+	mkdir -p $(@D)
+	msgfmt -o $@ $<
 
 gschemas.compiled: org.gtimelog.gschema.xml
 	glib-compile-schemas .
