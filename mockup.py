@@ -1443,10 +1443,14 @@ class TaskList(Gtk.TreeView):
 
 class PreferencesDialog(Gtk.Dialog):
 
+    use_header_bar = hasattr(Gtk.DialogFlags, 'USE_HEADER_BAR')
+
     def __init__(self, transient_for):
+        kwargs = {}
+        if self.use_header_bar:
+            kwargs['use_header_bar'] = True
         Gtk.Dialog.__init__(self, transient_for=transient_for,
-                            use_header_bar=True,
-                            title=_("Preferences"))
+                            title=_("Preferences"), **kwargs)
         self.set_default_size(500, -1)
 
         builder = Gtk.Builder.new_from_file(PREFERENCES_UI_FILE)
