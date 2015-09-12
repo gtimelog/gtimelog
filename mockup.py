@@ -148,6 +148,7 @@ class Application(Gtk.Application):
             print(_('GTimeLog version: {}').format(__version__))
             print(_('Python version: {}').format(sys.version.replace('\n', '')))
             print(_('GTK+ version: {}.{}.{}').format(Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION))
+            print(_('PyGI version: {}').format(gi.__version__))
             print(_('Data directory: {}').format(Settings().get_data_dir()))
             print(_('Legacy config directory: {}').format(Settings().get_config_dir()))
             self.check_schema()
