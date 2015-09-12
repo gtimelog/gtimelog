@@ -138,14 +138,20 @@ class Application(Gtk.Application):
             make_option("--version", description=_("Show version number and exit")),
         ])
 
+    def check_schema(self):
+        schema_source = Gio.SettingsSchemaSource.get_default()
+        if schema_source.lookup("org.gtimelog", False) is None:
+            sys.exit(_("\nWARNING: GSettings schema for org.gtimelog is missing!  If you're running from a source checkout, be sure to run 'make'."))
+
     def do_handle_local_options(self, options):
         if options.contains('version'):
             print(_('GTimeLog version: {}').format(__version__))
             print(_('Python version: {}').format(sys.version.replace('\n', '')))
             print(_('GTK+ version: {}.{}.{}').format(Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION, Gtk.MICRO_VERSION))
             print(_('Data directory: {}').format(Settings().get_data_dir()))
-            gsettings = Gio.Settings.new("org.gtimelog")
             print(_('Legacy config directory: {}').format(Settings().get_config_dir()))
+            self.check_schema()
+            gsettings = Gio.Settings.new("org.gtimelog")
             if not gsettings.get_boolean('settings-migrated'):
                 print(_('Settings will be migrated to GSettings (org.gtimelog) on first launch'))
             else:
@@ -159,6 +165,9 @@ class Application(Gtk.Application):
 
     def do_startup(self):
         mark_time("in app startup")
+
+        self.check_schema()
+
         Gtk.Application.do_startup(self)
 
         mark_time("basic app startup done")
