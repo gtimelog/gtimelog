@@ -255,10 +255,12 @@ class Application(Gtk.Application):
 
 def copy_properties(src, dest):
     blacklist = ('events', 'child', 'parent', 'input-hints', 'buffer', 'tabs', 'completion', 'model', 'type')
+    # GObject.ParamFlags.READWRITE is missing on Ubuntu 14.04 LTS
+    RW = GObject.ParamFlags.READABLE | GObject.ParamFlags.WRITABLE
     for prop in src.props:
         if prop.flags & GObject.ParamFlags.DEPRECATED != 0:
             continue
-        if prop.flags & GObject.ParamFlags.READWRITE != GObject.ParamFlags.READWRITE:
+        if prop.flags & RW != RW:
             continue
         if prop.name in blacklist:
             continue
