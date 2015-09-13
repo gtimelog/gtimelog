@@ -237,6 +237,8 @@ class Application(Gtk.Application):
         gsettings = Gio.Settings.new("org.gtimelog")
         if gsettings.get_boolean('remote-task-list'):
             uri = gsettings.get_string('task-list-edit-url')
+            if self.get_active_window() is not None:
+                self.get_active_window().editing_remote_tasks = True
         else:
             filename = Settings().get_task_list_file()
             self.create_if_missing(filename)
@@ -427,6 +429,7 @@ class Window(Gtk.ApplicationWindow):
         self._date = None
         self._showing_today = None
         self._window_size_update_timeout = None
+        self.editing_remote_tasks = False
         self.timelog = None
         self.tasks = None
         self.app = app
@@ -521,6 +524,7 @@ class Window(Gtk.ApplicationWindow):
         self.task_entry.connect('changed', self.task_entry_changed)
         self.connect('notify::detail-level', self.detail_level_changed)
         self.connect('notify::time-range', self.time_range_changed)
+        self.connect('focus-in-event', self.gained_focus)
         mark_time('window ready')
 
         GLib.idle_add(self.load_log)
@@ -591,7 +595,7 @@ class Window(Gtk.ApplicationWindow):
             url = self.gsettings.get_string('task-list-url')
             filename = Settings().get_task_list_cache_file()
             tasks = RemoteTaskList(url, filename)
-            self.download_tasks(url, filename)
+            self.download_tasks()
         else:
             filename = Settings().get_task_list_file()
             tasks = LocalTaskList(filename)
@@ -610,9 +614,11 @@ class Window(Gtk.ApplicationWindow):
             can_edit_tasks = True
         self.app.actions.edit_tasks.set_enabled(can_edit_tasks)
 
-    def download_tasks(self, url, cache_filename):
+    def download_tasks(self):
         if self._download:
             return
+        url = self.gsettings.get_string('task-list-url')
+        cache_filename = Settings().get_task_list_cache_file()
         self.tasks_infobar_label.set_text(_("Downloading tasks from  {}.").format(url))
         self.tasks_infobar.show()
         cancellable = Gio.Cancellable()
@@ -632,6 +638,11 @@ class Window(Gtk.ApplicationWindow):
             self.check_reload_tasks()
             self.tasks_infobar.hide()
         self._download = None
+
+    def gained_focus(self, *args):
+        if self.editing_remote_tasks:
+            self.download_tasks()
+            self.editing_remote_tasks = False
 
     def virtual_midnight_changed(self, *args):
         if self.timelog:
