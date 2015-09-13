@@ -31,6 +31,10 @@
         <attribute name="label" translatable="yes">Edit tasks</attribute>
         <attribute name="action">app.edit-tasks</attribute>
       </item>
+      <item>
+        <attribute name="label" translatable="yes">Refresh tasks</attribute>
+        <attribute name="action">app.refresh-tasks</attribute>
+      </item>
     </section>
     <section>
       <item>

@@ -121,7 +121,7 @@ class Application(Gtk.Application):
     class Actions(object):
 
         def __init__(self, app):
-            for action_name in ['preferences', 'help', 'about', 'quit', 'edit-log', 'edit-tasks']:
+            for action_name in ['preferences', 'help', 'about', 'quit', 'edit-log', 'edit-tasks', 'refresh-tasks']:
                 action = Gio.SimpleAction.new(action_name, None)
                 action.connect('activate', getattr(app, 'on_' + action_name.replace('-', '_')))
                 app.add_action(action)
@@ -244,6 +244,12 @@ class Application(Gtk.Application):
             self.create_if_missing(filename)
             uri = GLib.filename_to_uri(filename, None)
         Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
+
+    def on_refresh_tasks(self, action, parameter):
+        gsettings = Gio.Settings.new("org.gtimelog")
+        if gsettings.get_boolean('remote-task-list'):
+            if self.get_active_window() is not None:
+                self.get_active_window().download_tasks()
 
     def create_if_missing(self, filename):
         if not os.path.exists(filename):
@@ -545,6 +551,7 @@ class Window(Gtk.ApplicationWindow):
         self.gsettings.bind('name', self.report_view, 'name', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('sender', self.report_view, 'sender', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('list-email', self.recipient_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('remote-task-list', self.app.actions.refresh_tasks, 'enabled', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.connect('changed::remote-task-list', self.load_tasks)
         self.gsettings.connect('changed::task-list-url', self.load_tasks)
         self.gsettings.connect('changed::task-list-edit-url', self.update_edit_tasks_availability)
