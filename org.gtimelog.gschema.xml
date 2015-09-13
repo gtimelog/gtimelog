@@ -78,6 +78,12 @@
             <description>URL for fetching tasks for the task pane.  Expects a plain text response with one task name per line, with an optional category in front (delimited with a ':').</description>
         </key>
 
+        <key name="task-list-edit-url" type="s">
+            <default>""</default>
+            <summary>Task list edit URL</summary>
+            <description>URL for editing tasks for the task pane.  Will be opened in a browser window if the user asks to edit tasks.</description>
+        </key>
+
     </schema>
 
 </schemalist>

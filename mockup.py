@@ -234,9 +234,13 @@ class Application(Gtk.Application):
         Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
 
     def on_edit_tasks(self, action, parameter):
-        filename = Settings().get_task_list_file()
-        uri = GLib.filename_to_uri(filename, None)
-        self.create_if_missing(filename)
+        gsettings = Gio.Settings.new("org.gtimelog")
+        if gsettings.get_boolean('remote-task-list'):
+            uri = gsettings.get_string('task-list-edit-url')
+        else:
+            filename = Settings().get_task_list_file()
+            self.create_if_missing(filename)
+            uri = GLib.filename_to_uri(filename, None)
         Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
 
     def create_if_missing(self, filename):
@@ -533,10 +537,11 @@ class Window(Gtk.ApplicationWindow):
         self.gsettings.bind('name', self.report_view, 'name', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('sender', self.report_view, 'sender', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('list-email', self.recipient_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
-        self.gsettings.bind('remote-task-list', self.app.actions.edit_tasks, 'enabled', Gio.SettingsBindFlags.INVERT_BOOLEAN)
         self.gsettings.connect('changed::remote-task-list', self.load_tasks)
         self.gsettings.connect('changed::task-list-url', self.load_tasks)
+        self.gsettings.connect('changed::task-list-edit-url', self.update_edit_tasks_availability)
         self.gsettings.connect('changed::virtual-midnight', self.virtual_midnight_changed)
+        self.update_edit_tasks_availability()
 
         w, h = self.gsettings.get_value('window-size')
         tpp = self.gsettings.get_int('task-pane-position')
@@ -556,6 +561,9 @@ class Window(Gtk.ApplicationWindow):
             self.gsettings.set_string('list-email', old_settings.email)
             self.gsettings.set_boolean('remote-task-list', bool(old_settings.task_list_url))
             self.gsettings.set_string('task-list-url', old_settings.task_list_url)
+            for arg in old_settings.edit_task_list_cmd.split():
+                if arg.startswith('http://', 'https://'):
+                    self.gsettings.set_string('task-list-edit-url', arg)
             vm = old_settings.virtual_midnight
             self.gsettings.set_value('virtual-midnight', GLib.Variant('(ii)', (vm.hour, vm.minute)))
             self.gsettings.set_boolean('settings-migrated', True)
@@ -589,6 +597,14 @@ class Window(Gtk.ApplicationWindow):
         self.tasks = tasks
         mark_time("tasks presented")
         self.watch_file(self.tasks.filename, self.on_tasks_file_changed)
+        self.update_edit_tasks_availability()
+
+    def update_edit_tasks_availability(self, *args):
+        if self.gsettings.get_boolean('remote-task-list'):
+            can_edit_tasks = bool(self.gsettings.get_string('task-list-edit-url'))
+        else:
+            can_edit_tasks = True
+        self.app.actions.edit_tasks.set_enabled(can_edit_tasks)
 
     def virtual_midnight_changed(self, *args):
         if self.timelog:
