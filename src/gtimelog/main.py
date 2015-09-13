@@ -977,6 +977,8 @@ class Window(Gtk.ApplicationWindow):
         else:
             self.time_label.set_text(format_duration(now - last_time))
         self.log_view.now = now
+        if self.showing_today and virtual_day(now, self.get_virtual_midnight()) != self.date:
+            self.date = None
         return True
 
     def email(self, sender, recipient, body):
