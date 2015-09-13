@@ -150,9 +150,9 @@ class Application(Gtk.Application):
             try:
                 os.makedirs(data_dir)
             except OSError as e:
-                print(_("Could not create {directory}: {error}").format(directory=data_dir, error=e), file=sys.stderr)
+                log.error(_("Could not create {directory}: {error}").format(directory=data_dir, error=e), file=sys.stderr)
             else:
-                print(_("Created {directory}").format(directory=data_dir))
+                log.info(_("Created {directory}").format(directory=data_dir))
 
     def do_handle_local_options(self, options):
         if options.contains('version'):
@@ -590,7 +590,7 @@ class Window(Gtk.ApplicationWindow):
             vm = old_settings.virtual_midnight
             self.gsettings.set_value('virtual-midnight', GLib.Variant('(ii)', (vm.hour, vm.minute)))
             self.gsettings.set_boolean('settings-migrated', True)
-            print(_('Settings from {filename} migrated to GSettings (org.gtimelog)').format(filename=old_settings.get_config_file()))
+            log.info(_('Settings from {filename} migrated to GSettings (org.gtimelog)').format(filename=old_settings.get_config_file()))
 
         mark_time('settings loaded')
 
@@ -642,19 +642,20 @@ class Window(Gtk.ApplicationWindow):
         log.debug("Downloading tasks from %s", url)
         cancellable = Gio.Cancellable()
         gfile = Gio.File.new_for_uri(url)
-        self._download = (gfile, cancellable)
+        self._download = (gfile, cancellable, url)
         gfile.load_contents_async(cancellable, self.tasks_downloaded, cache_filename)
 
     def tasks_downloaded(self, source, result, cache_filename):
         try:
             success, content, etag = source.load_contents_finish(result)
         except GLib.GError as e:
-            log.debug("Failed to download tasks: %s", e)
+            url = self._download[2]
+            log.error("Failed to download tasks from %s: %s", url, e)
             self.tasks_infobar_label.set_text(_("Download failed."))
             self.tasks_infobar.show()
         else:
-            log.info("Successfully downloaded tasks (etag: %s):\n  %s",
-                     etag, content.decode('UTF-8', 'replace').replace('\n', '\n  '))
+            log.debug("Successfully downloaded tasks (etag: %s):\n  %s",
+                      etag, content.decode('UTF-8', 'replace').replace('\n', '\n  '))
             with open(cache_filename, 'wb') as f:
                 f.write(content)
             self.check_reload_tasks()
@@ -872,7 +873,7 @@ class Window(Gtk.ApplicationWindow):
             with open(filename, 'a') as f:
                 f.write("{},{},{},{}\n".format(timestamp, report_kind, report_id, recipient))
         except IOError as e:
-            log.error("Couldn't append to {}: {}".format(filename, e))
+            log.error(_("Couldn't append to {}: {}").format(filename, e))
 
     def on_cancel_report(self, action=None, parameter=None):
         self.main_stack.set_visible_child_name('entry')
@@ -973,11 +974,11 @@ class Window(Gtk.ApplicationWindow):
             stdin = to_bytes(msg.as_string())
             stdout, stderr = sendmail.communicate(stdin)
         except OSError as e:
-            log.error("Couldn't execute %s: %s", command, e)
+            log.error(_("Couldn't execute %s: %s"), command, e)
             return False
         else:
             if sendmail.returncode != 0:
-                log.error("Couldn't send email: %s returned code %d",
+                log.error(_("Couldn't send email: %s returned code %d"),
                           command, sendmail.returncode)
             return sendmail.returncode == 0
 
@@ -1592,7 +1593,7 @@ def main():
     if '--debug' in sys.argv:
         root_logger.setLevel(logging.DEBUG)
     else:
-        root_logger.setLevel(logging.ERROR)
+        root_logger.setLevel(logging.INFO)
 
     # Tell GTK+ to use out translations
     locale.bindtextdomain('gtimelog', LOCALE_DIR)
