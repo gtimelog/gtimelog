@@ -34,11 +34,19 @@ Changelog
   - No more tray icons.
   - Dropped --tray, --toggle, --quit, --sample-config command
     line options.
-  - The "Reload" option and hot key are gone.
+  - The "Reload" option and hot key are gone -- reloading is automatic now.
   - Report for a custom date range is gone.
   - "Complete report in spreadsheet" is gone.
   - "Work/slacking stats in spreadsheet" is gone.
   - Setting to disable GTK+ completion is gone.
+  - Setting for editor is gone: the default file association for text
+    files will be used.
+  - Settings for mailer is gone: mail sending is internal now,
+  - Setting for spreadhseet is gone.
+  - Setting to show remaining office hours is gone (set office hours to 0
+    to hide the estimate).
+  - Report style cannot be selected.
+  - No more setting to select initial detail level.
 
 
 0.10 (unreleased)
