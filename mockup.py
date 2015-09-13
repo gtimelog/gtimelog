@@ -522,6 +522,7 @@ class Window(Gtk.ApplicationWindow):
         self.bind_property('time_range', self.report_view, 'time_range', GObject.BindingFlags.SYNC_CREATE)
         self.recipient_entry.bind_property('text', self.report_view, 'recipient', GObject.BindingFlags.SYNC_CREATE)
 
+        # Workaround for a GTK+ 3.10 bug (https://bugzilla.gnome.org/show_bug.cgi?id=705673)
         builder.get_object('back_button').connect('button-press-event', self.disable_double_click)
         builder.get_object('forward_button').connect('button-press-event', self.disable_double_click)
         builder.get_object('today_button').connect('button-press-event', self.disable_double_click)
