@@ -1567,6 +1567,9 @@ class PreferencesDialog(Gtk.Dialog):
                             title=_("Preferences"), **kwargs)
         self.set_default_size(500, -1)
 
+        if not self.use_header_bar:
+            self.add_button(_("Close"), Gtk.ResponseType.CLOSE)
+
         builder = Gtk.Builder.new_from_file(PREFERENCES_UI_FILE)
         vbox = builder.get_object('dialog-vbox')
         self.get_content_area().add(vbox)
