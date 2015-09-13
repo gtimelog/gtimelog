@@ -15,3 +15,4 @@ tags
 coverage.xml
 locale
 gschemas.compiled
+src/gtimelog/experiment-gtk3.10.ui

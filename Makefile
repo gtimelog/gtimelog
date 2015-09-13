@@ -15,7 +15,7 @@ po_files = $(wildcard po/*.po)
 mo_files = $(patsubst po/%.po,locale/%/LC_MESSAGES/gtimelog.mo,$(po_files))
 
 .PHONY: all
-all: $(manpages) $(mo_files) gschemas.compiled
+all: $(manpages) $(mo_files) gschemas.compiled src/gtimelog/experiment-gtk3.10.ui
 
 .PHONY: run
 run: gschemas.compiled $(mo_files)
@@ -40,6 +40,10 @@ coverage-diff: coverage
 update-translations:
 	cd po && intltool-update -g gtimelog -p
 	for po in $(po_files); do msgmerge -U $$po po/gtimelog.pot; done
+
+%-gtk3.10.ui: %.ui
+	sed -e 's/margin_start/margin_left/' -e 's/margin_end/margin_right/' < $< > $@.tmp
+	mv $@.tmp $@
 
 locale/%/LC_MESSAGES/gtimelog.mo: po/%.po
 	mkdir -p $(@D)

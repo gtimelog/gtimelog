@@ -83,6 +83,7 @@ HELP_URI = ''
 HELP_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'help'))
 
 UI_FILE = 'src/gtimelog/experiment.ui'
+OLD_GTK_UI_FILE = 'src/gtimelog/experiment-gtk3.10.ui'
 ABOUT_DIALOG_UI_FILE = 'src/gtimelog/about.ui'
 PREFERENCES_UI_FILE = 'src/gtimelog/preferences.ui'
 MENUS_UI_FILE = 'src/gtimelog/menus.ui'
@@ -442,7 +443,10 @@ class Window(Gtk.ApplicationWindow):
         self.app = app
 
         mark_time("loading ui")
-        builder = Gtk.Builder.new_from_file(UI_FILE)
+        if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 12):
+            builder = Gtk.Builder.new_from_file(OLD_GTK_UI_FILE)
+        else:
+            builder = Gtk.Builder.new_from_file(UI_FILE)
         mark_time("main ui loaded")
         builder.add_from_file(MENUS_UI_FILE)
         mark_time("menus loaded")
