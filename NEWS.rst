@@ -32,7 +32,7 @@ Changelog
 * Dropped features:
 
   - No more tray icons.
-  - Dropped --tray, --toggle, --quit, --sample-config, --debug command
+  - Dropped --tray, --toggle, --quit, --sample-config command
     line options.
   - The "Reload" option and hot key are gone.
   - Report for a custom date range is gone.

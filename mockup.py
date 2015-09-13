@@ -136,6 +136,7 @@ class Application(Gtk.Application):
         GLib.set_prgname('gtimelog')
         self.add_main_option_entries([
             make_option("--version", description=_("Show version number and exit")),
+            make_option("--debug", description=_("Show debug information on the console")),
         ])
 
     def check_schema(self):
@@ -628,6 +629,7 @@ class Window(Gtk.ApplicationWindow):
         cache_filename = Settings().get_task_list_cache_file()
         self.tasks_infobar_label.set_text(_("Downloading tasks from  {}.").format(url))
         self.tasks_infobar.show()
+        log.debug("Downloading tasks from %s", url)
         cancellable = Gio.Cancellable()
         gfile = Gio.File.new_for_uri(url)
         self._download = (gfile, cancellable)
@@ -637,9 +639,12 @@ class Window(Gtk.ApplicationWindow):
         try:
             success, content, etag = source.load_contents_finish(result)
         except GLib.GError as e:
+            log.debug("Failed to download tasks: %s", e)
             self.tasks_infobar_label.set_text(_("Failed to download tasks: {}.").format(e))
             self.tasks_infobar.show()
         else:
+            log.info("Successfully downloaded tasks (etag: %s):\n  %s",
+                     etag, content.decode('UTF-8', 'replace').replace('\n', '\n  '))
             with open(cache_filename, 'wb') as f:
                 f.write(content)
             self.check_reload_tasks()
@@ -1574,7 +1579,10 @@ def main():
 
     root_logger = logging.getLogger()
     root_logger.addHandler(logging.StreamHandler())
-    root_logger.setLevel(logging.ERROR)
+    if '--debug' in sys.argv:
+        root_logger.setLevel(logging.DEBUG)
+    else:
+        root_logger.setLevel(logging.ERROR)
 
     # Tell GTK+ to use out translations
     locale.bindtextdomain('gtimelog', LOCALE_DIR)
