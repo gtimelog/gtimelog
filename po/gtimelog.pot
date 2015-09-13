@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-13 19:54+0300\n"
+"POT-Creation-Date: 2015-09-13 21:32+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../gtimelog.desktop.in.h:1 ../mockup.py:135 ../mockup.py:891
-#: ../src/gtimelog/about.ui.h:1 ../src/gtimelog/experiment.ui.h:7
+#: ../gtimelog.desktop.in.h:1 ../src/gtimelog/main.py:141
+#: ../src/gtimelog/main.py:911 ../src/gtimelog/about.ui.h:1
+#: ../src/gtimelog/gtimelog.ui.h:7
 msgid "Time Log"
 msgstr ""
 
@@ -26,215 +27,219 @@ msgstr ""
 msgid "Track and time daily activities"
 msgstr ""
 
-#: ../mockup.py:102
+#: ../src/gtimelog/main.py:108
 #, python-brace-format
 msgid "{0} h {1} min"
 msgstr ""
 
-#: ../mockup.py:138
+#: ../src/gtimelog/main.py:144
 msgid "Show version number and exit"
 msgstr ""
 
-#: ../mockup.py:139
+#: ../src/gtimelog/main.py:145
 msgid "Show debug information on the console"
 msgstr ""
 
-#: ../mockup.py:145
+#: ../src/gtimelog/main.py:151
 msgid ""
 "\n"
 "WARNING: GSettings schema for org.gtimelog is missing!  If you're running "
 "from a source checkout, be sure to run 'make'."
 msgstr ""
 
-#: ../mockup.py:153
+#: ../src/gtimelog/main.py:159
 #, python-brace-format
 msgid "Could not create {directory}: {error}"
 msgstr ""
 
-#: ../mockup.py:155
+#: ../src/gtimelog/main.py:161
 #, python-brace-format
 msgid "Created {directory}"
 msgstr ""
 
-#: ../mockup.py:159
+#: ../src/gtimelog/main.py:165
 msgid "GTimeLog version: {}"
 msgstr ""
 
-#: ../mockup.py:160
+#: ../src/gtimelog/main.py:166
 msgid "Python version: {}"
 msgstr ""
 
-#: ../mockup.py:161
+#: ../src/gtimelog/main.py:167
 msgid "GTK+ version: {}.{}.{}"
 msgstr ""
 
-#: ../mockup.py:162
+#: ../src/gtimelog/main.py:168
 msgid "PyGI version: {}"
 msgstr ""
 
-#: ../mockup.py:163
+#: ../src/gtimelog/main.py:169
 msgid "Data directory: {}"
 msgstr ""
 
-#: ../mockup.py:164
+#: ../src/gtimelog/main.py:170
 msgid "Legacy config directory: {}"
 msgstr ""
 
-#: ../mockup.py:168
+#: ../src/gtimelog/main.py:174
 msgid "Settings will be migrated to GSettings (org.gtimelog) on first launch"
 msgstr ""
 
-#: ../mockup.py:170
+#: ../src/gtimelog/main.py:176
 msgid "Settings already migrated to GSettings (org.gtimelog)"
 msgstr ""
 
-#: ../mockup.py:593
+#: ../src/gtimelog/main.py:613
 #, python-brace-format
 msgid "Settings from {filename} migrated to GSettings (org.gtimelog)"
 msgstr ""
 
-#: ../mockup.py:642
+#: ../src/gtimelog/main.py:662
 msgid "Downloading tasks..."
 msgstr ""
 
-#: ../mockup.py:657
+#: ../src/gtimelog/main.py:677
 msgid "Download failed."
 msgstr ""
 
-#: ../mockup.py:781
+#: ../src/gtimelog/main.py:801
 msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
 msgstr ""
 
-#: ../mockup.py:784
+#: ../src/gtimelog/main.py:804
 msgid "{0:%Y}, week {1:0>2} ({0:%B %-d}-{2:%-d})"
 msgstr ""
 
-#: ../mockup.py:787
+#: ../src/gtimelog/main.py:807
 msgid "{0:%B %Y}"
 msgstr ""
 
-#: ../mockup.py:852
+#: ../src/gtimelog/main.py:872
 msgid "Report"
 msgstr ""
 
-#: ../mockup.py:869
+#: ../src/gtimelog/main.py:889
 msgid "Couldn't send email to {}."
 msgstr ""
 
-#: ../mockup.py:879
+#: ../src/gtimelog/main.py:899
 msgid "Couldn't append to {}: {}"
 msgstr ""
 
-#: ../mockup.py:956
+#: ../src/gtimelog/main.py:976
 msgid "%H:%M"
 msgstr ""
 
-#: ../mockup.py:980
+#: ../src/gtimelog/main.py:1000
 #, python-format
 msgid "Couldn't execute %s: %s"
 msgstr ""
 
-#: ../mockup.py:984
+#: ../src/gtimelog/main.py:1004
 #, python-format
 msgid "Couldn't send email: %s returned code %d"
 msgstr ""
 
-#: ../mockup.py:1209
+#: ../src/gtimelog/main.py:1229
 msgid "{0:%A, %Y-%m-%d}\n"
 msgstr ""
 
-#: ../mockup.py:1256
+#: ../src/gtimelog/main.py:1276
 msgid "({0:%H:%M}-{1:%H:%M})"
 msgstr ""
 
-#: ../mockup.py:1322
+#: ../src/gtimelog/main.py:1342
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week, {2} per day)"
 msgstr ""
 
-#: ../mockup.py:1323
+#: ../src/gtimelog/main.py:1343
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week)"
 msgstr ""
 
-#: ../mockup.py:1325
+#: ../src/gtimelog/main.py:1345
 #, python-brace-format
 msgid "Total work done this week: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:1326
+#: ../src/gtimelog/main.py:1346
 #, python-brace-format
 msgid "Total work done this week: {0}"
 msgstr ""
 
-#: ../mockup.py:1328
+#: ../src/gtimelog/main.py:1348
 #, python-brace-format
 msgid "Total work done this month: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:1329
+#: ../src/gtimelog/main.py:1349
 #, python-brace-format
 msgid "Total work done this month: {0}"
 msgstr ""
 
-#: ../mockup.py:1348
+#: ../src/gtimelog/main.py:1368
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week, {2} per day)"
 msgstr ""
 
-#: ../mockup.py:1349
+#: ../src/gtimelog/main.py:1369
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week)"
 msgstr ""
 
-#: ../mockup.py:1351
+#: ../src/gtimelog/main.py:1371
 #, python-brace-format
 msgid "Total slacking this week: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:1352
+#: ../src/gtimelog/main.py:1372
 #, python-brace-format
 msgid "Total slacking this week: {0}"
 msgstr ""
 
-#: ../mockup.py:1354
+#: ../src/gtimelog/main.py:1374
 #, python-brace-format
 msgid "Total slacking this month: {0} ({1} per day)"
 msgstr ""
 
-#: ../mockup.py:1355
+#: ../src/gtimelog/main.py:1375
 #, python-brace-format
 msgid "Total slacking this month: {0}"
 msgstr ""
 
-#: ../mockup.py:1379
+#: ../src/gtimelog/main.py:1399
 msgid "Time left at work: {0} (should've finished at {1:%H:%M})"
 msgstr ""
 
-#: ../mockup.py:1382
+#: ../src/gtimelog/main.py:1402
 msgid "Time left at work: {0} (till {1:%H:%M})"
 msgstr ""
 
-#: ../mockup.py:1396
+#: ../src/gtimelog/main.py:1416
 #, python-brace-format
 msgid "At office today: {0} ({1} overtime)"
 msgstr ""
 
-#: ../mockup.py:1402
+#: ../src/gtimelog/main.py:1422
 #, python-brace-format
 msgid "At office today: {0} ({1} left)"
 msgstr ""
 
-#: ../mockup.py:1513
+#: ../src/gtimelog/main.py:1533
 msgid "Tasks"
 msgstr ""
 
-#: ../mockup.py:1528
+#: ../src/gtimelog/main.py:1548
 msgid "Other"
 msgstr ""
 
-#: ../mockup.py:1550 ../src/gtimelog/menus.ui.h:1
+#: ../src/gtimelog/main.py:1570 ../src/gtimelog/menus.ui.h:1
 msgid "Preferences"
+msgstr ""
+
+#: ../src/gtimelog/main.py:1574
+msgid "Close"
 msgstr ""
 
 #: ../src/gtimelog/about.ui.h:2
@@ -245,31 +250,31 @@ msgstr ""
 msgid "A time tracking application"
 msgstr ""
 
-#: ../src/gtimelog/experiment.ui.h:1
+#: ../src/gtimelog/gtimelog.ui.h:1
 msgid "Add"
 msgstr ""
 
-#: ../src/gtimelog/experiment.ui.h:2
+#: ../src/gtimelog/gtimelog.ui.h:2
 msgid "Daily"
 msgstr ""
 
-#: ../src/gtimelog/experiment.ui.h:3
+#: ../src/gtimelog/gtimelog.ui.h:3
 msgid "Weekly"
 msgstr ""
 
-#: ../src/gtimelog/experiment.ui.h:4
+#: ../src/gtimelog/gtimelog.ui.h:4
 msgid "Monthly"
 msgstr ""
 
-#: ../src/gtimelog/experiment.ui.h:5
+#: ../src/gtimelog/gtimelog.ui.h:5
 msgid "Recipient"
 msgstr ""
 
-#: ../src/gtimelog/experiment.ui.h:6
+#: ../src/gtimelog/gtimelog.ui.h:6
 msgid "Send"
 msgstr ""
 
-#: ../src/gtimelog/experiment.ui.h:8
+#: ../src/gtimelog/gtimelog.ui.h:8
 msgid "Cancel"
 msgstr ""
 
