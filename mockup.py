@@ -423,6 +423,7 @@ class Window(Gtk.ApplicationWindow):
         Gtk.ApplicationWindow.__init__(self, application=app, icon_name='gtimelog')
 
         self._watches = {}
+        self._download = None
         self._date = None
         self._showing_today = None
         self._window_size_update_timeout = None
@@ -465,6 +466,9 @@ class Window(Gtk.ApplicationWindow):
         self.today_button = builder.get_object("today_button")
         self.cancel_report_button = builder.get_object("cancel_report_button")
         self.recipient_entry = builder.get_object("recipient_entry")
+        self.tasks_infobar = builder.get_object("tasks_infobar")
+        self.tasks_infobar.connect('response', lambda *args: self.tasks_infobar.hide())
+        self.tasks_infobar_label = builder.get_object("tasks_infobar_label")
         self.infobar = builder.get_object("report_infobar")
         self.infobar.connect('response', lambda *args: self.infobar.hide())
         self.infobar_label = builder.get_object("infobar_label")
@@ -587,7 +591,7 @@ class Window(Gtk.ApplicationWindow):
             url = self.gsettings.get_string('task-list-url')
             filename = Settings().get_task_list_cache_file()
             tasks = RemoteTaskList(url, filename)
-            # TODO: initiate a refresh now
+            self.download_tasks(url, filename)
         else:
             filename = Settings().get_task_list_file()
             tasks = LocalTaskList(filename)
@@ -605,6 +609,29 @@ class Window(Gtk.ApplicationWindow):
         else:
             can_edit_tasks = True
         self.app.actions.edit_tasks.set_enabled(can_edit_tasks)
+
+    def download_tasks(self, url, cache_filename):
+        if self._download:
+            return
+        self.tasks_infobar_label.set_text(_("Downloading tasks from  {}.").format(url))
+        self.tasks_infobar.show()
+        cancellable = Gio.Cancellable()
+        gfile = Gio.File.new_for_uri(url)
+        self._download = (gfile, cancellable)
+        gfile.load_contents_async(cancellable, self.tasks_downloaded, cache_filename)
+
+    def tasks_downloaded(self, source, result, cache_filename):
+        try:
+            success, content, etag = source.load_contents_finish(result)
+        except GLib.GError as e:
+            self.tasks_infobar_label.set_text(_("Failed to download tasks: {}.").format(e))
+            self.tasks_infobar.show()
+        else:
+            with open(cache_filename, 'wb') as f:
+                f.write(content)
+            self.check_reload_tasks()
+            self.tasks_infobar.hide()
+        self._download = None
 
     def virtual_midnight_changed(self, *args):
         if self.timelog:
