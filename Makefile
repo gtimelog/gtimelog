@@ -21,7 +21,7 @@ all: $(manpages) $(runtime_files)
 
 .PHONY: run
 run: $(runtime_files)
-	./mockup.py
+	./gtimelog
 
 .PHONY: check test
 check test:
