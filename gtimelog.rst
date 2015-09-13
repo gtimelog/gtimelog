@@ -54,10 +54,15 @@ reports, use three asterisks::
 
 ``gtimelog`` displays all the things you've done today, calculates the total
 time you spent working, and the total time you spent "slacking".  It also
-advises you how much time you still have to work today to get 8 hours of work
-done.  There are two basic views: one shows all the activities in
-chronological order, with starting and ending times, while another groups all
-entries with the same into one activity and just shows the total duration.
+advises you how much time you still have to work today to get 8 hours of
+work done, and how much time is left just to have spent a workday at the
+office (the number of hours in a day is configurable).
+
+There are three basic views: one shows all the activities in chronological
+order, with starting and ending times; another groups all entries with the
+same title into one activity and just shows the total duration; and a
+third one groups all entries from the same categories into one line with
+the total duration.
 
 At the end of the day you can send off a daily report by choosing ``Report...``
 from the menu.  You can select a date and a date range (day/week/month) and
