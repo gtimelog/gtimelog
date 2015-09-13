@@ -41,6 +41,7 @@ You can run it from a source checkout without an explicit installation step::
 
   $ git clone https://github.com/gtimelog/gtimelog
   $ cd gtimelog
+  $ make
   $ ./gtimelog
 
 System requirements:
@@ -48,6 +49,7 @@ System requirements:
 - Python (2.7 or 3.3+)
 - PyGObject
 - gobject-introspection type libraries for GTK+, Pango
+- GTK+ 3.10 or newer (3.14 or newer for best results)
 
 
 Documentation
