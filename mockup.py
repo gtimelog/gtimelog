@@ -452,7 +452,7 @@ class Window(Gtk.ApplicationWindow):
         mark_time("menus loaded")
 
         if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 14):
-            builder.get_object('menu_image').props.icon_name = 'view-context-menu-symbolic'
+            builder.get_object('menu_image').props.icon_name = 'emblem-system-symbolic'
 
         # I want to use a custom Gtk.ApplicationWindow subclass, but I
         # also want to be able to edit the .ui file with Glade.  So I use
