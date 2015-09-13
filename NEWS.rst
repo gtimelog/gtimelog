@@ -36,7 +36,6 @@ Changelog
     line options.
   - The "Reload" option and hot key are gone.
   - Report for a custom date range is gone.
-  - Remote task lists are not supported.
   - "Complete report in spreadsheet" is gone.
   - "Work/slacking stats in spreadsheet" is gone.
   - Setting to disable GTK+ completion is gone.
