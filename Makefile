@@ -13,7 +13,7 @@ FILE_WITH_CHANGELOG = NEWS.rst
 manpages = gtimelog.1 gtimelogrc.5
 po_files = $(wildcard po/*.po)
 mo_files = $(patsubst po/%.po,locale/%/LC_MESSAGES/gtimelog.mo,$(po_files))
-fallback_ui_files = src/gtimelog/experiment-gtk3.10.ui src/gtimelog/preferences-gtk3.10.ui
+fallback_ui_files = src/gtimelog/gtimelog-gtk3.10.ui src/gtimelog/preferences-gtk3.10.ui
 runtime_files = gschemas.compiled $(mo_files) $(fallback_ui_files)
 
 .PHONY: all

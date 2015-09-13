@@ -84,10 +84,10 @@ HELP_URI = ''
 HELP_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'help'))
 
 if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 12):
-    UI_FILE = 'src/gtimelog/experiment-gtk3.10.ui'
+    UI_FILE = 'src/gtimelog/gtimelog-gtk3.10.ui'
     PREFERENCES_UI_FILE = 'src/gtimelog/preferences-gtk3.10.ui'
 else:
-    UI_FILE = 'src/gtimelog/experiment.ui'
+    UI_FILE = 'src/gtimelog/gtimelog.ui'
     PREFERENCES_UI_FILE = 'src/gtimelog/preferences.ui'
 
 ABOUT_DIALOG_UI_FILE = 'src/gtimelog/about.ui'
