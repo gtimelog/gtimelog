@@ -2,12 +2,24 @@
 
 <schemalist>
 
+    <enum id="org.gtimelog.DetailLevel">
+        <value nick="chronological" value="1"/>
+        <value nick="grouped" value="2"/>
+        <value nick="summary" value="3"/>
+    </enum>
+
     <schema path="/org/gtimelog/" id="org.gtimelog">
 
         <key name="settings-migrated" type="b">
             <default>false</default>
             <summary>Settings migrated</summary>
             <description>Set to true after copying old settings from a gtimelogrc file.  If false, and if a gtimelogrc exists, settings from the gtimelogrc will be copied into GSettings.</description>
+        </key>
+
+        <key name="detail-level" enum="org.gtimelog.DetailLevel">
+            <default>"chronological"</default>
+            <summary>Detail level</summary>
+            <description>Detail level to show in the main pane.</description>
         </key>
 
         <key name="show-task-pane" type="b">

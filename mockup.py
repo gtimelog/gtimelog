@@ -546,6 +546,7 @@ class Window(Gtk.ApplicationWindow):
 
     def load_settings(self):
         self.gsettings = Gio.Settings.new("org.gtimelog")
+        self.gsettings.bind('detail-level', self, 'detail-level', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('show-task-pane', self.task_pane, 'visible', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('hours', self.log_view, 'hours', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('office-hours', self.log_view, 'office-hours', Gio.SettingsBindFlags.DEFAULT)
@@ -569,6 +570,12 @@ class Window(Gtk.ApplicationWindow):
         if not self.gsettings.get_boolean('settings-migrated'):
             old_settings = Settings()
             old_settings.load()
+            if old_settings.summary_view:
+                self.gsettings.set_string('detail-level', 'summary')
+            elif old_settings.chronological:
+                self.gsettings.set_string('detail-level', 'chronological')
+            else:
+                self.gsettings.set_string('detail-level', 'grouped')
             self.gsettings.set_boolean('show-task-pane', old_settings.show_tasks)
             self.gsettings.set_double('hours', old_settings.hours)
             self.gsettings.set_double('office-hours', old_settings.office_hours)

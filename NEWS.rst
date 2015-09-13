@@ -46,7 +46,6 @@ Changelog
   - Setting to show remaining office hours is gone (set office hours to 0
     to hide the estimate).
   - Report style cannot be selected.
-  - No more setting to select initial detail level.
 
 
 0.10 (unreleased)
