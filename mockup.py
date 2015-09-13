@@ -582,10 +582,10 @@ class Window(Gtk.ApplicationWindow):
             self.gsettings.set_string('name', old_settings.name)
             self.gsettings.set_string('sender', old_settings.sender)
             self.gsettings.set_string('list-email', old_settings.email)
-            self.gsettings.set_boolean('remote-task-list', bool(old_settings.task_list_url))
             self.gsettings.set_string('task-list-url', old_settings.task_list_url)
+            self.gsettings.set_boolean('remote-task-list', bool(old_settings.task_list_url))
             for arg in old_settings.edit_task_list_cmd.split():
-                if arg.startswith('http://', 'https://'):
+                if arg.startswith(('http://', 'https://')):
                     self.gsettings.set_string('task-list-edit-url', arg)
             vm = old_settings.virtual_midnight
             self.gsettings.set_value('virtual-midnight', GLib.Variant('(ii)', (vm.hour, vm.minute)))
@@ -633,6 +633,9 @@ class Window(Gtk.ApplicationWindow):
         if self._download:
             return
         url = self.gsettings.get_string('task-list-url')
+        if not url:
+            log.debug("Not downloading tasks: URL not specified")
+            return
         cache_filename = Settings().get_task_list_cache_file()
         self.tasks_infobar_label.set_text(_("Downloading tasks..."))
         self.tasks_infobar.show()
