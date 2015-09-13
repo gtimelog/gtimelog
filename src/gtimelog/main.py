@@ -275,6 +275,7 @@ class Application(Gtk.Application):
         # on every invocation.
         builder = Gtk.Builder.new_from_file(ABOUT_DIALOG_UI_FILE)
         about_dialog = builder.get_object('about_dialog')
+        about_dialog.set_version(__version__)
         about_dialog.set_transient_for(self.get_active_window())
         about_dialog.connect("response", lambda *args: about_dialog.destroy())
         about_dialog.show()

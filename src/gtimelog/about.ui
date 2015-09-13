@@ -6,7 +6,7 @@
     <property name="can_focus">False</property>
     <property name="modal">True</property>
     <property name="program_name" translatable="yes">Time Log</property>
-    <property name="version">0.10.dev0</property>
+    <property name="version">(placeholder)</property>
     <property name="copyright" translatable="yes">Copyright © 2004–2015 Marius Gedminas and contributors.</property>
     <property name="comments" translatable="yes">A time tracking application</property>
     <property name="website">https://gtimelog.org/</property>
