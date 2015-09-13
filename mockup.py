@@ -19,8 +19,6 @@ def mark_time(what=None, _prev=[0, 0]):
 mark_time()
 mark_time("in script")
 
-os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
-
 import datetime
 import gettext
 import locale
@@ -39,8 +37,11 @@ try:
 except ImportError:
     DEVNULL = open(os.devnull, 'w')
 
-
 mark_time("Python imports done")
+
+
+if '--debug' in sys.argv:
+    os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
 
 SCHEMA_DIR = os.path.abspath(os.path.dirname(__file__))
 if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
