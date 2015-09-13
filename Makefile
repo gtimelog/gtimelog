@@ -61,7 +61,7 @@ gschemas.compiled: org.gtimelog.gschema.xml
 
 .PHONY: clean
 clean:
-	rm -rf temp tmp build gtimelog.egg-info
+	rm -rf temp tmp build gtimelog.egg-info $(runtime_files) locale
 	find -name '*.pyc' -delete
 
 .PHONY: dist
