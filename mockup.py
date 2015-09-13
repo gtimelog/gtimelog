@@ -614,6 +614,7 @@ class Window(Gtk.ApplicationWindow):
         else:
             filename = Settings().get_task_list_file()
             tasks = LocalTaskList(filename)
+            self.tasks_infobar.hide()
         mark_time("tasks loaded")
         if self.tasks:
             self.unwatch_file(self.tasks.filename)
@@ -637,6 +638,7 @@ class Window(Gtk.ApplicationWindow):
             log.debug("Not downloading tasks: URL not specified")
             return
         cache_filename = Settings().get_task_list_cache_file()
+        self.tasks_infobar.set_message_type(Gtk.MessageType.INFO)
         self.tasks_infobar_label.set_text(_("Downloading tasks..."))
         self.tasks_infobar.show()
         log.debug("Downloading tasks from %s", url)
@@ -651,6 +653,7 @@ class Window(Gtk.ApplicationWindow):
         except GLib.GError as e:
             url = self._download[2]
             log.error("Failed to download tasks from %s: %s", url, e)
+            self.tasks_infobar.set_message_type(Gtk.MessageType.ERROR)
             self.tasks_infobar_label.set_text(_("Download failed."))
             self.tasks_infobar.show()
         else:
