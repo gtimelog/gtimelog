@@ -627,7 +627,7 @@ class Window(Gtk.ApplicationWindow):
             return
         url = self.gsettings.get_string('task-list-url')
         cache_filename = Settings().get_task_list_cache_file()
-        self.tasks_infobar_label.set_text(_("Downloading tasks from  {}.").format(url))
+        self.tasks_infobar_label.set_text(_("Downloading tasks..."))
         self.tasks_infobar.show()
         log.debug("Downloading tasks from %s", url)
         cancellable = Gio.Cancellable()
@@ -640,7 +640,7 @@ class Window(Gtk.ApplicationWindow):
             success, content, etag = source.load_contents_finish(result)
         except GLib.GError as e:
             log.debug("Failed to download tasks: %s", e)
-            self.tasks_infobar_label.set_text(_("Failed to download tasks: {}.").format(e))
+            self.tasks_infobar_label.set_text(_("Download failed."))
             self.tasks_infobar.show()
         else:
             log.info("Successfully downloaded tasks (etag: %s):\n  %s",
