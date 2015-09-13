@@ -16,3 +16,4 @@ coverage.xml
 locale
 gschemas.compiled
 src/gtimelog/experiment-gtk3.10.ui
+src/gtimelog/preferences-gtk3.10.ui

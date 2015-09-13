@@ -44,7 +44,11 @@ update-translations:
 	for po in $(po_files); do msgmerge -U $$po po/gtimelog.pot; done
 
 %-gtk3.10.ui: %.ui
-	sed -e 's/margin_start/margin_left/' -e 's/margin_end/margin_right/' < $< > $@.tmp
+	sed -e 's/margin_start/margin_left/' \
+	    -e 's/margin_end/margin_right/' \
+	    -e '/property name="monospace"/d' \
+	    -e '/GtkHeaderBar/,$$ s/<property name="position">.*<\/property>//' \
+	    < $< > $@.tmp
 	mv $@.tmp $@
 
 locale/%/LC_MESSAGES/gtimelog.mo: po/%.po
