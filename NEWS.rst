@@ -1,6 +1,47 @@
 Changelog
 ---------
 
+0.11 (unreleased)
+~~~~~~~~~~~~~~~~~
+
+* A complete rewrite of the user interface, to better fit GNOME 3 (GH: #31).
+  Requires GTK+ 3.10, but newer versions are better.
+
+* History browsing can show you weeks/months, not just days.
+
+* There's now a preferences dialog (GH: #47).
+
+* Window size and task pane size/visibility are remembered across
+  restarts (GH: #30).
+
+* Settings are stored in GSettings.  The old config file will be imported
+  on first startup.
+
+* Work hours and office hours are separate settings now (GH: #46).
+
+* Native support for emailing reports.  Requires a configured MTA on the
+  local machine (i.e. /usr/sbin/sendmail).
+
+* There's a help page listing all the keyboard shortcuts.
+
+* The user interface can be translated (and is translated into Lithuanian).
+  Reports are an exception (GH: #45).
+
+* More efficient file change watching (GH: #11).
+
+* Dropped features:
+
+  - No more tray icons.
+  - Dropped --tray, --toggle, --quit, --sample-config, --debug command
+    line options.
+  - The "Reload" option and hot key are gone.
+  - Report for a custom date range is gone.
+  - Remote task lists are not supported.
+  - "Complete report in spreadsheet" is gone.
+  - "Work/slacking stats in spreadsheet" is gone.
+  - Setting to disable GTK+ completion is gone.
+
+
 0.10 (unreleased)
 ~~~~~~~~~~~~~~~~~
 
