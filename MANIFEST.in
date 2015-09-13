@@ -3,7 +3,8 @@ include *.rst
 include Makefile
 include gtimelog
 include gtimelog.desktop
-include gtimelogrc.example
+include gtimelog.appdata.xml
+include org.gtimelog.gschema.xml
 include runtests
 include tox.ini
 include .travis.yml
@@ -12,3 +13,5 @@ include .gitignore
 recursive-include src *.png *.ui
 recursive-include docs *.png *.rst
 recursive-include scripts *.py *.rst
+recursive-include help *.page *.xml *png
+recursive-include po *.po *.pot *.in
