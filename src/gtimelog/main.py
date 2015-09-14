@@ -43,7 +43,8 @@ mark_time("Python imports done")
 if '--debug' in sys.argv:
     os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
 
-SCHEMA_DIR = os.path.abspath(os.path.dirname(__file__))
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+SCHEMA_DIR = ROOT
 if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
     os.environ['GSETTINGS_SCHEMA_DIR'] = SCHEMA_DIR
 
@@ -52,9 +53,6 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango
 mark_time("Gtk imports done")
-
-pkgdir = os.path.join(os.path.dirname(__file__), 'src')
-sys.path.insert(0, pkgdir)
 
 from gtimelog import __version__
 from gtimelog.settings import Settings
@@ -81,18 +79,20 @@ mark_time("gtimelog imports done")
 
 # When the app is properly installed, use HELP_URI = 'help:gtimelog'
 HELP_URI = ''
-HELP_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'help'))
+HELP_DIR = os.path.abspath(os.path.join(ROOT, 'help'))
+
+UI_DIR = os.path.join(ROOT, 'src', 'gtimelog')
 
 if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 12):
-    UI_FILE = 'src/gtimelog/gtimelog-gtk3.10.ui'
-    PREFERENCES_UI_FILE = 'src/gtimelog/preferences-gtk3.10.ui'
+    UI_FILE = os.path.join(UI_DIR, 'gtimelog-gtk3.10.ui')
+    PREFERENCES_UI_FILE = os.path.join(UI_DIR, 'preferences-gtk3.10.ui')
 else:
-    UI_FILE = 'src/gtimelog/gtimelog.ui'
-    PREFERENCES_UI_FILE = 'src/gtimelog/preferences.ui'
+    UI_FILE = os.path.join(UI_DIR, 'gtimelog.ui')
+    PREFERENCES_UI_FILE = os.path.join(UI_DIR, 'preferences.ui')
 
-ABOUT_DIALOG_UI_FILE = 'src/gtimelog/about.ui'
-MENUS_UI_FILE = 'src/gtimelog/menus.ui'
-LOCALE_DIR = 'locale'
+ABOUT_DIALOG_UI_FILE = os.path.join(UI_DIR, 'about.ui')
+MENUS_UI_FILE = os.path.join(UI_DIR, 'menus.ui')
+LOCALE_DIR = os.path.join(ROOT, 'locale')
 
 
 log = logging.getLogger('gtimelog')
