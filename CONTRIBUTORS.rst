@@ -31,14 +31,14 @@ In alphabetic order:
 - Radek Muzatko
 - Rodrigo Daunoravicius
 - Rohan Mitchell
+- Shirish Agarwal  शिरीष अग्रवाल
 - Thom May
 - Tomaz Canabrava
 - Živilė Gedminaitė
--  Shirish Agarwal  शिरीष अग्रवाल
 
-Their contributions include patches (including those that didn't make it into 
-the mainline), helpful suggestions, icons, configuration tips for integration 
+Their contributions include patches (including those that didn't make it into
+the mainline), helpful suggestions, icons, configuration tips for integration
 with other software, offers for co-maintainership.
 
-Apologies to anyone I may have omitted.  If you drop me a note, I'll correct 
+Apologies to anyone I may have omitted.  If you drop me a note, I'll correct
 the omission.
