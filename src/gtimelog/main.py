@@ -21,6 +21,7 @@ mark_time("in script")
 
 import datetime
 import gettext
+import io
 import locale
 import logging
 import re
@@ -93,6 +94,8 @@ else:
 ABOUT_DIALOG_UI_FILE = os.path.join(UI_DIR, 'about.ui')
 MENUS_UI_FILE = os.path.join(UI_DIR, 'menus.ui')
 LOCALE_DIR = os.path.join(ROOT, 'locale')
+
+CONTRIBUTORS_FILE = os.path.join(ROOT, 'CONTRIBUTORS.rst')
 
 
 log = logging.getLogger('gtimelog')
@@ -270,12 +273,21 @@ class Application(Gtk.Application):
             uri = 'ghelp:' + GLib.filename_to_uri(filename, None).partition(':')[-1]
         Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
 
+    def get_contributors(self):
+        contributors = []
+        with io.open(CONTRIBUTORS_FILE, encoding='UTF-8') as f:
+            for line in f:
+                if line.startswith('- '):
+                    contributors.append(line[2:].strip())
+        return sorted(contributors)
+
     def on_about(self, action, parameter):
         # Note: must create a new dialog (which means a new Gtk.Builder)
         # on every invocation.
         builder = Gtk.Builder.new_from_file(ABOUT_DIALOG_UI_FILE)
         about_dialog = builder.get_object('about_dialog')
         about_dialog.set_version(__version__)
+        about_dialog.set_authors(self.get_contributors())
         about_dialog.set_transient_for(self.get_active_window())
         about_dialog.connect("response", lambda *args: about_dialog.destroy())
         about_dialog.show()
