@@ -10,7 +10,7 @@ FILE_WITH_CHANGELOG = NEWS.rst
 # Interesting targets
 #
 
-manpages = gtimelog.1 gtimelogrc.5
+manpages = gtimelog.1
 po_files = $(wildcard po/*.po)
 mo_files = $(patsubst po/%.po,locale/%/LC_MESSAGES/gtimelog.mo,$(po_files))
 fallback_ui_files = src/gtimelog/gtimelog-gtk3.10.ui src/gtimelog/preferences-gtk3.10.ui
