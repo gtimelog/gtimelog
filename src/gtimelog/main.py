@@ -20,6 +20,8 @@ mark_time()
 mark_time("in script")
 
 import datetime
+import email
+import email.header
 import gettext
 import io
 import locale
@@ -29,8 +31,7 @@ import signal
 import subprocess
 import sys
 from gettext import gettext as _
-from email.utils import parseaddr
-from email import message_from_string
+from email.utils import parseaddr, formataddr
 from io import StringIO
 
 try:
@@ -110,6 +111,35 @@ def format_duration(duration):
     """
     h, m = divmod(as_minutes(duration), 60)
     return _('{0} h {1} min').format(h, m)
+
+
+def isascii(s):
+    return all(32 <= ord(c) < 127 for c in s)
+
+
+def fixup_email(name_and_address):
+    name, addr = parseaddr(name_and_address)
+    name = str(email.header.Header(name, 'UTF-8'))
+    return formataddr((name, addr))
+
+
+def fixup_subject(header):
+    return str(email.header.Header(header, 'UTF-8'))
+
+
+def fixup_header(msg, header, fixup):
+    old = msg[header]
+    if not isascii(old):
+        del msg[header]
+        msg[header] = fixup(old)
+
+
+def message_from_string(message):
+    msg = email.message_from_string(message)
+    fixup_header(msg, 'From', fixup_email)
+    fixup_header(msg, 'To', fixup_email)
+    fixup_header(msg, 'Subject', fixup_subject)
+    return msg
 
 
 def make_option(long_name, short_name=None, flags=0, arg=GLib.OptionArg.NONE,
