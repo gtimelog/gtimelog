@@ -1219,7 +1219,7 @@ class TestSettings(unittest.TestCase):
         self.settings.save(os.path.join(tempdir, 'config'))
 
 
-class TestTagging (unittest.TestCase):
+class TestTagging(unittest.TestCase):
 
     TEST_TIMELOG = textwrap.dedent("""
         2014-05-27 10:03: arrived
@@ -1240,23 +1240,23 @@ class TestTagging (unittest.TestCase):
             StringIO(self.TEST_TIMELOG),
             datetime.datetime(2014, 5, 27, 9, 0),
             datetime.datetime(2014, 5, 27, 23, 59),
-            datetime.time(2, 0))
+            datetime.time(2, 0),
+        )
 
     def test_TimeWindow_set_of_all_tags(self):
         tags = self.tw.set_of_all_tags()
-        self.assertEqual(tags,
-                         set(['edx', 'hpc', 'hydra',
-                              'meeting', 'support', 'sysadmin']))
+        self.assertEqual(tags, {'edx', 'hpc', 'hydra', 'meeting',
+                                'support', 'sysadmin'})
 
     def test_TimeWindow_totals_per_tag1(self):
         """Test aggregate time per tag, 1 entry only"""
         result = self.tw.totals('meeting')
         self.assertEqual(len(result), 2)
         work, slack = result
-        self.assertEqual(work, (
+        self.assertEqual(work,
             # start/end times are manually extracted from the TEST_TIMELOG sample
             (datetime.timedelta(hours=12, minutes=11) - datetime.timedelta(hours=10, minutes=30))
-        ))
+        )
         self.assertEqual(slack, datetime.timedelta(0))
 
     def test_TimeWindow_totals_per_tag2(self):
@@ -1264,11 +1264,11 @@ class TestTagging (unittest.TestCase):
         result = self.tw.totals('hpc')
         self.assertEqual(len(result), 2)
         work, slack = result
-        self.assertEqual(work, (
+        self.assertEqual(work,
             # start/end times are manually extracted from the TEST_TIMELOG sample
             (datetime.timedelta(hours=17, minutes=3) - datetime.timedelta(hours=15, minutes=12))
             + (datetime.timedelta(hours=22, minutes=19) - datetime.timedelta(hours=19, minutes=6))
-        ))
+        )
         self.assertEqual(slack, datetime.timedelta(0))
 
     def test_TimeWindow__split_entry_and_tags1(self):
@@ -1283,28 +1283,28 @@ class TestTagging (unittest.TestCase):
         result = self.tw._split_entry_and_tags('restart CFEngine server -- sysadmin cfengine issue327')
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0], 'restart CFEngine server')
-        self.assertEqual(result[1], set(['sysadmin', 'cfengine', 'issue327']))
+        self.assertEqual(result[1], {'sysadmin', 'cfengine', 'issue327'})
 
     def test_TimeWindow__split_entry_and_tags3(self):
         """Test `TimeWindow._split_entry_and_tags` with category, entry, and tags"""
         result = self.tw._split_entry_and_tags('tooling: tagging support in gtimelog -- tooling gtimelog')
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0], 'tooling: tagging support in gtimelog')
-        self.assertEqual(result[1], set(['tooling', 'gtimelog']))
+        self.assertEqual(result[1], {'tooling', 'gtimelog'})
 
     def test_TimeWindow__split_entry_and_tags4(self):
         """Test `TimeWindow._split_entry_and_tags` with slack-type entry"""
         result = self.tw._split_entry_and_tags('read news -- reading **')
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0], 'read news **')
-        self.assertEqual(result[1], set(['reading']))
+        self.assertEqual(result[1], {'reading'})
 
     def test_TimeWindow__split_entry_and_tags5(self):
         """Test `TimeWindow._split_entry_and_tags` with slack-type entry"""
         result = self.tw._split_entry_and_tags('read news -- reading ***')
         self.assertEqual(len(result), 2)
         self.assertEqual(result[0], 'read news ***')
-        self.assertEqual(result[1], set(['reading']))
+        self.assertEqual(result[1], {'reading'})
 
     def test_Reports__report_tags(self):
         from gtimelog.timelog import Reports
