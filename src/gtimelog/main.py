@@ -1493,6 +1493,10 @@ class ReportView(Gtk.TextView):
         self.connect('notify::date', self.queue_update)
         self.connect('notify::time-range', self.queue_update)
         self.connect('notify::visible', self.queue_update)
+        if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 160):
+            self.override_font(Pango.FontDescription.from_string("Monospace"))
+        else:
+            self.set_monospace(True)
 
     def queue_update(self, *args):
         if not self._update_pending:

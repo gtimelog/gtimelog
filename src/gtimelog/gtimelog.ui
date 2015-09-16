@@ -316,7 +316,6 @@
                     <property name="editable">False</property>
                     <property name="left_margin">6</property>
                     <property name="right_margin">6</property>
-                    <property name="monospace">True</property>
                   </object>
                 </child>
               </object>
