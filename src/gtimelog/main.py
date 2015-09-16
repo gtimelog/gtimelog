@@ -490,6 +490,9 @@ class Window(Gtk.ApplicationWindow):
         self.add(main_stack)
         self.set_titlebar(headerbar)
 
+        if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 14):
+            main_stack.connect('draw', self.draw_main_stack)
+
         # Cannot store these in the same .ui file nor hook them up in the
         # .ui because glade doesn't support that and strips both the
         # <menu> and the menu-model property on save.
@@ -578,6 +581,13 @@ class Window(Gtk.ApplicationWindow):
         # minute boundary, so we would delay updating the current time
         # unnecessarily.
         GLib.timeout_add_seconds(1, self.tick)
+
+    def draw_main_stack(self, widget, cr):
+        w = widget.get_allocated_width()
+        h = widget.get_allocated_height()
+        context = widget.get_style_context()
+        Gtk.render_background(context, cr, 0, 0, w, h)
+        return False
 
     def disable_double_click(self, widget, event):
         if event.type == Gdk.EventType._2BUTTON_PRESS:
