@@ -919,6 +919,32 @@ class Window(Gtk.ApplicationWindow):
             self.infobar_label.set_text(_("Couldn't send email to {}.").format(recipient))
             self.infobar.show()
 
+    def email(self, sender, recipient, body):
+        sender_address = parseaddr(sender)[1]
+        recipient_address = parseaddr(recipient)[1]
+        msg = message_from_string(body)
+        command = ['/usr/sbin/sendmail']
+        if sender_address:
+            command += ['-f', sender_address]
+        command.append(recipient_address)
+        try:
+            sendmail = subprocess.Popen(
+                command,
+                stdin=subprocess.PIPE,
+                stdout=DEVNULL,
+                stderr=subprocess.STDOUT,
+            )
+            stdin = to_bytes(msg.as_string())
+            stdout, stderr = sendmail.communicate(stdin)
+        except OSError as e:
+            log.error(_("Couldn't execute %s: %s"), command, e)
+            return False
+        else:
+            if sendmail.returncode != 0:
+                log.error(_("Couldn't send email: %s returned code %d"),
+                          command, sendmail.returncode)
+            return sendmail.returncode == 0
+
     def record_sent_email(self, report_kind, report_id, recipient):
         filename = Settings().get_report_log_file()
         timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -1010,32 +1036,6 @@ class Window(Gtk.ApplicationWindow):
         if self.showing_today and virtual_day(now, self.get_virtual_midnight()) != self.date:
             self.date = None
         return True
-
-    def email(self, sender, recipient, body):
-        sender_address = parseaddr(sender)[1]
-        recipient_address = parseaddr(recipient)[1]
-        msg = message_from_string(body)
-        command = ['/usr/sbin/sendmail']
-        if sender_address:
-            command += ['-f', sender_address]
-        command.append(recipient_address)
-        try:
-            sendmail = subprocess.Popen(
-                command,
-                stdin=subprocess.PIPE,
-                stdout=DEVNULL,
-                stderr=subprocess.STDOUT,
-            )
-            stdin = to_bytes(msg.as_string())
-            stdout, stderr = sendmail.communicate(stdin)
-        except OSError as e:
-            log.error(_("Couldn't execute %s: %s"), command, e)
-            return False
-        else:
-            if sendmail.returncode != 0:
-                log.error(_("Couldn't send email: %s returned code %d"),
-                          command, sendmail.returncode)
-            return sendmail.returncode == 0
 
 
 class TaskEntry(Gtk.Entry):
