@@ -93,6 +93,7 @@ else:
 
 ABOUT_DIALOG_UI_FILE = os.path.join(UI_DIR, 'about.ui')
 MENUS_UI_FILE = os.path.join(UI_DIR, 'menus.ui')
+CSS_FILE = os.path.join(UI_DIR, 'gtimelog.css')
 LOCALE_DIR = os.path.join(ROOT, 'locale')
 
 CONTRIBUTORS_FILE = os.path.join(ROOT, 'CONTRIBUTORS.rst')
@@ -193,6 +194,13 @@ class Application(Gtk.Application):
         Gtk.Application.do_startup(self)
 
         mark_time("basic app startup done")
+
+        css = Gtk.CssProvider()
+        css.load_from_path(CSS_FILE)
+        screen = Gdk.Screen.get_default()
+        Gtk.StyleContext.add_provider_for_screen(
+            screen, css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        mark_time("CSS loaded")
 
         builder = Gtk.Builder.new_from_file(MENUS_UI_FILE)
         self.set_app_menu(builder.get_object('app_menu'))
