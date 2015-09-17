@@ -701,13 +701,16 @@ def doctest_Reports_monthly_report_categorized():
         <BLANKLINE>
         No work done this month.
 
-        >>> fh = StringIO('\n'.join([
-        ...    '2010-01-30 09:00: start',
-        ...    '2010-01-30 09:23: Bing: stuff',
-        ...    '2010-01-30 12:54: Bong: other stuff',
-        ...    '2010-01-30 13:32: lunch **',
-        ...    '2010-01-30 23:46: misc',
-        ...    '']))
+        >>> fh = StringIO(textwrap.dedent('''
+        ...    2010-01-28 09:00: start
+        ...    2010-01-28 09:23: give up ***
+        ...
+        ...    2010-01-30 09:00: start
+        ...    2010-01-30 09:23: Bing: stuff
+        ...    2010-01-30 12:54: Bong: other stuff
+        ...    2010-01-30 13:32: lunch **
+        ...    2010-01-30 23:46: misc
+        ... '''))
 
         >>> window = make_time_window(fh, min, max, vm)
         >>> reports = Reports(window)
@@ -842,13 +845,16 @@ def doctest_Reports_weekly_report_plain():
         <BLANKLINE>
         No work done this week.
 
-        >>> fh = StringIO('\n'.join([
-        ...    '2010-01-30 09:00: start',
-        ...    '2010-01-30 09:23: Bing: stuff',
-        ...    '2010-01-30 12:54: Bong: other stuff',
-        ...    '2010-01-30 13:32: lunch **',
-        ...    '2010-01-30 15:46: misc',
-        ...    '']))
+        >>> fh = StringIO(textwrap.dedent('''
+        ...    2010-01-28 09:00: start
+        ...    2010-01-28 09:23: give up ***
+        ...
+        ...    2010-01-30 09:00: start
+        ...    2010-01-30 09:23: Bing: stuff
+        ...    2010-01-30 12:54: Bong: other stuff
+        ...    2010-01-30 13:32: lunch **
+        ...    2010-01-30 15:46: misc
+        ... '''))
 
         >>> window = make_time_window(fh, min, max, vm)
         >>> reports = Reports(window)
