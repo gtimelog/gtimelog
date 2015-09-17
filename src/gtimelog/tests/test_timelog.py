@@ -1317,6 +1317,24 @@ class TestTagging(unittest.TestCase):
             as each entry may be belong to multiple areas (or none at all).
             """).strip())
 
+    def test_Reports_daily_report_includes_tags(self):
+        rp = Reports(self.tw)
+        txt = StringIO()
+        rp.daily_report(txt, 'me@example.com', 'me')
+        self.assertIn('Time spent in each area', txt.getvalue())
+
+    def test_Reports_weekly_report_includes_tags(self):
+        rp = Reports(self.tw)
+        txt = StringIO()
+        rp.weekly_report_plain(txt, 'me@example.com', 'me')
+        self.assertIn('Time spent in each area', txt.getvalue())
+
+    def test_Reports_categorized_report_includes_tags(self):
+        rp = Reports(self.tw)
+        txt = StringIO()
+        rp.weekly_report_categorized(txt, 'me@example.com', 'me')
+        self.assertIn('Time spent in each area', txt.getvalue())
+
 
 def additional_tests(): # for setup.py
     return doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE,
