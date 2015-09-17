@@ -638,13 +638,13 @@ def doctest_Reports_weekly_report_categorized():
         <BLANKLINE>
         No work done this week.
 
-        >>> fh = StringIO('\n'.join([
-        ...    '2010-01-30 09:00: start',
-        ...    '2010-01-30 09:23: Bing: stuff',
-        ...    '2010-01-30 12:54: Bong: other stuff',
-        ...    '2010-01-30 13:32: lunch **',
-        ...    '2010-01-30 23:46: misc',
-        ...    '']))
+        >>> fh = StringIO(textwrap.dedent('''
+        ...    2010-01-30 09:00: start **
+        ...    2010-01-30 09:23: Bing: stuff
+        ...    2010-01-30 12:54: Bong: other stuff
+        ...    2010-01-30 13:32: lunch **
+        ...    2010-01-30 23:46: misc: blah
+        ... '''))
 
         >>> window = make_time_window(fh, min, max)
         >>> reports = Reports(window)
@@ -666,16 +666,16 @@ def doctest_Reports_weekly_report_categorized():
         ----------------------------------------------------------------------
                                                                           3:31
         <BLANKLINE>
-        No category:
+        misc:
         <BLANKLINE>
-          Misc                                                           10:14
+          Blah                                                           10:14
         ----------------------------------------------------------------------
                                                                          10:14
         <BLANKLINE>
         Total work done this week: 14:08
         <BLANKLINE>
         Categories by time spent:
-          No category     10:14
+          misc            10:14
           Bong             3:31
           Bing             0:23
 
