@@ -18,7 +18,7 @@ except ImportError:
 import freezegun
 import mock
 
-from gtimelog.timelog import TimeLog
+from gtimelog.timelog import TimeLog, Reports, Exports, TaskList
 
 
 class Checker(doctest.OutputChecker):
@@ -307,7 +307,6 @@ def doctest_uniq():
 
 
 def make_time_window(file=None, min=None, max=None, vm=datetime.time(2)):
-    from gtimelog.timelog import TimeLog
     if file is None:
         file = StringIO()
     return TimeLog(file, vm).window_for(min, max)
@@ -504,7 +503,6 @@ def doctest_Exports_to_csv_complete():
 
         >>> window = make_time_window(sampledata, min, max, vm)
 
-        >>> from gtimelog.timelog import Exports
         >>> Exports(window).to_csv_complete(sys.stdout)
         task,time (minutes)
         etc,60
@@ -534,7 +532,6 @@ def doctest_Exports_to_csv_daily():
 
         >>> window = make_time_window(sampledata, min, max, vm)
 
-        >>> from gtimelog.timelog import Exports
         >>> Exports(window).to_csv_daily(sys.stdout)
         date,day-start (hours),slacking (hours),work (hours)
         2008-06-03,12.75,0.0,3.0
@@ -562,8 +559,6 @@ def doctest_Exports_icalendar():
         ... ''')
 
         >>> window = make_time_window(sampledata, min, max, vm)
-
-        >>> from gtimelog.timelog import Exports
 
         >>> with freezegun.freeze_time("2015-05-18 15:40"):
         ...     with mock.patch('socket.getfqdn') as mock_getfqdn:
@@ -624,7 +619,6 @@ def doctest_Reports_weekly_report_categorized():
     r"""Tests for Reports.weekly_report_categorized
 
         >>> from datetime import datetime
-        >>> from gtimelog.timelog import Reports
 
         >>> min = datetime(2010, 1, 25)
         >>> max = datetime(2010, 1, 31)
@@ -686,7 +680,6 @@ def doctest_Reports_monthly_report_categorized():
     r"""Tests for Reports.monthly_report_categorized
 
         >>> from datetime import datetime, time
-        >>> from gtimelog.timelog import Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
@@ -749,7 +742,6 @@ def doctest_Reports_report_categories():
     r"""Tests for Reports._report_categories
 
         >>> from datetime import datetime, time, timedelta
-        >>> from gtimelog.timelog import Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
@@ -776,7 +768,6 @@ def doctest_Reports_daily_report():
     r"""Tests for Reports.daily_report
 
         >>> from datetime import datetime, time
-        >>> from gtimelog.timelog import Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 30)
@@ -831,7 +822,6 @@ def doctest_Reports_weekly_report_plain():
     r"""Tests for Reports.weekly_report_plain
 
         >>> from datetime import datetime, time
-        >>> from gtimelog.timelog import Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
@@ -883,7 +873,6 @@ def doctest_Reports_monthly_report_plain():
     r"""Tests for Reports.monthly_report_plain
 
         >>> from datetime import datetime, time
-        >>> from gtimelog.timelog import Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2007, 9, 1)
@@ -932,7 +921,6 @@ def doctest_Reports_custom_range_report_categorized():
     r"""Tests for Reports.custom_range_report_categorized
 
         >>> from datetime import datetime, time
-        >>> from gtimelog.timelog import Reports
 
         >>> vm = time(2, 0)
         >>> min = datetime(2010, 1, 25)
@@ -995,7 +983,6 @@ def doctest_Reports_custom_range_report_categorized():
 def doctest_TaskList_missing_file():
     """Test for TaskList
 
-        >>> from gtimelog.timelog import TaskList
         >>> tasklist = TaskList('/nosuchfile')
         >>> tasklist.check_reload()
         False
@@ -1022,7 +1009,6 @@ def doctest_TaskList_real_file():
         >>> one_second_ago = time.time() - 2
         >>> os.utime(taskfile, (one_second_ago, one_second_ago))
 
-        >>> from gtimelog.timelog import TaskList
         >>> tasklist = TaskList(taskfile)
         >>> pprint(tasklist.groups)
         [('Other', ['some task', 'other task']),
@@ -1315,7 +1301,6 @@ class TestTagging(unittest.TestCase):
         self.assertEqual(result[1], {'reading'})
 
     def test_Reports__report_tags(self):
-        from gtimelog.timelog import Reports
         rp = Reports(self.tw)
         txt = StringIO()
         # use same tags as in tests above, so we know the totals
