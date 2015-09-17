@@ -1054,6 +1054,9 @@ class TestTimeLog(unittest.TestCase):
             self.tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
         return self.tempdir
 
+    def tempfile(self, filename='timelog.txt'):
+        return os.path.join(self.mkdtemp(), filename)
+
     def test_window_for_day(self):
         timelog = TimeLog(StringIO(), datetime.time(2, 0))
         window = timelog.window_for_day(datetime.date(2015, 9, 17))
@@ -1083,8 +1086,7 @@ class TestTimeLog(unittest.TestCase):
 
     def test_appending_clears_window_cache(self):
         # Regression test for https://github.com/gtimelog/gtimelog/issues/28
-        tempfile = os.path.join(self.mkdtemp(), 'timelog.txt')
-        timelog = TimeLog(tempfile, datetime.time(2, 0))
+        timelog = TimeLog(self.tempfile(), datetime.time(2, 0))
 
         w = timelog.window_for_day(datetime.date(2014, 11, 12))
         self.assertEqual(list(w.all_entries()), [])
@@ -1094,15 +1096,20 @@ class TestTimeLog(unittest.TestCase):
         self.assertEqual(len(list(w.all_entries())), 1)
 
     def test_append_adds_blank_line_on_new_day(self):
-        tempfile = os.path.join(self.mkdtemp(), 'timelog.txt')
-        timelog = TimeLog(tempfile, datetime.time(2, 0))
+        timelog = TimeLog(self.tempfile(), datetime.time(2, 0))
         timelog.append('working on sth', now=datetime.datetime(2014, 11, 12, 18, 0))
         timelog.append('new day **', now=datetime.datetime(2014, 11, 13, 8, 0))
-        with open(tempfile, 'r') as f:
+        with open(timelog.filename, 'r') as f:
             self.assertEqual(f.readlines(),
                              ['2014-11-12 18:00: working on sth\n',
                               '\n',
                               '2014-11-13 08:00: new day **\n'])
+
+    @freezegun.freeze_time("2015-05-12 16:27:35.115265")
+    def test_append_rounds_the_time(self):
+        timelog = TimeLog(self.tempfile(), datetime.time(2, 0))
+        timelog.append('now')
+        self.assertEqual(timelog.items[-1][0], datetime.datetime(2015, 5, 12, 16, 27))
 
     @freezegun.freeze_time("2015-05-12 16:27")
     def test_valid_time_accepts_any_time_in_the_past_when_log_is_empty(self):
