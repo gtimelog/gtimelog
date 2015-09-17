@@ -1054,6 +1054,33 @@ class TestTimeLog(unittest.TestCase):
             self.tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
         return self.tempdir
 
+    def test_window_for_day(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        window = timelog.window_for_day(datetime.date(2015, 9, 17))
+        self.assertEqual(window.min_timestamp, datetime.datetime(2015, 9, 17, 2, 0))
+        self.assertEqual(window.max_timestamp, datetime.datetime(2015, 9, 18, 2, 0))
+
+    def test_window_for_week(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        for d in range(14, 21):
+            window = timelog.window_for_week(datetime.date(2015, 9, d))
+            self.assertEqual(window.min_timestamp, datetime.datetime(2015, 9, 14, 2, 0))
+            self.assertEqual(window.max_timestamp, datetime.datetime(2015, 9, 21, 2, 0))
+
+    def test_window_for_month(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        for d in range(1, 31):
+            window = timelog.window_for_month(datetime.date(2015, 9, d))
+            self.assertEqual(window.min_timestamp, datetime.datetime(2015, 9, 1, 2, 0))
+            self.assertEqual(window.max_timestamp, datetime.datetime(2015, 10, 1, 2, 0))
+
+    def test_window_for_date_range(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        window = timelog.window_for_date_range(datetime.date(2015, 9, 3),
+                                               datetime.date(2015, 9, 24))
+        self.assertEqual(window.min_timestamp, datetime.datetime(2015, 9, 3, 2, 0))
+        self.assertEqual(window.max_timestamp, datetime.datetime(2015, 9, 25, 2, 0))
+
     def test_appending_clears_window_cache(self):
         # Regression test for https://github.com/gtimelog/gtimelog/issues/28
         tempfile = os.path.join(self.mkdtemp(), 'timelog.txt')
