@@ -60,7 +60,7 @@ from gtimelog import __version__
 from gtimelog.settings import Settings
 from gtimelog.timelog import (
     as_minutes, virtual_day, different_days, prev_month, next_month, uniq, parse_time,
-    Reports, TaskList as LocalTaskList, TimeLog)
+    Reports, TaskList, TimeLog)
 
 
 if str is bytes:
@@ -688,11 +688,11 @@ class Window(Gtk.ApplicationWindow):
         mark_time("loading tasks")
         if self.gsettings.get_boolean('remote-task-list'):
             filename = Settings().get_task_list_cache_file()
-            tasks = LocalTaskList(filename)
+            tasks = TaskList(filename)
             self.download_tasks()
         else:
             filename = Settings().get_task_list_file()
-            tasks = LocalTaskList(filename)
+            tasks = TaskList(filename)
             self.tasks_infobar.hide()
         mark_time("tasks loaded")
         if self.tasks:
