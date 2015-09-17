@@ -120,6 +120,9 @@ class TestSettings(unittest.TestCase):
         self.settings.load('/dev/null')
         self.assertEqual(self.settings.name, 'Anonymous')
 
+    def test_load_default_file(self):
+        self.settings.load()
+
     def test_save(self):
         tempdir = self.mkdtemp()
         self.settings.save(os.path.join(tempdir, 'config'))

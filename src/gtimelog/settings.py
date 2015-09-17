@@ -165,9 +165,7 @@ class Settings(object):
         self.report_style = config.get('gtimelog', 'report_style')
         self.start_in_tray = config.getboolean('gtimelog', 'start_in_tray')
 
-    def save(self, filename=None):
-        if filename is None:
-            filename = self.get_config_file()
+    def save(self, filename):
         config = self._config()
         with open(filename, 'w') as f:
             config.write(f)
