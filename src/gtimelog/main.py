@@ -564,7 +564,7 @@ class Window(Gtk.ApplicationWindow):
         self.bind_property('subtitle', self.headerbar, 'subtitle', GObject.BindingFlags.DEFAULT)
 
         self.task_pane = builder.get_object("task_pane")
-        self.task_list = TaskList()
+        self.task_list = TaskListView()
         swap_widget(builder, 'task_list', self.task_list)
         self.task_list.connect('row-activated', self.task_list_row_activated)
         self.bind_property('tasks', self.task_list, 'tasks', GObject.BindingFlags.DEFAULT)
@@ -1585,7 +1585,7 @@ class ReportView(Gtk.TextView):
         self.get_buffer().set_text(output.getvalue())
 
 
-class TaskList(Gtk.TreeView):
+class TaskListView(Gtk.TreeView):
 
     tasks = GObject.Property(
         type=object, nick='Tasks',
