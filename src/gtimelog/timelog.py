@@ -1023,50 +1023,6 @@ class TaskList(object):
         self.load()
 
 
-class RemoteTaskList(TaskList):
-    """Task list stored on a remote server.
-
-    Keeps a cached copy of the list in a local file, so you can use it offline.
-    """
-
-    def __init__(self, url, cache_filename):
-        self.url = url
-        TaskList.__init__(self, cache_filename)
-        self.first_time = True
-
-    def check_reload(self):
-        """Check whether the task list needs to be reloaded.
-
-        Download the task list if this is the first time, and a cached copy is
-        not found.
-
-        Returns True if the file was reloaded.
-        """
-        if self.first_time:
-            self.first_time = False
-            if not os.path.exists(self.filename):
-                self.download()
-                return True
-        return TaskList.check_reload(self)
-
-    def download(self):
-        """Download the task list from the server."""
-        if self.loading_callback:
-            self.loading_callback()
-        try:
-            urllib.urlretrieve(self.url, self.filename)
-        except IOError:
-            if self.error_callback:
-                self.error_callback()
-        self.load()
-        if self.loaded_callback:
-            self.loaded_callback()
-
-    def reload(self):
-        """Reload the task list."""
-        self.download()
-
-
 class CSVWriter(object):
 
     def __init__(self, *args, **kw):
