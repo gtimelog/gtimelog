@@ -1093,6 +1093,17 @@ class TestTimeLog(unittest.TestCase):
         w = timelog.window_for_day(datetime.date(2014, 11, 12))
         self.assertEqual(len(list(w.all_entries())), 1)
 
+    def test_append_adds_blank_line_on_new_day(self):
+        tempfile = os.path.join(self.mkdtemp(), 'timelog.txt')
+        timelog = TimeLog(tempfile, datetime.time(2, 0))
+        timelog.append('working on sth', now=datetime.datetime(2014, 11, 12, 18, 0))
+        timelog.append('new day **', now=datetime.datetime(2014, 11, 13, 8, 0))
+        with open(tempfile, 'r') as f:
+            self.assertEqual(f.readlines(),
+                             ['2014-11-12 18:00: working on sth\n',
+                              '\n',
+                              '2014-11-13 08:00: new day **\n'])
+
     @freezegun.freeze_time("2015-05-12 16:27")
     def test_valid_time_accepts_any_time_in_the_past_when_log_is_empty(self):
         timelog = TimeLog(StringIO(), datetime.time(2, 0))
