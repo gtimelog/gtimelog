@@ -14,7 +14,7 @@ except ImportError:
     PY3 = False
 
 
-from gtimelog.timelog import parse_time, TimeLog, TaskList, RemoteTaskList
+from gtimelog.timelog import parse_time
 
 
 legacy_default_home = os.path.normpath('~/.gtimelog')
@@ -86,9 +86,6 @@ class Settings(object):
     def get_timelog_file(self):
         return os.path.join(self.get_data_dir(), 'timelog.txt')
 
-    def get_time_log(self):
-        return TimeLog(self.get_timelog_file(), self.virtual_midnight)
-
     def get_report_log_file(self):
         return os.path.join(self.get_data_dir(), 'sentreports.log')
 
@@ -97,13 +94,6 @@ class Settings(object):
 
     def get_task_list_cache_file(self):
         return os.path.join(self.get_data_dir(), 'remote-tasks.txt')
-
-    def get_task_list(self):
-        if self.task_list_url:
-            return RemoteTaskList(self.task_list_url,
-                                  self.get_task_list_cache_file())
-        else:
-            return TaskList(self.get_task_list_file())
 
     def _config(self):
         config = RawConfigParser()

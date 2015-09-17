@@ -10,7 +10,7 @@ pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
 
 from gtimelog.settings import Settings
-from gtimelog.timelog import parse_datetime
+from gtimelog.timelog import parse_datetime, TimeLog
 
 
 fns = []
@@ -208,7 +208,7 @@ def parse_and_sort_unicode_piecemeal():
 
 @mark
 def full():
-    return Settings().get_time_log().items
+    return TimeLog(Settings().get_timelog_file(), Settings().virtual_midnight).items
 
 
 def main():
