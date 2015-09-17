@@ -218,6 +218,43 @@ def doctest_first_of_month():
     """
 
 
+def doctest_prev_month():
+    """Tests for prev_month
+
+        >>> from gtimelog.timelog import prev_month
+        >>> from datetime import date, timedelta
+
+        >>> prev_month(date(2007, 3, 1))
+        datetime.date(2007, 2, 1)
+
+        >>> prev_month(date(2007, 3, 7))
+        datetime.date(2007, 2, 1)
+
+        >>> prev_month(date(2007, 3, 31))
+        datetime.date(2007, 2, 1)
+
+        >>> prev_month(date(2007, 4, 1))
+        datetime.date(2007, 3, 1)
+
+        >>> prev_month(date(2007, 2, 28))
+        datetime.date(2007, 1, 1)
+
+        >>> prev_month(date(2007, 4, 1))
+        datetime.date(2007, 3, 1)
+
+    Why not test extensively?
+
+        >>> d = date(2000, 1, 1)
+        >>> while d < date(2005, 1, 1):
+        ...     f = prev_month(d)
+        ...     next = f + timedelta(31)
+        ...     if f.day != 1 or (next.year, next.month) != (d.year, d.month):
+        ...         print("WRONG: prev_month(%r) returned %r" % (d, f))
+        ...     d += timedelta(1)
+
+    """
+
+
 def doctest_next_month():
     """Tests for next_month
 
