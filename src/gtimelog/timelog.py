@@ -56,7 +56,7 @@ def format_duration_long(duration):
 def parse_datetime(dt):
     """Parse a datetime instance from 'YYYY-MM-DD HH:MM' formatted string."""
     if len(dt) != 16 or dt[4] != '-' or dt[7] != '-' or dt[10] != ' ' or dt[13] != ':':
-        raise ValueError('bad date time: ', dt)
+        raise ValueError('bad date time: %r' % dt)
     try:
         year = int(dt[:4])
         month = int(dt[5:7])
@@ -64,7 +64,7 @@ def parse_datetime(dt):
         hour = int(dt[11:13])
         min = int(dt[14:])
     except ValueError:
-        raise ValueError('bad date time: ', dt)
+        raise ValueError('bad date time: %r' % dt)
     return datetime.datetime(year, month, day, hour, min)
 
 

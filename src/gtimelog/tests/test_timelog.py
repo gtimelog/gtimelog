@@ -111,7 +111,11 @@ def doctest_parse_datetime():
         >>> parse_datetime('xyzzy')
         Traceback (most recent call last):
           ...
-        ValueError: ('bad date time: ', 'xyzzy')
+        ValueError: bad date time: 'xyzzy'
+        >>> parse_datetime('YYYY-MM-DD HH:MM')
+        Traceback (most recent call last):
+          ...
+        ValueError: bad date time: 'YYYY-MM-DD HH:MM'
 
     """
 
