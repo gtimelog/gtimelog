@@ -149,9 +149,6 @@ class TimeCollection(object):
         self.items = []
         self.virtual_midnight = virtual_midnight
 
-    def __repr__(self):
-        return '<TimeCollection ({} items)>'.format(len(self.items))
-
     def last_time(self):
         """Return the time of the last entry.
 
