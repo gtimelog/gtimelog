@@ -72,7 +72,7 @@ def parse_time(t):
     """Parse a time instance from 'HH:MM' formatted string."""
     m = re.match(r'^(\d+):(\d+)$', t)
     if not m:
-        raise ValueError('bad time: ', t)
+        raise ValueError('bad time: %r' % t)
     hour, min = map(int, m.groups())
     return datetime.time(hour, min)
 

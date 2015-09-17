@@ -129,7 +129,7 @@ def doctest_parse_time():
         >>> parse_time('xyzzy')
         Traceback (most recent call last):
           ...
-        ValueError: ('bad time: ', 'xyzzy')
+        ValueError: bad time: 'xyzzy'
 
     """
 
