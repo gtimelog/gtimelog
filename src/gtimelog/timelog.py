@@ -153,15 +153,6 @@ class TimeCollection(object):
     def __repr__(self):
         return '<TimeCollection ({} items)>'.format(len(self.items))
 
-    def first_time(self):
-        """Return the time of the first entry.
-
-        Returns a datetime.datetime instance or None, if the window is empty.
-        """
-        if not self.items:
-            return None
-        return self.items[0][0]
-
     def last_time(self):
         """Return the time of the last entry.
 
