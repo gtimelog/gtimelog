@@ -12,7 +12,6 @@ import os
 import socket
 import sys
 import re
-import urllib
 from hashlib import md5
 from operator import itemgetter
 
