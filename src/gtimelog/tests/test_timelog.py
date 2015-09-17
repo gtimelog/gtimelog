@@ -1057,6 +1057,25 @@ class TestTimeLog(unittest.TestCase):
     def tempfile(self, filename='timelog.txt'):
         return os.path.join(self.mkdtemp(), filename)
 
+    def test_reloading(self):
+        logfile = self.tempfile()
+        timelog = TimeLog(logfile, datetime.time(2, 0))
+        # No file - nothing to reload
+        self.assertFalse(timelog.check_reload())
+        # Create a file - it should be reloaded, once.
+        open(logfile, 'w').close()
+        self.assertTrue(timelog.check_reload())
+        self.assertFalse(timelog.check_reload())
+        # Change the timestamp, somehow
+        st = os.stat(logfile)
+        os.utime(logfile, (st.st_atime, st.st_mtime + 1))
+        self.assertTrue(timelog.check_reload())
+        self.assertFalse(timelog.check_reload())
+        # Disappearance of the file is noticed
+        os.unlink(logfile)
+        self.assertTrue(timelog.check_reload())
+        self.assertFalse(timelog.check_reload())
+
     def test_window_for_day(self):
         timelog = TimeLog(StringIO(), datetime.time(2, 0))
         window = timelog.window_for_day(datetime.date(2015, 9, 17))
