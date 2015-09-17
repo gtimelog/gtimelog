@@ -101,6 +101,21 @@ class TestSettings(unittest.TestCase):
         self.assertEqual(self.settings.get_timelog_file(),
                          os.path.normpath('~/.local/share/gtimelog/timelog.txt'))
 
+    def test_get_report_log_file(self):
+        self.settings.get_data_dir = lambda: os.path.normpath('~/.local/share/gtimelog')
+        self.assertEqual(self.settings.get_report_log_file(),
+                         os.path.normpath('~/.local/share/gtimelog/sentreports.log'))
+
+    def test_get_task_list_file(self):
+        self.settings.get_data_dir = lambda: os.path.normpath('~/.local/share/gtimelog')
+        self.assertEqual(self.settings.get_task_list_file(),
+                         os.path.normpath('~/.local/share/gtimelog/tasks.txt'))
+
+    def test_get_task_list_cache_file(self):
+        self.settings.get_data_dir = lambda: os.path.normpath('~/.local/share/gtimelog')
+        self.assertEqual(self.settings.get_task_list_cache_file(),
+                         os.path.normpath('~/.local/share/gtimelog/remote-tasks.txt'))
+
     def test_load(self):
         self.settings.load('/dev/null')
         self.assertEqual(self.settings.name, 'Anonymous')
