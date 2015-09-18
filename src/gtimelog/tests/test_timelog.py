@@ -1326,13 +1326,22 @@ class TestTagging(unittest.TestCase):
     def test_Reports_weekly_report_includes_tags(self):
         rp = Reports(self.tw)
         txt = StringIO()
-        rp.weekly_report_plain(txt, 'me@example.com', 'me')
+        rp.weekly_report(txt, 'me@example.com', 'me')
+        self.assertIn('Time spent in each area', txt.getvalue())
+
+    def test_Reports_monthly_report_includes_tags(self):
+        rp = Reports(self.tw)
+        txt = StringIO()
+        rp.monthly_report(txt, 'me@example.com', 'me')
         self.assertIn('Time spent in each area', txt.getvalue())
 
     def test_Reports_categorized_report_includes_tags(self):
-        rp = Reports(self.tw)
+        rp = Reports(self.tw, style='categorized')
         txt = StringIO()
-        rp.weekly_report_categorized(txt, 'me@example.com', 'me')
+        rp.weekly_report(txt, 'me@example.com', 'me')
+        self.assertIn('Time spent in each area', txt.getvalue())
+        txt = StringIO()
+        rp.monthly_report(txt, 'me@example.com', 'me')
         self.assertIn('Time spent in each area', txt.getvalue())
 
 
