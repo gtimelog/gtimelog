@@ -78,6 +78,16 @@
             <description>Email to send activity reports to.</description>
         </key>
 
+        <key name="report-style" type="s">
+            <default>"plain"</default>
+            <summary>Report style</summary>
+            <description>Report style.</description>
+            <choices>
+                <choice value="plain"/>
+                <choice value="categorized"/>
+            </choices>
+        </key>
+
         <key name="remote-task-list" type="b">
             <default>false</default>
             <summary>Use remote task list</summary>

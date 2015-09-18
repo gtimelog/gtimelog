@@ -447,9 +447,10 @@ class Exports(object):
 class Reports(object):
     """Generation of reports."""
 
-    def __init__(self, window, email_headers=True):
+    def __init__(self, window, email_headers=True, style='plain'):
         self.window = window
         self.email_headers = email_headers
+        self.style = style
 
     def _categorizing_report(self, output, email, who, subject, period_name):
         """A report that displays entries by category.
@@ -658,6 +659,18 @@ class Reports(object):
         week = self.window.min_timestamp.isocalendar()[1]
         return u'Weekly report for %s (week %02d)' % (who, week)
 
+    def weekly_report(self, output, email, who):
+        if self.style == 'categorized':
+            return self.weekly_report_categorized(output, email, who)
+        else:
+            return self.weekly_report_plain(output, email, who)
+
+    def weekly_report_plain(self, output, email, who):
+        """Format a weekly report."""
+        subject = self.weekly_report_subject(who)
+        return self._plain_report(output, email, who, subject,
+                                  period_name='week')
+
     def weekly_report_categorized(self, output, email, who):
         """Format a weekly report with entries displayed  under categories."""
         subject = self.weekly_report_subject(who)
@@ -668,23 +681,23 @@ class Reports(object):
         month = self.window.min_timestamp.strftime('%Y/%m')
         return u'Monthly report for %s (%s)' % (who, month)
 
-    def monthly_report_categorized(self, output, email, who):
-        """Format a monthly report with entries displayed  under categories."""
-        subject = self.monthly_report_subject(who)
-        return self._categorizing_report(output, email, who, subject,
-                                         period_name='month')
-
-    def weekly_report_plain(self, output, email, who):
-        """Format a weekly report ."""
-        subject = self.weekly_report_subject(who)
-        return self._plain_report(output, email, who, subject,
-                                  period_name='week')
+    def monthly_report(self, output, email, who):
+        if self.style == 'categorized':
+            return self.monthly_report_categorized(output, email, who)
+        else:
+            return self.monthly_report_plain(output, email, who)
 
     def monthly_report_plain(self, output, email, who):
         """Format a monthly report ."""
         subject = self.monthly_report_subject(who)
         return self._plain_report(output, email, who, subject,
                                   period_name='month')
+
+    def monthly_report_categorized(self, output, email, who):
+        """Format a monthly report with entries displayed  under categories."""
+        subject = self.monthly_report_subject(who)
+        return self._categorizing_report(output, email, who, subject,
+                                         period_name='month')
 
     def custom_range_report_subject(self, who):
         min = self.window.min_timestamp.strftime('%Y-%m-%d')

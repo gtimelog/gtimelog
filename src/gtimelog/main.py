@@ -643,6 +643,7 @@ class Window(Gtk.ApplicationWindow):
         self.gsettings.bind('name', self.report_view, 'name', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('sender', self.sender_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('list-email', self.recipient_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('report-style', self.report_view, 'report-style', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('remote-task-list', self.app.actions.refresh_tasks, 'enabled', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.connect('changed::remote-task-list', self.load_tasks)
         self.gsettings.connect('changed::task-list-url', self.load_tasks)
@@ -672,6 +673,7 @@ class Window(Gtk.ApplicationWindow):
             self.gsettings.set_string('name', old_settings.name)
             self.gsettings.set_string('sender', old_settings.sender)
             self.gsettings.set_string('list-email', old_settings.email)
+            self.gsettings.set_string('report-style', old_settings.report_style)
             self.gsettings.set_string('task-list-url', old_settings.task_list_url)
             self.gsettings.set_boolean('remote-task-list', bool(old_settings.task_list_url))
             for arg in old_settings.edit_task_list_cmd.split():
@@ -1536,6 +1538,10 @@ class ReportView(Gtk.TextView):
         type=str, default='day', nick='Time range',
         blurb='Time range to show (day/week/month)')
 
+    report_style = GObject.Property(
+        type=str, nick='Report style',
+        blurb='Style of the report (plain/categorized)')
+
     body = GObject.Property(
         type=str, nick='Report body',
         blurb='Report body text')
@@ -1548,6 +1554,7 @@ class ReportView(Gtk.TextView):
         self.connect('notify::name', self.update_subject)
         self.connect('notify::date', self.queue_update)
         self.connect('notify::time-range', self.queue_update)
+        self.connect('notify::report-style', self.queue_update)
         self.connect('notify::visible', self.queue_update)
         self.bind_property('body', self.get_buffer(), 'text', GObject.BindingFlags.BIDIRECTIONAL)
         if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 160):
@@ -1615,16 +1622,16 @@ class ReportView(Gtk.TextView):
             self.get_buffer().set_text('')
             return # not loaded yet
         window = self.get_time_window()
-        reports = Reports(window, email_headers=False)
+        reports = Reports(window, email_headers=False, style=self.report_style)
         output = StringIO()
         recipient = to_unicode(self.recipient)
         name = to_unicode(self.name)
         if self.time_range == 'day':
             reports.daily_report(output, recipient, name)
         elif self.time_range == 'week':
-            reports.weekly_report_plain(output, recipient, name)
+            reports.weekly_report(output, recipient, name)
         elif self.time_range == 'month':
-            reports.monthly_report_plain(output, recipient, name)
+            reports.monthly_report(output, recipient, name)
         textbuf = self.get_buffer()
         textbuf.set_text(output.getvalue())
         textbuf.place_cursor(textbuf.get_start_iter())
