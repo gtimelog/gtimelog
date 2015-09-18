@@ -240,6 +240,9 @@
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
+            <property name="margin_top">6</property>
+            <property name="margin_bottom">6</property>
+            <property name="spacing">6</property>
             <child>
               <object class="GtkButtonBox" id="buttonbox1">
                 <property name="visible">True</property>
@@ -247,8 +250,6 @@
                 <property name="halign">center</property>
                 <property name="margin_start">6</property>
                 <property name="margin_end">6</property>
-                <property name="margin_top">6</property>
-                <property name="margin_bottom">6</property>
                 <property name="hexpand">False</property>
                 <property name="layout_style">start</property>
                 <child>
@@ -305,41 +306,58 @@
               </packing>
             </child>
             <child>
-              <object class="GtkScrolledWindow" id="scrolledwindow3">
+              <object class="GtkBox" id="report_hbox1">
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="shadow_type">in</property>
+                <property name="can_focus">False</property>
+                <property name="margin_start">12</property>
+                <property name="margin_end">6</property>
+                <property name="spacing">12</property>
                 <child>
-                  <object class="GtkTextView" id="report_view">
-                    <property name="visible">False</property>
-                    <property name="can_focus">True</property>
-                    <property name="editable">False</property>
-                    <property name="left_margin">6</property>
-                    <property name="right_margin">6</property>
+                  <object class="GtkLabel" id="sender_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Sender</property>
+                    <property name="mnemonic_widget">sender_entry</property>
+                    <property name="xalign">1</property>
                   </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="sender_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
                 </child>
               </object>
               <packing>
-                <property name="expand">True</property>
+                <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
             </child>
             <child>
-              <object class="GtkBox" id="box4">
+              <object class="GtkBox" id="report_hbox2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="margin_start">6</property>
+                <property name="margin_start">12</property>
                 <property name="margin_end">6</property>
-                <property name="margin_top">6</property>
-                <property name="margin_bottom">6</property>
-                <property name="spacing">6</property>
+                <property name="spacing">12</property>
                 <child>
-                  <object class="GtkLabel" id="label1">
+                  <object class="GtkLabel" id="recipient_label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Recipient</property>
                     <property name="mnemonic_widget">recipient_entry</property>
+                    <property name="xalign">1</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -358,6 +376,81 @@
                     <property name="position">1</property>
                   </packing>
                 </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="report_hbox3">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_start">12</property>
+                <property name="margin_end">6</property>
+                <property name="spacing">12</property>
+                <child>
+                  <object class="GtkLabel" id="subject_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Subject</property>
+                    <property name="mnemonic_widget">subject_entry</property>
+                    <property name="xalign">1</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="subject_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="editable">False</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow" id="scrolledwindow3">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="shadow_type">in</property>
+                <child>
+                  <object class="GtkTextView" id="report_view">
+                    <property name="visible">False</property>
+                    <property name="can_focus">True</property>
+                    <property name="editable">True</property>
+                    <property name="left_margin">6</property>
+                    <property name="right_margin">6</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
+                <property name="position">4</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox" id="box4">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_start">6</property>
+                <property name="margin_end">6</property>
+                <property name="spacing">6</property>
                 <child>
                   <object class="GtkButton" id="send_button">
                     <property name="label" translatable="yes">Send</property>
@@ -365,11 +458,15 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="action_name">win.send-report</property>
+                    <style>
+                      <class name="suggested-action"/>
+                    </style>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">2</property>
+                    <property name="pack_type">end</property>
+                    <property name="position">0</property>
                   </packing>
                 </child>
               </object>
@@ -546,5 +643,13 @@
         </child>
       </object>
     </child>
+  </object>
+  <object class="GtkSizeGroup" id="report_labels">
+    <property name="mode">GTK_SIZE_GROUP_HORIZONTAL</property>
+    <widgets>
+      <widget name="sender_label"/>
+      <widget name="recipient_label"/>
+      <widget name="subject_label"/>
+    </widgets>
   </object>
 </interface>

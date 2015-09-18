@@ -538,7 +538,9 @@ class Window(Gtk.ApplicationWindow):
         self.forward_button = builder.get_object("forward_button")
         self.today_button = builder.get_object("today_button")
         self.cancel_report_button = builder.get_object("cancel_report_button")
+        self.sender_entry = builder.get_object("sender_entry")
         self.recipient_entry = builder.get_object("recipient_entry")
+        self.subject_entry = builder.get_object("subject_entry")
         self.tasks_infobar = builder.get_object("tasks_infobar")
         self.tasks_infobar.connect('response', lambda *args: self.tasks_infobar.hide())
         self.tasks_infobar_label = builder.get_object("tasks_infobar_label")
@@ -583,7 +585,9 @@ class Window(Gtk.ApplicationWindow):
         self.bind_property('timelog', self.report_view, 'timelog', GObject.BindingFlags.DEFAULT)
         self.bind_property('date', self.report_view, 'date', GObject.BindingFlags.DEFAULT)
         self.bind_property('time_range', self.report_view, 'time_range', GObject.BindingFlags.SYNC_CREATE)
+        self.sender_entry.bind_property('text', self.report_view, 'sender', GObject.BindingFlags.SYNC_CREATE)
         self.recipient_entry.bind_property('text', self.report_view, 'recipient', GObject.BindingFlags.SYNC_CREATE)
+        self.report_view.bind_property('subject', self.subject_entry, 'text', GObject.BindingFlags.DEFAULT)
 
         # Workaround for a GTK+ 3.10 bug (https://bugzilla.gnome.org/show_bug.cgi?id=705673)
         builder.get_object('back_button').connect('button-press-event', self.disable_double_click)
@@ -631,7 +635,7 @@ class Window(Gtk.ApplicationWindow):
         self.gsettings.bind('hours', self.log_view, 'hours', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('office-hours', self.log_view, 'office-hours', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('name', self.report_view, 'name', Gio.SettingsBindFlags.DEFAULT)
-        self.gsettings.bind('sender', self.report_view, 'sender', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('sender', self.sender_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('list-email', self.recipient_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('remote-task-list', self.app.actions.refresh_tasks, 'enabled', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.connect('changed::remote-task-list', self.load_tasks)
@@ -1515,10 +1519,9 @@ class ReportView(Gtk.TextView):
     def __init__(self):
         Gtk.TextView.__init__(self)
         self._update_pending = False
+        self._subject = ''
         self.connect('notify::timelog', self.queue_update)
-        self.connect('notify::name', self.queue_update)
-        self.connect('notify::sender', self.queue_update)
-        self.connect('notify::recipient', self.queue_update)
+        self.connect('notify::name', self.update_subject)
         self.connect('notify::date', self.queue_update)
         self.connect('notify::time-range', self.queue_update)
         self.connect('notify::visible', self.queue_update)
@@ -1540,6 +1543,10 @@ class ReportView(Gtk.TextView):
             return self.timelog.window_for_week(self.date)
         elif self.time_range == 'month':
             return self.timelog.window_for_month(self.date)
+
+    @GObject.Property(type=str, nick='Name', blurb='Report subject')
+    def subject(self):
+        return self._subject
 
     def get_report_text(self):
         return self.get_buffer().props.text
@@ -1563,19 +1570,33 @@ class ReportView(Gtk.TextView):
         elif self.time_range == 'month':
             return 'monthly'
 
-    def populate_report(self):
-        self._update_pending = False
-        self.get_buffer().set_text('')
+    def update_subject(self, *args):
+        self._subject = ''
         if self.timelog is None or not self.get_visible():
+            self.notify('subject')
             return # not loaded yet
         window = self.get_time_window()
         reports = Reports(window)
+        name = to_unicode(self.name)
+        if self.time_range == 'day':
+            self._subject = reports.daily_report_subject(name)
+        elif self.time_range == 'week':
+            self._subject = reports.weekly_report_subject(name)
+        elif self.time_range == 'month':
+            self._subject = reports.monthly_report_subject(name)
+        self.notify('subject')
+
+    def populate_report(self):
+        self._update_pending = False
+        self.update_subject()
+        if self.timelog is None or not self.get_visible():
+            self.get_buffer().set_text('')
+            return # not loaded yet
+        window = self.get_time_window()
+        reports = Reports(window, email_headers=False)
         output = StringIO()
-        sender = to_unicode(self.sender)
         recipient = to_unicode(self.recipient)
         name = to_unicode(self.name)
-        if self.sender:
-            output.write(u"From: {}\n".format(sender))
         if self.time_range == 'day':
             reports.daily_report(output, recipient, name)
         elif self.time_range == 'week':
