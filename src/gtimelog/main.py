@@ -1615,7 +1615,9 @@ class ReportView(Gtk.TextView):
             reports.weekly_report_plain(output, recipient, name)
         elif self.time_range == 'month':
             reports.monthly_report_plain(output, recipient, name)
-        self.get_buffer().set_text(output.getvalue())
+        textbuf = self.get_buffer()
+        textbuf.set_text(output.getvalue())
+        textbuf.place_cursor(textbuf.get_start_iter())
 
 
 class TaskListView(Gtk.TreeView):
