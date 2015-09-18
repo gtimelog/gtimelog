@@ -576,7 +576,7 @@ class Window(Gtk.ApplicationWindow):
 
         self.actions = self.Actions(self)
         self.actions.add_entry.set_enabled(False)
-        self.actions.send_report.set_enabled(True)
+        self.actions.send_report.set_enabled(False)
 
         # couldn't figure out how to set action targets in the .ui file
         builder.get_object('daily_report_toggle').set_detailed_action_name('win.time-range::day')
@@ -591,6 +591,9 @@ class Window(Gtk.ApplicationWindow):
         self.sender_entry.bind_property('text', self.report_view, 'sender', GObject.BindingFlags.SYNC_CREATE)
         self.recipient_entry.bind_property('text', self.report_view, 'recipient', GObject.BindingFlags.SYNC_CREATE)
         self.report_view.bind_property('subject', self.subject_entry, 'text', GObject.BindingFlags.DEFAULT)
+        self.report_view.connect('notify::recipient', self.update_send_report_availability)
+        self.report_view.connect('notify::body', self.update_send_report_availability)
+        self.update_send_report_availability()
 
         # Workaround for a GTK+ 3.10 bug (https://bugzilla.gnome.org/show_bug.cgi?id=705673)
         builder.get_object('back_button').connect('button-press-event', self.disable_double_click)
@@ -715,6 +718,13 @@ class Window(Gtk.ApplicationWindow):
         else:
             can_edit_tasks = True
         self.app.actions.edit_tasks.set_enabled(can_edit_tasks)
+
+    def update_send_report_availability(self, *args):
+        if self.main_stack.get_visible_child_name() == 'report':
+            can_send = bool(self.report_view.recipient and self.report_view.body)
+        else:
+            can_send = False
+        self.actions.send_report.set_enabled(can_send)
 
     def download_tasks(self):
         if self._download:
@@ -937,10 +947,11 @@ class Window(Gtk.ApplicationWindow):
             self.report_view.show()
             self.headerbar.set_show_close_button(False)
             self.set_title(_("Report"))
-            self.actions.send_report.set_enabled(True)
+            self.update_send_report_availability()
 
     def on_send_report(self, action, parameter):
         if self.main_stack.get_visible_child_name() != 'report':
+            log.debug("Not sending report: not in report mode")
             return
         sender = self.report_view.sender
         recipient = self.report_view.recipient
@@ -1008,7 +1019,7 @@ class Window(Gtk.ApplicationWindow):
         self.infobar.hide()
         self.headerbar.set_show_close_button(True)
         self.set_title(_("Time Log"))
-        self.actions.send_report.set_enabled(False)
+        self.update_send_report_availability()
         self.add_button.grab_default() # huh
 
     def on_timelog_file_changed(self, monitor, file, other_file, event_type):
