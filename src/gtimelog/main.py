@@ -940,6 +940,8 @@ class Window(Gtk.ApplicationWindow):
         if self.main_stack.get_visible_child_name() == 'report':
             self.on_cancel_report()
         else:
+            self.saved_date = self.date
+            self.saved_time_range = self.time_range
             self.main_stack.set_visible_child_name('report')
             self.view_button.hide()
             self.task_pane_button.hide()
@@ -1020,6 +1022,8 @@ class Window(Gtk.ApplicationWindow):
         self.infobar.hide()
         self.headerbar.set_show_close_button(True)
         self.set_title(_("Time Log"))
+        self.date = self.saved_date
+        self.time_range = self.saved_time_range
         self.update_send_report_availability()
         self.add_button.grab_default() # huh
 
