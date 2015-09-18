@@ -45,7 +45,6 @@ Changelog
   - Setting for spreadsheet is gone.
   - Separate setting to show remaining office hours is gone (set office hours
     to 0 to hide the estimate).
-  - Report style cannot be selected.
 
 
 0.10 (unreleased)
