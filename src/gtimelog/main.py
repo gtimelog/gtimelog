@@ -1009,7 +1009,6 @@ class Window(Gtk.ApplicationWindow):
 
     def on_cancel_report(self, action=None, parameter=None):
         self.main_stack.set_visible_child_name('entry')
-        self.headerbar.get_style_context().remove_class('selection-mode')
         self.view_button.show()
         self.task_pane_button.show()
         self.menu_button.show()
