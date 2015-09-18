@@ -1682,6 +1682,10 @@ class PreferencesDialog(Gtk.Dialog):
 
         if not self.use_header_bar:
             self.add_button(_("Close"), Gtk.ResponseType.CLOSE)
+            self.set_default_response(Gtk.ResponseType.CLOSE)
+        else:
+            # can't do it now, it doesn't have window decorations yet!
+            GLib.idle_add(self.make_enter_close_the_dialog)
 
         builder = Gtk.Builder.new_from_file(PREFERENCES_UI_FILE)
         vbox = builder.get_object('dialog-vbox')
@@ -1705,6 +1709,18 @@ class PreferencesDialog(Gtk.Dialog):
         self.gsettings.connect('changed::virtual-midnight', self.virtual_midnight_changed)
         self.virtual_midnight_changed()
         self.virtual_midnight_entry.connect('focus-out-event', self.virtual_midnight_set)
+
+    def make_enter_close_the_dialog(self):
+        hb = self.get_header_bar()
+        hb.forall(self._traverse_headerbar_children, None)
+
+    def _traverse_headerbar_children(self, widget, user_data):
+        if isinstance(widget, Gtk.Box):
+            widget.forall(self._traverse_headerbar_children, None)
+        elif isinstance(widget, Gtk.Button):
+            if widget.get_style_context().has_class('close'):
+                widget.set_can_default(True)
+                widget.grab_default()
 
     def virtual_midnight_changed(self, *args):
         h, m = self.gsettings.get_value('virtual-midnight')
