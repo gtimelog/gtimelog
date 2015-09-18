@@ -40,6 +40,12 @@
             <description>Size of the application window (width and height).</description>
         </key>
 
+        <key name="window-position" type="(ii)">
+            <default>(-1, -1)</default>
+            <summary>Window position</summary>
+            <description>Position of the application window (X and Y).</description>
+        </key>
+
         <key name="hours" type="d">
             <default>8</default>
             <summary>Work hours</summary>

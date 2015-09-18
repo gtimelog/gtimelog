@@ -651,9 +651,12 @@ class Window(Gtk.ApplicationWindow):
         self.gsettings.connect('changed::virtual-midnight', self.virtual_midnight_changed)
         self.update_edit_tasks_availability()
 
+        x, y = self.gsettings.get_value('window-position')
         w, h = self.gsettings.get_value('window-size')
         tpp = self.gsettings.get_int('task-pane-position')
         self.resize(w, h)
+        if (x, y) != (-1, -1):
+            self.move(x, y)
         self.paned.set_position(tpp)
         self.paned.connect('notify::position', self.delay_store_window_size)
         self.connect("configure-event", self.delay_store_window_size)
@@ -781,9 +784,11 @@ class Window(Gtk.ApplicationWindow):
             self._window_size_update_timeout = GLib.timeout_add(500, self.store_window_size)
 
     def store_window_size(self):
-        w, h = self.get_size()
+        position = self.get_position()
+        size = self.get_size()
         tpp = self.paned.get_position()
-        self.gsettings.set_value('window-size', GLib.Variant('(ii)', (w, h)))
+        self.gsettings.set_value('window-size', GLib.Variant('(ii)', size))
+        self.gsettings.set_value('window-position', GLib.Variant('(ii)', position))
         self.gsettings.set_int('task-pane-position', tpp)
         GLib.source_remove(self._window_size_update_timeout)
         self._window_size_update_timeout = None
