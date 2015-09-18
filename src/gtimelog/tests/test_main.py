@@ -16,20 +16,21 @@ mock_gi = mock.patch.dict('sys.modules', {'gi': gi, 'gi.repository': gi.reposito
 @mock_gi
 class TestEmail(unittest.TestCase):
 
-    def test_message_from_string_ascii(self):
-        from gtimelog.main import message_from_string
-        msg = message_from_string(textwrap.dedent('''\
-            From: ASCII Name <test@example.com>
-            To: activity@example.com
-            Subject: Report for Mr. Plain
-
-            These are the activites done by Mr. Plain:
-            ...
-        '''))
+    def test_prepare_message_ascii(self):
+        from gtimelog.main import prepare_message
+        msg = prepare_message(
+            sender='ASCII Name <test@example.com>',
+            recipient='activity@example.com',
+            subject='Report for Mr. Plain',
+            body='These are the activites done by Mr. Plain:\n...\n',
+        )
         self.assertEqual("ASCII Name <test@example.com>", msg["From"])
         self.assertEqual("activity@example.com", msg["To"])
         self.assertEqual("Report for Mr. Plain", msg["Subject"])
         expected = textwrap.dedent('''\
+            Content-Type: text/plain; charset="us-ascii"
+            MIME-Version: 1.0
+            Content-Transfer-Encoding: 7bit
             From: ASCII Name <test@example.com>
             To: activity@example.com
             Subject: Report for Mr. Plain
@@ -39,23 +40,23 @@ class TestEmail(unittest.TestCase):
         ''')
         self.assertEqual(expected, msg.as_string())
 
-    def test_message_from_string_unicode(self):
-        from gtimelog.main import message_from_string
-        msg = message_from_string(textwrap.dedent('''\
-            From: Ünicødę Name <test@example.com>
-            To: Anöther nąme <activity@example.com>
-            Subject: Report for Mr. ☃
-
-            These are the activites done by Mr. ☃:
-            ...
-        '''))
+    def test_prepare_message_unicode(self):
+        from gtimelog.main import prepare_message
+        msg = prepare_message(
+            sender='Ünicødę Name <test@example.com>',
+            recipient='Anöther nąme <activity@example.com>',
+            subject='Report for Mr. ☃',
+            body='These are the activites done by Mr. ☃:\n...\n',
+        )
         expected = textwrap.dedent('''\
+            MIME-Version: 1.0
+            Content-Type: text/plain; charset="utf-8"
+            Content-Transfer-Encoding: base64
             From: =?utf-8?b?w5xuaWPDuGTEmSBOYW1l?= <test@example.com>
             To: =?utf-8?b?QW7DtnRoZXIgbsSFbWU=?= <activity@example.com>
             Subject: =?utf-8?b?UmVwb3J0IGZvciBNci4g4piD?=
 
-            These are the activites done by Mr. ☃:
-            ...
+            VGhlc2UgYXJlIHRoZSBhY3Rpdml0ZXMgZG9uZSBieSBNci4g4piDOgouLi4K
         ''')
         self.assertEqual(expected, msg.as_string())
 

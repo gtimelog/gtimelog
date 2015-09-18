@@ -22,6 +22,7 @@ mark_time("in script")
 import datetime
 import email
 import email.header
+import email.mime.text
 import gettext
 import io
 import locale
@@ -114,31 +115,32 @@ def format_duration(duration):
 
 
 def isascii(s):
-    return all(32 <= ord(c) < 127 for c in s)
+    return all(0 <= ord(c) <= 127 for c in s)
 
 
-def fixup_email(name_and_address):
+def address_header(name_and_address):
+    if isascii(name_and_address):
+        return name_and_address
     name, addr = parseaddr(name_and_address)
     name = str(email.header.Header(name, 'UTF-8'))
     return formataddr((name, addr))
 
 
-def fixup_subject(header):
-    return str(email.header.Header(header, 'UTF-8'))
+def subject_header(header):
+    if isascii(header):
+        return header
+    return email.header.Header(header, 'UTF-8')
 
 
-def fixup_header(msg, header, fixup):
-    old = msg[header]
-    if not isascii(old):
-        del msg[header]
-        msg[header] = fixup(old)
-
-
-def message_from_string(message):
-    msg = email.message_from_string(message)
-    fixup_header(msg, 'From', fixup_email)
-    fixup_header(msg, 'To', fixup_email)
-    fixup_header(msg, 'Subject', fixup_subject)
+def prepare_message(sender, recipient, subject, body):
+    if isascii(body):
+        msg = email.mime.text.MIMEText(body)
+    else:
+        msg = email.mime.text.MIMEText(body, _charset="UTF-8")
+    if sender:
+        msg["From"] = address_header(sender)
+    msg["To"] = address_header(recipient)
+    msg["Subject"] = subject_header(subject)
     return msg
 
 
@@ -942,10 +944,15 @@ class Window(Gtk.ApplicationWindow):
             return
         sender = self.report_view.sender
         recipient = self.report_view.recipient
-        body = self.report_view.get_report_text()
+        subject = self.report_view.subject
+        body = self.report_view.body
         if not body:
+            log.debug("Not sending report: no body")
             return
-        if self.email(sender, recipient, body):
+        if not recipient:
+            log.debug("Not sending report: no destination")
+            return
+        if self.email(sender, recipient, subject, body):
             self.record_sent_email(self.report_view.get_report_kind(),
                                    self.report_view.get_report_id(),
                                    recipient)
@@ -954,10 +961,10 @@ class Window(Gtk.ApplicationWindow):
             self.infobar_label.set_text(_("Couldn't send email to {}.").format(recipient))
             self.infobar.show()
 
-    def email(self, sender, recipient, body):
-        sender_address = parseaddr(sender)[1]
-        recipient_address = parseaddr(recipient)[1]
-        msg = message_from_string(body)
+    def email(self, sender, recipient, subject, body):
+        sender_name, sender_address = parseaddr(sender)
+        recipient_name, recipient_address = parseaddr(recipient)
+        msg = prepare_message(sender, recipient, subject, body)
         command = ['/usr/sbin/sendmail']
         if sender_address:
             command += ['-f', sender_address]
@@ -1519,6 +1526,10 @@ class ReportView(Gtk.TextView):
         type=str, default='day', nick='Time range',
         blurb='Time range to show (day/week/month)')
 
+    body = GObject.Property(
+        type=str, nick='Report body',
+        blurb='Report body text')
+
     def __init__(self):
         Gtk.TextView.__init__(self)
         self._update_pending = False
@@ -1528,6 +1539,7 @@ class ReportView(Gtk.TextView):
         self.connect('notify::date', self.queue_update)
         self.connect('notify::time-range', self.queue_update)
         self.connect('notify::visible', self.queue_update)
+        self.bind_property('body', self.get_buffer(), 'text', GObject.BindingFlags.BIDIRECTIONAL)
         if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 160):
             self.override_font(Pango.FontDescription.from_string("Monospace"))
         else:
@@ -1550,9 +1562,6 @@ class ReportView(Gtk.TextView):
     @GObject.Property(type=str, nick='Name', blurb='Report subject')
     def subject(self):
         return self._subject
-
-    def get_report_text(self):
-        return self.get_buffer().props.text
 
     def get_report_id(self):
         if self.time_range == 'day':
