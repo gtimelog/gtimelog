@@ -447,8 +447,9 @@ class Exports(object):
 class Reports(object):
     """Generation of reports."""
 
-    def __init__(self, window):
+    def __init__(self, window, email_headers=True):
         self.window = window
+        self.email_headers = email_headers
 
     def _categorizing_report(self, output, email, who, subject, period_name):
         """A report that displays entries by category.
@@ -485,9 +486,11 @@ class Reports(object):
         """
         window = self.window
 
-        output.write("To: %(email)s\n" % {'email': email})
-        output.write("Subject: %s\n" % subject)
-        output.write('\n')
+        if self.email_headers:
+            output.write("To: %(email)s\n" % {'email': email})
+            output.write("Subject: %s\n" % subject)
+            output.write('\n')
+
         items = list(window.all_entries())
         if not items:
             output.write("No work done this %s.\n" % period_name)
@@ -608,9 +611,11 @@ class Reports(object):
         """
         window = self.window
 
-        output.write("To: %(email)s\n" % {'email': email})
-        output.write('Subject: %s\n' % subject)
-        output.write('\n')
+        if self.email_headers:
+            output.write("To: %(email)s\n" % {'email': email})
+            output.write('Subject: %s\n' % subject)
+            output.write('\n')
+
         items = list(window.all_entries())
         if not items:
             output.write("No work done this %s.\n" % period_name)
@@ -649,42 +654,60 @@ class Reports(object):
         if tags:
             self._report_tags(output, tags)
 
+    def weekly_report_subject(self, who):
+        week = self.window.min_timestamp.isocalendar()[1]
+        return u'Weekly report for %s (week %02d)' % (who, week)
+
     def weekly_report_categorized(self, output, email, who):
         """Format a weekly report with entries displayed  under categories."""
-        week = self.window.min_timestamp.isocalendar()[1]
-        subject = u'Weekly report for %s (week %02d)' % (who, week)
+        subject = self.weekly_report_subject(who)
         return self._categorizing_report(output, email, who, subject,
                                          period_name='week')
 
+    def monthly_report_subject(self, who):
+        month = self.window.min_timestamp.strftime('%Y/%m')
+        return u'Monthly report for %s (%s)' % (who, month)
+
     def monthly_report_categorized(self, output, email, who):
         """Format a monthly report with entries displayed  under categories."""
-        month = self.window.min_timestamp.strftime('%Y/%m')
-        subject = u'Monthly report for %s (%s)' % (who, month)
+        subject = self.monthly_report_subject(who)
         return self._categorizing_report(output, email, who, subject,
                                          period_name='month')
 
     def weekly_report_plain(self, output, email, who):
         """Format a weekly report ."""
-        week = self.window.min_timestamp.isocalendar()[1]
-        subject = u'Weekly report for %s (week %02d)' % (who, week)
+        subject = self.weekly_report_subject(who)
         return self._plain_report(output, email, who, subject,
                                   period_name='week')
 
     def monthly_report_plain(self, output, email, who):
         """Format a monthly report ."""
-        month = self.window.min_timestamp.strftime('%Y/%m')
-        subject = u'Monthly report for %s (%s)' % (who, month)
+        subject = self.monthly_report_subject(who)
         return self._plain_report(output, email, who, subject,
                                   period_name='month')
 
-    def custom_range_report_categorized(self, output, email, who):
-        """Format a custom range report with entries displayed  under categories."""
+    def custom_range_report_subject(self, who):
         min = self.window.min_timestamp.strftime('%Y-%m-%d')
         max = self.window.max_timestamp - datetime.timedelta(1)
         max = max.strftime('%Y-%m-%d')
-        subject = u'Custom date range report for %s (%s - %s)' % (who, min, max)
+        return u'Custom date range report for %s (%s - %s)' % (who, min, max)
+
+    def custom_range_report_categorized(self, output, email, who):
+        """Format a custom range report with entries displayed under categories."""
+        subject = self.custom_range_report_subject(who)
         return self._categorizing_report(output, email, who, subject,
                                          period_name='custom range')
+
+    def daily_report_subject(self, who):
+        # strftime('%a') would give us translated names, but we want our
+        # reports to be standardized and machine-parseable
+        weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        weekday = weekday_names[self.window.min_timestamp.weekday()]
+        week = self.window.min_timestamp.isocalendar()[1]
+        return (u"{0:%Y-%m-%d} report for {who}"
+                u" ({weekday}, week {week:0>2})".format(
+                    self.window.min_timestamp, who=who,
+                    weekday=weekday, week=week))
 
     def daily_report(self, output, email, who):
         """Format a daily report.
@@ -692,18 +715,10 @@ class Reports(object):
         Writes a daily report template in RFC-822 format to output.
         """
         window = self.window
-
-        # Locale is set as a side effect of 'import gtk', so strftime('%a')
-        # would give us translated names
-        weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        weekday = weekday_names[window.min_timestamp.weekday()]
-        week = window.min_timestamp.isocalendar()[1]
-        output.write(u"To: %s\n" % email)
-        output.write(u"Subject: {0:%Y-%m-%d} report for {who}"
-                     u" ({weekday}, week {week:0>2})\n".format(
-                         window.min_timestamp, who=who,
-                         weekday=weekday, week=week))
-        output.write('\n')
+        if self.email_headers:
+            output.write(u"To: %s\n" % email)
+            output.write(u"Subject: %s\n" % self.daily_report_subject(who))
+            output.write('\n')
         items = list(window.all_entries())
         if not items:
             output.write("No work done today.\n")
