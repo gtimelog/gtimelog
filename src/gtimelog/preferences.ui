@@ -296,6 +296,7 @@
                     <property name="can_focus">True</property>
                     <property name="expand">True</property>
                     <property name="text">activity@example.com</property>
+                    <property name="placeholder_text" translatable="yes">email@example.com</property>
                     <property name="activates_default">True</property>
                   </object>
                   <packing>
@@ -309,6 +310,7 @@
                     <property name="can_focus">True</property>
                     <property name="expand">True</property>
                     <property name="text">J. Random Hacker &lt;jrh@example.com&gt;</property>
+                    <property name="placeholder_text" translatable="yes">Your Name &lt;youremail@example.com&gt;</property>
                     <property name="activates_default">True</property>
                   </object>
                   <packing>
@@ -323,6 +325,7 @@
                     <property name="expand">True</property>
                     <property name="text">JRH</property>
                     <property name="activates_default">True</property>
+                    <property name="placeholder_text" translatable="yes">Nickname used in the Subject line</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>

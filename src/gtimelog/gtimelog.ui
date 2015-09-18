@@ -336,6 +336,7 @@
                       <object class="GtkEntry" id="sender_entry">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="placeholder_text" translatable="yes">Your Name &lt;youremail@example.com&gt;</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
@@ -375,6 +376,7 @@
                       <object class="GtkEntry" id="recipient_entry">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
+                        <property name="placeholder_text" translatable="yes">email@example.com</property>
                       </object>
                       <packing>
                         <property name="expand">True</property>
