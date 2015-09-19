@@ -46,7 +46,7 @@ update-translations:
 %-gtk3.10.ui: %.ui
 	sed -e 's/margin_start/margin_left/' \
 	    -e 's/margin_end/margin_right/' \
-	    -e '/property name="max-width-chars"/d' \
+	    -e '/property name="max_width_chars"/d' \
 	    -e '/GtkHeaderBar/,$$ s/<property name="position">.*<\/property>//' \
 	    < $< > $@.tmp
 	mv $@.tmp $@
