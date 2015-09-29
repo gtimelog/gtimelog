@@ -1,3 +1,3 @@
 # The gtimelog package.
 
-__version__ = '0.9.3dev'
+__version__ = '0.9.3'
