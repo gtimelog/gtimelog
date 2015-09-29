@@ -7,7 +7,7 @@ python:
     - 3.4
     - 3.5
 install:
-    - pip install coverage coveralls -e .
+    - pip install coverage coveralls .
 script:
     - coverage run setup.py -q test
 after_success:
