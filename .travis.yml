@@ -1,11 +1,16 @@
 language: python
+sudo: false
 python:
     - 2.6
     - 2.7
     - 3.3
+    - 3.4
+    - 3.5
 install:
-    - travis_retry pip install .
+    - pip install coverage coveralls -e .
 script:
-    - python setup.py test -q
+    - coverage run setup.py -q test
+after_success:
+    - coveralls
 notifications:
     email: false
