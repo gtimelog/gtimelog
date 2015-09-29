@@ -47,8 +47,8 @@ Changelog
     to 0 to hide the estimate).
 
 
-0.10 (unreleased)
-~~~~~~~~~~~~~~~~~
+0.10.0 (2015-09-29)
+~~~~~~~~~~~~~~~~~~~
 
 * Use Tango colors in the main text buffer (GH: #13).
 
@@ -77,7 +77,7 @@ Changelog
 * Improve tray icon selection logic for best contrast (GH: #29).
 
 
-0.9.3 (unreleased)
+0.9.3 (2015-09-29)
 ~~~~~~~~~~~~~~~~~~
 
 * Adding new entries didn't update total weekly numbers (GH: #28).
