@@ -9,7 +9,7 @@ python:
 install:
     - pip install coverage coveralls .
 script:
-    - coverage run setup.py -q test
+    - coverage run ./runtests
 after_success:
     - coveralls
 notifications:
