@@ -141,6 +141,7 @@ def prepare_message(sender, recipient, subject, body):
         msg["From"] = address_header(sender)
     msg["To"] = address_header(recipient)
     msg["Subject"] = subject_header(subject)
+    msg["User-Agent"] = "gtimelog/{}".format(__version__)
     return msg
 
 
