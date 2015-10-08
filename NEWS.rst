@@ -38,7 +38,6 @@ Changelog
   - Report for a custom date range is gone.
   - "Complete report in spreadsheet" is gone.
   - "Work/slacking stats in spreadsheet" is gone.
-  - Setting to disable GTK+ completion is gone.
   - Setting for editor is gone: the default file association for text
     files will be used.
   - Settings for mailer is gone: mail sending is internal now.

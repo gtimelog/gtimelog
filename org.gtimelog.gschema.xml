@@ -112,6 +112,12 @@
             <description>URL for editing tasks for the task pane.  Will be opened in a browser window if the user asks to edit tasks.</description>
         </key>
 
+        <key name="gtk-completion" type="b">
+            <default>true</default>
+            <summary>Use completion</summary>
+            <description>If true, the task entry will use the standard GTK+ completion.  If false, it'll only use the custom prefix completion on PageUp/PageDown.</description>
+        </key>
+
     </schema>
 
 </schemalist>

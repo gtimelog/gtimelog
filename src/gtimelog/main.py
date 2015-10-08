@@ -646,6 +646,7 @@ class Window(Gtk.ApplicationWindow):
         self.gsettings.bind('list-email', self.recipient_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('report-style', self.report_view, 'report-style', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('remote-task-list', self.app.actions.refresh_tasks, 'enabled', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('gtk-completion', self.task_entry, 'gtk-completion-enabled', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.connect('changed::remote-task-list', self.load_tasks)
         self.gsettings.connect('changed::task-list-url', self.load_tasks)
         self.gsettings.connect('changed::task-list-edit-url', self.update_edit_tasks_availability)
@@ -685,6 +686,7 @@ class Window(Gtk.ApplicationWindow):
                     self.gsettings.set_string('task-list-edit-url', arg)
             vm = old_settings.virtual_midnight
             self.gsettings.set_value('virtual-midnight', GLib.Variant('(ii)', (vm.hour, vm.minute)))
+            self.gsettings.set_boolean('gtk-completion', bool(old_settings.enable_gtk_completion))
             self.gsettings.set_boolean('settings-migrated', True)
             log.info(_('Settings from {filename} migrated to GSettings (org.gtimelog)').format(filename=old_settings.get_config_file()))
 
@@ -1113,6 +1115,10 @@ class TaskEntry(Gtk.Entry):
         type=int, default=1000, nick='Completion limit',
         blurb='Maximum number of items in the completion popup')
 
+    gtk_completion_enabled = GObject.Property(
+        type=bool, default=True, nick='Completion enabled',
+        blurb='GTK+ completion enabled?')
+
     def __init__(self):
         Gtk.Entry.__init__(self)
         self.set_up_history()
@@ -1120,6 +1126,7 @@ class TaskEntry(Gtk.Entry):
         self.connect('notify::timelog', self.timelog_changed)
         self.connect('notify::completion-limit', self.timelog_changed)
         self.connect('changed', self.on_changed)
+        self.connect('notify::gtk-completion-enabled', self.gtk_completion_enabled_changed)
 
     def set_up_history(self):
         self.history = []
@@ -1128,12 +1135,19 @@ class TaskEntry(Gtk.Entry):
         self.history_undo = ''
 
     def set_up_completion(self):
-        completion = Gtk.EntryCompletion()
+        completion = self.gtk_completion = Gtk.EntryCompletion()
         self.completion_choices = Gtk.ListStore(str)
         self.completion_choices_as_set = set()
         completion.set_model(self.completion_choices)
         completion.set_text_column(0)
-        self.set_completion(completion)
+        if self.gtk_completion_enabled:
+            self.set_completion(completion)
+
+    def gtk_completion_enabled_changed(self, *args):
+        if self.gtk_completion_enabled:
+            self.set_completion(self.gtk_completion)
+        else:
+            self.set_completion(None)
 
     def timelog_changed(self, *args):
         mark_time('about to initialize history completion')
