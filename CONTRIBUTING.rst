@@ -49,5 +49,5 @@ Run the test suite with ::
 
 or, to test against all supported Python versions ::
 
-    $ pip install --user tox
+    $ pip install tox
     $ tox
