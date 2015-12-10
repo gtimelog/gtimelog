@@ -1,0 +1,178 @@
+Metadata-Version: 1.1
+Name: gtimelog
+Version: 0.10.0
+Summary: A Gtk+ time tracking application
+Home-page: http://mg.pov.lt/gtimelog/
+Author: Marius Gedminas
+Author-email: marius@gedmin.as
+License: GPL
+Description: GTimeLog
+        ========
+        
+        GTimeLog is a simple app for keeping track of time.
+        
+        .. image:: https://pypip.in/version/gtimelog/badge.svg?style=flat
+           :target: https://pypi.python.org/pypi/gtimelog/
+           :alt: latest version
+        
+        .. image:: https://travis-ci.org/gtimelog/gtimelog.svg?branch=master
+           :target: https://travis-ci.org/gtimelog/gtimelog
+           :alt: build status
+        
+        .. image:: https://coveralls.io/repos/gtimelog/gtimelog/badge.svg?branch=master
+           :target: https://coveralls.io/r/gtimelog/gtimelog?branch=master
+           :alt: test coverage
+        
+        .. contents::
+        
+        .. image:: https://raw.github.com/gtimelog/gtimelog/master/docs/gtimelog.png
+           :alt: screenshot
+        
+        
+        Installing
+        ----------
+        
+        GTimeLog is packaged for Debian and Ubuntu::
+        
+          sudo apt-get install gtimelog
+        
+        For Ubuntu, a newer version can usually be found in the PPA:
+        
+          https://launchpad.net/~gtimelog-dev/+archive/ppa
+        
+        You can fetch the latest released version from PyPI ::
+        
+          $ pip install gtimelog
+          $ gtimelog
+        
+        You can run it from a source checkout without an explicit installation step::
+        
+          $ git clone https://github.com/gtimelog/gtimelog
+          $ cd gtimelog
+          $ ./gtimelog
+        
+        System requirements:
+        
+        - Python (2.7 or 3.3+)
+        - PyGObject
+        - gobject-introspection type libraries for GTK+, Pango
+        
+        
+        Documentation
+        -------------
+        
+        This is work in progress:
+        
+        - `docs/index.rst`_ contains an overview
+        - `docs/formats.rst`_ describes the file formats
+        
+        .. _docs/index.rst: https://github.com/gtimelog/gtimelog/blob/master/docs/index.rst
+        .. _docs/formats.rst: https://github.com/gtimelog/gtimelog/blob/master/docs/formats.rst
+        
+        
+        Resources
+        ---------
+        
+        Website: http://mg.pov.lt/gtimelog
+        
+        Mailing list: gtimelog@googlegroups.com
+        (archive at http://groups.google.com/group/gtimelog)
+        
+        IRC: #gtimelog on irc.freenode.net
+        
+        Source code: https://github.com/gtimelog/gtimelog
+        
+        Report bugs at https://github.com/gtimelog/gtimelog/issues
+        
+        There's an old bugtracker at https://bugs.launchpad.net/gtimelog
+        
+        I sometimes also browse distribution bugs:
+        
+        - Ubuntu https://bugs.launchpad.net/ubuntu/+source/gtimelog
+        - Debian http://bugs.debian.org/gtimelog
+        
+        
+        Credits
+        -------
+        
+        GTimeLog was mainly written by Marius Gedminas <marius@gedmin.as>.
+        
+        Barry Warsaw <barry@python.org> stepped in as a co-maintainer when
+        Marius burned out.  Then Barry got busy and Marius recovered.
+        
+        Many excellent contributors are listed in `CONTRIBUTORS.rst`_
+        
+        .. _CONTRIBUTORS.rst: https://github.com/gtimelog/gtimelog/blob/master/CONTRIBUTORS.rst
+        
+        
+        Changelog
+        ---------
+        
+        0.10.0 (2015-09-29)
+        ~~~~~~~~~~~~~~~~~~~
+        
+        * Use Tango colors in the main text buffer (GH: #13).
+        
+        * Allow tagging entries (GH: #19)
+        
+          - The syntax is ``category: text -- tag1 tag2``
+          - Per-tag summaries show up in reports
+        
+        * Use GtkApplication instead of own DBus server for enforcing single-instance.
+        
+          - Drop --replace, --ignore-dbus command-line options because of this.
+          - Require glib and gio to be version 2.40 or newer for sane
+            GtkApplication-based command line parsing
+            (check with ``pkg-config --modversion glib-2.0 gio-2.0``).
+        
+        * Remove obsolete code:
+        
+          - Drop support for Python 2.6 (PyGObject dropped support for it long ago).
+          - Drop PyGtk/Gtk+ 2 support code (it didn't work since 0.9.1 anyway).
+          - Drop EggTrayIcon support (it was for Gtk+ 2 only anyway).
+          - Drop the --prefer-pygtk command-line option.
+        
+        * Disable tray icon by default for new users (existing gtimelogrc files will be
+          untouched).
+        
+        * Improve tray icon selection logic for best contrast (GH: #29).
+        
+        
+        0.9.3 (2015-09-29)
+        ~~~~~~~~~~~~~~~~~~
+        
+        * Adding new entries didn't update total weekly numbers (GH: #28).
+        
+        
+        0.9.2 (2014-09-28)
+        ~~~~~~~~~~~~~~~~~~
+        * Note that Gtk+ 2.x is no longer supported (this regressed somewhere between
+          0.9.0 and 0.9.1, but I didn't notice because I have no access to a system
+          that has Gtk+ 2.x).
+        * Fix setup.py to work on Python 3 when your locale is not UTF-8 (LP: #1263772).
+        * Fix two Gtk-CRITICAL warnings on startup (GH: #14).
+        * Fix Unicode warning when adding entries (GH: #20).
+        * Speed up entry addition (GH: #21).
+        * Fix Unicode error when navigating history with PageUp/PageDown (GH: #22).
+        * Update current task time when autoreloading (GH: #23).
+        * Fix 'LocaleError: unknown encoding:' on Mac OS X (GH: #25).
+        * Fix 'TypeError: unorderable types: NoneType() < str()' in summary view
+          on Python 3 (GH: #26).
+        
+        
+        Older versions
+        ~~~~~~~~~~~~~~
+        
+        See the `full changelog`_.
+        
+        .. _full changelog: https://github.com/gtimelog/gtimelog/blob/master/NEWS.rst
+        
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Environment :: X11 Applications :: GTK
+Classifier: License :: OSI Approved :: GNU General Public License (GPL)
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Topic :: Office/Business
