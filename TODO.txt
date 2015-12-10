@@ -1,0 +1,23 @@
+Minor bugs
+----------
+
+Sometimes the log view is repainted incorrectly when you are in grouped view
+with a scrollbar, and add an entry for an existing activity.
+
+Midnight handling sometimes acts funny and you need to refresh the view.
+
+
+Unimplemented features
+----------------------
+
+Options dialog.
+
+Re-reading of timelog.txt should be automatic (watch mtime of the file).
+
+History browsing.
+
+Better integration with GNOME (gconf for options, use user's preferred editor
+and mailer).
+
+More options: "virtual midnight" (currently hardcoded at 2 am).
+
