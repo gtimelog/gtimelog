@@ -53,6 +53,21 @@ Work activities can also include a category name, e.g.::
 
 The tasks are grouped by category in the reports.
 
+Each entry may be additionally labelled with multiple
+(space-separated) tags, e.g.::
+
+  project3: upgrade webserver -- sysadmin www front-end
+  project3: restart mail server -- sysadmin mail
+
+Reports will then include an additional breakdown by tag: for each
+tag, the total time spent in entries marked with that tag is shown.
+Note that these times will (likely) not add up to the total reporting
+time, as each entry may be marked with several tags.
+
+Tags must be separated from the rest of the entry by `` -- ``, i.e.,
+double-dash surrounded by spaces.  Tags will *not* be shown in the
+main UI pane.
+
 
 Tasks Pane
 ==========

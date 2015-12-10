@@ -25,8 +25,14 @@ check test:
 
 .PHONY: coverage
 coverage:
-	coverage run ./runtests
-	coverage report --include 'src/gtimelog/*'
+	detox -e coverage,coverage3 -- -p
+	coverage combine
+	coverage report
+
+.PHONY: coverage-diff
+coverage-diff: coverage
+	coverage xml
+	diff-cover coverage.xml
 
 .PHONY: clean
 clean:
@@ -79,7 +85,7 @@ release: releasechecklist
 	# I'm chicken so I won't actually do these things yet
 	@echo "Please run"
 	@echo
-	@echo "  $(PYTHON) setup.py sdist register upload && git tag `$(PYTHON) setup.py --version`"
+	@echo "  rm -rf dist && $(PYTHON) setup.py sdist && twine upload dist/* && git tag `$(PYTHON) setup.py --version`"
 	@echo
 	@echo "Please increment the version number in $(FILE_WITH_VERSION)"
 	@echo "and add a new empty entry at the top of $(FILE_WITH_CHANGELOG), then"

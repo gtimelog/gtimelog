@@ -46,4 +46,3 @@ Run the test suite with ::
     $ ./runtests
 
 The common ``python setup.py test`` idiom is also supported.
-

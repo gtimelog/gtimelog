@@ -1,14 +1,48 @@
 Changelog
 ---------
 
+0.10.0 (2015-09-29)
+~~~~~~~~~~~~~~~~~~~
+
+* Use Tango colors in the main text buffer (GH: #13).
+
+* Allow tagging entries (GH: #19)
+
+  - The syntax is ``category: text -- tag1 tag2``
+  - Per-tag summaries show up in reports
+
+* Use GtkApplication instead of own DBus server for enforcing single-instance.
+
+  - Drop --replace, --ignore-dbus command-line options because of this.
+  - Require glib and gio to be version 2.40 or newer for sane
+    GtkApplication-based command line parsing
+    (check with ``pkg-config --modversion glib-2.0 gio-2.0``).
+
+* Remove obsolete code:
+
+  - Drop support for Python 2.6 (PyGObject dropped support for it long ago).
+  - Drop PyGtk/Gtk+ 2 support code (it didn't work since 0.9.1 anyway).
+  - Drop EggTrayIcon support (it was for Gtk+ 2 only anyway).
+  - Drop the --prefer-pygtk command-line option.
+
+* Disable tray icon by default for new users (existing gtimelogrc files will be
+  untouched).
+
+* Improve tray icon selection logic for best contrast (GH: #29).
+
+
+0.9.3 (2015-09-29)
+~~~~~~~~~~~~~~~~~~
+
+* Adding new entries didn't update total weekly numbers (GH: #28).
+
 
 0.9.2 (2014-09-28)
 ~~~~~~~~~~~~~~~~~~
-* Fix setup.py to work on Python 3 when your locale is not UTF-8
-  (LP: #1263772).
 * Note that Gtk+ 2.x is no longer supported (this regressed somewhere between
   0.9.0 and 0.9.1, but I didn't notice because I have no access to a system
   that has Gtk+ 2.x).
+* Fix setup.py to work on Python 3 when your locale is not UTF-8 (LP: #1263772).
 * Fix two Gtk-CRITICAL warnings on startup (GH: #14).
 * Fix Unicode warning when adding entries (GH: #20).
 * Speed up entry addition (GH: #21).

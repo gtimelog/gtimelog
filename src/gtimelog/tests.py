@@ -1,16 +1,23 @@
 """Tests for gtimelog"""
 
+import datetime
 import doctest
-import unittest
 import os
-import tempfile
 import shutil
+import tempfile
+import textwrap
+import unittest
+import sys
 from pprint import pprint
-
 try:
     from cStringIO import StringIO
 except ImportError:
     from io import StringIO
+
+import freezegun
+import mock
+
+from gtimelog.timelog import TimeLog
 
 
 def doctest_as_hours():
@@ -248,6 +255,22 @@ def doctest_uniq():
     """
 
 
+def doctest_TimeWindow_repr():
+    """Test for TimeWindow.__repr__
+
+        >>> from datetime import datetime, time
+        >>> min = datetime(2013, 12, 3)
+        >>> max = datetime(2013, 12, 4)
+        >>> vm = time(2, 0)
+
+        >>> from gtimelog.timelog import TimeWindow
+        >>> window = TimeWindow('/nosuchfile', min, max, vm)
+        >>> window
+        <TimeWindow: 2013-12-03 00:00:00..2013-12-04 00:00:00>
+
+    """
+
+
 def doctest_TimeWindow_reread_no_file():
     """Test for TimeWindow.reread
 
@@ -404,7 +427,7 @@ def doctest_TimeWindow_last_entry():
         >>> window.items = [
         ...     (datetime(2013, 12, 4, 9, 0), 'started **'),
         ... ]
-        >>> start, stop, duration, entry = window.last_entry()
+        >>> start, stop, duration, tags, entry = window.last_entry()
         >>> start == stop == datetime(2013, 12, 4, 9, 0)
         True
         >>> duration
@@ -418,7 +441,7 @@ def doctest_TimeWindow_last_entry():
         ...     (datetime(2013, 12, 3, 12, 0), 'stuff'),
         ...     (datetime(2013, 12, 4, 9, 0), 'started **'),
         ... ]
-        >>> start, stop, duration, entry = window.last_entry()
+        >>> start, stop, duration, tags, entry = window.last_entry()
         >>> start == stop == datetime(2013, 12, 4, 9, 0)
         True
         >>> duration
@@ -433,7 +456,7 @@ def doctest_TimeWindow_last_entry():
         ...     (datetime(2013, 12, 4, 9, 0), 'started **'),
         ...     (datetime(2013, 12, 4, 9, 31), 'gtimelog: tests'),
         ... ]
-        >>> start, stop, duration, entry = window.last_entry()
+        >>> start, stop, duration, tags, entry = window.last_entry()
         >>> start
         datetime.datetime(2013, 12, 4, 9, 0)
         >>> stop
@@ -468,7 +491,6 @@ def doctest_TimeWindow_to_csv_complete():
         >>> from gtimelog.timelog import TimeWindow
         >>> window = TimeWindow(sampledata, min, max, vm)
 
-        >>> import sys
         >>> window.to_csv_complete(sys.stdout)
         task,time (minutes)
         etc,60
@@ -499,7 +521,6 @@ def doctest_TimeWindow_to_csv_daily():
         >>> from gtimelog.timelog import TimeWindow
         >>> window = TimeWindow(sampledata, min, max, vm)
 
-        >>> import sys
         >>> window.to_csv_daily(sys.stdout)
         date,day-start (hours),slacking (hours),work (hours)
         2008-06-03,12.75,0.0,3.0
@@ -509,10 +530,83 @@ def doctest_TimeWindow_to_csv_daily():
     """
 
 
+def doctest_TimeWindow_icalendar():
+    r"""Tests for TimeWindow.icalendar
+
+        >>> from datetime import datetime, time
+        >>> min = datetime(2008, 6, 1)
+        >>> max = datetime(2008, 7, 1)
+        >>> vm = time(2, 0)
+
+        >>> sampledata = StringIO(r'''
+        ... 2008-06-03 12:45: start **
+        ... 2008-06-03 13:00: something
+        ... 2008-06-03 15:45: something, else; with special\chars
+        ... 2008-06-05 12:45: start **
+        ... 2008-06-05 13:15: something
+        ... 2008-06-05 14:15: rest **
+        ... ''')
+
+        >>> from gtimelog.timelog import TimeWindow
+        >>> window = TimeWindow(sampledata, min, max, vm)
+
+        >>> with freezegun.freeze_time("2015-05-18 15:40"):
+        ...     with mock.patch('socket.getfqdn') as mock_getfqdn:
+        ...         mock_getfqdn.return_value = 'localhost'
+        ...         window.icalendar(sys.stdout)
+        ... # doctest: +REPORT_NDIFF
+        BEGIN:VCALENDAR
+        PRODID:-//mg.pov.lt/NONSGML GTimeLog//EN
+        VERSION:2.0
+        BEGIN:VEVENT
+        UID:be5f9be205c2308f7f1a30d6c399d6bd@localhost
+        SUMMARY:start **
+        DTSTART:20080603T124500
+        DTEND:20080603T124500
+        DTSTAMP:20150518T154000Z
+        END:VEVENT
+        BEGIN:VEVENT
+        UID:33c7e212fed11eda71d5acd4bd22119b@localhost
+        SUMMARY:something
+        DTSTART:20080603T124500
+        DTEND:20080603T130000
+        DTSTAMP:20150518T154000Z
+        END:VEVENT
+        BEGIN:VEVENT
+        UID:b10c11beaf91df16964a46b4c87420b1@localhost
+        SUMMARY:something\, else\; with special\\chars
+        DTSTART:20080603T130000
+        DTEND:20080603T154500
+        DTSTAMP:20150518T154000Z
+        END:VEVENT
+        BEGIN:VEVENT
+        UID:04964eef67ec22178d74fe4c0f06aa2a@localhost
+        SUMMARY:start **
+        DTSTART:20080605T124500
+        DTEND:20080605T124500
+        DTSTAMP:20150518T154000Z
+        END:VEVENT
+        BEGIN:VEVENT
+        UID:2b51ea6d1c26f02d58051a691657068d@localhost
+        SUMMARY:something
+        DTSTART:20080605T124500
+        DTEND:20080605T131500
+        DTSTAMP:20150518T154000Z
+        END:VEVENT
+        BEGIN:VEVENT
+        UID:bd6bfd401333dbbf34fec941567d5d06@localhost
+        SUMMARY:rest **
+        DTSTART:20080605T131500
+        DTEND:20080605T141500
+        DTSTAMP:20150518T154000Z
+        END:VEVENT
+        END:VCALENDAR
+
+    """
+
+
 def doctest_Reports_weekly_report_categorized():
     r"""Tests for Reports.weekly_report_categorized
-
-        >>> import sys
 
         >>> from datetime import datetime, time
         >>> from gtimelog.timelog import TimeWindow, Reports
@@ -577,8 +671,6 @@ def doctest_Reports_weekly_report_categorized():
 def doctest_Reports_monthly_report_categorized():
     r"""Tests for Reports.monthly_report_categorized
 
-        >>> import sys
-
         >>> from datetime import datetime, time
         >>> from gtimelog.timelog import TimeWindow, Reports
 
@@ -639,8 +731,6 @@ def doctest_Reports_monthly_report_categorized():
 def doctest_Reports_report_categories():
     r"""Tests for Reports._report_categories
 
-        >>> import sys
-
         >>> from datetime import datetime, time, timedelta
         >>> from gtimelog.timelog import TimeWindow, Reports
 
@@ -667,8 +757,6 @@ def doctest_Reports_report_categories():
 
 def doctest_Reports_daily_report():
     r"""Tests for Reports.daily_report
-
-        >>> import sys
 
         >>> from datetime import datetime, time
         >>> from gtimelog.timelog import TimeWindow, Reports
@@ -725,8 +813,6 @@ def doctest_Reports_daily_report():
 def doctest_Reports_weekly_report_plain():
     r"""Tests for Reports.weekly_report_plain
 
-        >>> import sys
-
         >>> from datetime import datetime, time
         >>> from gtimelog.timelog import TimeWindow, Reports
 
@@ -776,8 +862,6 @@ def doctest_Reports_weekly_report_plain():
 def doctest_Reports_monthly_report_plain():
     r"""Tests for Reports.monthly_report_plain
 
-        >>> import sys
-
         >>> from datetime import datetime, time
         >>> from gtimelog.timelog import TimeWindow, Reports
 
@@ -826,8 +910,6 @@ def doctest_Reports_monthly_report_plain():
 
 def doctest_Reports_custom_range_report_categorized():
     r"""Tests for Reports.custom_range_report_categorized
-
-        >>> import sys
 
         >>> from datetime import datetime, time
         >>> from gtimelog.timelog import TimeWindow, Reports
@@ -944,6 +1026,123 @@ def doctest_TaskList_real_file():
     """
 
 
+class TestTimeLog(unittest.TestCase):
+
+    def setUp(self):
+        self.tempdir = None
+
+    def tearDown(self):
+        if self.tempdir:
+            shutil.rmtree(self.tempdir)
+
+    def mkdtemp(self):
+        if self.tempdir is None:
+            self.tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
+        return self.tempdir
+
+    def test_appending_clears_window_cache(self):
+        # Regression test for https://github.com/gtimelog/gtimelog/issues/28
+        tempfile = os.path.join(self.mkdtemp(), 'timelog.txt')
+        timelog = TimeLog(tempfile, datetime.time(2, 0))
+
+        w = timelog.window_for_day(datetime.date(2014, 11, 12))
+        self.assertEqual(list(w.all_entries()), [])
+
+        timelog.append('started **', now=datetime.datetime(2014, 11, 12, 10, 00))
+        w = timelog.window_for_day(datetime.date(2014, 11, 12))
+        self.assertEqual(len(list(w.all_entries())), 1)
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_valid_time_accepts_any_time_in_the_past_when_log_is_empty(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        past = datetime.datetime(2015, 5, 12, 14, 20)
+        self.assertTrue(timelog.valid_time(past))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_valid_time_rejects_times_in_the_future(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        future = datetime.datetime(2015, 5, 12, 16, 30)
+        self.assertFalse(timelog.valid_time(future))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_valid_time_rejects_times_before_last_entry(self):
+        timelog = TimeLog(StringIO("2015-05-12 15:00: did stuff"),
+                          datetime.time(2, 0))
+        past = datetime.datetime(2015, 5, 12, 14, 20)
+        self.assertFalse(timelog.valid_time(past))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_valid_time_accepts_times_between_last_entry_and_now(self):
+        timelog = TimeLog(StringIO("2015-05-12 15:00: did stuff"),
+                          datetime.time(2, 0))
+        past = datetime.datetime(2015, 5, 12, 15, 20)
+        self.assertTrue(timelog.valid_time(past))
+
+    def test_parse_correction_leaves_regular_text_alone(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("did stuff"),
+                         ("did stuff", None))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_recognizes_absolute_times(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("15:20 did stuff"),
+                         ("did stuff", datetime.datetime(2015, 5, 12, 15, 20)))
+
+    @freezegun.freeze_time("2015-05-13 00:27")
+    def test_parse_correction_handles_virtual_midnight_yesterdays_time(self):
+        # Regression test for https://github.com/gtimelog/gtimelog/issues/33
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("15:20 did stuff"),
+                         ("did stuff", datetime.datetime(2015, 5, 12, 15, 20)))
+
+    @freezegun.freeze_time("2015-05-13 00:27")
+    def test_parse_correction_handles_virtual_midnight_todays_time(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("00:15 did stuff"),
+                         ("did stuff", datetime.datetime(2015, 5, 13, 00, 15)))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_ignores_future_absolute_times(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("17:20 did stuff"),
+                         ("17:20 did stuff", None))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_ignores_bad_absolute_times(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("19:60 did stuff"),
+                         ("19:60 did stuff", None))
+        self.assertEqual(timelog.parse_correction("24:00 did stuff"),
+                         ("24:00 did stuff", None))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_ignores_absolute_times_before_last_entry(self):
+        timelog = TimeLog(StringIO("2015-05-12 16:00: stuff"),
+                          datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("15:20 did stuff"),
+                         ("15:20 did stuff", None))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_recognizes_relative_times(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("-20 did stuff"),
+                         ("did stuff", datetime.datetime(2015, 5, 12, 16, 7)))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_ignores_relative_times_before_last_entry(self):
+        timelog = TimeLog(StringIO("2015-05-12 16:00: stuff"),
+                          datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("-30 did stuff"),
+                         ("-30 did stuff", None))
+
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_ignores_bad_relative_times(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("-200 did stuff"),
+                         ("-200 did stuff", None))
+
+
 class TestSettings(unittest.TestCase):
 
     def setUp(self):
@@ -1046,6 +1245,113 @@ class TestSettings(unittest.TestCase):
         self.settings.save(os.path.join(tempdir, 'config'))
 
 
+class TestTagging (unittest.TestCase):
+
+    TEST_TIMELOG = textwrap.dedent("""
+        2014-05-27 10:03: arrived
+        2014-05-27 10:13: edx: introduce topic to new sysadmins -- edx
+        2014-05-27 10:30: email
+        2014-05-27 12:11: meeting: how to support new courses?  -- edx meeting
+        2014-05-27 15:12: edx: write test procedure for EdX instances -- edx sysadmin
+        2014-05-27 17:03: cluster: set-up accounts, etc. -- sysadmin hpc
+        2014-05-27 17:14: support: how to run statistics on Hydra? -- support hydra
+        2014-05-27 17:36: off: pause **
+        2014-05-27 17:38: email
+        2014-05-27 19:06: off: dinner & family **
+        2014-05-27 22:19: cluster: fix shmmax-shmall issue -- sysadmin hpc
+        """)
+
+    def setUp(self):
+        from gtimelog.timelog import TimeWindow
+        self.tw = TimeWindow(
+            filename=StringIO(self.TEST_TIMELOG),
+            min_timestamp=datetime.datetime(2014, 5, 27, 9, 0),
+            max_timestamp=datetime.datetime(2014, 5, 27, 23, 59),
+            virtual_midnight=datetime.time(2, 0))
+
+    def test_TimeWindow_set_of_all_tags(self):
+        tags = self.tw.set_of_all_tags()
+        self.assertEqual(tags,
+                         set(['edx', 'hpc', 'hydra',
+                              'meeting', 'support', 'sysadmin']))
+
+    def test_TimeWindow_totals_per_tag1(self):
+        """Test aggregate time per tag, 1 entry only"""
+        result = self.tw.totals('meeting')
+        self.assertEqual(len(result), 2)
+        work, slack = result
+        self.assertEqual(work, (
+            # start/end times are manually extracted from the TEST_TIMELOG sample
+            (datetime.timedelta(hours=12, minutes=11) - datetime.timedelta(hours=10, minutes=30))
+        ))
+        self.assertEqual(slack, datetime.timedelta(0))
+
+    def test_TimeWindow_totals_per_tag2(self):
+        """Test aggregate time per tag, several entries"""
+        result = self.tw.totals('hpc')
+        self.assertEqual(len(result), 2)
+        work, slack = result
+        self.assertEqual(work, (
+            # start/end times are manually extracted from the TEST_TIMELOG sample
+            (datetime.timedelta(hours=17, minutes=3) - datetime.timedelta(hours=15, minutes=12))
+            + (datetime.timedelta(hours=22, minutes=19) - datetime.timedelta(hours=19, minutes=6))
+        ))
+        self.assertEqual(slack, datetime.timedelta(0))
+
+    def test_TimeWindow__split_entry_and_tags1(self):
+        """Test `TimeWindow._split_entry_and_tags` with simple entry"""
+        result = self.tw._split_entry_and_tags('email')
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], 'email')
+        self.assertEqual(result[1], set())
+
+    def test_TimeWindow__split_entry_and_tags2(self):
+        """Test `TimeWindow._split_entry_and_tags` with simple entry and tags"""
+        result = self.tw._split_entry_and_tags('restart CFEngine server -- sysadmin cfengine issue327')
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], 'restart CFEngine server')
+        self.assertEqual(result[1], set(['sysadmin', 'cfengine', 'issue327']))
+
+    def test_TimeWindow__split_entry_and_tags3(self):
+        """Test `TimeWindow._split_entry_and_tags` with category, entry, and tags"""
+        result = self.tw._split_entry_and_tags('tooling: tagging support in gtimelog -- tooling gtimelog')
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], 'tooling: tagging support in gtimelog')
+        self.assertEqual(result[1], set(['tooling', 'gtimelog']))
+
+    def test_TimeWindow__split_entry_and_tags4(self):
+        """Test `TimeWindow._split_entry_and_tags` with slack-type entry"""
+        result = self.tw._split_entry_and_tags('read news -- reading **')
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], 'read news **')
+        self.assertEqual(result[1], set(['reading']))
+
+    def test_TimeWindow__split_entry_and_tags5(self):
+        """Test `TimeWindow._split_entry_and_tags` with slack-type entry"""
+        result = self.tw._split_entry_and_tags('read news -- reading ***')
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result[0], 'read news ***')
+        self.assertEqual(result[1], set(['reading']))
+
+    def test_Reports__report_tags(self):
+        from gtimelog.timelog import Reports
+        rp = Reports(self.tw)
+        txt = StringIO()
+        # use same tags as in tests above, so we know the totals
+        rp._report_tags(txt, ['meeting', 'hpc'])
+        self.assertEqual(
+            txt.getvalue().strip(),
+            textwrap.dedent("""
+            Time spent in each area:
+
+              hpc          5:04
+              meeting      1:41
+
+            Note that area totals may not add up to the period totals,
+            as each entry may be belong to multiple areas (or none at all).
+            """).strip())
+
+
 def additional_tests(): # for setup.py
     return doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE)
 
@@ -1058,7 +1364,7 @@ def test_suite():
 
 
 def main():
-    unittest.TextTestRunner().run(test_suite())
+    unittest.main(module='gtimelog.tests', defaultTest='test_suite')
 
 
 if __name__ == '__main__':

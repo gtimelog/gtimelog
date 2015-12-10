@@ -48,9 +48,8 @@ class Settings(object):
     edit_task_list_cmd = ''
 
     show_office_hours = True
-    show_tray_icon = True
+    show_tray_icon = False
     prefer_app_indicator = True
-    prefer_old_tray_icon = False
     start_in_tray = False
 
     report_style = 'plain'
@@ -108,8 +107,6 @@ class Settings(object):
         config.set('gtimelog', 'show_tray_icon', str(self.show_tray_icon))
         config.set('gtimelog', 'prefer_app_indicator',
                    str(self.prefer_app_indicator))
-        config.set('gtimelog', 'prefer_old_tray_icon',
-                   str(self.prefer_old_tray_icon))
         config.set('gtimelog', 'report_style', str(self.report_style))
         config.set('gtimelog', 'start_in_tray', str(self.start_in_tray))
         return config
@@ -144,8 +141,6 @@ class Settings(object):
         self.show_tray_icon = config.getboolean('gtimelog', 'show_tray_icon')
         self.prefer_app_indicator = config.getboolean('gtimelog',
                                                       'prefer_app_indicator')
-        self.prefer_old_tray_icon = config.getboolean('gtimelog',
-                                                      'prefer_old_tray_icon')
         self.report_style = config.get('gtimelog', 'report_style')
         self.start_in_tray = config.getboolean('gtimelog', 'start_in_tray')
 

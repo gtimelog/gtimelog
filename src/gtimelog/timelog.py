@@ -6,9 +6,11 @@ import codecs
 import csv
 import datetime
 import os
+import socket
 import sys
 import re
 import urllib
+from hashlib import md5
 from operator import itemgetter
 
 
@@ -138,6 +140,10 @@ class TimeWindow(object):
         self.virtual_midnight = virtual_midnight
         self.reread(callback)
 
+    def __repr__(self):
+        return '<TimeWindow: {}..{}>'.format(self.min_timestamp,
+                                             self.max_timestamp)
+
     def reread(self, callback=None):
         """Parse the time log file and update self.items.
 
@@ -189,10 +195,37 @@ class TimeWindow(object):
             return None
         return self.items[-1][0]
 
+    @staticmethod
+    def _split_entry_and_tags(entry):
+        """
+        Split the entry title (proper) from the trailing tags.
+
+        Tags are separated from the title by a `` -- `` marker:
+        anything *before* the marker is the entry title,
+        anything *following* it is the (space-separated) set of tags.
+
+        Return a tuple consisting of entry title and set of tags.
+        """
+        if ' -- ' in entry:
+            entry, tags_bundle = entry.split(' -- ', 1)
+            # there might be spaces preceding ' -- '
+            entry = entry.rstrip()
+            tags = set(tags_bundle.split())
+            # put back '**' and '***' if they were in the tags part
+            if '***' in tags:
+                entry += ' ***'
+                tags.remove('***')
+            elif '**' in tags:
+                entry += ' **'
+                tags.remove('**')
+        else:
+            tags = set()
+        return entry, tags
+
     def all_entries(self):
         """Iterate over all entries.
 
-        Yields (start, stop, duration, entry) tuples.  The first entry
+        Yields (start, stop, duration, tags, entry) tuples.  The first entry
         has a duration of 0.
         """
         stop = None
@@ -204,13 +237,24 @@ class TimeWindow(object):
                                                self.virtual_midnight):
                 start = stop
             duration = stop - start
-            yield start, stop, duration, entry
+            # tags are appended to the entry title, separated by ' -- '
+            entry, tags = self._split_entry_and_tags(entry)
+            yield start, stop, duration, tags, entry
+
+    def set_of_all_tags(self):
+        """
+        Return set of all tags mentioned in entries.
+        """
+        all_tags = set()
+        for _, _, _, entry_tags, _ in self.all_entries():
+            all_tags.update(entry_tags)
+        return all_tags
 
     def count_days(self):
         """Count days that have entries."""
         count = 0
         last = None
-        for start, stop, duration, entry in self.all_entries():
+        for start, stop, duration, tags, entry in self.all_entries():
             if last is None or different_days(last, start,
                                               self.virtual_midnight):
                 last = start
@@ -236,7 +280,8 @@ class TimeWindow(object):
         if different_days(start, stop, self.virtual_midnight):
             start = stop
         duration = stop - start
-        return start, stop, duration, entry
+        entry, tags = self._split_entry_and_tags(entry)
+        return start, stop, duration, tags, entry
 
     def grouped_entries(self, skip_first=True):
         """Return consolidated entries (grouped by entry title).
@@ -247,7 +292,7 @@ class TimeWindow(object):
         """
         work = {}
         slack = {}
-        for start, stop, duration, entry in self.all_entries():
+        for start, stop, duration, tags, entry in self.all_entries():
             if skip_first:
                 skip_first = False
                 continue
@@ -297,8 +342,11 @@ class TimeWindow(object):
                     None, datetime.timedelta(0)) + duration
         return entries, totals
 
-    def totals(self):
+    def totals(self, tag=None):
         """Calculate total time of work and slacking entries.
+
+        If optional argument `tag` is given, only compute
+        totals for entries marked with the given tag.
 
         Returns (total_work, total_slacking) tuple.
 
@@ -318,7 +366,9 @@ class TimeWindow(object):
         (that is, it would be true if sum could operate on timedeltas).
         """
         total_work = total_slacking = datetime.timedelta(0)
-        for start, stop, duration, entry in self.all_entries():
+        for start, stop, duration, tags, entry in self.all_entries():
+            if tag is not None and tag not in tags:
+                continue
             if '**' in entry:
                 total_slacking += duration
             else:
@@ -330,15 +380,13 @@ class TimeWindow(object):
         output.write("BEGIN:VCALENDAR\n")
         output.write("PRODID:-//mg.pov.lt/NONSGML GTimeLog//EN\n")
         output.write("VERSION:2.0\n")
-        try:
-            import socket
-            idhost = socket.getfqdn()
-        except: # can it actually ever fail?
-            idhost = 'localhost'
+        idhost = socket.getfqdn()
         dtstamp = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-        for start, stop, duration, entry in self.all_entries():
+        def _hash(start, stop, entry):
+            return md5(("%s%s%s" % (start, stop, entry)).encode('UTF-8')).hexdigest()
+        for start, stop, duration, tags, entry in self.all_entries():
             output.write("BEGIN:VEVENT\n")
-            output.write("UID:%s@%s\n" % (hash((start, stop, entry)), idhost))
+            output.write("UID:%s@%s\n" % (_hash(start, stop, entry), idhost))
             output.write("SUMMARY:%s\n" % (entry.replace('\\', '\\\\'))
                                                 .replace(';', '\\;')
                                                 .replace(',', '\\,'))
@@ -380,7 +428,7 @@ class TimeWindow(object):
         d0 = datetime.timedelta(0)
         days = {} # date -> [time_started, slacking, work]
         dmin = None
-        for start, stop, duration, entry in self.all_entries():
+        for start, stop, duration, tags, entry in self.all_entries():
             if dmin is None:
                 dmin = start.date()
             day = days.setdefault(start.date(),
@@ -400,9 +448,9 @@ class TimeWindow(object):
                 dmin += datetime.timedelta(days=1)
 
         # convert to hours, and a sortable list
-        items = [(day, as_hours(start), as_hours(slacking), as_hours(work))
-                  for day, (start, slacking, work) in days.items()]
-        items.sort()
+        items = sorted(
+            (day, as_hours(start), as_hours(slacking), as_hours(work))
+            for day, (start, slacking, work) in days.items())
         writer.writerows(items)
 
 
@@ -412,8 +460,7 @@ class Reports(object):
     def __init__(self, window):
         self.window = window
 
-    def _categorizing_report(self, output, email, who, subject, period_name,
-                             estimated_column=False):
+    def _categorizing_report(self, output, email, who, subject, period_name):
         """A report that displays entries by category.
 
         Writes a report template in RFC-822 format to output.
@@ -456,10 +503,7 @@ class Reports(object):
             output.write("No work done this %s.\n" % period_name)
             return
         output.write(" " * 46)
-        if estimated_column:
-            output.write("estimated        actual\n")
-        else:
-            output.write("                   time\n")
+        output.write("                   time\n")
 
         total_work, total_slacking = window.totals()
         entries, totals = window.categorized_work_entries()
@@ -484,13 +528,8 @@ class Reports(object):
                         continue # skip empty "arrival" entries
 
                     entry = entry[:1].upper() + entry[1:]
-                    if estimated_column:
-                        output.write(u"  %-46s  %-14s  %s\n" %
-                                     (entry, '-',
-                                     format_duration_short(duration)))
-                    else:
-                        output.write(u"  %-61s  %+5s\n" %
-                                     (entry, format_duration_short(duration)))
+                    output.write(u"  %-61s  %+5s\n" %
+                                 (entry, format_duration_short(duration)))
 
                 output.write('-' * 70 + '\n')
                 output.write(u"%+70s\n" % format_duration_short(totals[cat]))
@@ -507,6 +546,45 @@ class Reports(object):
         output.write('Categories by time spent:\n')
         for time, cat in ordered_by_time:
             output.write(line_format % (cat, format_duration_short(time)))
+
+        tags = self.window.set_of_all_tags()
+        if tags:
+            self._report_tags(output, tags)
+
+    def _report_tags(self, output, tags):
+        """Helper method that lists time spent per tag.
+
+        Use this to add a section in a report looks similar to this:
+
+        sysadmin:     2 hours 1 min
+        www:          18 hours 45 min
+        mailserver:   3 hours
+
+        Note that duration may not add up to the total working time,
+        as a single entry can have multiple or no tags at all!
+
+        Argument `tags` is a set of tags (string).  It is not modified.
+        """
+        output.write('\n')
+        output.write('Time spent in each area:\n')
+        output.write('\n')
+        # sum work and slacking time per tag; we do not care in this report
+        tags_totals = {}
+        for tag in tags:
+            spent_working, spent_slacking = self.window.totals(tag)
+            tags_totals[tag] = spent_working + spent_slacking
+        # compute width of tag label column
+        max_tag_length = max([len(tag) for tag in tags_totals.keys()])
+        line_format = '  %-' + str(max_tag_length + 4) + 's %+5s\n'
+        # sort by time spent (descending)
+        for tag, spent in sorted(tags_totals.items(),
+                                 key=(lambda it: it[1]),
+                                 reverse=True):
+            output.write(line_format % (tag, format_duration_short(spent)))
+        output.write('\n')
+        output.write(
+            'Note that area totals may not add up to the period totals,\n'
+            'as each entry may be belong to multiple areas (or none at all).\n')
 
     def _report_categories(self, output, categories):
         """A helper method that lists time spent per category.
@@ -533,8 +611,7 @@ class Reports(object):
                 cat, format_duration_long(duration)))
         output.write('\n')
 
-    def _plain_report(self, output, email, who, subject, period_name,
-                      estimated_column=False):
+    def _plain_report(self, output, email, who, subject, period_name):
         """Format a report that does not categorize entries.
 
         Writes a report template in RFC-822 format to output.
@@ -549,10 +626,7 @@ class Reports(object):
             output.write("No work done this %s.\n" % period_name)
             return
         output.write(" " * 46)
-        if estimated_column:
-            output.write("estimated       actual\n")
-        else:
-            output.write("                time\n")
+        output.write("                time\n")
         work, slack = window.grouped_entries()
         total_work, total_slacking = window.totals()
         categories = {}
@@ -572,12 +646,8 @@ class Reports(object):
                         None, datetime.timedelta(0)) + duration
 
                 entry = entry[:1].upper() + entry[1:]
-                if estimated_column:
-                    output.write(u"%-46s  %-14s  %s\n" %
-                                 (entry, '-', format_duration_long(duration)))
-                else:
-                    output.write(u"%-62s  %s\n" %
-                                 (entry, format_duration_long(duration)))
+                output.write(u"%-62s  %s\n" %
+                             (entry, format_duration_long(duration)))
             output.write('\n')
         output.write("Total work done this %s: %s\n" %
                      (period_name, format_duration_long(total_work)))
@@ -585,50 +655,46 @@ class Reports(object):
         if categories:
             self._report_categories(output, categories)
 
-    def weekly_report_categorized(self, output, email, who,
-                                  estimated_column=False):
+        tags = self.window.set_of_all_tags()
+        if tags:
+            self._report_tags(output, tags)
+
+    def weekly_report_categorized(self, output, email, who):
         """Format a weekly report with entries displayed  under categories."""
         week = self.window.min_timestamp.isocalendar()[1]
         subject = u'Weekly report for %s (week %02d)' % (who, week)
         return self._categorizing_report(output, email, who, subject,
-                                         period_name='week',
-                                         estimated_column=estimated_column)
+                                         period_name='week')
 
-    def monthly_report_categorized(self, output, email, who,
-                                   estimated_column=False):
+    def monthly_report_categorized(self, output, email, who):
         """Format a monthly report with entries displayed  under categories."""
         month = self.window.min_timestamp.strftime('%Y/%m')
         subject = u'Monthly report for %s (%s)' % (who, month)
         return self._categorizing_report(output, email, who, subject,
-                                         period_name='month',
-                                         estimated_column=estimated_column)
+                                         period_name='month')
 
-    def weekly_report_plain(self, output, email, who, estimated_column=False):
+    def weekly_report_plain(self, output, email, who):
         """Format a weekly report ."""
         week = self.window.min_timestamp.isocalendar()[1]
         subject = u'Weekly report for %s (week %02d)' % (who, week)
         return self._plain_report(output, email, who, subject,
-                                  period_name='week',
-                                  estimated_column=estimated_column)
+                                  period_name='week')
 
-    def monthly_report_plain(self, output, email, who, estimated_column=False):
+    def monthly_report_plain(self, output, email, who):
         """Format a monthly report ."""
         month = self.window.min_timestamp.strftime('%Y/%m')
         subject = u'Monthly report for %s (%s)' % (who, month)
         return self._plain_report(output, email, who, subject,
-                                  period_name='month',
-                                  estimated_column=estimated_column)
+                                  period_name='month')
 
-    def custom_range_report_categorized(self, output, email, who,
-                                        estimated_column=False):
+    def custom_range_report_categorized(self, output, email, who):
         """Format a custom range report with entries displayed  under categories."""
         min = self.window.min_timestamp.strftime('%Y-%m-%d')
         max = self.window.max_timestamp - datetime.timedelta(1)
         max = max.strftime('%Y-%m-%d')
         subject = u'Custom date range report for %s (%s - %s)' % (who, min, max)
         return self._categorizing_report(output, email, who, subject,
-                                         period_name='custom range',
-                                         estimated_column=estimated_column)
+                                         period_name='custom range')
 
     def daily_report(self, output, email, who):
         """Format a daily report.
@@ -652,7 +718,7 @@ class Reports(object):
         if not items:
             output.write("No work done today.\n")
             return
-        start, stop, duration, entry = items[0]
+        start, stop, duration, tags, entry = items[0]
         entry = entry[:1].upper() + entry[1:]
         output.write("%s at %s\n" % (entry, start.strftime('%H:%M')))
         output.write('\n')
@@ -689,6 +755,10 @@ class Reports(object):
         output.write("Time spent slacking: %s\n" %
                      format_duration_long(total_slacking))
 
+        tags = self.window.set_of_all_tags()
+        if tags:
+            self._report_tags(output, tags)
+
 
 class TimeLog(object):
     """Time log.
@@ -723,6 +793,10 @@ class TimeLog(object):
 
         Returns None if the file doesn't exist.
         """
+        # Accept any file-like object instead of a filename (for the benefit of
+        # unit tests).
+        if hasattr(self.filename, 'read'):
+            return None
         try:
             return os.stat(self.filename).st_mtime
         except OSError:
@@ -809,14 +883,56 @@ class TimeLog(object):
         self.window.items.append((now, entry))
         line = '%s: %s' % (now.strftime("%Y-%m-%d %H:%M"), entry)
         self.raw_append(line)
+        for (min, max), cached in self._cache.items():
+            if cached is not self.window and min <= now < max:
+                cached.items.append((now, entry))
 
     def valid_time(self, time):
+        """Is this a valid time for a correction?
+
+        Valid times are those between the last timelog entry and now.
+        """
         if time > datetime.datetime.now():
             return False
         last = self.window.last_time()
         if last and time < last:
             return False
         return True
+
+    def parse_correction(self, entry):
+        """Recognize a time correction.
+
+        Corrections are entries that begin with a timestamp (HH:MM) or a
+        relative number of minutes (-MM).
+
+        Returns a tuple (entry, timestamp).  ``timestamp`` will be None
+        if no correction was recognized.  ``entry`` will have the leading
+        timestamp stripped.
+        """
+        now = None
+        date_match = re.match(r'(\d\d):(\d\d)\s+', entry)
+        delta_match = re.match(r'-([1-9]\d?|1\d\d)\s+', entry)
+        if date_match:
+            h = int(date_match.group(1))
+            m = int(date_match.group(2))
+            if 0 <= h < 24 and 0 <= m < 60:
+                now = datetime.datetime.combine(self.virtual_today(),
+                                                datetime.time(h, m))
+                if now.time() < self.virtual_midnight:
+                    now += datetime.timedelta(1)
+                if self.valid_time(now):
+                    entry = entry[date_match.end():]
+                else:
+                    now = None
+        if delta_match:
+            seconds = int(delta_match.group()) * 60
+            now = datetime.datetime.now().replace(second=0, microsecond=0)
+            now += datetime.timedelta(seconds=seconds)
+            if self.valid_time(now):
+                entry = entry[delta_match.end():]
+            else:
+                now = None
+        return entry, now
 
 
 class TaskList(object):
