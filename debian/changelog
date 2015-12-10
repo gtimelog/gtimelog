@@ -1,6 +1,10 @@
 gtimelog (0.10.0-1) UNRELEASED; urgency=medium
 
   * New upstream release.
+  * d/control:
+    - Convert to gbp and move to collab-maint.
+    - Uploaders: Remove PAPT until that team switches to git.
+    - Vcs-* fields: updated.
   * d/patches/fix-icon-path: No longer needed.  (Closes: #807047)
   * d/patches/unittest-mock.patch: Use stdlib unittest.mock.
 

@@ -2,7 +2,6 @@ Source: gtimelog
 Section: admin
 Priority: optional
 Maintainer: Barry Warsaw <barry@debian.org>
-Uploaders: Python Applications Packaging Team <python-apps-team@lists.alioth.debian.org>
 Build-Depends: debhelper (>= 9),
                python-docutils,
                python3,
@@ -10,7 +9,8 @@ Build-Depends: debhelper (>= 9),
                python3-setuptools
 Standards-Version: 3.9.6
 Homepage: http://mg.pov.lt/gtimelog/
-Vcs-Git: https://github.com/gtimelog/gtimelog
+Vcs-Git: git://anonscm.debian.org/collab-maint/gtimelog.git
+Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/gtimelog.git
 X-Python3-Version: >= 3.3
 
 Package: gtimelog
