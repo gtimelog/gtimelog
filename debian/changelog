@@ -2,6 +2,7 @@ gtimelog (0.10.0-1) UNRELEASED; urgency=medium
 
   * New upstream release.
   * d/patches/fix-icon-path: No longer needed.  (Closes: #807047)
+  * d/patches/unittest-mock.patch: Use stdlib unittest.mock.
 
  -- Barry Warsaw <barry@debian.org>  Thu, 10 Dec 2015 16:51:17 -0500
 

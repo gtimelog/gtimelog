@@ -6,6 +6,7 @@ Uploaders: Python Applications Packaging Team <python-apps-team@lists.alioth.deb
 Build-Depends: debhelper (>= 9),
                python-docutils,
                python3,
+               python3-freezegun,
                python3-setuptools
 Standards-Version: 3.9.6
 Homepage: http://mg.pov.lt/gtimelog/
