@@ -2,6 +2,23 @@ Changelog
 ---------
 
 
+0.9.2 (2014-09-28)
+~~~~~~~~~~~~~~~~~~
+* Fix setup.py to work on Python 3 when your locale is not UTF-8
+  (LP: #1263772).
+* Note that Gtk+ 2.x is no longer supported (this regressed somewhere between
+  0.9.0 and 0.9.1, but I didn't notice because I have no access to a system
+  that has Gtk+ 2.x).
+* Fix two Gtk-CRITICAL warnings on startup (GH: #14).
+* Fix Unicode warning when adding entries (GH: #20).
+* Speed up entry addition (GH: #21).
+* Fix Unicode error when navigating history with PageUp/PageDown (GH: #22).
+* Update current task time when autoreloading (GH: #23).
+* Fix 'LocaleError: unknown encoding:' on Mac OS X (GH: #25).
+* Fix 'TypeError: unorderable types: NoneType() < str()' in summary view
+  on Python 3 (GH: #26).
+
+
 0.9.1 (2013-12-23)
 ~~~~~~~~~~~~~~~~~~
 * Manual pages for gtimelog(1) and gtimelogrc(5).

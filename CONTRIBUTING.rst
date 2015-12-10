@@ -47,8 +47,3 @@ Run the test suite with ::
 
 The common ``python setup.py test`` idiom is also supported.
 
-
-Donations
----------
-
-Marius has a Gittip account at https://www.gittip.com/mgedmin/

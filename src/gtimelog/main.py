@@ -37,15 +37,21 @@ if '--prefer-pygtk' in sys.argv:
         import pygtk
         toolkit = 'pygtk'
     except ImportError:
-        import gi
-        toolkit = 'gi'
+        try:
+            import gi
+            toolkit = 'gi'
+        except ImportError:
+            sys.exit("Please install pygobject or pygtk")
 else:
     try:
         import gi
         toolkit = 'gi'
     except ImportError:
-        import pygtk
-        toolkit = 'pygtk'
+        try:
+            import pygtk
+            toolkit = 'pygtk'
+        except ImportError:
+            sys.exit("Please install pygobject or pygtk")
 
 
 if toolkit == 'gi':
@@ -218,6 +224,8 @@ class SimpleStatusIcon(IconChooser):
 
     def tip(self):
         """Compute tooltip text."""
+        # NB: returns UTF-8 text instead of Unicode on Python 2.  This
+        # seems to be harmless for now.
         current_task = self.gtimelog_window.task_entry.get_text()
         if not current_task:
             current_task = 'nothing'
@@ -531,8 +539,11 @@ class MainWindow:
                 self.write_item(item)
         elif self.summary_view:
             entries, totals = window.categorized_work_entries()
+            no_cat = totals.pop(None, None)
+            if no_cat is not None:
+                self.write_group('no category', no_cat)
             for category, duration in sorted(totals.items()):
-                self.write_group(category or 'no category', duration)
+                self.write_group(category, duration)
             where = buffer.get_end_iter()
             where.backward_cursor_position()
             buffer.place_cursor(where)
@@ -622,6 +633,8 @@ class MainWindow:
         if last_time is None:
             return None
         now = datetime.datetime.now()
+        # NB: works with UTF-8-encoded binary strings on Python 2.  This
+        # seems harmless for now.
         current_task = self.task_entry.get_text()
         current_task_time = now - last_time
         if '**' in current_task:
@@ -675,12 +688,12 @@ class MainWindow:
         self.history_undo = ''
         if not self.have_completion:
             return
-        seen = set()
+        self.completion_choices_as_set.clear()
         self.completion_choices.clear()
         for entry in self.history:
-            if entry not in seen:
-                seen.add(entry)
+            if entry not in self.completion_choices_as_set:
                 self.completion_choices.append([entry])
+                self.completion_choices_as_set.add(entry)
 
     def set_up_completion(self):
         """Set up autocompletion."""
@@ -691,6 +704,7 @@ class MainWindow:
         if not self.have_completion:
             return
         self.completion_choices = gtk.ListStore(str)
+        self.completion_choices_as_set = set()
         completion = gtk.EntryCompletion()
         completion.set_model(self.completion_choices)
         completion.set_text_column(0)
@@ -702,8 +716,9 @@ class MainWindow:
         self.history_pos = 0
         if not self.have_completion:
             return
-        if entry not in [row[0] for row in self.completion_choices]:
+        if entry not in self.completion_choices_as_set:
             self.completion_choices.append([entry])
+            self.completion_choices_as_set.add(entry)
 
     def jump_to_date(self, date):
         """Switch to looking at a given date"""
@@ -1097,12 +1112,19 @@ class MainWindow:
             return True
         return False
 
+    def _get_entry_text(self):
+        """Return the current task entry text (as Unicode)."""
+        entry = self.task_entry.get_text()
+        if not isinstance(entry, unicode):
+            entry = unicode(entry, 'UTF-8')
+        return entry
+
     def _do_history(self, delta):
         """Handle movement in history."""
         if not self.history:
             return
         if self.history_pos == 0:
-            self.history_undo = self.task_entry.get_text()
+            self.history_undo = self._get_entry_text()
             self.filtered_history = uniq([
                 l for l in self.history if l.startswith(self.history_undo)])
         history = self.filtered_history
@@ -1121,9 +1143,7 @@ class MainWindow:
         if self.looking_at_date is not None:
             self.jump_to_today()
 
-        entry = self.task_entry.get_text()
-        if not isinstance(entry, unicode):
-            entry = unicode(entry, 'UTF-8')
+        entry = self._get_entry_text()
 
         now = None
         date_match = re.match(r'(\d\d):(\d\d)\s+', entry)
@@ -1171,6 +1191,7 @@ class MainWindow:
         if self.timelog.check_reload():
             self.populate_log()
             self.set_up_history()
+            force_update = True
         if self.task_pane.get_property('visible'):
             if self.tasks.check_reload():
                 self.set_up_task_list()
@@ -1267,6 +1288,7 @@ def main():
 
     if opts.debug:
         print('GTimeLog version: %s' % gtimelog.__version__)
+        print('Python version: %s' % sys.version)
         print('Toolkit: %s' % toolkit)
         print('Gtk+ version: %s' % gtk_version)
         print('D-Bus available: %s' % ('yes' if dbus else 'no'))
@@ -1307,8 +1329,12 @@ def main():
                 if opts.quit:
                     print('gtimelog is not running')
                     sys.exit()
-            else:
+            elif opts.quit or opts.replace or opts.toggle:
+                # we need dbus to work for this, so abort
                 sys.exit('gtimelog: %s' % e)
+            else:
+                # otherwise just emit a warning
+                print("gtimelog: dbus is not available:\n  %s" % e)
     else: # not dbus
         if opts.quit or opts.replace or opts.toggle:
             sys.exit("gtimelog: dbus not available")
@@ -1384,7 +1410,10 @@ def main():
         if opts.debug:
             print('Starting minimized')
     if dbus:
-        service = Service(main_window)
+        try:
+            service = Service(main_window)  # noqa
+        except dbus.DBusException as e:
+            print("gtimelog: dbus is not available:\n  %s" % e)
     # This is needed to make ^C terminate gtimelog when we're using
     # gobject-introspection.
     signal.signal(signal.SIGINT, signal.SIG_DFL)
