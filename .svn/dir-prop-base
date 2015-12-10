@@ -1,9 +1,0 @@
-K 10
-svn:ignore
-V 41
-timelog.txt
-dist
-*.bak
-gtimelog.egg-info
-
-END

@@ -1,0 +1,14 @@
+include COPYING
+include *.rst
+include Makefile
+include gtimelog
+include gtimelog.desktop
+include gtimelogrc.example
+include runtests
+include tox.ini
+include .travis.yml
+include .coveragerc
+include .gitignore
+recursive-include src *.png *.ui
+recursive-include docs *.png *.rst
+recursive-include scripts *.py *.rst

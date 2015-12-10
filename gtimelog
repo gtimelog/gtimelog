@@ -1,0 +1,12 @@
+#!/usr/bin/python
+"""
+Script to run GTimeLog from the source checkout without installing
+"""
+import os
+import sys
+
+pkgdir = os.path.join(os.path.dirname(__file__), 'src')
+sys.path.insert(0, pkgdir)
+
+from gtimelog.main import main
+main()

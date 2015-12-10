@@ -1,0 +1,11 @@
+language: python
+python:
+    - 2.6
+    - 2.7
+    - 3.3
+install:
+    - travis_retry pip install .
+script:
+    - python setup.py test -q
+notifications:
+    email: false

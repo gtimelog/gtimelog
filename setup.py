@@ -1,29 +1,74 @@
 #!/usr/bin/env python
+import os
+import re
 from setuptools import setup
+
+here = os.path.dirname(__file__)
+
+
+def read(filename):
+    with open(os.path.join(here, filename)) as f:
+        return f.read()
+
+
+metadata = dict(
+    (k, eval(v)) for k, v in
+    re.findall('^(__version__|__author__|__url__|__licence__) = (.*)$',
+               read('src/gtimelog/__init__.py'), flags=re.MULTILINE)
+)
+
+version = metadata['__version__']
+
+changes = read('NEWS.rst').split('\n\n\n')
+changes_in_latest_versions = '\n\n\n'.join(changes[:3])
+older_changes = '''
+Older versions
+~~~~~~~~~~~~~~
+
+See the `full changelog`_.
+
+.. _full changelog: https://github.com/gtimelog/gtimelog/blob/master/NEWS.rst
+'''
+
+short_description = 'A Gtk+ time tracking application'
+long_description = (
+    read('README.rst') +
+    '\n\n' +
+    changes_in_latest_versions +
+    '\n\n' +
+    older_changes
+)
 
 setup(
     name='gtimelog',
-    version='0.0.85',
+    version=version,
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
     url='http://mg.pov.lt/gtimelog/',
-    description='A Gtk+ time tracking application',
+    description=short_description,
+    long_description=long_description,
     license='GPL',
-    classifiers = [
-        'Development Status :: 3 - Alpha',
+    classifiers=[
+        'Development Status :: 4 - Beta',
         'Environment :: X11 Applications :: GTK',
         'License :: OSI Approved :: GNU General Public License (GPL)',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.3',
+        # 2.6 might work, but I can't test it myself -- recent
+        # python-gobject versions dropped support for Python 2.6
         'Topic :: Office/Business',
     ],
 
     packages=['gtimelog'],
-    package_dir={'gtimelog': '.'},
-    package_data={'gtimelog': ['*.glade', '*.png']},
+    package_dir={'gtimelog': 'src/gtimelog'},
+    package_data={'gtimelog': ['*.ui', '*.png']},
+    test_suite='gtimelog.tests',
     zip_safe=False,
     entry_points="""
-    [console_scripts]
-    gtimelog = gtimelog.gtimelog:main
+    [gui_scripts]
+    gtimelog = gtimelog.main:main
     """,
-# This is true, but pointless, because easy_install PyGTK chokes and dies
-#   install_requires=['PyGTK'],
+# This is true, but pointless, because PyGObject cannot be installed via
+# setuptools/distutils
+#   install_requires=['PyGObject'], # or PyGTK
 )

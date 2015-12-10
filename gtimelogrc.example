@@ -22,9 +22,16 @@ editor = gvim
 # 2.4), False disables and lets you access history by pressing Up/Down.
 gtk-completion = False
 
+# Do you want a systray icon?
+show_tray_icon = yes
+
+# Do you prefer the old systray icon (that shows time taken for the current
+# task next to the icon), or the new one (just the icon)?
+prefer_old_tray_icon = yes
+
 # How many hours' work in a day.
 hours = 8
 
-# When does one work end and another begin
+# When does one work day end and another begin
 virtual_midnight = 02:00
 
