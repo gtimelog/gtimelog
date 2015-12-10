@@ -55,15 +55,16 @@ setup(
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
-        # 2.6 might work, but I can't test it myself -- recent
-        # python-gobject versions dropped support for Python 2.6
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Office/Business',
     ],
 
     packages=['gtimelog'],
-    package_dir={'gtimelog': 'src/gtimelog'},
+    package_dir={'': 'src'},
     package_data={'gtimelog': ['*.ui', '*.png']},
     test_suite='gtimelog.tests',
+    tests_require=['freezegun', 'mock'],
     zip_safe=False,
     entry_points="""
     [gui_scripts]
@@ -71,5 +72,5 @@ setup(
     """,
 # This is true, but pointless, because PyGObject cannot be installed via
 # setuptools/distutils
-#   install_requires=['PyGObject'], # or PyGTK
+#   install_requires=['PyGObject'],
 )

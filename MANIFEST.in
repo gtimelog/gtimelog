@@ -2,6 +2,7 @@ include COPYING
 include *.rst
 include Makefile
 include gtimelog
+include gtimelog.appdata.xml
 include gtimelog.desktop
 include gtimelogrc.example
 include runtests

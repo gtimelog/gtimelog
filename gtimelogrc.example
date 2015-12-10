@@ -18,16 +18,13 @@ mailer = x-terminal-emulator -e mutt -H %s
 # file; if there is no '%s', the name of the log file is appended.
 editor = gvim
 
-# User interface: True enables drop-down history completion (if you have PyGtk
-# 2.4), False disables and lets you access history by pressing Up/Down.
+# User interface: True enables drop-down history completion, False disables and
+# lets you access history by pressing Up/Down.  (You can always use the non-Gtk
+# completion by pressing PageUp/PageDown.)
 gtk-completion = False
 
 # Do you want a systray icon?
 show_tray_icon = yes
-
-# Do you prefer the old systray icon (that shows time taken for the current
-# task next to the icon), or the new one (just the icon)?
-prefer_old_tray_icon = yes
 
 # How many hours' work in a day.
 hours = 8
