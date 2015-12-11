@@ -75,7 +75,7 @@ setup(
         'test': [
             'freezegun',
         ],
-        'test:python_version < "3"': [
+        'test:python_version == "2.7"': [
             'mock',
         ],
     },
