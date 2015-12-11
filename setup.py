@@ -71,6 +71,14 @@ setup(
     package_data={'gtimelog': ['*.ui', '*.png']},
     test_suite='gtimelog.tests',
     tests_require=tests_require,
+    extras_require={
+        'test': [
+            'freezegun',
+        ],
+        'test:python_version < "3"': [
+            'mock',
+        ],
+    },
     zip_safe=False,
     entry_points="""
     [gui_scripts]

@@ -6,7 +6,7 @@ python:
     - 3.4
     - 3.5
 install:
-    - pip install freezegun mock coverage coveralls -e .
+    - pip install coverage coveralls -e .[test]
 script:
     - coverage run -m gtimelog.tests
 after_success:
