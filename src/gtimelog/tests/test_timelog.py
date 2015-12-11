@@ -16,7 +16,12 @@ except ImportError:
     from io import StringIO
 
 import freezegun
-import mock
+try:
+    # Python 3
+    from unittest import mock
+except ImportError:
+    # Python 2
+    import mock
 
 from gtimelog.timelog import TimeLog, Reports, Exports, TaskList
 

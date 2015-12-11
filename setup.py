@@ -2,6 +2,7 @@
 import os
 import re
 import io
+import sys
 from setuptools import setup
 
 here = os.path.dirname(__file__)
@@ -40,6 +41,11 @@ long_description = (
     older_changes
 )
 
+tests_require = ['freezegun']
+if sys.version_info < (3,):
+    # Python 2 doesn't have unittest.mock
+    tests_require.append('mock')
+
 setup(
     name='gtimelog',
     version=version,
@@ -64,7 +70,7 @@ setup(
     package_dir={'': 'src'},
     package_data={'gtimelog': ['*.ui', '*.png']},
     test_suite='gtimelog.tests',
-    tests_require=['freezegun', 'mock'],
+    tests_require=tests_require,
     zip_safe=False,
     entry_points="""
     [gui_scripts]

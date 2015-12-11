@@ -4,7 +4,12 @@
 import textwrap
 import unittest
 
-import mock
+try:
+    # Python 3
+    from unittest import mock
+except ImportError:
+    # Python 2
+    import mock
 
 
 gi = mock.MagicMock()
