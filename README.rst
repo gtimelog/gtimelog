@@ -8,7 +8,7 @@ GTimeLog is a simple app for keeping track of time.
    :alt: build status
 
 .. image:: https://ci.appveyor.com/api/projects/status/github/gtimelog/gtimelog?branch=master&svg=true
-   :target: https://ci.appveyor.com/project/mgedmin/gtimelog/branch/master
+   :target: https://ci.appveyor.com/project/mgedmin/gtimelog
    :alt: build status (on Windows)
 
 .. image:: https://coveralls.io/repos/gtimelog/gtimelog/badge.svg?branch=master
