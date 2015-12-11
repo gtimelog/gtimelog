@@ -11,6 +11,10 @@ GTimeLog is a simple app for keeping track of time.
    :target: https://travis-ci.org/gtimelog/gtimelog
    :alt: build status
 
+.. image:: https://ci.appveyor.com/api/projects/status/github/gtimelog/gtimelog?branch=master&svg=true
+   :target: https://ci.appveyor.com/project/mgedmin/gtimelog/branch/master
+   :alt: build status (on Windows)
+
 .. image:: https://coveralls.io/repos/gtimelog/gtimelog/badge.svg?branch=master
    :target: https://coveralls.io/r/gtimelog/gtimelog?branch=master
    :alt: test coverage
