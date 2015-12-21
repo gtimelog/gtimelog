@@ -1581,7 +1581,7 @@ class ReportView(Gtk.TextView):
         self.connect('notify::report-style', self.queue_update)
         self.connect('notify::visible', self.queue_update)
         self.bind_property('body', self.get_buffer(), 'text', GObject.BindingFlags.BIDIRECTIONAL)
-        if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 160):
+        if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 16):
             self.override_font(Pango.FontDescription.from_string("Monospace"))
         else:
             self.set_monospace(True)
