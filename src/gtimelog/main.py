@@ -790,9 +790,15 @@ class Window(Gtk.ApplicationWindow):
         position = self.get_position()
         size = self.get_size()
         tpp = self.paned.get_position()
-        self.gsettings.set_value('window-size', GLib.Variant('(ii)', size))
-        self.gsettings.set_value('window-position', GLib.Variant('(ii)', position))
-        self.gsettings.set_int('task-pane-position', tpp)
+        old_position = self.gsettings.get_value('window-position')
+        old_size = self.gsettings.get_value('window-size')
+        old_tpp = self.gsettings.get_int('task-pane-position')
+        if tuple(size) != tuple(old_size):
+            self.gsettings.set_value('window-size', GLib.Variant('(ii)', size))
+        if tuple(position) != tuple(old_position):
+            self.gsettings.set_value('window-position', GLib.Variant('(ii)', position))
+        if tpp != old_tpp:
+            self.gsettings.set_int('task-pane-position', tpp)
         GLib.source_remove(self._window_size_update_timeout)
         self._window_size_update_timeout = None
         return False
