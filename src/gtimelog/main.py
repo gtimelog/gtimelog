@@ -803,8 +803,6 @@ class Window(Gtk.ApplicationWindow):
     def store_window_size(self):
         if not self.is_maximized_in_any_way():
             self._store_window_size()
-        else:
-            print("ignooring because %x" % self.props.window.get_state())
         GLib.source_remove(self._window_size_update_timeout)
         self._window_size_update_timeout = None
         return False
