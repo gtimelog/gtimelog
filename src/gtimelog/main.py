@@ -358,7 +358,7 @@ class Application(Gtk.Application):
 
 def copy_properties(src, dest):
     blacklist = ('events', 'child', 'parent', 'input-hints', 'buffer', 'tabs', 'completion', 'model', 'type')
-    # GObject.ParamFlags.READWRITE is missing on Ubuntu 14.04 LTS
+    # GObject.ParamFlags.READWRITE is missing on Ubuntu 14.04 LTS, which has GTK+ 3.10
     RW = GObject.ParamFlags.READABLE | GObject.ParamFlags.WRITABLE
     for prop in src.props:
         if prop.flags & GObject.ParamFlags.DEPRECATED != 0:
@@ -1581,9 +1581,10 @@ class ReportView(Gtk.TextView):
         self.connect('notify::report-style', self.queue_update)
         self.connect('notify::visible', self.queue_update)
         self.bind_property('body', self.get_buffer(), 'text', GObject.BindingFlags.BIDIRECTIONAL)
-        if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 160):
+        if not hasattr(self, 'set_monospace'):  # GTK+ < 3.16
             self.override_font(Pango.FontDescription.from_string("Monospace"))
         else:
+            # NB: the properties in the .ui file override these
             self.set_monospace(True)
 
     def queue_update(self, *args):
