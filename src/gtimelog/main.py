@@ -1580,12 +1580,25 @@ class ReportView(Gtk.TextView):
         self.connect('notify::time-range', self.queue_update)
         self.connect('notify::report-style', self.queue_update)
         self.connect('notify::visible', self.queue_update)
-        self.bind_property('body', self.get_buffer(), 'text', GObject.BindingFlags.BIDIRECTIONAL)
+        self.bind_property('body', self.get_buffer(), 'text',
+                           GObject.BindingFlags.BIDIRECTIONAL)
+        if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 16):
+            # Seems like a bug on GTK+ 3.10 where editing text doesn't emit the
+            # notify::text signal, and so property bindings don't get updated.
+            # I don't have the patience to dig through bugzilla to find when
+            # the bug was fixed, or to test GTK+ 3.12/3.14, so I'll just apply
+            # the workaround for all GTK+ versions older than the one I
+            # currently use, which doesn't have the bug.  The workaround should
+            # be harmless.
+            self.get_buffer().connect('changed', self.buffer_changed_workaround)
         if not hasattr(self, 'set_monospace'):  # GTK+ < 3.16
             self.override_font(Pango.FontDescription.from_string("Monospace"))
         else:
             # NB: the properties in the .ui file override these
             self.set_monospace(True)
+
+    def buffer_changed_workaround(self, *args):
+        self.get_buffer().notify('text')
 
     def queue_update(self, *args):
         if not self._update_pending:
