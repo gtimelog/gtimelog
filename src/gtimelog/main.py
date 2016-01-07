@@ -786,7 +786,7 @@ class Window(Gtk.ApplicationWindow):
         if self._window_size_update_timeout is None:
             self._window_size_update_timeout = GLib.timeout_add(500, self.store_window_size)
 
-    def store_window_size(self):
+    def _store_window_size(self):
         position = self.get_position()
         size = self.get_size()
         tpp = self.paned.get_position()
@@ -799,9 +799,26 @@ class Window(Gtk.ApplicationWindow):
             self.gsettings.set_value('window-position', GLib.Variant('(ii)', position))
         if tpp != old_tpp:
             self.gsettings.set_int('task-pane-position', tpp)
+
+    def store_window_size(self):
+        if not self.is_maximized_in_any_way():
+            self._store_window_size()
+        else:
+            print("ignooring because %x" % self.props.window.get_state())
         GLib.source_remove(self._window_size_update_timeout)
         self._window_size_update_timeout = None
         return False
+
+    def is_maximized_in_any_way(self):
+        # NB: This fails to catch horizontally maximized windows because
+        # GDK ignores the _NET_WM_STATE_MAXIMIZED_HORZ atom when it's not
+        # accompanied by _NET_WM_STATE_MAXIMIZED_VERT.  We only catch
+        # vertically maximized windows because GDK thinks they're tiled.
+        assert self.props.window is not None
+        MAXIMIZED_IN_ANY_WAY = (Gdk.WindowState.MAXIMIZED
+                                | Gdk.WindowState.TILED
+                                | Gdk.WindowState.FULLSCREEN)
+        return (self.props.window.get_state() & MAXIMIZED_IN_ANY_WAY) != 0
 
     def watch_file(self, filename, callback):
         gf = Gio.File.new_for_path(filename)
