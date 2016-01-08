@@ -433,6 +433,14 @@ class FakePropertyAction(object):
             self.action.set_state(new_state)
 
 
+REPORT_KINDS = {
+    # map time_range values to report_kind values
+    'day': ReportRecord.DAILY,
+    'week': ReportRecord.WEEKLY,
+    'month': ReportRecord.MONTHLY,
+}
+
+
 class Window(Gtk.ApplicationWindow):
 
     timelog = GObject.Property(
@@ -594,6 +602,7 @@ class Window(Gtk.ApplicationWindow):
         self.report_view.bind_property('subject', self.subject_entry, 'text', GObject.BindingFlags.DEFAULT)
         self.report_view.connect('notify::recipient', self.update_send_report_availability)
         self.report_view.connect('notify::body', self.update_send_report_availability)
+        self.report_view.connect('notify::report-status', self.update_already_sent_indication)
         self.update_send_report_availability()
 
         # Workaround for a GTK+ 3.10 bug (https://bugzilla.gnome.org/show_bug.cgi?id=705673)
@@ -733,6 +742,18 @@ class Window(Gtk.ApplicationWindow):
         else:
             can_send = False
         self.actions.send_report.set_enabled(can_send)
+
+    def update_already_sent_indication(self, *args):
+        if self.report_view.report_status == 'sent':
+            self.infobar_label.set_text(_("Report already sent"))
+            self.infobar.show()
+        elif self.report_view.report_status == 'sent-elsewhere':
+            self.infobar_label.set_text(
+                _("Report already sent (to {})").format(
+                    self.report_view.report_sent_to))
+            self.infobar.show()
+        else:
+            self.infobar.hide()
 
     def download_tasks(self):
         if self._download:
@@ -1034,11 +1055,7 @@ class Window(Gtk.ApplicationWindow):
     def record_sent_email(self, time_range, date, recipient):
         filename = Settings().get_report_log_file()
         try:
-            report_kind = {
-                'day': ReportRecord.DAILY,
-                'week': ReportRecord.WEEKLY,
-                'month': ReportRecord.MONTHLY,
-            }[time_range]
+            report_kind = REPORT_KINDS[time_range]
             ReportRecord(filename).record(report_kind, date, recipient)
         except IOError as e:
             log.error(_("Couldn't append to {}: {}").format(filename, e))
@@ -1594,6 +1611,14 @@ class ReportView(Gtk.TextView):
         type=str, nick='Report body',
         blurb='Report body text')
 
+    report_status = GObject.Property(
+        type=str, default='not-sent', nick='Report status',
+        blurb='Status of this particular report (not-sent/sent/sent-elsewhere)')
+
+    report_sent_to = GObject.Property(
+        type=str, nick='Report was sent to',
+        blurb='Who already received this report (other than the current recipient?)')
+
     def __init__(self):
         Gtk.TextView.__init__(self)
         self._update_pending = False
@@ -1604,6 +1629,7 @@ class ReportView(Gtk.TextView):
         self.connect('notify::time-range', self.queue_update)
         self.connect('notify::report-style', self.queue_update)
         self.connect('notify::visible', self.queue_update)
+        self.connect('notify::recipient', self.update_already_sent_indication)
         self.bind_property('body', self.get_buffer(), 'text',
                            GObject.BindingFlags.BIDIRECTIONAL)
         if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 16):
@@ -1678,6 +1704,23 @@ class ReportView(Gtk.TextView):
         textbuf = self.get_buffer()
         textbuf.set_text(output.getvalue())
         textbuf.place_cursor(textbuf.get_start_iter())
+        self.update_already_sent_indication()
+
+    def update_already_sent_indication(self, *args):
+        if not self.date:
+            return
+        report_kind = REPORT_KINDS[self.time_range]
+        filename = Settings().get_report_log_file()
+        # XXX: cache, don't reload every time!
+        record = ReportRecord(filename)
+        recipients = record.get_recipients(report_kind, self.date)
+        self.report_sent_to = ', '.join(sorted(set(recipients) - {self.recipient}))
+        if not recipients:
+            self.report_status = 'not-sent'
+        elif self.recipient in recipients:
+            self.report_status = 'sent'
+        else:
+            self.report_status = 'sent-elsewhere'
 
 
 class TaskListView(Gtk.TreeView):

@@ -822,6 +822,31 @@ class ReportRecord(object):
         with open(self.filename, 'a') as f:
             f.write("{},{},{},{}\n".format(timestamp, report_kind, report_id, recipient))
 
+    def get_recipients(self, report_kind, report_date):
+        """Look up who received a particular report.
+
+        report_kind is one of DAILY, WEEKLY, MONTHLY.
+
+        report_date is a date in the report period.
+
+        Returns a list of recipients, in order.
+        """
+        # XXX: inefficient to parse the file every time!
+        report_id = self.get_report_id(report_kind, report_date)
+        recipients = []
+        try:
+            with open(self.filename) as f:
+                for line in f:
+                    try:
+                        timestamp, r_kind, r_id, recipient = line.split(',', 3)
+                    except ValueError:
+                        continue
+                    if r_kind == report_kind and r_id == report_id:
+                        recipients.append(recipient.strip())
+        except IOError:
+            pass
+        return recipients
+
 
 class TimeLog(TimeCollection):
     """Time log.

@@ -1357,6 +1357,11 @@ class TestReportRecord(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.tmpdir)
         self.filename = os.path.join(self.tmpdir, 'sentreports.log')
 
+    def load_fixture(self, lines):
+        with open(self.filename, 'w') as f:
+            for line in lines:
+                f.write(line + '\n')
+
     def test_get_report_id(self):
         get_id = ReportRecord.get_report_id
         self.assertEqual(
@@ -1364,7 +1369,7 @@ class TestReportRecord(unittest.TestCase):
             '2015/53',
         )
 
-    def test(self):
+    def test_record(self):
         rr = ReportRecord(self.filename)
         now = datetime.datetime(2016, 1, 8, 9, 34, 50)
         rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.com', now)
@@ -1379,6 +1384,37 @@ class TestReportRecord(unittest.TestCase):
                 "2016-01-08 09:34:50,weekly,2016/1,test@example.com",
                 "2016-01-08 09:34:50,monthly,2016-01,test@example.com",
             ]
+        )
+
+    def test_get_recipients(self):
+        self.load_fixture([
+            "2015-12-21 12:15:11,daily,2015-12-21,test@example.com",
+            "2015-12-21 12:17:35,daily,2015-12-21,marius+test@example.com",
+            "2015-12-21 12:18:21,daily,2015-12-21,marius+test@example.com",
+            "2015-12-21 12:19:06,weekly,2015/46,marius+test@example.com",
+            "2016-01-04 10:35:09,weekly,2015/53,activity@example.com",
+            "2016-01-04 11:00:33,monthly,2015-12,activity@example.com",
+            "2016-01-04 12:59:24,weekly,2015/49,activity@example.com",
+            "2016-01-04 12:59:37,weekly,2015/52,activity@example.com",
+        ])
+        rr = ReportRecord(self.filename)
+        self.assertEqual(
+            rr.get_recipients(rr.DAILY, datetime.date(2016, 1, 6)),
+            [],
+        )
+        self.assertEqual(
+            rr.get_recipients(rr.DAILY, datetime.date(2015, 12, 21)),
+            [
+                "test@example.com",
+                "marius+test@example.com",
+                "marius+test@example.com",
+            ],
+        )
+        self.assertEqual(
+            rr.get_recipients(rr.WEEKLY, datetime.date(2015, 12, 21)),
+            [
+                "activity@example.com",
+            ],
         )
 
 
