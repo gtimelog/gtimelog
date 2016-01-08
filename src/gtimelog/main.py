@@ -1053,10 +1053,9 @@ class Window(Gtk.ApplicationWindow):
             return sendmail.returncode == 0
 
     def record_sent_email(self, time_range, date, recipient):
-        filename = Settings().get_report_log_file()
         try:
             report_kind = REPORT_KINDS[time_range]
-            ReportRecord(filename).record(report_kind, date, recipient)
+            self.report_view.record.record(report_kind, date, recipient)
         except IOError as e:
             log.error(_("Couldn't append to {}: {}").format(filename, e))
 
@@ -1647,6 +1646,9 @@ class ReportView(Gtk.TextView):
             # NB: the properties in the .ui file override these
             self.set_monospace(True)
 
+        filename = Settings().get_report_log_file()
+        self.record = ReportRecord(filename)
+
     def buffer_changed_workaround(self, *args):
         self.get_buffer().notify('text')
 
@@ -1710,10 +1712,7 @@ class ReportView(Gtk.TextView):
         if not self.date:
             return
         report_kind = REPORT_KINDS[self.time_range]
-        filename = Settings().get_report_log_file()
-        # XXX: cache, don't reload every time!
-        record = ReportRecord(filename)
-        recipients = record.get_recipients(report_kind, self.date)
+        recipients = self.record.get_recipients(report_kind, self.date)
         self.report_sent_to = ', '.join(sorted(set(recipients) - {self.recipient}))
         if not recipients:
             self.report_status = 'not-sent'
