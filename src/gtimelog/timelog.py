@@ -126,6 +126,21 @@ def uniq(l):
     return result
 
 
+def get_mtime(filename):
+    """Return the modification time of a file, if it exists.
+
+    Returns None if the file doesn't exist.
+    """
+    # Accept any file-like object instead of a filename (for the benefit of
+    # unit tests).
+    if hasattr(filename, 'read'):
+        return None
+    try:
+        return os.stat(filename).st_mtime
+    except OSError:
+        return None
+
+
 Entry = collections.namedtuple('Entry', 'start stop duration tags entry')
 
 
@@ -869,31 +884,17 @@ class TimeLog(TimeCollection):
 
         Returns True if the file was reloaded.
         """
-        mtime = self.get_mtime()
+        mtime = get_mtime(self.filename)
         if mtime != self.last_mtime:
             self.reread()
             return True
         else:
             return False
 
-    def get_mtime(self):
-        """Return the mtime of self.filename, if it exists.
-
-        Returns None if the file doesn't exist.
-        """
-        # Accept any file-like object instead of a filename (for the benefit of
-        # unit tests).
-        if hasattr(self.filename, 'read'):
-            return None
-        try:
-            return os.stat(self.filename).st_mtime
-        except OSError:
-            return None
-
     def reread(self):
         """Reload the log file."""
         self.day = self.virtual_today()
-        self.last_mtime = self.get_mtime()
+        self.last_mtime = get_mtime(self.filename)
         try:
             if hasattr(self.filename, 'read'):
                 # accept any file-like object
@@ -979,7 +980,7 @@ class TimeLog(TimeCollection):
             f.write('\n')
         f.write(line + '\n')
         f.close()
-        self.last_mtime = self.get_mtime()
+        self.last_mtime = get_mtime(self.filename)
 
     def append(self, entry, now=None):
         """Append a new entry to the time log."""
@@ -1076,27 +1077,17 @@ class TaskList(object):
 
         Returns True if the file was reloaded.
         """
-        mtime = self.get_mtime()
+        mtime = get_mtime(self.filename)
         if mtime != self.last_mtime:
             self.load()
             return True
         else:
             return False
 
-    def get_mtime(self):
-        """Return the mtime of self.filename, if it exists.
-
-        Returns None if the file doesn't exist.
-        """
-        try:
-            return os.stat(self.filename).st_mtime
-        except OSError:
-            return None
-
     def load(self):
         """Load task list from a file named self.filename."""
         groups = {}
-        self.last_mtime = self.get_mtime()
+        self.last_mtime = get_mtime(self.filename)
         try:
             with open(self.filename) as f:
                 for line in f:
