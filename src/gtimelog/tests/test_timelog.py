@@ -1357,6 +1357,13 @@ class TestReportRecord(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.tmpdir)
         self.filename = os.path.join(self.tmpdir, 'sentreports.log')
 
+    def test_get_report_id(self):
+        get_id = ReportRecord.get_report_id
+        self.assertEqual(
+            get_id(ReportRecord.WEEKLY, datetime.date(2016, 1, 1)),
+            '2015/53',
+        )
+
     def test(self):
         rr = ReportRecord(self.filename)
         now = datetime.datetime(2016, 1, 8, 9, 34, 50)

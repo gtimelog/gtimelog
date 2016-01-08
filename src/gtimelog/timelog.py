@@ -796,7 +796,7 @@ class ReportRecord(object):
         elif report_kind == cls.WEEKLY:
             # I'd prefer the ISO 8601 format (2015-W31 instead of 2015/31), but
             # let's be compatible with https://github.com/ProgrammersOfVilnius/gtimesheet
-            return '{}/{}'.format(date.year, date.isocalendar()[1])
+            return '{}/{}'.format(*date.isocalendar()[:2])
         elif report_kind == cls.MONTHLY:
             return date.strftime('%Y-%m')
         else: # pragma: nocover
