@@ -1417,6 +1417,87 @@ class TestReportRecord(unittest.TestCase):
             ],
         )
 
+    def test_reread_missing_file(self):
+        rr = ReportRecord(self.filename)
+        rr.reread()
+        self.assertEqual(len(rr._records), 0)
+
+    def test_record_then_load_when_empty(self):
+        rr = ReportRecord(self.filename)
+        now = datetime.datetime(2016, 1, 8, 9, 34, 50)
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.com', now)
+        self.assertEqual(
+            rr.get_recipients(rr.DAILY, datetime.date(2016, 1, 6)),
+            ['test@example.com']
+        )
+
+    def test_record_then_load_twice_when_empty(self):
+        # Recording twice might not change the mtime because the resolution
+        # is too low; so record() must update the internal data structures
+        # by itself.
+        rr = ReportRecord(self.filename)
+        now = datetime.datetime(2016, 1, 8, 9, 34, 50)
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.com', now)
+        self.assertEqual(
+            rr.get_recipients(rr.DAILY, datetime.date(2016, 1, 6)),
+            ['test@example.com']
+        )
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.org', now)
+        self.assertEqual(
+            rr.get_recipients(rr.DAILY, datetime.date(2016, 1, 6)),
+            ['test@example.com', 'test@example.org']
+        )
+
+    def test_record_then_load_when_nonempty(self):
+        # Since we have lazy-loading, the "let's add the new record internally
+        # and set last_mtime" optimization in record() might trick ReportRecord
+        # into not loading an existing file at all.
+        self.load_fixture([
+            "2016-01-08 09:34:50,daily,2016-01-06,test@example.com",
+            "2016-01-08 09:34:50,weekly,2016/1,test@example.com",
+            "2016-01-08 09:34:50,monthly,2016-01,test@example.com",
+        ])
+        rr = ReportRecord(self.filename)
+        now = datetime.datetime(2016, 1, 8, 9, 34, 50)
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.org', now)
+        self.assertEqual(
+            rr.get_recipients(rr.DAILY, datetime.date(2016, 1, 6)),
+            ['test@example.com', 'test@example.org']
+        )
+
+    def test_record_then_load_twice_when_nonempty(self):
+        # I'm not sure what I'm protecting against with this test.  Probably
+        # pure unnecessary paranoia.
+        self.load_fixture([
+            "2016-01-08 09:34:50,daily,2016-01-06,test@example.com",
+            "2016-01-08 09:34:50,weekly,2016/1,test@example.com",
+            "2016-01-08 09:34:50,monthly,2016-01,test@example.com",
+        ])
+        rr = ReportRecord(self.filename)
+        now = datetime.datetime(2016, 1, 8, 9, 34, 50)
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.org', now)
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.net', now)
+        self.assertEqual(
+            rr.get_recipients(rr.DAILY, datetime.date(2016, 1, 6)),
+            ['test@example.com', 'test@example.org', 'test@example.net']
+        )
+
+    def test_automatic_reload(self):
+        rr = ReportRecord(self.filename)
+        self.assertEqual(
+            rr.get_recipients(rr.DAILY, datetime.date(2016, 1, 6)),
+            []
+        )
+        self.load_fixture([
+            "2016-01-08 09:34:50,daily,2016-01-06,test@example.com",
+            "2016-01-08 09:34:50,weekly,2016/1,test@example.com",
+            "2016-01-08 09:34:50,monthly,2016-01,test@example.com",
+        ])
+        self.assertEqual(
+            rr.get_recipients(rr.DAILY, datetime.date(2016, 1, 6)),
+            ['test@example.com']
+        )
+
 
 def additional_tests(): # for setup.py
     return doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE,

@@ -12,6 +12,7 @@ import os
 import socket
 import sys
 import re
+from collections import defaultdict
 from hashlib import md5
 from operator import itemgetter
 
@@ -803,6 +804,8 @@ class ReportRecord(object):
 
     def __init__(self, filename):
         self.filename = filename
+        self.last_mtime = None
+        self._records = defaultdict(list)
 
     @classmethod
     def get_report_id(cls, report_kind, date):
@@ -836,6 +839,28 @@ class ReportRecord(object):
         report_id = self.get_report_id(report_kind, report_date)
         with open(self.filename, 'a') as f:
             f.write("{},{},{},{}\n".format(timestamp, report_kind, report_id, recipient))
+        if self.last_mtime is not None:
+            self.last_mtime = get_mtime(self.filename)
+            self._records[report_kind, report_id].append(recipient)
+
+    def check_reload(self):
+        mtime = get_mtime(self.filename)
+        if mtime != self.last_mtime:
+            self.reread()
+
+    def reread(self):
+        self.last_mtime = get_mtime(self.filename)
+        self._records.clear()
+        try:
+            with open(self.filename) as f:
+                for line in f:
+                    try:
+                        timestamp, report_kind, report_id, recipient = line.split(',', 3)
+                    except ValueError:
+                        continue
+                    self._records[report_kind, report_id].append(recipient.strip())
+        except IOError:
+            pass
 
     def get_recipients(self, report_kind, report_date):
         """Look up who received a particular report.
@@ -846,21 +871,9 @@ class ReportRecord(object):
 
         Returns a list of recipients, in order.
         """
-        # XXX: inefficient to parse the file every time!
+        self.check_reload()
         report_id = self.get_report_id(report_kind, report_date)
-        recipients = []
-        try:
-            with open(self.filename) as f:
-                for line in f:
-                    try:
-                        timestamp, r_kind, r_id, recipient = line.split(',', 3)
-                    except ValueError:
-                        continue
-                    if r_kind == report_kind and r_id == report_id:
-                        recipients.append(recipient.strip())
-        except IOError:
-            pass
-        return recipients
+        return self._records.get((report_kind, report_id), [])
 
 
 class TimeLog(TimeCollection):
