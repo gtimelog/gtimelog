@@ -1053,11 +1053,12 @@ class Window(Gtk.ApplicationWindow):
             return sendmail.returncode == 0
 
     def record_sent_email(self, time_range, date, recipient):
+        record = self.report_view.record
         try:
             report_kind = REPORT_KINDS[time_range]
-            self.report_view.record.record(report_kind, date, recipient)
+            record.record(report_kind, date, recipient)
         except IOError as e:
-            log.error(_("Couldn't append to {}: {}").format(filename, e))
+            log.error(_("Couldn't append to {}: {}").format(record.filename, e))
 
     def on_cancel_report(self, action=None, parameter=None):
         self.main_stack.set_visible_child_name('entry')
