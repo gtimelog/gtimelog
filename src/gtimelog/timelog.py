@@ -778,6 +778,51 @@ class Reports(object):
             self._report_tags(output, tags)
 
 
+class ReportRecord(object):
+    """A record of sent reports."""
+
+    # Let's be compatible with https://github.com/ProgrammersOfVilnius/gtimesheet
+    DAILY = 'daily'
+    WEEKLY = 'weekly'
+    MONTHLY = 'monthly'
+
+    def __init__(self, filename):
+        self.filename = filename
+
+    @classmethod
+    def get_report_id(cls, report_kind, date):
+        if report_kind == cls.DAILY:
+            return date.strftime('%Y-%m-%d')
+        elif report_kind == cls.WEEKLY:
+            # I'd prefer the ISO 8601 format (2015-W31 instead of 2015/31), but
+            # let's be compatible with https://github.com/ProgrammersOfVilnius/gtimesheet
+            return '{}/{}'.format(date.year, date.isocalendar()[1])
+        elif report_kind == cls.MONTHLY:
+            return date.strftime('%Y-%m')
+        else: # pragma: nocover
+            raise AssertionError('Bug: unexpected report kind: %r' % report_kind)
+
+    def record(self, report_kind, report_date, recipient, now=None):
+        """Record that a record has been sent.
+
+        report_kind is one of DAILY, WEEKLY, MONTHLY.
+
+        report_date is a date in the report period.
+
+        recipient is an email address.  The intent here is to distinguish
+        real reports sent to activity@yourcompany.example.com from test
+        reports sent to a test address.
+        """
+        assert report_kind in (self.DAILY, self.WEEKLY, self.MONTHLY)
+        assert isinstance(report_date, datetime.date)
+        if now is None:
+            now = datetime.datetime.now()
+        timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+        report_id = self.get_report_id(report_kind, report_date)
+        with open(self.filename, 'a') as f:
+            f.write("{},{},{},{}\n".format(timestamp, report_kind, report_id, recipient))
+
+
 class TimeLog(TimeCollection):
     """Time log.
 

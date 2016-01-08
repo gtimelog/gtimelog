@@ -61,7 +61,7 @@ from gtimelog import __version__
 from gtimelog.settings import Settings
 from gtimelog.timelog import (
     as_minutes, virtual_day, different_days, prev_month, next_month, uniq, parse_time,
-    Reports, TaskList, TimeLog)
+    Reports, ReportRecord, TaskList, TimeLog)
 
 
 if str is bytes:
@@ -997,8 +997,8 @@ class Window(Gtk.ApplicationWindow):
             log.debug("Not sending report: no destination")
             return
         if self.email(sender, recipient, subject, body):
-            self.record_sent_email(self.report_view.get_report_kind(),
-                                   self.report_view.get_report_id(),
+            self.record_sent_email(self.report_view.time_range,
+                                   self.report_view.date,
                                    recipient)
             self.on_cancel_report()
         else:
@@ -1031,12 +1031,15 @@ class Window(Gtk.ApplicationWindow):
                           command, sendmail.returncode)
             return sendmail.returncode == 0
 
-    def record_sent_email(self, report_kind, report_id, recipient):
+    def record_sent_email(self, time_range, date, recipient):
         filename = Settings().get_report_log_file()
-        timestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         try:
-            with open(filename, 'a') as f:
-                f.write("{},{},{},{}\n".format(timestamp, report_kind, report_id, recipient))
+            report_kind = {
+                'day': ReportRecord.DAILY,
+                'week': ReportRecord.WEEKLY,
+                'month': ReportRecord.MONTHLY,
+            }[time_range]
+            ReportRecord(filename).record(report_kind, date, recipient)
         except IOError as e:
             log.error(_("Couldn't append to {}: {}").format(filename, e))
 
@@ -1638,25 +1641,6 @@ class ReportView(Gtk.TextView):
     @GObject.Property(type=str, nick='Name', blurb='Report subject')
     def subject(self):
         return self._subject
-
-    def get_report_id(self):
-        if self.time_range == 'day':
-            return self.date.strftime('%Y-%m-%d')
-        elif self.time_range == 'week':
-            # I'd prefer the ISO 8601 format (2015-W31 instead of 2015/31), but
-            # let's be compatible with https://github.com/ProgrammersOfVilnius/gtimesheet
-            return '{}/{}'.format(self.date.year, self.date.isocalendar()[1])
-        elif self.time_range == 'month':
-            return self.date.strftime('%Y-%m')
-
-    def get_report_kind(self):
-        # Let's be compatible with https://github.com/ProgrammersOfVilnius/gtimesheet
-        if self.time_range == 'day':
-            return 'daily'
-        elif self.time_range == 'week':
-            return 'weekly'
-        elif self.time_range == 'month':
-            return 'monthly'
 
     def update_subject(self, *args):
         self._subject = ''

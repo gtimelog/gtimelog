@@ -23,7 +23,7 @@ except ImportError:
     # Python 2
     import mock
 
-from gtimelog.timelog import TimeLog, Reports, Exports, TaskList
+from gtimelog.timelog import TimeLog, Reports, ReportRecord, Exports, TaskList
 
 
 class Checker(doctest.OutputChecker):
@@ -1348,6 +1348,31 @@ class TestTagging(unittest.TestCase):
         txt = StringIO()
         rp.monthly_report(txt, 'me@example.com', 'me')
         self.assertIn('Time spent in each area', txt.getvalue())
+
+
+class TestReportRecord(unittest.TestCase):
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp(prefix='gtimelog-test-')
+        self.addCleanup(shutil.rmtree, self.tmpdir)
+        self.filename = os.path.join(self.tmpdir, 'sentreports.log')
+
+    def test(self):
+        rr = ReportRecord(self.filename)
+        now = datetime.datetime(2016, 1, 8, 9, 34, 50)
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.com', now)
+        rr.record(rr.WEEKLY, datetime.date(2016, 1, 6), 'test@example.com', now)
+        rr.record(rr.MONTHLY, datetime.date(2016, 1, 6), 'test@example.com', now)
+        with open(self.filename) as f:
+            written = f.read()
+        self.assertEqual(
+            written.splitlines(),
+            [
+                "2016-01-08 09:34:50,daily,2016-01-06,test@example.com",
+                "2016-01-08 09:34:50,weekly,2016/1,test@example.com",
+                "2016-01-08 09:34:50,monthly,2016-01,test@example.com",
+            ]
+        )
 
 
 def additional_tests(): # for setup.py
