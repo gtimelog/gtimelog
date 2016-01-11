@@ -12,6 +12,11 @@
     <screenshots>
         <screenshot width="802" height="533" type="default">https://gtimelog.org/gtimelog-gtk3.png</screenshot>
     </screenshots>
+    <keywords>
+        <keyword>time</keyword>
+        <keyword>tracking</keyword>
+        <keyword>logging</keyword>
+    </keywords>
     <url type="homepage">https://gtimelog.org/</url>
     <updatecontact>marius@gedmin.as</updatecontact>
 </application>
