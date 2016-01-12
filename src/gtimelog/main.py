@@ -1644,11 +1644,10 @@ class ReportView(Gtk.TextView):
             # currently use, which doesn't have the bug.  The workaround should
             # be harmless.
             self.get_buffer().connect('changed', self.buffer_changed_workaround)
-        if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 16):
-            self.override_font(Pango.FontDescription.from_string("Monospace"))
-        else:
-            # NB: the properties in the .ui file override these
-            self.set_monospace(True)
+        # GTK+ versions before 3.16 did not have a 'monospace' property.
+        # GTK+ themes other than Adwaita ignore the 'monospace' property and
+        # use a proportional font for text widgets.
+        self.override_font(Pango.FontDescription.from_string("Monospace"))
 
         filename = Settings().get_report_log_file()
         self.record = ReportRecord(filename)
