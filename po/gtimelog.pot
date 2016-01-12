@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-08 10:36+0200\n"
+"POT-Creation-Date: 2016-01-12 09:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../gtimelog.desktop.in.h:1 ../src/gtimelog/main.py:178
-#: ../src/gtimelog/main.py:1073 ../src/gtimelog/about.ui.h:1
+#: ../src/gtimelog/main.py:1076 ../src/gtimelog/about.ui.h:1
 #: ../src/gtimelog/gtimelog.ui.h:10
 msgid "Time Log"
 msgstr ""
@@ -114,139 +114,139 @@ msgstr ""
 msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
 msgstr ""
 
-#: ../src/gtimelog/main.py:932
-msgid "{0:%Y}, week {1:0>2} ({0:%B %-d}-{2:%-d})"
+#: ../src/gtimelog/main.py:935
+msgid "{0}, week {1} ({2:%B %-d}-{3:%-d})"
 msgstr ""
 
-#: ../src/gtimelog/main.py:935
+#: ../src/gtimelog/main.py:938
 msgid "{0:%B %Y}"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1003
+#: ../src/gtimelog/main.py:1006
 msgid "Report"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1026
+#: ../src/gtimelog/main.py:1029
 msgid "Couldn't send email to {}."
 msgstr ""
 
-#: ../src/gtimelog/main.py:1047
+#: ../src/gtimelog/main.py:1050
 #, python-format
 msgid "Couldn't execute %s: %s"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1051
+#: ../src/gtimelog/main.py:1054
 #, python-format
 msgid "Couldn't send email: %s returned code %d"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1061
+#: ../src/gtimelog/main.py:1064
 msgid "Couldn't append to {}: {}"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1140
+#: ../src/gtimelog/main.py:1143
 msgid "%H:%M"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1381
+#: ../src/gtimelog/main.py:1384
 msgid "{0:%A, %Y-%m-%d}\n"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1428
+#: ../src/gtimelog/main.py:1431
 msgid "({0:%H:%M}-{1:%H:%M})"
-msgstr ""
-
-#: ../src/gtimelog/main.py:1494
-#, python-brace-format
-msgid "Total work done: {0} ({1} this week, {2} per day)"
-msgstr ""
-
-#: ../src/gtimelog/main.py:1495
-#, python-brace-format
-msgid "Total work done: {0} ({1} this week)"
 msgstr ""
 
 #: ../src/gtimelog/main.py:1497
 #, python-brace-format
-msgid "Total work done this week: {0} ({1} per day)"
+msgid "Total work done: {0} ({1} this week, {2} per day)"
 msgstr ""
 
 #: ../src/gtimelog/main.py:1498
 #, python-brace-format
-msgid "Total work done this week: {0}"
+msgid "Total work done: {0} ({1} this week)"
 msgstr ""
 
 #: ../src/gtimelog/main.py:1500
 #, python-brace-format
-msgid "Total work done this month: {0} ({1} per day)"
+msgid "Total work done this week: {0} ({1} per day)"
 msgstr ""
 
 #: ../src/gtimelog/main.py:1501
 #, python-brace-format
+msgid "Total work done this week: {0}"
+msgstr ""
+
+#: ../src/gtimelog/main.py:1503
+#, python-brace-format
+msgid "Total work done this month: {0} ({1} per day)"
+msgstr ""
+
+#: ../src/gtimelog/main.py:1504
+#, python-brace-format
 msgid "Total work done this month: {0}"
-msgstr ""
-
-#: ../src/gtimelog/main.py:1520
-#, python-brace-format
-msgid "Total slacking: {0} ({1} this week, {2} per day)"
-msgstr ""
-
-#: ../src/gtimelog/main.py:1521
-#, python-brace-format
-msgid "Total slacking: {0} ({1} this week)"
 msgstr ""
 
 #: ../src/gtimelog/main.py:1523
 #, python-brace-format
-msgid "Total slacking this week: {0} ({1} per day)"
+msgid "Total slacking: {0} ({1} this week, {2} per day)"
 msgstr ""
 
 #: ../src/gtimelog/main.py:1524
 #, python-brace-format
-msgid "Total slacking this week: {0}"
+msgid "Total slacking: {0} ({1} this week)"
 msgstr ""
 
 #: ../src/gtimelog/main.py:1526
 #, python-brace-format
-msgid "Total slacking this month: {0} ({1} per day)"
+msgid "Total slacking this week: {0} ({1} per day)"
 msgstr ""
 
 #: ../src/gtimelog/main.py:1527
 #, python-brace-format
+msgid "Total slacking this week: {0}"
+msgstr ""
+
+#: ../src/gtimelog/main.py:1529
+#, python-brace-format
+msgid "Total slacking this month: {0} ({1} per day)"
+msgstr ""
+
+#: ../src/gtimelog/main.py:1530
+#, python-brace-format
 msgid "Total slacking this month: {0}"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1551
+#: ../src/gtimelog/main.py:1554
 msgid "Time left at work: {0} (should've finished at {1:%H:%M})"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1554
+#: ../src/gtimelog/main.py:1557
 msgid "Time left at work: {0} (till {1:%H:%M})"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1568
+#: ../src/gtimelog/main.py:1571
 #, python-brace-format
 msgid "At office today: {0} ({1} overtime)"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1574
+#: ../src/gtimelog/main.py:1577
 #, python-brace-format
 msgid "At office today: {0} ({1} left)"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1736
+#: ../src/gtimelog/main.py:1739
 msgid "Tasks"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1751
+#: ../src/gtimelog/main.py:1754
 msgid "Other"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1773 ../src/gtimelog/menus.ui.h:1
+#: ../src/gtimelog/main.py:1776 ../src/gtimelog/menus.ui.h:1
 msgid "Preferences"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1777
+#: ../src/gtimelog/main.py:1780
 msgid "Close"
 msgstr ""
 
