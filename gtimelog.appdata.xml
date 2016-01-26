@@ -19,4 +19,7 @@
     </keywords>
     <url type="homepage">https://gtimelog.org/</url>
     <updatecontact>marius@gedmin.as</updatecontact>
+    <component>
+        <translation type="gettext">gtimelog</translation>
+    </component>
 </application>
