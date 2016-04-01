@@ -81,5 +81,11 @@
         <attribute name="target">month</attribute>
       </item>
     </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Filter</attribute>
+        <attribute name="action">win.show-search-bar</attribute>
+      </item>
+    </section>
   </menu>
 </interface>
