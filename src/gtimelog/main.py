@@ -1082,6 +1082,7 @@ class Window(Gtk.ApplicationWindow):
     def on_cancel_report(self, action=None, parameter=None):
         if self.main_stack.get_visible_child_name() != 'report':
             self.search_bar.set_search_mode(False)
+            self.filter_text = ''
             return
         self.main_stack.set_visible_child_name('entry')
         self.view_button.show()
