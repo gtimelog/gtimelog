@@ -1433,9 +1433,17 @@ class LogView(Gtk.TextView):
             return # bug!
         if self.filter_text:
             self.w('\n')
-            self.wfmt(_('Total for {0}: {1}'),
-                      (self.filter_text, 'highlight'),
-                      (format_duration(total), 'duration'))
+            args = [
+                (self.filter_text, 'highlight'),
+                (format_duration(total), 'duration'),
+            ]
+            work_days = window.count_days()
+            if work_days > 1:
+                per_diem = total / work_days
+                args.append((format_duration(per_diem), 'duration'))
+                self.wfmt(_('Total for {0}: {1} ({2} per day)'), *args)
+            else:
+                self.wfmt(_('Total for {0}: {1}'), *args)
             self.w('\n')
         self.reposition_cursor()
         self.add_footer()
