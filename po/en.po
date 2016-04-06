@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-01 12:18+0300\n"
+"POT-Creation-Date: 2016-04-06 17:07+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../gtimelog.desktop.in.h:1 ../src/gtimelog/main.py:178
-#: ../src/gtimelog/main.py:1095 ../src/gtimelog/about.ui.h:1
+#: ../src/gtimelog/main.py:1096 ../src/gtimelog/about.ui.h:1
 #: ../src/gtimelog/gtimelog.ui.h:10
 msgid "Time Log"
 msgstr ""
@@ -145,114 +145,119 @@ msgstr ""
 msgid "Couldn't append to {}: {}"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1162
+#: ../src/gtimelog/main.py:1163
 msgid "%H:%M"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1410
+#: ../src/gtimelog/main.py:1411
 msgid "{0:%A, %Y-%m-%d}\n"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1435
+#: ../src/gtimelog/main.py:1444
+#, python-brace-format
+msgid "Total for {0}: {1} ({2} per day)"
+msgstr ""
+
+#: ../src/gtimelog/main.py:1446
 #, python-brace-format
 msgid "Total for {0}: {1}"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1470
+#: ../src/gtimelog/main.py:1479
 msgid "({0:%H:%M}-{1:%H:%M})"
 msgstr "({0:%H:%M}–{1:%H:%M})"
 
-#: ../src/gtimelog/main.py:1536
+#: ../src/gtimelog/main.py:1545
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week, {2} per day)"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1537
+#: ../src/gtimelog/main.py:1546
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week)"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1539
+#: ../src/gtimelog/main.py:1548
 #, python-brace-format
 msgid "Total work done this week: {0} ({1} per day)"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1540
+#: ../src/gtimelog/main.py:1549
 #, python-brace-format
 msgid "Total work done this week: {0}"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1542
+#: ../src/gtimelog/main.py:1551
 #, python-brace-format
 msgid "Total work done this month: {0} ({1} per day)"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1543
+#: ../src/gtimelog/main.py:1552
 #, python-brace-format
 msgid "Total work done this month: {0}"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1562
+#: ../src/gtimelog/main.py:1571
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week, {2} per day)"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1563
+#: ../src/gtimelog/main.py:1572
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week)"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1565
+#: ../src/gtimelog/main.py:1574
 #, python-brace-format
 msgid "Total slacking this week: {0} ({1} per day)"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1566
+#: ../src/gtimelog/main.py:1575
 #, python-brace-format
 msgid "Total slacking this week: {0}"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1568
+#: ../src/gtimelog/main.py:1577
 #, python-brace-format
 msgid "Total slacking this month: {0} ({1} per day)"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1569
+#: ../src/gtimelog/main.py:1578
 #, python-brace-format
 msgid "Total slacking this month: {0}"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1593
+#: ../src/gtimelog/main.py:1602
 msgid "Time left at work: {0} (should've finished at {1:%H:%M})"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1596
+#: ../src/gtimelog/main.py:1605
 msgid "Time left at work: {0} (till {1:%H:%M})"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1610
+#: ../src/gtimelog/main.py:1619
 #, python-brace-format
 msgid "At office today: {0} ({1} overtime)"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1616
+#: ../src/gtimelog/main.py:1625
 #, python-brace-format
 msgid "At office today: {0} ({1} left)"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1777
+#: ../src/gtimelog/main.py:1786
 msgid "Tasks"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1792
+#: ../src/gtimelog/main.py:1801
 msgid "Other"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1814 ../src/gtimelog/menus.ui.h:1
+#: ../src/gtimelog/main.py:1823 ../src/gtimelog/menus.ui.h:1
 msgid "Preferences"
 msgstr ""
 
-#: ../src/gtimelog/main.py:1818
+#: ../src/gtimelog/main.py:1827
 msgid "Close"
 msgstr ""
 
