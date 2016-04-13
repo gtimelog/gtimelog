@@ -1450,7 +1450,8 @@ class LogView(Gtk.TextView):
         self.scroll_to_end()
 
     def entry_added(self, same_day):
-        if self.detail_level == 'chronological' and same_day:
+        if (self.detail_level == 'chronological' and same_day
+                and not self.filter_text):
             self.delete_footer()
             self.write_item(self.timelog.last_entry())
             self.add_footer()
