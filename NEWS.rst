@@ -9,6 +9,9 @@ Changelog
 
 * History browsing can show you weeks/months, not just days.
 
+* You can filter the displayed tasks, with a total shown at the bottom
+  (GH: #88).
+
 * There's now a preferences dialog (GH: #47).
 
 * Window size and task pane size/visibility are remembered across
