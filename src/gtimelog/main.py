@@ -358,7 +358,11 @@ class Application(Gtk.Application):
 
 
 def copy_properties(src, dest):
-    blacklist = ('events', 'child', 'parent', 'input-hints', 'buffer', 'tabs', 'completion', 'model', 'type')
+    blacklist = (
+        'events', 'child', 'parent', 'input-hints', 'buffer', 'tabs',
+        'completion', 'model', 'type',
+        'progress-', 'primary-icon-', 'secondary-icon-',
+    )
     # GObject.ParamFlags.READWRITE is missing on Ubuntu 14.04 LTS, which has GTK+ 3.10
     RW = GObject.ParamFlags.READABLE | GObject.ParamFlags.WRITABLE
     for prop in src.props:
@@ -366,7 +370,7 @@ def copy_properties(src, dest):
             continue
         if prop.flags & RW != RW:
             continue
-        if prop.name in blacklist:
+        if prop.name.startswith(blacklist):
             continue
         setattr(dest.props, prop.name, getattr(src.props, prop.name))
 
