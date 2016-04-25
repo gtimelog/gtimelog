@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-12 09:43+0200\n"
+"POT-Creation-Date: 2016-04-06 17:07+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -20,7 +20,7 @@ msgstr ""
 "%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: ../gtimelog.desktop.in.h:1 ../src/gtimelog/main.py:178
-#: ../src/gtimelog/main.py:1076 ../src/gtimelog/about.ui.h:1
+#: ../src/gtimelog/main.py:1096 ../src/gtimelog/about.ui.h:1
 #: ../src/gtimelog/gtimelog.ui.h:10
 msgid "Time Log"
 msgstr "Laiko žurnalas"
@@ -95,164 +95,174 @@ msgstr ""
 msgid "Settings already migrated to GSettings (org.gtimelog)"
 msgstr "Nustatymai jau buvo perkelti į GSettings (org.gtimelog)"
 
-#: ../src/gtimelog/main.py:700
+#: ../src/gtimelog/main.py:713
 #, python-brace-format
 msgid "Settings from {filename} migrated to GSettings (org.gtimelog)"
 msgstr "Nustatymai perkelti iš {filename} į GSettings (org.gtimelog)"
 
-#: ../src/gtimelog/main.py:748
+#: ../src/gtimelog/main.py:761
 msgid "Report already sent"
 msgstr "Ataskaita jau buvo išsiųsta"
 
-#: ../src/gtimelog/main.py:752
+#: ../src/gtimelog/main.py:765
 msgid "Report already sent (to {})"
 msgstr "Ataskaita jau buvo išsiųsta kitam gavėjui ({})"
 
-#: ../src/gtimelog/main.py:767
+#: ../src/gtimelog/main.py:780
 msgid "Downloading tasks..."
 msgstr "Parsiunčiamos užduotys..."
 
-#: ../src/gtimelog/main.py:782
+#: ../src/gtimelog/main.py:795
 msgid "Download failed."
 msgstr "Nepavyko parsisiųsti užduočių."
 
-#: ../src/gtimelog/main.py:929
+#: ../src/gtimelog/main.py:942
 msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
 msgstr "{0:%A, %Y-%m-%d} ({1} savaitė)"
 
-#: ../src/gtimelog/main.py:935
+#: ../src/gtimelog/main.py:948
 msgid "{0}, week {1} ({2:%B %-d}-{3:%-d})"
 msgstr "{0}, {1} savaitė ({2:%B %-d}–{3:%-d})"
 
-#: ../src/gtimelog/main.py:938
+#: ../src/gtimelog/main.py:951
 msgid "{0:%B %Y}"
 msgstr "{0:%Y %B} mėn."
 
-#: ../src/gtimelog/main.py:1006
+#: ../src/gtimelog/main.py:1022
 msgid "Report"
 msgstr "Ataskaita"
 
-#: ../src/gtimelog/main.py:1029
+#: ../src/gtimelog/main.py:1045
 msgid "Couldn't send email to {}."
 msgstr "Nepavyko išsiųsti laiško {}."
 
-#: ../src/gtimelog/main.py:1050
+#: ../src/gtimelog/main.py:1066
 #, python-format
 msgid "Couldn't execute %s: %s"
 msgstr "Nepavyko paleisti %s: %s"
 
-#: ../src/gtimelog/main.py:1054
+#: ../src/gtimelog/main.py:1070
 #, python-format
 msgid "Couldn't send email: %s returned code %d"
 msgstr "Nepavyko išsiųsti laiško: %s grąžino kodą %d"
 
-#: ../src/gtimelog/main.py:1064
+#: ../src/gtimelog/main.py:1080
 msgid "Couldn't append to {}: {}"
 msgstr "Nepavyko rašyti į {}: {}"
 
-#: ../src/gtimelog/main.py:1143
+#: ../src/gtimelog/main.py:1163
 msgid "%H:%M"
 msgstr "%H:%M"
 
-#: ../src/gtimelog/main.py:1384
+#: ../src/gtimelog/main.py:1411
 msgid "{0:%A, %Y-%m-%d}\n"
 msgstr "{0:%A, %Y-%m-%d}\n"
 
-#: ../src/gtimelog/main.py:1431
+#: ../src/gtimelog/main.py:1444
+#, python-brace-format
+msgid "Total for {0}: {1} ({2} per day)"
+msgstr "Iš viso {0}: {1} (po {2} per dieną)"
+
+#: ../src/gtimelog/main.py:1446
+#, python-brace-format
+msgid "Total for {0}: {1}"
+msgstr "Iš viso {0}: {1}"
+
+#: ../src/gtimelog/main.py:1479
 msgid "({0:%H:%M}-{1:%H:%M})"
 msgstr "({0:%H:%M}–{1:%H:%M})"
 
-#: ../src/gtimelog/main.py:1497
+#: ../src/gtimelog/main.py:1545
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week, {2} per day)"
 msgstr "Iš viso dirbta: {0} (šią savaitę {1}, po {2} per dieną)"
 
-#: ../src/gtimelog/main.py:1498
+#: ../src/gtimelog/main.py:1546
 #, python-brace-format
 msgid "Total work done: {0} ({1} this week)"
 msgstr "Iš viso dirbta: {0} (šią savaitę {1})"
 
-#: ../src/gtimelog/main.py:1500
+#: ../src/gtimelog/main.py:1548
 #, python-brace-format
 msgid "Total work done this week: {0} ({1} per day)"
 msgstr "Iš viso dirbta šią savaitę: {0} (po {1} per dieną)"
 
-#: ../src/gtimelog/main.py:1501
+#: ../src/gtimelog/main.py:1549
 #, python-brace-format
 msgid "Total work done this week: {0}"
 msgstr "Iš viso dirbta šią savaitę: {0}"
 
-#: ../src/gtimelog/main.py:1503
+#: ../src/gtimelog/main.py:1551
 #, python-brace-format
 msgid "Total work done this month: {0} ({1} per day)"
 msgstr "Iš viso dirbta šį mėnesį: {0} (po {1} per dieną)"
 
-#: ../src/gtimelog/main.py:1504
+#: ../src/gtimelog/main.py:1552
 #, python-brace-format
 msgid "Total work done this month: {0}"
 msgstr "Iš viso dirbta šį mėnesį: {0}"
 
-#: ../src/gtimelog/main.py:1523
+#: ../src/gtimelog/main.py:1571
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week, {2} per day)"
 msgstr "Iš viso nedirbta: {0} (šią savaitę {1}, po {2} per dieną)"
 
-#: ../src/gtimelog/main.py:1524
+#: ../src/gtimelog/main.py:1572
 #, python-brace-format
 msgid "Total slacking: {0} ({1} this week)"
 msgstr "Iš viso nedirbta: {0} (šią savaitę {1})"
 
-#: ../src/gtimelog/main.py:1526
+#: ../src/gtimelog/main.py:1574
 #, python-brace-format
 msgid "Total slacking this week: {0} ({1} per day)"
 msgstr "Iš viso nedirbta šią savaitę: {0} (po {1} per dieną)"
 
-#: ../src/gtimelog/main.py:1527
+#: ../src/gtimelog/main.py:1575
 #, python-brace-format
 msgid "Total slacking this week: {0}"
 msgstr "Iš viso nedirbta šią savaitę: {0}"
 
-#: ../src/gtimelog/main.py:1529
+#: ../src/gtimelog/main.py:1577
 #, python-brace-format
 msgid "Total slacking this month: {0} ({1} per day)"
 msgstr "Iš viso nedirbta šį mėnesį: {0} (po {1} per dieną)"
 
-#: ../src/gtimelog/main.py:1530
+#: ../src/gtimelog/main.py:1578
 #, python-brace-format
 msgid "Total slacking this month: {0}"
 msgstr "Iš viso nedirbta šį mėnesį: {0}"
 
-#: ../src/gtimelog/main.py:1554
+#: ../src/gtimelog/main.py:1602
 msgid "Time left at work: {0} (should've finished at {1:%H:%M})"
 msgstr "Liko dirbti: {0} (reikėjo baigti {1:%H:%M})"
 
-#: ../src/gtimelog/main.py:1557
+#: ../src/gtimelog/main.py:1605
 msgid "Time left at work: {0} (till {1:%H:%M})"
 msgstr "Liko dirbti: {0} (iki {1:%H:%M})"
 
-#: ../src/gtimelog/main.py:1571
+#: ../src/gtimelog/main.py:1619
 #, python-brace-format
 msgid "At office today: {0} ({1} overtime)"
 msgstr "Šiandien darbe: {0} ({1} per daug)"
 
-#: ../src/gtimelog/main.py:1577
+#: ../src/gtimelog/main.py:1625
 #, python-brace-format
 msgid "At office today: {0} ({1} left)"
 msgstr "Šiandien darbe: {0} (liko {1})"
 
-#: ../src/gtimelog/main.py:1739
+#: ../src/gtimelog/main.py:1786
 msgid "Tasks"
 msgstr "Užduotys"
 
-#: ../src/gtimelog/main.py:1754
+#: ../src/gtimelog/main.py:1801
 msgid "Other"
 msgstr "Kitos"
 
-#: ../src/gtimelog/main.py:1776 ../src/gtimelog/menus.ui.h:1
+#: ../src/gtimelog/main.py:1823 ../src/gtimelog/menus.ui.h:1
 msgid "Preferences"
 msgstr "Nustatymai"
 
-#: ../src/gtimelog/main.py:1780
+#: ../src/gtimelog/main.py:1827
 msgid "Close"
 msgstr "Uždaryti"
 
@@ -415,6 +425,10 @@ msgstr "Savaitė"
 #: ../src/gtimelog/menus.ui.h:16
 msgid "Month"
 msgstr "Mėnuo"
+
+#: ../src/gtimelog/menus.ui.h:17
+msgid "Filter"
+msgstr "Filtruoti"
 
 #~ msgid "J. Random Hacker <jrh@example.com>"
 #~ msgstr "Vardenis Pavardenis <vp@example.com>"

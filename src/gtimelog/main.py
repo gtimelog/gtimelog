@@ -252,6 +252,7 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.time-range::month", ["<Alt>6"])
         self.set_accels_for_action("win.show-task-pane", ["F9"])
         self.set_accels_for_action("win.show-menu", ["F10"])
+        self.set_accels_for_action("win.show-search-bar", ["<Primary>F"])
         self.set_accels_for_action("win.go-back", ["<Alt>Left"])
         self.set_accels_for_action("win.go-forward", ["<Alt>Right"])
         self.set_accels_for_action("win.go-home", ["<Alt>Home"])
@@ -463,6 +464,10 @@ class Window(Gtk.ApplicationWindow):
         type=str, default='day', nick='Time range',
         blurb='Time range to show (day/week/month)')
 
+    filter_text = GObject.Property(
+        type=str, default='', nick='Filter text',
+        blurb='Show only tasks matching this substring')
+
     class Actions(object):
 
         def __init__(self, win):
@@ -489,6 +494,9 @@ class Window(Gtk.ApplicationWindow):
 
             self.show_menu = PropertyAction.new("show-menu", win.menu_button, "active")
             win.add_action(self.show_menu)
+
+            self.show_search_bar = PropertyAction.new("show-search-bar", win.search_bar, "search-mode-enabled")
+            win.add_action(self.show_search_bar)
 
             for action_name in ['go-back', 'go-forward', 'go-home', 'add-entry', 'report', 'send-report', 'cancel-report']:
                 action = Gio.SimpleAction.new(action_name, None)
@@ -576,6 +584,11 @@ class Window(Gtk.ApplicationWindow):
         self.bind_property('time_range', self.log_view, 'time_range', GObject.BindingFlags.SYNC_CREATE)
         self.task_entry.bind_property('text', self.log_view, 'current_task', GObject.BindingFlags.DEFAULT)
         self.bind_property('subtitle', self.headerbar, 'subtitle', GObject.BindingFlags.DEFAULT)
+        self.bind_property('filter_text', self.log_view, 'filter_text', GObject.BindingFlags.DEFAULT)
+
+        self.search_bar = builder.get_object("search_bar")
+        self.search_entry = builder.get_object("search_entry")
+        self.search_entry.connect('search-changed', self.on_search_changed)
 
         self.task_pane = builder.get_object("task_pane")
         self.task_list = TaskListView()
@@ -945,6 +958,9 @@ class Window(Gtk.ApplicationWindow):
         assert self.time_range in {'day', 'week', 'month'}
         self.notify('subtitle')
 
+    def on_search_changed(self, *args):
+        self.filter_text = self.search_entry.get_text()
+
     def on_go_back(self, action, parameter):
         if self.time_range == 'day':
             self.date -= datetime.timedelta(1)
@@ -1064,6 +1080,10 @@ class Window(Gtk.ApplicationWindow):
             log.error(_("Couldn't append to {}: {}").format(record.filename, e))
 
     def on_cancel_report(self, action=None, parameter=None):
+        if self.main_stack.get_visible_child_name() != 'report':
+            self.search_bar.set_search_mode(False)
+            self.filter_text = ''
+            return
         self.main_stack.set_visible_child_name('entry')
         self.view_button.show()
         self.task_pane_button.show()
@@ -1295,6 +1315,10 @@ class LogView(Gtk.TextView):
         type=object, default=None, nick='Now',
         blurb='Current date and time')
 
+    filter_text = GObject.Property(
+        type=str, default='', nick='Filter text',
+        blurb='Show only tasks matching this substring')
+
     def __init__(self):
         Gtk.TextView.__init__(self)
         self._extended_footer = False
@@ -1312,6 +1336,7 @@ class LogView(Gtk.TextView):
         self.connect('notify::office-hours', self.queue_footer_update)
         self.connect('notify::current-task', self.queue_footer_update)
         self.connect('notify::now', self.queue_footer_update)
+        self.connect('notify::filter-text', self.queue_update)
 
     def queue_update(self, *args):
         if not self._update_pending:
@@ -1336,6 +1361,7 @@ class LogView(Gtk.TextView):
         buffer.create_tag('today', foreground='#204a87')     # Tango dark blue
         buffer.create_tag('duration', foreground='#ce5c00')  # Tango dark orange
         buffer.create_tag('time', foreground='#4e9a06')      # Tango dark green
+        buffer.create_tag('highlight', foreground='#4e9a06') # Tango dark green
         buffer.create_tag('slacking', foreground='gray')
 
     def get_time_window(self):
@@ -1374,6 +1400,7 @@ class LogView(Gtk.TextView):
         if self.timelog is None:
             return # not loaded yet
         window = self.get_time_window()
+        total = datetime.timedelta(0)
         if self.detail_level == 'chronological':
             prev = None
             for item in window.all_entries():
@@ -1382,27 +1409,49 @@ class LogView(Gtk.TextView):
                     self.w("\n")
                 if self.time_range != 'day' and first_of_day:
                     self.w(_("{0:%A, %Y-%m-%d}\n").format(item.start))
-                self.write_item(item)
+                if self.filter_text in item.entry:
+                    self.write_item(item)
+                    total += item.duration
                 prev = item.start
         elif self.detail_level == 'grouped':
             work, slack = window.grouped_entries()
             for start, entry, duration in work + slack:
-                self.write_group(entry, duration)
+                if self.filter_text in entry:
+                    self.write_group(entry, duration)
+                    total += duration
         elif self.detail_level == 'summary':
             entries, totals = window.categorized_work_entries()
             no_cat = totals.pop(None, None)
+            categories = sorted(totals.items())
             if no_cat is not None:
-                self.write_group('no category', no_cat)
-            for category, duration in sorted(totals.items()):
-                self.write_group(category, duration)
+                categories = [('no category', no_cat)] + categories
+            for category, duration in categories:
+                if self.filter_text in category:
+                    self.write_group(category, duration)
+                    total += duration
         else:
             return # bug!
+        if self.filter_text:
+            self.w('\n')
+            args = [
+                (self.filter_text, 'highlight'),
+                (format_duration(total), 'duration'),
+            ]
+            work_days = window.count_days()
+            if work_days > 1:
+                per_diem = total / work_days
+                args.append((format_duration(per_diem), 'duration'))
+                self.wfmt(_('Total for {0}: {1} ({2} per day)'), *args)
+            else:
+                self.wfmt(_('Total for {0}: {1}'), *args)
+            self.w('\n')
         self.reposition_cursor()
         self.add_footer()
         self.scroll_to_end()
 
     def entry_added(self, same_day):
-        if self.detail_level == 'chronological' and same_day:
+        if (self.detail_level == 'chronological' and same_day
+                and not self.filter_text):
             self.delete_footer()
             self.write_item(self.timelog.last_entry())
             self.add_footer()

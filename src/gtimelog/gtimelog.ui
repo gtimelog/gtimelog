@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.18.1 -->
+<!-- Generated with glade 3.19.0 -->
 <interface>
   <requires lib="gtk+" version="3.10"/>
   <object class="GtkImage" id="image1">
@@ -54,19 +54,52 @@
                 <property name="position">600</property>
                 <property name="position_set">True</property>
                 <child>
-                  <object class="GtkScrolledWindow" id="scrolledwindow1">
+                  <object class="GtkBox" id="box1">
                     <property name="visible">True</property>
-                    <property name="can_focus">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkTextView" id="log_view">
+                      <object class="GtkSearchBar" id="search_bar">
+                        <property name="visible">True</property>
+                        <property name="app_paintable">True</property>
+                        <property name="can_focus">False</property>
+                        <child>
+                          <object class="GtkSearchEntry" id="search_entry">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="primary_icon_name">edit-find-symbolic</property>
+                            <property name="primary_icon_activatable">False</property>
+                            <property name="primary_icon_sensitive">False</property>
+                          </object>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkScrolledWindow" id="scrolledwindow1">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="pixels_above_lines">2</property>
-                        <property name="editable">False</property>
-                        <property name="wrap_mode">word</property>
-                        <property name="left_margin">6</property>
-                        <property name="right_margin">6</property>
+                        <child>
+                          <object class="GtkTextView" id="log_view">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="pixels_above_lines">2</property>
+                            <property name="editable">False</property>
+                            <property name="wrap_mode">word</property>
+                            <property name="left_margin">6</property>
+                            <property name="right_margin">6</property>
+                          </object>
+                        </child>
                       </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
                     </child>
                   </object>
                   <packing>
