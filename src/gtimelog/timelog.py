@@ -321,11 +321,14 @@ class TimeCollection(object):
                     None, datetime.timedelta(0)) + duration
         return entries, totals
 
-    def totals(self, tag=None):
+    def totals(self, tag=None, filter_text=None):
         """Calculate total time of work and slacking entries.
 
         If optional argument `tag` is given, only compute
         totals for entries marked with the given tag.
+
+        If optional argument `filter_text` is given, only compute
+        totals for entries matching the text.
 
         Returns (total_work, total_slacking) tuple.
 
@@ -347,6 +350,8 @@ class TimeCollection(object):
         total_work = total_slacking = datetime.timedelta(0)
         for start, stop, duration, tags, entry in self.all_entries():
             if tag is not None and tag not in tags:
+                continue
+            if filter_text is not None and filter_text not in entry:
                 continue
             if '**' in entry:
                 total_slacking += duration

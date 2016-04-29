@@ -1218,6 +1218,49 @@ class TestTimeLog(unittest.TestCase):
                          ("-200 did stuff", None))
 
 
+class TestFiltering(unittest.TestCase):
+
+    TEST_TIMELOG = textwrap.dedent("""
+        2014-05-27 10:03: arrived
+        2014-05-27 10:13: edx: introduce topic to new sysadmins
+        2014-05-27 10:30: email
+        2014-05-27 12:11: meeting: how to support new courses?
+        2014-05-27 15:12: edx: write test procedure for EdX instances
+        2014-05-27 17:03: cluster: set-up accounts, etc.
+        2014-05-27 17:14: support: how to run statistics on Hydra?
+        2014-05-27 17:36: off: pause **
+        2014-05-27 17:38: email
+        2014-05-27 19:06: off: dinner & family **
+        2014-05-27 22:19: cluster: fix shmmax-shmall issue
+        """)
+
+    def setUp(self):
+        self.tw = make_time_window(
+            StringIO(self.TEST_TIMELOG),
+            datetime.datetime(2014, 5, 27, 9, 0),
+            datetime.datetime(2014, 5, 27, 23, 59),
+            datetime.time(2, 0),
+        )
+
+    def test_TimeWindow_totals_filtering1(self):
+        work, slack = self.tw.totals(filter_text='support')
+        # matches two items: 1h 41m (10:30--12:11) + 11m (17:03--17:14)
+        self.assertEqual(work, datetime.timedelta(hours=1, minutes=52))
+        self.assertEqual(slack, datetime.timedelta(0))
+
+    def test_TimeWindow_totals_filtering2(self):
+        work, slack = self.tw.totals(filter_text='f')
+        # matches four items:
+        # 3h  1m (12:11--15:12) edx: write test procedure [f]or EdX instances
+        # 3h 13m (19:06--22:19) cluster: [f]ix shmmax-shmall issue
+        # total work: 6h 14m
+        #    22m (17:14--17:36) o[f]f: pause **
+        # 1h 28m (17:38--19:06) o[f]f: dinner & family **
+        # total slacking: 1h 50m
+        self.assertEqual(work, datetime.timedelta(hours=6, minutes=14))
+        self.assertEqual(slack, datetime.timedelta(hours=1, minutes=50))
+
+
 class TestTagging(unittest.TestCase):
 
     TEST_TIMELOG = textwrap.dedent("""
