@@ -1441,7 +1441,7 @@ class LogView(Gtk.TextView):
                 (self.filter_text, 'highlight'),
                 (format_duration(total), 'duration'),
             ]
-            if self.time_range == 'day':
+            if self.time_range != 'day':
                 work_days = window.count_days() or 1
                 per_diem = total / work_days
                 args.append((format_duration(per_diem), 'duration'))
