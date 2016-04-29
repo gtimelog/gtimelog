@@ -5,3 +5,4 @@
 # to make the diffs more readable
 
 *.po    filter=po
+*.pot   filter=po
