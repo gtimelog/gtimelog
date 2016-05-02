@@ -764,11 +764,15 @@ class Window(Gtk.ApplicationWindow):
         if self.report_view.report_status == 'sent':
             self.infobar_label.set_text(_("Report already sent"))
             self.infobar.show()
+            # https://github.com/gtimelog/gtimelog/issues/89
+            self.infobar.queue_resize()
         elif self.report_view.report_status == 'sent-elsewhere':
             self.infobar_label.set_text(
                 _("Report already sent (to {})").format(
                     self.report_view.report_sent_to))
             self.infobar.show()
+            # https://github.com/gtimelog/gtimelog/issues/89
+            self.infobar.queue_resize()
         else:
             self.infobar.hide()
 
