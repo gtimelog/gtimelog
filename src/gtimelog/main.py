@@ -1517,7 +1517,7 @@ class LogView(Gtk.TextView):
 
         Each argument should be a tuple (value, tag_name).
         """
-        for bit in re.split('({\d+(?::[^}]*)?})', fmt):
+        for bit in re.split(r'({\d+(?::[^}]*)?})', fmt):
             if bit.startswith('{'):
                 spec = bit[1:-1]
                 idx, colon, fmt = spec.partition(':')
