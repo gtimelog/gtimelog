@@ -291,6 +291,7 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="action_name">win.time-range</property>
+                    <property name="action_target">"day"</property>
                     <property name="active">True</property>
                   </object>
                   <packing>
@@ -306,6 +307,7 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="action_name">win.time-range</property>
+                    <property name="action_target">"week"</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>
@@ -320,6 +322,7 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="action_name">win.time-range</property>
+                    <property name="action_target">"month"</property>
                   </object>
                   <packing>
                     <property name="expand">True</property>

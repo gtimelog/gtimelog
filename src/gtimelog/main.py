@@ -604,11 +604,6 @@ class Window(Gtk.ApplicationWindow):
         self.actions.add_entry.set_enabled(False)
         self.actions.send_report.set_enabled(False)
 
-        # couldn't figure out how to set action targets in the .ui file
-        builder.get_object('daily_report_toggle').set_detailed_action_name('win.time-range::day')
-        builder.get_object('weekly_report_toggle').set_detailed_action_name('win.time-range::week')
-        builder.get_object('monthly_report_toggle').set_detailed_action_name('win.time-range::month')
-
         self.report_view = ReportView()
         swap_widget(builder, 'report_view', self.report_view)
         self.bind_property('timelog', self.report_view, 'timelog', GObject.BindingFlags.DEFAULT)
