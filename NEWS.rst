@@ -1,8 +1,12 @@
 Changelog
 ---------
 
-0.10.1 (unreleased)
+0.10.1 (2016-09-22)
 ~~~~~~~~~~~~~~~~~~~
+
+* Fix error on Python 3 when using ``task_list_url`` (GH: #92).
+
+* Fix some PyGIWarnings about unspecified versions on startup.
 
 
 0.10.0 (2015-09-29)
