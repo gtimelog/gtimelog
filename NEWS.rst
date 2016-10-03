@@ -1,10 +1,11 @@
 Changelog
 ---------
 
-0.10.2 (unreleased)
+0.10.2 (2016-10-03)
 ~~~~~~~~~~~~~~~~~~~
 
-* No changes yet.
+* Fix misleading name produced by ``--sample-config`` (GH: #94) when using
+  Python 3.
 
 
 0.10.1 (2016-09-22)
@@ -209,12 +210,12 @@ Changelog
 * New command-line option: --tray.  Makes GTimeLog start minimized, or exit
   without doing anything if it's already running.
 * Added some documentation for contributors: HACKING.txt.
-* Daily reports include totals by category.  Contributed by Laurynas Speičys
+* Daily reports include totals by category.  Contributed by Laurynas SpeiÄys
   <laurynas@pov.lt>.
 * The tasks pane can be toggled by pressing F9 and has a close button.
 * Alternative weekly and monthly report style, can be chosen by adding
   ``report_style = categorized`` to ~/.gtimelog/gtimelogrc.
-  Contributed by Laurynas Speičys <laurynas@pov.lt>.
+  Contributed by Laurynas SpeiÄys <laurynas@pov.lt>.
 * Bugfix: always preserve the order of entries, even when they have the same
   timestamp (LP: #708825).
 
