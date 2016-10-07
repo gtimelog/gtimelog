@@ -50,6 +50,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 SCHEMA_DIR = ROOT
 if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
     os.environ['GSETTINGS_SCHEMA_DIR'] = SCHEMA_DIR
+    if not os.path.exists(os.path.join(SCHEMA_DIR, 'gschemas.compiled')):
+        print("Compiling GSettings schema")
+        subprocess.call(['glib-compile-schemas', '.'])
 
 
 import gi
