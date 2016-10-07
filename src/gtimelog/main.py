@@ -1899,17 +1899,17 @@ def main():
     else:
         root_logger.setLevel(logging.INFO)
 
+    # Tell Python's gettext.gettext() to use our translations
+    gettext.bindtextdomain('gtimelog', LOCALE_DIR)
+    gettext.textdomain('gtimelog')
+
     # Tell GTK+ to use out translations
     if hasattr(locale, 'bindtextdomain'):
         locale.bindtextdomain('gtimelog', LOCALE_DIR)
         locale.textdomain('gtimelog')
     else:  # pragma: nocover
         # https://github.com/gtimelog/gtimelog/issues/95#issuecomment-252299266
-        print("gtimelog: unable to configure translations: no locale.bindtextdomain()")
-
-    # Tell Python's gettext.gettext() to use our translations
-    gettext.bindtextdomain('gtimelog', LOCALE_DIR)
-    gettext.textdomain('gtimelog')
+        log.error(_("Unable to configure translations: no locale.bindtextdomain()"))
 
     # Make ^C terminate the process
     signal.signal(signal.SIGINT, signal.SIG_DFL)
