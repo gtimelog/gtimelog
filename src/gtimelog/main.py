@@ -52,7 +52,10 @@ if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
     os.environ['GSETTINGS_SCHEMA_DIR'] = SCHEMA_DIR
     if not os.path.exists(os.path.join(SCHEMA_DIR, 'gschemas.compiled')):
         print("Compiling GSettings schema")
-        subprocess.call(['glib-compile-schemas', '.'])
+        glib_compile_schemas = os.path.join(sys.prefix, 'lib', 'site-packages', 'gnome', 'glib-compile-schemas.exe')
+        if not os.path.exists(glib_compile_schemas):
+            glib_compile_schemas = 'glib-compile-schemas'
+        subprocess.call([glib_compile_schemas, SCHEMA_DIR])
 
 
 import gi
