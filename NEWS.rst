@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-0.10.3 (unreleased)
+0.10.3 (2016-10-07)
 ~~~~~~~~~~~~~~~~~~~
 
 - Make it work (again) when the AppIndicator bindings are not available.
