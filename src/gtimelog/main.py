@@ -49,13 +49,18 @@ if '--debug' in sys.argv:
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SCHEMA_DIR = ROOT
 if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
+    # Have to do this before importing 'gi'.
     os.environ['GSETTINGS_SCHEMA_DIR'] = SCHEMA_DIR
     if not os.path.exists(os.path.join(SCHEMA_DIR, 'gschemas.compiled')):
+        # This, too, I have to do before importing 'gi'.
         print("Compiling GSettings schema")
         glib_compile_schemas = os.path.join(sys.prefix, 'lib', 'site-packages', 'gnome', 'glib-compile-schemas.exe')
         if not os.path.exists(glib_compile_schemas):
             glib_compile_schemas = 'glib-compile-schemas'
-        subprocess.call([glib_compile_schemas, SCHEMA_DIR])
+        try:
+            subprocess.call([glib_compile_schemas, SCHEMA_DIR])
+        except OSError as e:
+            print("Failed: %s" % e)
 
 
 import gi
