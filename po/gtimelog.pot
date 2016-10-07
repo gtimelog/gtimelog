@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-29 18:12+0300\n"
+"POT-Creation-Date: 2016-10-07 20:46+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -202,6 +202,11 @@ msgid "Preferences"
 msgstr ""
 
 msgid "Close"
+msgstr ""
+
+#. pragma: nocover
+#. https://github.com/gtimelog/gtimelog/issues/95#issuecomment-252299266
+msgid "Unable to configure translations: no locale.bindtextdomain()"
 msgstr ""
 
 msgid "Copyright © 2004–2015 Marius Gedminas and contributors."

@@ -40,6 +40,7 @@ coverage-diff: coverage
 
 .PHONY: update-translations
 update-translations:
+	git config filter.po.clean 'msgcat - --no-location'
 	cd po && intltool-update -g gtimelog -p
 	for po in $(po_files); do msgmerge -U $$po po/gtimelog.pot; done
 
