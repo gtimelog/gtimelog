@@ -7,7 +7,7 @@ minimal time logging application
 --------------------------------
 
 :Author: Marius Gedminas <mgedmin@gedmin.as>
-:Date: 2015-09-13
+:Date: 2016-10-07
 :Copyright: Marius Gedminas
 :Version: 0.11
 :Manual section: 1

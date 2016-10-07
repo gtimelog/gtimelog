@@ -215,8 +215,8 @@ msgstr "Uždaryti"
 msgid "Unable to configure translations: no locale.bindtextdomain()"
 msgstr "Nepavyko įjungti vertimų: nėra locale.bindtextdomain()"
 
-msgid "Copyright © 2004–2015 Marius Gedminas and contributors."
-msgstr "Autorinės teisės © 2004–2015 Marius Gedminas ir kiti."
+msgid "Copyright © 2004–2016 Marius Gedminas and contributors."
+msgstr "Autorinės teisės © 2004–2016 Marius Gedminas ir kiti."
 
 msgid "A time tracking application"
 msgstr "Programa darbo laiko sekimui"

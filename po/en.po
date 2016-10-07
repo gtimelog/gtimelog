@@ -210,7 +210,7 @@ msgstr ""
 msgid "Unable to configure translations: no locale.bindtextdomain()"
 msgstr ""
 
-msgid "Copyright © 2004–2015 Marius Gedminas and contributors."
+msgid "Copyright © 2004–2016 Marius Gedminas and contributors."
 msgstr ""
 
 msgid "A time tracking application"
