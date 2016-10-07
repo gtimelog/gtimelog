@@ -1900,8 +1900,13 @@ def main():
         root_logger.setLevel(logging.INFO)
 
     # Tell GTK+ to use out translations
-    locale.bindtextdomain('gtimelog', LOCALE_DIR)
-    locale.textdomain('gtimelog')
+    if hasattr(locale, 'bindtextdomain'):
+        locale.bindtextdomain('gtimelog', LOCALE_DIR)
+        locale.textdomain('gtimelog')
+    else:  # pragma: nocover
+        # https://github.com/gtimelog/gtimelog/issues/95#issuecomment-252299266
+        print("gtimelog: unable to configure translations: no locale.bindtextdomain()")
+
     # Tell Python's gettext.gettext() to use our translations
     gettext.bindtextdomain('gtimelog', LOCALE_DIR)
     gettext.textdomain('gtimelog')
