@@ -32,7 +32,7 @@ try:
     gi.require_version('AppIndicator3', '0.1')
     from gi.repository import AppIndicator3
     have_app_indicator = True
-except ImportError:
+except (ValueError, ImportError):
     have_app_indicator = False
 
 from gtimelog import __version__
