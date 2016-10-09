@@ -17,3 +17,4 @@ locale
 gschemas.compiled
 src/gtimelog/gtimelog-gtk3.10.ui
 src/gtimelog/preferences-gtk3.10.ui
+.coverage.*
