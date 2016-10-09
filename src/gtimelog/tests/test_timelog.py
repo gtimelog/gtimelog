@@ -1412,12 +1412,12 @@ class TestReportRecord(unittest.TestCase):
             '2015/53',
         )
 
+    @freezegun.freeze_time("2016-01-08 09:34:50")
     def test_record(self):
         rr = ReportRecord(self.filename)
-        now = datetime.datetime(2016, 1, 8, 9, 34, 50)
-        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.com', now)
-        rr.record(rr.WEEKLY, datetime.date(2016, 1, 6), 'test@example.com', now)
-        rr.record(rr.MONTHLY, datetime.date(2016, 1, 6), 'test@example.com', now)
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.com')
+        rr.record(rr.WEEKLY, datetime.date(2016, 1, 6), 'test@example.com')
+        rr.record(rr.MONTHLY, datetime.date(2016, 1, 6), 'test@example.com')
         with open(self.filename) as f:
             written = f.read()
         self.assertEqual(
@@ -1464,6 +1464,16 @@ class TestReportRecord(unittest.TestCase):
         rr = ReportRecord(self.filename)
         rr.reread()
         self.assertEqual(len(rr._records), 0)
+
+    def test_reread_bad_records_are_ignored(self):
+        self.load_fixture([
+            "2016-01-08 09:34:50,daily,2016-01-06,test@example.com",
+            "Somebody might edit this file and corrupt it",
+            "2016-01-08 09:34:50,monthly,2016-01,test@example.com",
+        ])
+        rr = ReportRecord(self.filename)
+        rr.reread()
+        self.assertEqual(len(rr._records), 2)
 
     def test_record_then_load_when_empty(self):
         rr = ReportRecord(self.filename)
