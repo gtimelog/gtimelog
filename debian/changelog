@@ -1,3 +1,10 @@
+gtimelog (0.10.3-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+  * d/control: Bump Standards-Version with no other changes necessary.
+
+ -- Barry Warsaw <barry@debian.org>  Mon, 24 Oct 2016 11:11:57 -0400
+
 gtimelog (0.10.0-1) unstable; urgency=medium
 
   * New upstream release.

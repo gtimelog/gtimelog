@@ -7,7 +7,7 @@ Build-Depends: debhelper (>= 9),
                python3,
                python3-freezegun,
                python3-setuptools
-Standards-Version: 3.9.6
+Standards-Version: 3.9.8
 Homepage: http://mg.pov.lt/gtimelog/
 Vcs-Git: git://anonscm.debian.org/collab-maint/gtimelog.git
 Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/gtimelog.git
