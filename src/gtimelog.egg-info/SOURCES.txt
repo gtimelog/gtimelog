@@ -10,6 +10,7 @@ NEWS.rst
 NOTES.rst
 README.rst
 TODO.rst
+appveyor.yml
 gtimelog
 gtimelog.appdata.xml
 gtimelog.desktop

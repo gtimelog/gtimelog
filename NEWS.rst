@@ -1,6 +1,27 @@
 Changelog
 ---------
 
+0.10.3 (2016-10-07)
+~~~~~~~~~~~~~~~~~~~
+
+- Make it work (again) when the AppIndicator bindings are not available.
+
+
+0.10.2 (2016-10-03)
+~~~~~~~~~~~~~~~~~~~
+
+* Fix misleading name produced by ``--sample-config`` (GH: #94) when using
+  Python 3.
+
+
+0.10.1 (2016-09-22)
+~~~~~~~~~~~~~~~~~~~
+
+* Fix error on Python 3 when using ``task_list_url`` (GH: #92).
+
+* Fix some PyGIWarnings about unspecified versions on startup.
+
+
 0.10.0 (2015-09-29)
 ~~~~~~~~~~~~~~~~~~~
 
@@ -195,12 +216,12 @@ Changelog
 * New command-line option: --tray.  Makes GTimeLog start minimized, or exit
   without doing anything if it's already running.
 * Added some documentation for contributors: HACKING.txt.
-* Daily reports include totals by category.  Contributed by Laurynas Speičys
+* Daily reports include totals by category.  Contributed by Laurynas SpeiÄys
   <laurynas@pov.lt>.
 * The tasks pane can be toggled by pressing F9 and has a close button.
 * Alternative weekly and monthly report style, can be chosen by adding
   ``report_style = categorized`` to ~/.gtimelog/gtimelogrc.
-  Contributed by Laurynas Speičys <laurynas@pov.lt>.
+  Contributed by Laurynas SpeiÄys <laurynas@pov.lt>.
 * Bugfix: always preserve the order of entries, even when they have the same
   timestamp (LP: #708825).
 

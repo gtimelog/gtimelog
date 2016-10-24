@@ -9,9 +9,13 @@ import os
 import socket
 import sys
 import re
-import urllib
 from hashlib import md5
 from operator import itemgetter
+
+try:
+    from urllib import urlretrieve          # Python 2
+except ImportError:
+    from urllib.request import urlretrieve  # Python 3
 
 
 PY3 = sys.version_info[0] >= 3
@@ -1040,7 +1044,7 @@ class RemoteTaskList(TaskList):
         if self.loading_callback:
             self.loading_callback()
         try:
-            urllib.urlretrieve(self.url, self.filename)
+            urlretrieve(self.url, self.filename)
         except IOError:
             if self.error_callback:
                 self.error_callback()

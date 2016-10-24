@@ -88,7 +88,7 @@ class Settings(object):
         config = RawConfigParser()
         config.add_section('gtimelog')
         config.set('gtimelog', 'list-email', self.email)
-        config.set('gtimelog', 'name', self.name.encode(self._encoding))
+        config.set('gtimelog', 'name', self._str(self.name))
         config.set('gtimelog', 'editor', self.editor)
         config.set('gtimelog', 'mailer', self.mailer)
         config.set('gtimelog', 'spreadsheet', self.spreadsheet)
@@ -112,9 +112,15 @@ class Settings(object):
         return config
 
     if PY3:
+        def _str(self, value):
+            return value  # ConfigParser already accepts unicode
+
         def _unicode(self, value):
             return value  # ConfigParser already gives us unicode
     else:
+        def _str(self, value):
+            return value.encode(self._encoding)
+
         def _unicode(self, value):
             return value.decode(self._encoding)
 
@@ -148,4 +154,3 @@ class Settings(object):
         config = self._config()
         with open(filename, 'w') as f:
             config.write(f)
-
