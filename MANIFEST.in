@@ -13,3 +13,6 @@ include .gitignore
 recursive-include src *.png *.ui
 recursive-include docs *.png *.rst
 recursive-include scripts *.py *.rst
+
+# added by check_manifest.py
+include *.yml

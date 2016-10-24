@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: gtimelog
-Version: 0.10.0
+Version: 0.10.3
 Summary: A Gtk+ time tracking application
 Home-page: http://mg.pov.lt/gtimelog/
 Author: Marius Gedminas
@@ -108,56 +108,25 @@ Description: GTimeLog
         Changelog
         ---------
         
-        0.10.0 (2015-09-29)
+        0.10.3 (2016-10-07)
         ~~~~~~~~~~~~~~~~~~~
         
-        * Use Tango colors in the main text buffer (GH: #13).
-        
-        * Allow tagging entries (GH: #19)
-        
-          - The syntax is ``category: text -- tag1 tag2``
-          - Per-tag summaries show up in reports
-        
-        * Use GtkApplication instead of own DBus server for enforcing single-instance.
-        
-          - Drop --replace, --ignore-dbus command-line options because of this.
-          - Require glib and gio to be version 2.40 or newer for sane
-            GtkApplication-based command line parsing
-            (check with ``pkg-config --modversion glib-2.0 gio-2.0``).
-        
-        * Remove obsolete code:
-        
-          - Drop support for Python 2.6 (PyGObject dropped support for it long ago).
-          - Drop PyGtk/Gtk+ 2 support code (it didn't work since 0.9.1 anyway).
-          - Drop EggTrayIcon support (it was for Gtk+ 2 only anyway).
-          - Drop the --prefer-pygtk command-line option.
-        
-        * Disable tray icon by default for new users (existing gtimelogrc files will be
-          untouched).
-        
-        * Improve tray icon selection logic for best contrast (GH: #29).
+        - Make it work (again) when the AppIndicator bindings are not available.
         
         
-        0.9.3 (2015-09-29)
-        ~~~~~~~~~~~~~~~~~~
+        0.10.2 (2016-10-03)
+        ~~~~~~~~~~~~~~~~~~~
         
-        * Adding new entries didn't update total weekly numbers (GH: #28).
+        * Fix misleading name produced by ``--sample-config`` (GH: #94) when using
+          Python 3.
         
         
-        0.9.2 (2014-09-28)
-        ~~~~~~~~~~~~~~~~~~
-        * Note that Gtk+ 2.x is no longer supported (this regressed somewhere between
-          0.9.0 and 0.9.1, but I didn't notice because I have no access to a system
-          that has Gtk+ 2.x).
-        * Fix setup.py to work on Python 3 when your locale is not UTF-8 (LP: #1263772).
-        * Fix two Gtk-CRITICAL warnings on startup (GH: #14).
-        * Fix Unicode warning when adding entries (GH: #20).
-        * Speed up entry addition (GH: #21).
-        * Fix Unicode error when navigating history with PageUp/PageDown (GH: #22).
-        * Update current task time when autoreloading (GH: #23).
-        * Fix 'LocaleError: unknown encoding:' on Mac OS X (GH: #25).
-        * Fix 'TypeError: unorderable types: NoneType() < str()' in summary view
-          on Python 3 (GH: #26).
+        0.10.1 (2016-09-22)
+        ~~~~~~~~~~~~~~~~~~~
+        
+        * Fix error on Python 3 when using ``task_list_url`` (GH: #92).
+        
+        * Fix some PyGIWarnings about unspecified versions on startup.
         
         
         Older versions
