@@ -29,14 +29,19 @@ def format_time(t):
         return '%d min' % m
 
 
-total = 0
-for line in sys.stdin:
-    if '  ' not in line:
-        continue
-    time = parse_time(line.split('  ')[-1].strip())
-    if time is None:
-        continue
-    print line.rstrip()
-    total += time
+def format_float_time(t):
+    return '%.2f' % (t/60.0)
 
-print "** Total: %s" % format_time(total)
+
+if __name__ == '__main__':
+    total = 0
+    for line in sys.stdin:
+        if '  ' not in line:
+            continue
+        time = parse_time(line.split('  ')[-1].strip())
+        if time is None:
+            continue
+        print line.rstrip()
+        total += time
+
+    print "** Total: %s" % format_float_time(total)
