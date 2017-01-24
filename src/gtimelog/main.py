@@ -490,7 +490,7 @@ class Window(Gtk.ApplicationWindow):
             # On Ubuntu 15.04 we can use Gio.PropertyAction
             # But what's the actual difference -- PyGI version?  GTK version?
             # What test do I make to determine which one to use?
-            if gi.__version__ < '3.14':
+            if gi.__version__ < '3.20':
                 PropertyAction = FakePropertyAction
             else:
                 PropertyAction = Gio.PropertyAction
