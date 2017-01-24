@@ -1,5 +1,6 @@
 """Tests for gtimelog.timelog"""
 
+import codecs
 import datetime
 import doctest
 import os
@@ -1000,7 +1001,7 @@ class Mixins(object):
 
     def write_file(self, filename, content):
         filename = os.path.join(self.mkdtemp(), filename)
-        with open(filename, 'w') as f:
+        with codecs.open(filename, 'w', encoding='UTF-8') as f:
             f.write(content)
         return filename
 
@@ -1026,6 +1027,13 @@ class TestTaskList(Mixins, unittest.TestCase):
             ('Other', ['some task', 'other task']),
             ('misc', ['paperwork']),
             ('project', ['do it', 'fix bugs']),
+        ])
+
+    def test_unicode(self):
+        taskfile = self.write_file('tasks.txt', u'\N{SNOWMAN}')
+        tasklist = TaskList(taskfile)
+        self.assertEqual(tasklist.groups, [
+            ('Other', [u'\N{SNOWMAN}']),
         ])
 
     def test_reloading(self):
