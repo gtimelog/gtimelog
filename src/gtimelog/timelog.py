@@ -1107,7 +1107,7 @@ class TaskList(object):
         groups = {}
         self.last_mtime = get_mtime(self.filename)
         try:
-            with open(self.filename) as f:
+            with codecs.open(self.filename, encoding='UTF-8') as f:
                 for line in f:
                     line = line.strip()
                     if not line or line.startswith('#'):
