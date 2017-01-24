@@ -7,9 +7,9 @@ import re
 import shutil
 import tempfile
 import textwrap
+import time
 import unittest
 import sys
-from pprint import pprint
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -985,74 +985,71 @@ def doctest_Reports_custom_range_report_categorized():
     """
 
 
-def doctest_TaskList_missing_file():
-    """Test for TaskList
+class Mixins(object):
 
-        >>> tasklist = TaskList('/nosuchfile')
-        >>> tasklist.check_reload()
-        False
-        >>> tasklist.reload()
-
-    """
-
-
-def doctest_TaskList_real_file():
-    r"""Test for TaskList
-
-        >>> import time
-        >>> tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
-        >>> taskfile = os.path.join(tempdir, 'tasks.txt')
-        >>> with open(taskfile, 'w') as f:
-        ...     _ = f.write('\n'.join([
-        ...         '# comments are skipped',
-        ...         'some task',
-        ...         'other task',
-        ...         'project: do it',
-        ...         'project: fix bugs',
-        ...         'misc: paperwork',
-        ...         ]) + '\n')
-        >>> one_second_ago = time.time() - 2
-        >>> os.utime(taskfile, (one_second_ago, one_second_ago))
-
-        >>> tasklist = TaskList(taskfile)
-        >>> pprint(tasklist.groups)
-        [('Other', ['some task', 'other task']),
-         ('misc', ['paperwork']),
-         ('project', ['do it', 'fix bugs'])]
-
-        >>> tasklist.check_reload()
-        False
-
-        >>> with open(taskfile, 'w') as f:
-        ...     _ = f.write('new tasks\n')
-
-        >>> tasklist.check_reload()
-        True
-
-        >>> pprint(tasklist.groups)
-        [('Other', ['new tasks'])]
-
-        >>> shutil.rmtree(tempdir)
-
-    """
-
-
-class TestTimeLog(unittest.TestCase):
-
-    def setUp(self):
-        self.tempdir = None
-
-    def tearDown(self):
-        if self.tempdir:
-            shutil.rmtree(self.tempdir)
+    tempdir = None
 
     def mkdtemp(self):
         if self.tempdir is None:
             self.tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
+            self.addCleanup(shutil.rmtree, self.tempdir)
         return self.tempdir
 
     def tempfile(self, filename='timelog.txt'):
         return os.path.join(self.mkdtemp(), filename)
+
+    def write_file(self, filename, content):
+        filename = os.path.join(self.mkdtemp(), filename)
+        with open(filename, 'w') as f:
+            f.write(content)
+        return filename
+
+
+class TestTaskList(Mixins, unittest.TestCase):
+
+    def test_missing_file(self):
+        tasklist = TaskList('/nosuchfile')
+        self.assertFalse(tasklist.check_reload())
+        tasklist.reload()  # no crash
+
+    def test_parsing(self):
+        taskfile = self.write_file('tasks.txt', textwrap.dedent('''\
+            # comments are skipped
+            some task
+            other task
+            project: do it
+            project: fix bugs
+            misc: paperwork
+        '''))
+        tasklist = TaskList(taskfile)
+        self.assertEqual(tasklist.groups, [
+            ('Other', ['some task', 'other task']),
+            ('misc', ['paperwork']),
+            ('project', ['do it', 'fix bugs']),
+        ])
+
+    def test_reloading(self):
+        taskfile = self.write_file('tasks.txt', 'some tasks\n')
+        couple_seconds_ago = time.time() - 2
+        os.utime(taskfile, (couple_seconds_ago, couple_seconds_ago))
+
+        tasklist = TaskList(taskfile)
+        self.assertEqual(tasklist.groups, [
+            ('Other', ['some tasks']),
+        ])
+        self.assertFalse(tasklist.check_reload())
+
+        with open(taskfile, 'w') as f:
+            f.write('new tasks\n')
+
+        self.assertTrue(tasklist.check_reload())
+
+        self.assertEqual(tasklist.groups, [
+            ('Other', ['new tasks']),
+        ])
+
+
+class TestTimeLog(Mixins, unittest.TestCase):
 
     def test_reloading(self):
         logfile = self.tempfile()
@@ -1393,12 +1390,10 @@ class TestTagging(unittest.TestCase):
         self.assertIn('Time spent in each area', txt.getvalue())
 
 
-class TestReportRecord(unittest.TestCase):
+class TestReportRecord(Mixins, unittest.TestCase):
 
     def setUp(self):
-        self.tmpdir = tempfile.mkdtemp(prefix='gtimelog-test-')
-        self.addCleanup(shutil.rmtree, self.tmpdir)
-        self.filename = os.path.join(self.tmpdir, 'sentreports.log')
+        self.filename = self.tempfile('sentreports.log')
 
     def load_fixture(self, lines):
         with open(self.filename, 'w') as f:
