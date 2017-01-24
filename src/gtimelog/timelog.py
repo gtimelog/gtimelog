@@ -12,7 +12,6 @@ import os
 import socket
 import sys
 import re
-import io
 from collections import defaultdict
 from hashlib import md5
 from operator import itemgetter
@@ -1108,7 +1107,7 @@ class TaskList(object):
         groups = {}
         self.last_mtime = get_mtime(self.filename)
         try:
-            with io.open(self.filename,encoding='UTF-8') as f:
+            with codecs.open(self.filename, encoding='UTF-8') as f:
                 for line in f:
                     line = line.strip()
                     if not line or line.startswith('#'):
