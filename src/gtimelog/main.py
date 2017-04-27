@@ -1928,7 +1928,10 @@ def main():
     # Run the app
     app = Application()
     mark_time("app created")
-    sys.exit(app.run(sys.argv))
+    try:
+        sys.exit(app.run(sys.argv))
+    finally:
+        mark_time("exiting")
 
 
 if __name__ == '__main__':
