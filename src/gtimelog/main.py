@@ -352,8 +352,16 @@ class Application(Gtk.Application):
 
     def do_activate(self):
         mark_time("in app activate")
-        if self.get_active_window() is not None:
-            self.get_active_window().present()
+        window = self.get_active_window()
+        if window is not None:
+            if not window.is_active():
+                # If I don't hide the window before calling present(), GNOME
+                # Shell ignores the presentation request (yay focus stealing
+                # prevention, I guess?).  If I do hide the window, present()
+                # works, but -- under Wayland -- forgets the window position
+                # and jumps to the top-left corner of the 1st screen :(
+                window.hide()
+            window.present()
             return
 
         window = Window(self)
