@@ -1,3 +1,9 @@
+gtimelog (0.10.3-2) UNRELEASED; urgency=medium
+
+  * d/control: Put PAPT in Maintainers and myself in Uploaders.
+
+ -- Barry Warsaw <barry@debian.org>  Mon, 28 Aug 2017 09:46:08 -0400
+
 gtimelog (0.10.3-1) unstable; urgency=medium
 
   * New upstream release.
