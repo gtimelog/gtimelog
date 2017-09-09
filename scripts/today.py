@@ -73,7 +73,7 @@ def print_diff(last_time, time, delta, action):
         delta = format_time(delta.seconds / 60)
 
     # format 1
-    ## print "%s%15s  %s" % (time, delta, action)
+    # print "%s%15s  %s" % (time, delta, action)
 
     # format 2
     action = action[:1].title() + action[1:]

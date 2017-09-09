@@ -386,6 +386,10 @@ class Exports(object):
     def __init__(self, window):
         self.window = window
 
+    @staticmethod
+    def _hash(start, stop, entry):
+        return md5(("%s%s%s" % (start, stop, entry)).encode('UTF-8')).hexdigest()
+
     def icalendar(self, output):
         """Create an iCalendar file with activities."""
         output.write("BEGIN:VCALENDAR\n")
@@ -393,11 +397,9 @@ class Exports(object):
         output.write("VERSION:2.0\n")
         idhost = socket.getfqdn()
         dtstamp = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-        def _hash(start, stop, entry):
-            return md5(("%s%s%s" % (start, stop, entry)).encode('UTF-8')).hexdigest()
         for start, stop, duration, tags, entry in self.window.all_entries():
             output.write("BEGIN:VEVENT\n")
-            output.write("UID:%s@%s\n" % (_hash(start, stop, entry), idhost))
+            output.write("UID:%s@%s\n" % (self._hash(start, stop, entry), idhost))
             output.write("SUMMARY:%s\n" % (entry.replace('\\', '\\\\'))
                                                 .replace(';', '\\;')
                                                 .replace(',', '\\,'))

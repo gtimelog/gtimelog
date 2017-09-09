@@ -16,6 +16,7 @@ def mark_time(what=None, _prev=[0, 0]):
             _prev[1] = t
     _prev[0] = t
 
+
 mark_time()
 mark_time("in script")
 
