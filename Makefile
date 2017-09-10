@@ -14,7 +14,9 @@ manpages = gtimelog.1
 po_files = $(wildcard po/*.po)
 mo_files = $(patsubst po/%.po,locale/%/LC_MESSAGES/gtimelog.mo,$(po_files))
 fallback_ui_files = src/gtimelog/gtimelog-gtk3.10.ui src/gtimelog/preferences-gtk3.10.ui
-runtime_files = gschemas.compiled $(mo_files) $(fallback_ui_files)
+schema_dir = src/gtimelog/data
+schema_files = $(schema_dir)/gschemas.compiled
+runtime_files = $(schema_files) $(mo_files) $(fallback_ui_files)
 
 .PHONY: all
 all: $(manpages) $(runtime_files)
@@ -56,8 +58,8 @@ locale/%/LC_MESSAGES/gtimelog.mo: po/%.po
 	mkdir -p $(@D)
 	msgfmt -o $@ $<
 
-gschemas.compiled: org.gtimelog.gschema.xml
-	glib-compile-schemas .
+$(schema_files): $(schema_dir)/org.gtimelog.gschema.xml
+	glib-compile-schemas $(schema_dir)
 
 .PHONY: clean
 clean:
