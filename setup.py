@@ -69,7 +69,7 @@ setup(
 
     packages=['gtimelog'],
     package_dir={'': 'src'},
-    package_data={'gtimelog': ['*.ui', '*.png']},
+    include_package_data=True,
     test_suite='gtimelog.tests',
     tests_require=tests_require,
     extras_require={

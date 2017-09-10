@@ -47,8 +47,9 @@ mark_time("Python imports done")
 if '--debug' in sys.argv:
     os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SCHEMA_DIR = ROOT
+HERE = os.path.dirname(__file__)
+
+SCHEMA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
     # Have to do this before importing 'gi'.
     os.environ['GSETTINGS_SCHEMA_DIR'] = SCHEMA_DIR
@@ -92,11 +93,13 @@ else:
 
 mark_time("gtimelog imports done")
 
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 # When the app is properly installed, use HELP_URI = 'help:gtimelog'
 HELP_URI = ''
 HELP_DIR = os.path.abspath(os.path.join(ROOT, 'help'))
 
-UI_DIR = os.path.join(ROOT, 'src', 'gtimelog')
+UI_DIR = HERE
 
 if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 12):
     UI_FILE = os.path.join(UI_DIR, 'gtimelog-gtk3.10.ui')
