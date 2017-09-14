@@ -360,10 +360,12 @@ class Application(Gtk.Application):
         if window is not None:
             if not window.is_active():
                 # If I don't hide the window before calling present(), GNOME
-                # Shell ignores the presentation request (yay focus stealing
-                # prevention, I guess?).  If I do hide the window, present()
-                # works, but -- under Wayland -- forgets the window position
-                # and jumps to the top-left corner of the 1st screen :(
+                # Shell (on Wayland) ignores the presentation request:
+                # https://bugzilla.gnome.org/show_bug.cgi?id=756202 and
+                # https://bugzilla.gnome.org/show_bug.cgi?id=766284
+                # If I do hide the window, present() works, but -- again, under
+                # Wayland -- forgets the window position and jumps to the
+                # top-left corner of the 1st screen :(
                 window.hide()
             window.present()
             return
