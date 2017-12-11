@@ -85,7 +85,5 @@ setup(
     [gui_scripts]
     gtimelog = gtimelog.main:main
     """,
-    # This is true, but pointless, because PyGObject cannot be installed via
-    # setuptools/distutils:
-    #   install_requires=['PyGObject'],
+    install_requires=['PyGObject'],
 )
