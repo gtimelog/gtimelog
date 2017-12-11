@@ -1,10 +1,5 @@
 language: python
 sudo: false
-addons:
-  apt:
-    packages:
-      - python-gobject
-      - python3-gobject
 python:
     - 2.7
     - 3.3
@@ -12,7 +7,9 @@ python:
     - 3.5
     - 3.6
 install:
-    - pip install coverage coveralls -e .[test]
+    - pip install coverage coveralls
+    - pip install freezegun mock
+    - pip install --no-deps -e .
 script:
     - coverage run -m gtimelog.tests
 after_success:
