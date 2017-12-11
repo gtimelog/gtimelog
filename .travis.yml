@@ -1,5 +1,10 @@
 language: python
 sudo: false
+addons:
+  apt:
+    packages:
+      - python-gobject
+      - python3-gobject
 python:
     - 2.7
     - 3.3
