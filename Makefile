@@ -70,34 +70,38 @@ clean:
 
 .PHONY: dist
 dist:
-	$(PYTHON) setup.py sdist bdist_wheel
+	$(PYTHON) setup.py -q sdist bdist_wheel
 
 .PHONY: distcheck
 distcheck: check dist
 	# Bit of a chicken-and-egg here, but if the tree is unclean, make
 	# distcheck will fail.
 	@test -z "`git status -s 2>&1`" || { echo; echo "Your working tree is not clean" 1>&2; git status; exit 1; }
-	make dist
-	pkg_and_version=`$(PYTHON) setup.py --name`-`$(PYTHON) setup.py --version` && \
+	@make dist
+	@pkg_and_version=`$(PYTHON) setup.py --name`-`$(PYTHON) setup.py --version` && \
 	rm -rf tmp && \
 	mkdir tmp && \
 	git archive --format=tar --prefix=tmp/tree/ HEAD | tar -xf - && \
 	cd tmp && \
-	tar xvzf ../dist/$$pkg_and_version.tar.gz && \
+	tar xzf ../dist/$$pkg_and_version.tar.gz && \
 	diff -ur $$pkg_and_version tree -x PKG-INFO -x setup.cfg -x '*.egg-info' && \
 	cd $$pkg_and_version && \
 	make dist check && \
 	cd .. && \
 	mkdir one two && \
 	cd one && \
-	tar xvzf ../../dist/$$pkg_and_version.tar.gz && \
+	tar xzf ../../dist/$$pkg_and_version.tar.gz && \
 	cd ../two/ && \
-	tar xvzf ../$$pkg_and_version/dist/$$pkg_and_version.tar.gz && \
+	tar xzf ../$$pkg_and_version/dist/$$pkg_and_version.tar.gz && \
 	cd .. && \
 	diff -ur one two -x SOURCES.txt && \
 	cd .. && \
 	rm -rf tmp && \
-	echo "sdist seems to be ok"
+	echo "sdist seems to be ok" || { echo "sdist check failed"; exit 1; }
+	@pkg_and_version=`$(PYTHON) setup.py --name`-`$(PYTHON) setup.py --version` && \
+	unzip -l dist/$$pkg_and_version-py2.py3-none-any.whl | \
+	grep -q gtimelog.mo && \
+	echo "wheel seems to be ok" || { echo "wheel check failed"; exit 1; }
 
 .PHONY: releasechecklist
 releasechecklist:

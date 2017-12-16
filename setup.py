@@ -70,6 +70,7 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
+    package_data={'': ['locale/*/LC_MESSAGES/gtimelog.mo']},
     test_suite='gtimelog.tests',
     tests_require=tests_require,
     extras_require={
