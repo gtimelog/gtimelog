@@ -49,7 +49,7 @@ if '--debug' in sys.argv:
 
 HERE = os.path.dirname(__file__)
 
-SCHEMA_DIR = os.path.join(os.path.dirname(__file__), 'data')
+SCHEMA_DIR = os.path.join(HERE, 'data')
 if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
     # Have to do this before importing 'gi'.
     os.environ['GSETTINGS_SCHEMA_DIR'] = SCHEMA_DIR
@@ -93,11 +93,9 @@ else:
 
 mark_time("gtimelog imports done")
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 # When the app is properly installed, use HELP_URI = 'help:gtimelog'
 HELP_URI = ''
-HELP_DIR = os.path.abspath(os.path.join(ROOT, 'help'))
+HELP_DIR = os.path.abspath(os.path.join(HERE, 'help'))
 
 UI_DIR = HERE
 
