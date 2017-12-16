@@ -12,7 +12,7 @@ include .travis.yml
 include .coveragerc
 include .gitignore
 include benchmark.py
-recursive-include src *.png *.ui *.xml *.css *.rst *.py
+recursive-include src *.png *.ui *.xml *.css *.rst
 recursive-include docs *.png *.rst
 recursive-include scripts *.py *.rst
 recursive-include help *.page *.xml *png

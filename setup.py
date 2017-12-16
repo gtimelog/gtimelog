@@ -3,7 +3,7 @@ import os
 import re
 import io
 import sys
-from setuptools import setup
+from setuptools import setup, find_packages
 
 here = os.path.dirname(__file__)
 
@@ -67,7 +67,7 @@ setup(
         'Topic :: Office/Business',
     ],
 
-    packages=['gtimelog'],
+    packages=find_packages('src'),
     package_dir={'': 'src'},
     include_package_data=True,
     test_suite='gtimelog.tests',
