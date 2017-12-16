@@ -11,6 +11,7 @@ include appveyor.yml
 include .travis.yml
 include .coveragerc
 include .gitignore
+include .gitattributes
 include benchmark.py
 recursive-include src *.png *.ui *.xml *.css *.rst gschemas.compiled
 recursive-include docs *.png *.rst
