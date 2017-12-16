@@ -113,7 +113,7 @@ MENUS_UI_FILE = os.path.join(UI_DIR, 'menus.ui')
 CSS_FILE = os.path.join(UI_DIR, 'gtimelog.css')
 LOCALE_DIR = os.path.join(ROOT, 'locale')
 
-CONTRIBUTORS_FILE = os.path.join(ROOT, 'CONTRIBUTORS.rst')
+CONTRIBUTORS_FILE = os.path.join(UI_DIR, 'CONTRIBUTORS.rst')
 
 
 log = logging.getLogger('gtimelog')

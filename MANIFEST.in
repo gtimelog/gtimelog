@@ -9,7 +9,7 @@ include tox.ini
 include .travis.yml
 include .coveragerc
 include .gitignore
-recursive-include src *.png *.ui *.xml *.css
+recursive-include src *.png *.ui *.xml *.css *.rst
 recursive-include docs *.png *.rst
 recursive-include scripts *.py *.rst
 recursive-include help *.page *.xml *png
