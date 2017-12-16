@@ -1,0 +1,46 @@
+{
+    "app-id": "org.gtimelog.GTimeLog",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "3.26",
+    "sdk": "org.gnome.Sdk",
+    "command": "gtimelog",
+    "rename-desktop-file": "gtimelog.desktop",
+    "rename-appdata-file": "gtimelog.appdata.xml",
+    "rename-icon": "gtimelog-large",
+    "finish-args": [
+        "--socket=x11",
+        "--socket=wayland"
+    ],
+    "modules": [
+        {
+            "name": "docutils",
+            "buildsystem": "simple",
+            "build-commands": [
+                "python3 setup.py install --prefix=/app",
+                "ln -s rst2man.py /app/bin/rst2man"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://pypi.python.org/packages/84/f4/5771e41fdf52aabebbadecc9381d11dea0fa34e4759b4071244fa094804c/docutils-0.14.tar.gz",
+                    "sha256": "51e64ef2ebfb29cae1faa133b3710143496eca21c530f3f71424d77687764274"
+                }
+            ]
+        },
+        {
+            "name": "gtimelog",
+            "buildsystem": "simple",
+            "build-commands": [
+                "make"
+            ],
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/gtimelog/gtimelog",
+                    "branch": "0.11",
+                    "commit": "0d36ec7d56b42277eb68614a3a46564cfd0b7001"
+                }
+            ]
+        }
+    ]
+}
