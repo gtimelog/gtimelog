@@ -69,7 +69,7 @@ double-dash surrounded by spaces.  Tags will *not* be shown in the
 main UI pane.
 
 
-Tasks Pane
+Tasks pane
 ==========
 
 There's a Tasks pane that lists common tasks.  Click on a task to transfer
@@ -153,3 +153,5 @@ Syncing
 
 GTimeLog has no built-in sync between multiple machines.  You can put its
 files into Dropbox and create a symlink.
+
+.. include:: footer.rst
