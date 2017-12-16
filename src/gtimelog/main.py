@@ -111,7 +111,7 @@ else:
 ABOUT_DIALOG_UI_FILE = os.path.join(UI_DIR, 'about.ui')
 MENUS_UI_FILE = os.path.join(UI_DIR, 'menus.ui')
 CSS_FILE = os.path.join(UI_DIR, 'gtimelog.css')
-LOCALE_DIR = os.path.join(ROOT, 'locale')
+LOCALE_DIR = os.path.join(UI_DIR, 'locale')
 
 CONTRIBUTORS_FILE = os.path.join(UI_DIR, 'CONTRIBUTORS.rst')
 

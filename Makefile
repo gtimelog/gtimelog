@@ -11,8 +11,10 @@ FILE_WITH_CHANGELOG = NEWS.rst
 #
 
 manpages = gtimelog.1
-po_files = $(wildcard po/*.po)
-mo_files = $(patsubst po/%.po,locale/%/LC_MESSAGES/gtimelog.mo,$(po_files))
+po_dir = src/gtimelog/po
+po_files = $(wildcard $(po_dir)/*.po)
+mo_dir = src/gtimelog/locale
+mo_files = $(patsubst $(po_dir)/%.po,$(mo_dir)/%/LC_MESSAGES/gtimelog.mo,$(po_files))
 fallback_ui_files = src/gtimelog/gtimelog-gtk3.10.ui src/gtimelog/preferences-gtk3.10.ui
 schema_dir = src/gtimelog/data
 schema_files = $(schema_dir)/gschemas.compiled
@@ -43,8 +45,8 @@ coverage-diff: coverage
 .PHONY: update-translations
 update-translations:
 	git config filter.po.clean 'msgcat - --no-location'
-	cd po && intltool-update -g gtimelog -p
-	for po in $(po_files); do msgmerge -U $$po po/gtimelog.pot; done
+	cd $(po_dir) && intltool-update -g gtimelog -p
+	for po in $(po_files); do msgmerge -U $$po $(po_dir)/gtimelog.pot; done
 
 %-gtk3.10.ui: %.ui
 	sed -e 's/margin_start/margin_left/' \
@@ -54,8 +56,8 @@ update-translations:
 	    < $< > $@.tmp
 	mv $@.tmp $@
 
-locale/%/LC_MESSAGES/gtimelog.mo: po/%.po
-	mkdir -p $(@D)
+$(mo_dir)/%/LC_MESSAGES/gtimelog.mo: $(po_dir)/%.po
+	@mkdir -p $(@D)
 	msgfmt -o $@ $<
 
 $(schema_files): $(schema_dir)/org.gtimelog.gschema.xml
@@ -63,12 +65,12 @@ $(schema_files): $(schema_dir)/org.gtimelog.gschema.xml
 
 .PHONY: clean
 clean:
-	rm -rf temp tmp build gtimelog.egg-info $(runtime_files) locale
+	rm -rf temp tmp build gtimelog.egg-info $(runtime_files) $(mo_dir)
 	find -name '*.pyc' -delete
 
 .PHONY: dist
 dist:
-	$(PYTHON) setup.py sdist
+	$(PYTHON) setup.py sdist bdist_wheel
 
 .PHONY: distcheck
 distcheck: check dist
@@ -112,7 +114,7 @@ release: releasechecklist
 	# I'm chicken so I won't actually do these things yet
 	@echo "Please run"
 	@echo
-	@echo "  rm -rf dist && $(PYTHON) setup.py sdist && twine upload dist/* && git tag `$(PYTHON) setup.py --version`"
+	@echo "  rm -rf dist && $(PYTHON) setup.py sdist bdist_wheel && twine upload dist/* && git tag `$(PYTHON) setup.py --version`"
 	@echo
 	@echo "Please increment the version number in $(FILE_WITH_VERSION)"
 	@echo "and add a new empty entry at the top of $(FILE_WITH_CHANGELOG), then"
