@@ -28,7 +28,11 @@ run: $(runtime_files)
 	./gtimelog
 
 .PHONY: check test
-check test:
+check: test
+	desktop-file-validate gtimelog.desktop
+	appstream-util validate-relax gtimelog.appdata.xml
+
+test:
 	./runtests
 
 .PHONY: coverage
