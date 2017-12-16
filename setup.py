@@ -21,7 +21,7 @@ metadata = dict(
 
 version = metadata['__version__']
 
-changes = read('NEWS.rst').split('\n\n\n')
+changes = read('CHANGES.rst').split('\n\n\n')
 changes_in_latest_versions = '\n\n\n'.join(changes[:3])
 older_changes = '''
 Older versions
@@ -29,7 +29,7 @@ Older versions
 
 See the `full changelog`_.
 
-.. _full changelog: https://github.com/gtimelog/gtimelog/blob/master/NEWS.rst
+.. _full changelog: https://github.com/gtimelog/gtimelog/blob/master/CHANGES.rst
 '''
 
 short_description = 'A Gtk+ time tracking application'

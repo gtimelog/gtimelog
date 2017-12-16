@@ -4,7 +4,7 @@
 
 PYTHON = python
 FILE_WITH_VERSION = src/gtimelog/__init__.py
-FILE_WITH_CHANGELOG = NEWS.rst
+FILE_WITH_CHANGELOG = CHANGES.rst
 
 #
 # Interesting targets
@@ -109,7 +109,7 @@ releasechecklist:
 	    echo "Please remove the 'dev' suffix from the version number in $(FILE_WITH_VERSION)"; exit 1; }
 	@$(PYTHON) setup.py --long-description | rst2html --exit-status=2 > /dev/null
 	@ver_and_date="`$(PYTHON) setup.py --version` (`date +%Y-%m-%d`)" && \
-	    grep -q "^$$ver_and_date$$" NEWS.rst || { \
+	    grep -q "^$$ver_and_date$$" CHANGES.rst || { \
 	        echo "$(FILE_WITH_CHANGELOG) has no entry for $$ver_and_date"; exit 1; }
 	make distcheck
 
