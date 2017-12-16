@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-0.11 (unreleased)
+0.11 (2017-12-16)
 ~~~~~~~~~~~~~~~~~
 
 * A complete rewrite of the user interface, to better fit GNOME 3 (GH: #31).
