@@ -1,15 +1,18 @@
 include COPYING
-include *.rst
+include *.rst *.txt
 include Makefile
 include gtimelog
 include gtimelog.desktop
+include gtimelog.desktop.in
 include gtimelog.appdata.xml
 include runtests
 include tox.ini
+include appveyor.yml
 include .travis.yml
 include .coveragerc
 include .gitignore
-recursive-include src *.png *.ui *.xml *.css *.rst
+include benchmark.py
+recursive-include src *.png *.ui *.xml *.css *.rst *.py
 recursive-include docs *.png *.rst
 recursive-include scripts *.py *.rst
 recursive-include help *.page *.xml *png
