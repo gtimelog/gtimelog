@@ -74,6 +74,16 @@ clean:
 
 include release.mk
 
+.PHONY: distcheck
+distcheck: distcheck-wheel  # add to the list of checks defined in release.mk
+
+.PHONY: distcheck-wheel
+distcheck-wheel:
+	@pkg_and_version=`$(PYTHON) setup.py --name`-`$(PYTHON) setup.py --version` && \
+	  unzip -l dist/$$pkg_and_version-py2.py3-none-any.whl | \
+	  grep -q gtimelog.mo && \
+	  echo "wheel seems to be ok"
+
 %.1: %.rst
 	rst2man $< > $@
 
