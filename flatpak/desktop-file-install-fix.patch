@@ -1,12 +1,10 @@
-*** old/setup.py
---- new/setup.py
-***************
-*** 87,90 ****
---- 87,93 ----
-      gtimelog = gtimelog.main:main
-      """,
-      install_requires=['PyGObject'],
-+     data_files = [
-+         ('/app/share/applications', ['gtimelog.desktop']),
-+     ],
-  )
+--- old/setup.py
++++ new/setup.py
+@@ -87,4 +87,6 @@
+     gtimelog = gtimelog.main:main
+     """,
+-    install_requires=['PyGObject'],
++    data_files = [
++        ('/app/share/applications', ['gtimelog.desktop']),
++    ],
+ )
