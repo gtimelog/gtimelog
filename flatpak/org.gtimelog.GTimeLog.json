@@ -1,0 +1,35 @@
+{
+    "id": "org.gtimelog.GTimeLog",
+    "runtime": "org.gnome.Platform",
+    "sdk": "org.gnome.Sdk",
+    "command": "gtimelog",
+    "tags": ["nightly"],
+    "modules": [
+        {
+            "name": "gtimelog",
+            "sources": [
+                {
+                    "type": "git",
+                    "url": "https://github.com/gtimelog/gtimelog.git"
+                },
+                {
+                    "type": "patch",
+                    "path": "desktop-file-install-fix.patch"
+                }
+            ],
+            "no-make-install": true,
+            "buildsystem": "simple",
+            "build-commands": ["python3 setup.py install --prefix=/app "]
+        }
+    ],
+    "finish-args": [
+        /* X11 + XShm access */
+        "--share=ipc", "--socket=x11",
+        /* Wayland access */
+        "--socket=wayland",
+        "--socket=session-bus"
+    ],
+    "rename-desktop-file": "gtimelog.desktop",
+    "rename-appdata-file": "gtimelog.appdata.xml",
+    "desktop-file-name-prefix": "(Nightly) "
+}
