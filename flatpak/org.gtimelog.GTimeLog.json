@@ -28,7 +28,12 @@
         "--share=ipc", "--socket=x11",
         /* Wayland access */
         "--socket=wayland",
-        "--socket=session-bus"
+        "--socket=session-bus",
+        /* dconf */
+        "--filesystem=xdg-run/dconf",
+        "--filesystem=~/.config/dconf:ro",
+        "--talk-name=ca.desrt.dconf",
+        "--env=DCONF_USER_CONFIG_DIR=.config/dconf"
     ],
     "rename-desktop-file": "gtimelog.desktop",
     "rename-appdata-file": "gtimelog.appdata.xml",
