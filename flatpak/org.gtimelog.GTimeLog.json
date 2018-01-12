@@ -12,15 +12,16 @@
                 {
                     "type": "git",
                     "url": "https://github.com/gtimelog/gtimelog.git"
-                },
-                {
-                    "type": "patch",
-                    "path": "desktop-file-install-fix.patch"
                 }
             ],
             "no-make-install": true,
             "buildsystem": "simple",
-            "build-commands": ["python3 setup.py install --prefix=/app "]
+            "build-commands": [
+                "sed -i -e '/install_requires=..PyGObject/d' setup.py",
+                "python3 setup.py -q install --prefix=/app",
+                "install -D -m 644 gtimelog.desktop /app/share/applications/gtimelog.desktop",
+                "install -D -m 644 src/gtimelog/gtimelog-large.png /app/share/icons/hicolor/256x256/apps/gtimelog.png"
+            ]
         }
     ],
     "finish-args": [
@@ -37,5 +38,6 @@
     ],
     "rename-desktop-file": "gtimelog.desktop",
     "rename-appdata-file": "gtimelog.appdata.xml",
+    "rename-icon": "gtimelog",
     "desktop-file-name-prefix": "(Nightly) "
 }
