@@ -1,11 +1,10 @@
 This package was debianized by Thom May <thom@debian.org> on
-Wed, 09 Feb 2005 13:43:16 +0000.
+Wed, 09 Feb 2005 13:43:16 +0000.  It was updated by Barry Warsaw
+<barry@debian.org> on 2013-12-05.
 
 It was downloaded from http://mg.pov.lt/gtimelog/
 
-Copyright:
-
-Upstream Author: Marius Gedminas <mgedmin@b4net.lt>
+Copyright 2013 Marius Gedminas <mgedmin@gedmin.as>
 
 License:
 
@@ -24,5 +23,4 @@ License:
    USA.
 
 On Debian GNU/Linux systems, the complete text of the GNU General
-Public License can be found in `/usr/share/common-licenses/GPL'.
-
+Public License can be found in `/usr/share/common-licenses/GPL-2'.

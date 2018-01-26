@@ -1,41 +1,10 @@
-#! /usr/bin/make -f 
+#!/usr/bin/make -f
 
-# Include dpatch stuff.
-include /usr/share/dpatch/dpatch.make
+%:
+	dh $@ --with=python3 --buildsystem=pybuild
 
-clean: unpatch
-	dh_testdir
-	dh_clean
-
-build: patch
-
-install:
-	dh_testdir
-	dh_testroot
-	dh_clean -k
-	dh_installdirs
-
-	install -m 755 gtimelog.py debian/gtimelog/usr/bin/gtimelog
-	install -m 644 gtimelog.glade debian/gtimelog/usr/share/gtimelog/
-	install -m 644 gtimelog.png debian/gtimelog/usr/share/pixmaps/
-	install -m 644 gtimelog-small.png debian/gtimelog/usr/share/pixmaps/
-	install -m 644 gtimelog.desktop debian/gtimelog/usr/share/applications/
-
-binary-indep: install
-	dh_testdir
-	dh_testroot
-	dh_installdocs
-	dh_installchangelogs
-	dh_installman debian/gtimelog.1
-	dh_installinit 
-	dh_compress
-	dh_pysupport
-	dh_fixperms
-	dh_installdeb
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
-
-binary-arch:
-
-binary: binary-arch binary-indep
+override_dh_installman:
+	mkdir -p debian/tmp
+	rst2man gtimelog.rst > debian/tmp/gtimelog.man
+	rst2man gtimelogrc.rst > debian/tmp/gtimelogrc.man
+	dh_installman

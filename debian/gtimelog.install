@@ -1,0 +1,6 @@
+gtimelog.desktop /usr/share/applications/
+gtimelogrc.example /usr/share/gtimelog
+src/gtimelog/gtimelog-large.png /usr/share/pixmaps/
+src/gtimelog/gtimelog-small-bright.png /usr/share/pixmaps/
+src/gtimelog/gtimelog-small.png /usr/share/pixmaps/
+src/gtimelog/gtimelog.png /usr/share/pixmaps/

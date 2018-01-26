@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import datetime
-import readline
+import readline  # make raw_input() friendlier
+
 
 f = open("timelog.txt", "a")
 print >> f
@@ -18,4 +19,3 @@ while True:
     f = open("timelog.txt", "a")
     print >> f, line
     f.close()
-

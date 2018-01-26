@@ -1,9 +1,9 @@
 [Desktop Entry]
-Name=Time Tracker
+Name=GTimeLog Time Tracker
 Comment=Track and time daily activities
 Exec=gtimelog
 Terminal=false
 Type=Application
 StartupNotify=true
-Icon=gnome-week.png
-Categories=Application;Utility
+Icon=gtimelog
+Categories=Application;Utility;
