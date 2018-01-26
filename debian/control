@@ -10,8 +10,8 @@ Build-Depends: debhelper (>= 9),
                python3-setuptools
 Standards-Version: 3.9.8
 Homepage: http://mg.pov.lt/gtimelog/
-Vcs-Git: git://anonscm.debian.org/collab-maint/gtimelog.git
-Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/gtimelog.git
+Vcs-Git: https://salsa.debian.org/debian/gtimelog.git
+Vcs-Browser: https://salsa.debian.org/debian/gtimelog
 X-Python3-Version: >= 3.3
 
 Package: gtimelog
