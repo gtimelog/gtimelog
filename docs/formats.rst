@@ -1,9 +1,8 @@
 Data Formats
 ============
 
-These tools were designed for easy interoperability.  There are two data
-formats: one is used for timelog.txt, another is used for daily reports.
-They are both human and machine readable, easy to edit, easy to parse.
+These tools were designed for easy interoperability.  The data formats are
+both human and machine readable, easy to edit, easy to parse.
 
 
 timelog.txt
@@ -38,16 +37,27 @@ comments.  This is likely to change in the future, so please use '#' to
 indicate real comments if you find you need them.
 
 All lines should be sorted by time.  Currently GTimeLog won't complain if
-they're not, and it will sort them to compensate (but there are probably bugs
-lurking with the computation of ``earliest_timestamp``).
+they're not, and it will sort them to compensate.
 
 GTimeLog doesn't re-write the file, it only appends to it.
+
+Example::
+
+  # this is a comment
+  2015-09-14 08:03: arrived at work **
+  2015-09-14 11:57: project-foo: working on task #1234
+  2015-09-14 13:04: lunch **
+  2015-09-14 16:34: project-foo: working on task #1234
+  2015-09-14 16:57: checking mail
+
+  2015-09-15 08:01: arrived at work **
+  ...
 
 Bugs:
 
 - There's no place for timezones.  If you want to track your travel times
   with GTimeLog, you're gonna have a bad time.
-- If you work late at night and change the value of ``virtual_midnight``,
+- If you work late at night and change the value of "virtual midnight",
   old historical entries can be misinterpreted.
 
 
@@ -59,6 +69,16 @@ starting with a '#' are ignored.  Task names should consist of a group name
 (project name, XP-style story, whatever), a colon, and a task name.  Tasks will
 be grouped.  If there is no colon on a line, the task will be grouped under
 "Other".
+
+Example::
+
+  # usual everyday tasks
+  mail
+  sysadmining
+  # project tasks
+  project-foo: fix bug with frobnicator (GH: #42)
+  project-foo: implement feature X (GH: #123)
+  project-bar: daily standup
 
 
 Daily reports
@@ -98,3 +118,19 @@ Formal grammar::
 There is a convention that entries that include two asterisks in their titles
 indicate slacking or pauses between work activities.
 
+
+sentreports.log
+---------------
+
+This is a comma-separated-value (CSV) file that logs all sent reports.
+The columns are: timestamp, report kind (daily/weekly/monthly), report
+date, recipient's email address.
+
+Weekly report dates use the ISO week numbering (YYYY/WW).
+
+Example::
+
+    2015-09-09 13:11:41,dayly,2015-09-09,activity@example.com
+    2015-09-09 13:12:39,weekly,2015/37,activity@example.com
+    2015-09-09 13:12:44,monthly,2015-09,activity@example.com
+    2015-09-09 13:12:57,daily,2015-09-09,activity@example.com

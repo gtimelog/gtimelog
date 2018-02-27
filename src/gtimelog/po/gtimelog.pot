@@ -1,0 +1,333 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-10-07 20:46+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Time Log"
+msgstr ""
+
+msgid "Track and time daily activities"
+msgstr ""
+
+#, python-brace-format
+msgid "{0} h {1} min"
+msgstr ""
+
+msgid "Show version number and exit"
+msgstr ""
+
+msgid "Show debug information on the console"
+msgstr ""
+
+msgid ""
+"\n"
+"WARNING: GSettings schema for org.gtimelog is missing!  If you're running "
+"from a source checkout, be sure to run 'make'."
+msgstr ""
+
+#, python-brace-format
+msgid "Could not create {directory}: {error}"
+msgstr ""
+
+#, python-brace-format
+msgid "Created {directory}"
+msgstr ""
+
+msgid "GTimeLog version: {}"
+msgstr ""
+
+msgid "Python version: {}"
+msgstr ""
+
+msgid "GTK+ version: {}.{}.{}"
+msgstr ""
+
+msgid "PyGI version: {}"
+msgstr ""
+
+msgid "Data directory: {}"
+msgstr ""
+
+msgid "Legacy config directory: {}"
+msgstr ""
+
+msgid "Settings will be migrated to GSettings (org.gtimelog) on first launch"
+msgstr ""
+
+msgid "Settings already migrated to GSettings (org.gtimelog)"
+msgstr ""
+
+#, python-brace-format
+msgid "Settings from {filename} migrated to GSettings (org.gtimelog)"
+msgstr ""
+
+msgid "Report already sent"
+msgstr ""
+
+msgid "Report already sent (to {})"
+msgstr ""
+
+msgid "Downloading tasks..."
+msgstr ""
+
+msgid "Download failed."
+msgstr ""
+
+msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
+msgstr ""
+
+msgid "{0}, week {1} ({2:%B %-d}-{3:%-d})"
+msgstr ""
+
+msgid "{0:%B %Y}"
+msgstr ""
+
+msgid "Report"
+msgstr ""
+
+msgid "Couldn't send email to {}."
+msgstr ""
+
+#, python-format
+msgid "Couldn't execute %s: %s"
+msgstr ""
+
+#, python-format
+msgid "Couldn't send email: %s returned code %d"
+msgstr ""
+
+msgid "Couldn't append to {}: {}"
+msgstr ""
+
+msgid "%H:%M"
+msgstr ""
+
+msgid "{0:%A, %Y-%m-%d}\n"
+msgstr ""
+
+#, python-brace-format
+msgid "Total for {0}: {1} ({2} per day)"
+msgstr ""
+
+#, python-brace-format
+msgid "Total for {0}: {1} ({2} this week)"
+msgstr ""
+
+msgid "({0:%H:%M}-{1:%H:%M})"
+msgstr ""
+
+#, python-brace-format
+msgid "Total work done: {0} ({1} this week, {2} per day)"
+msgstr ""
+
+#, python-brace-format
+msgid "Total work done: {0} ({1} this week)"
+msgstr ""
+
+#, python-brace-format
+msgid "Total work done this week: {0} ({1} per day)"
+msgstr ""
+
+#, python-brace-format
+msgid "Total work done this week: {0}"
+msgstr ""
+
+#, python-brace-format
+msgid "Total work done this month: {0} ({1} per day)"
+msgstr ""
+
+#, python-brace-format
+msgid "Total work done this month: {0}"
+msgstr ""
+
+#, python-brace-format
+msgid "Total slacking: {0} ({1} this week, {2} per day)"
+msgstr ""
+
+#, python-brace-format
+msgid "Total slacking: {0} ({1} this week)"
+msgstr ""
+
+#, python-brace-format
+msgid "Total slacking this week: {0} ({1} per day)"
+msgstr ""
+
+#, python-brace-format
+msgid "Total slacking this week: {0}"
+msgstr ""
+
+#, python-brace-format
+msgid "Total slacking this month: {0} ({1} per day)"
+msgstr ""
+
+#, python-brace-format
+msgid "Total slacking this month: {0}"
+msgstr ""
+
+msgid "Time left at work: {0} (should've finished at {1:%H:%M})"
+msgstr ""
+
+msgid "Time left at work: {0} (till {1:%H:%M})"
+msgstr ""
+
+#, python-brace-format
+msgid "At office today: {0} ({1} overtime)"
+msgstr ""
+
+#, python-brace-format
+msgid "At office today: {0} ({1} left)"
+msgstr ""
+
+msgid "Tasks"
+msgstr ""
+
+msgid "Other"
+msgstr ""
+
+msgid "Preferences"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+#. pragma: nocover
+#. https://github.com/gtimelog/gtimelog/issues/95#issuecomment-252299266
+msgid "Unable to configure translations: no locale.bindtextdomain()"
+msgstr ""
+
+msgid "Copyright © 2004–2017 Marius Gedminas and contributors."
+msgstr ""
+
+msgid "A time tracking application"
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "Daily"
+msgstr ""
+
+msgid "Weekly"
+msgstr ""
+
+msgid "Monthly"
+msgstr ""
+
+msgid "Sender"
+msgstr ""
+
+msgid "Your Name <youremail@example.com>"
+msgstr ""
+
+msgid "Recipient"
+msgstr ""
+
+msgid "email@example.com"
+msgstr ""
+
+msgid "Subject"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Send"
+msgstr ""
+
+msgid "Data entry"
+msgstr ""
+
+msgid "Virtual midnight"
+msgstr ""
+
+msgid "Goals"
+msgstr ""
+
+msgid "Work hours"
+msgstr ""
+
+msgid "Office hours"
+msgstr ""
+
+msgid "per day"
+msgstr ""
+
+msgid "(including lunch break)"
+msgstr ""
+
+msgid "Reports by email"
+msgstr ""
+
+msgid "Name"
+msgstr ""
+
+msgid "From"
+msgstr ""
+
+msgid "To"
+msgstr ""
+
+msgid "Nickname used in the Subject line"
+msgstr ""
+
+msgid "Help"
+msgstr ""
+
+msgid "About"
+msgstr ""
+
+msgid "Quit"
+msgstr ""
+
+msgid "Edit log"
+msgstr ""
+
+msgid "Edit tasks"
+msgstr ""
+
+msgid "Refresh tasks"
+msgstr ""
+
+msgid "Report..."
+msgstr ""
+
+msgid "Detail level"
+msgstr ""
+
+msgid "Chronological"
+msgstr ""
+
+msgid "Grouped"
+msgstr ""
+
+msgid "Summary"
+msgstr ""
+
+msgid "Time range"
+msgstr ""
+
+msgid "Day"
+msgstr ""
+
+msgid "Week"
+msgstr ""
+
+msgid "Month"
+msgstr ""
+
+msgid "Filter"
+msgstr ""

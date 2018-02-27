@@ -2,7 +2,8 @@
 import os
 import re
 import io
-from setuptools import setup
+import sys
+from setuptools import setup, find_packages
 
 here = os.path.dirname(__file__)
 
@@ -20,7 +21,7 @@ metadata = dict(
 
 version = metadata['__version__']
 
-changes = read('NEWS.rst').split('\n\n\n')
+changes = read('CHANGES.rst').split('\n\n\n')
 changes_in_latest_versions = '\n\n\n'.join(changes[:3])
 older_changes = '''
 Older versions
@@ -28,7 +29,7 @@ Older versions
 
 See the `full changelog`_.
 
-.. _full changelog: https://github.com/gtimelog/gtimelog/blob/master/NEWS.rst
+.. _full changelog: https://github.com/gtimelog/gtimelog/blob/master/CHANGES.rst
 '''
 
 short_description = 'A Gtk+ time tracking application'
@@ -40,12 +41,17 @@ long_description = (
     older_changes
 )
 
+tests_require = ['freezegun']
+if sys.version_info < (3,):
+    # Python 2 doesn't have unittest.mock
+    tests_require.append('mock')
+
 setup(
     name='gtimelog',
     version=version,
     author='Marius Gedminas',
     author_email='marius@gedmin.as',
-    url='http://mg.pov.lt/gtimelog/',
+    url='https://gtimelog.org/',
     description=short_description,
     long_description=long_description,
     license='GPL',
@@ -57,20 +63,28 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Office/Business',
     ],
 
-    packages=['gtimelog'],
+    packages=find_packages('src'),
     package_dir={'': 'src'},
-    package_data={'gtimelog': ['*.ui', '*.png']},
+    include_package_data=True,
+    package_data={'': ['locale/*/LC_MESSAGES/gtimelog.mo']},
     test_suite='gtimelog.tests',
-    tests_require=['freezegun', 'mock'],
+    tests_require=tests_require,
+    extras_require={
+        'test': [
+            'freezegun',
+        ],
+        'test:python_version == "2.7"': [
+            'mock',
+        ],
+    },
     zip_safe=False,
     entry_points="""
     [gui_scripts]
     gtimelog = gtimelog.main:main
     """,
-# This is true, but pointless, because PyGObject cannot be installed via
-# setuptools/distutils
-#   install_requires=['PyGObject'],
+    install_requires=['PyGObject'],
 )

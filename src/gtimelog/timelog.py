@@ -2,20 +2,19 @@
 Non-GUI bits of gtimelog.
 """
 
+from __future__ import unicode_literals
+
 import codecs
+import collections
 import csv
 import datetime
 import os
 import socket
 import sys
 import re
+from collections import defaultdict
 from hashlib import md5
 from operator import itemgetter
-
-try:
-    from urllib import urlretrieve          # Python 2
-except ImportError:
-    from urllib.request import urlretrieve  # Python 3
 
 
 PY3 = sys.version_info[0] >= 3
@@ -56,10 +55,16 @@ def format_duration_long(duration):
 
 def parse_datetime(dt):
     """Parse a datetime instance from 'YYYY-MM-DD HH:MM' formatted string."""
-    m = re.match(r'^(\d+)-(\d+)-(\d+) (\d+):(\d+)$', dt)
-    if not m:
-        raise ValueError('bad date time: ', dt)
-    year, month, day, hour, min = map(int, m.groups())
+    if len(dt) != 16 or dt[4] != '-' or dt[7] != '-' or dt[10] != ' ' or dt[13] != ':':
+        raise ValueError('bad date time: %r' % dt)
+    try:
+        year = int(dt[:4])
+        month = int(dt[5:7])
+        day = int(dt[8:10])
+        hour = int(dt[11:13])
+        min = int(dt[14:])
+    except ValueError:
+        raise ValueError('bad date time: %r' % dt)
     return datetime.datetime(year, month, day, hour, min)
 
 
@@ -67,7 +72,7 @@ def parse_time(t):
     """Parse a time instance from 'HH:MM' formatted string."""
     m = re.match(r'^(\d+):(\d+)$', t)
     if not m:
-        raise ValueError('bad time: ', t)
+        raise ValueError('bad time: %r' % t)
     hour, min = map(int, m.groups())
     return datetime.time(hour, min)
 
@@ -97,6 +102,14 @@ def first_of_month(date):
     return date.replace(day=1)
 
 
+def prev_month(date):
+    """Return the first day of the previous month."""
+    if date.month == 1:
+        return datetime.date(date.year - 1, 12, 1)
+    else:
+        return datetime.date(date.year, date.month - 1, 1)
+
+
 def next_month(date):
     """Return the first day of the next month."""
     if date.month == 12:
@@ -114,12 +127,26 @@ def uniq(l):
     return result
 
 
-class TimeWindow(object):
-    """A window into a time log.
+def get_mtime(filename):
+    """Return the modification time of a file, if it exists.
 
-    Reads a time log file and remembers all events that took place between
-    min_timestamp and max_timestamp.  Includes events that took place at
-    min_timestamp, but excludes events that took place at max_timestamp.
+    Returns None if the file doesn't exist.
+    """
+    # Accept any file-like object instead of a filename (for the benefit of
+    # unit tests).
+    if hasattr(filename, 'read'):
+        return None
+    try:
+        return os.stat(filename).st_mtime
+    except OSError:
+        return None
+
+
+Entry = collections.namedtuple('Entry', 'start stop duration tags entry')
+
+
+class TimeCollection(object):
+    """A collection of timestamped events.
 
     self.items is a list of (timestamp, event_title) tuples.
 
@@ -127,77 +154,66 @@ class TimeWindow(object):
     a start time, a stop time, and a duration.  Entry title is the title of the
     event that occurred at the stop time.
 
-    The first event also creates a special "arrival" entry of zero duration.
+    The first event of each day also creates a special "start" entry of zero
+    duration.
 
     Entries that span virtual midnight boundaries are also converted to
-    "arrival" entries at their end point.
-
-    The earliest_timestamp attribute contains the first (which should be the
-    oldest) timestamp in the file.
+    "start" entries at their end point.
     """
 
-    def __init__(self, filename, min_timestamp, max_timestamp,
-                 virtual_midnight, callback=None):
-        self.filename = filename
-        self.min_timestamp = min_timestamp
-        self.max_timestamp = max_timestamp
-        self.virtual_midnight = virtual_midnight
-        self.reread(callback)
-
-    def __repr__(self):
-        return '<TimeWindow: {}..{}>'.format(self.min_timestamp,
-                                             self.max_timestamp)
-
-    def reread(self, callback=None):
-        """Parse the time log file and update self.items.
-
-        Also updates self.earliest_timestamp.
-        """
+    def __init__(self, virtual_midnight):
         self.items = []
-        self.earliest_timestamp = None
-        try:
-            # accept any file-like object
-            # this is a hook for unit tests, really
-            if hasattr(self.filename, 'read'):
-                f = self.filename
-                f.seek(0)
-            else:
-                f = codecs.open(self.filename, encoding='UTF-8')
-        except IOError:
-            return
-        line = ''
-        for line in f:
-            if ': ' not in line:
-                continue
-            time, entry = line.split(': ', 1)
-            try:
-                time = parse_datetime(time)
-            except ValueError:
-                continue
-            else:
-                entry = entry.strip()
-                if callback:
-                    callback(entry)
-                if self.earliest_timestamp is None:
-                    self.earliest_timestamp = time
-                if self.min_timestamp <= time < self.max_timestamp:
-                    self.items.append((time, entry))
-        # There's code that relies on entries being sorted.  The entries really
-        # should be already sorted in the file, but sometimes the user edits
-        # timelog.txt directly and introduces errors.
-        # XXX: instead of quietly resorting them we should inform the user if
-        # there are errors
-        # Note that we must preserve the relative order of entries with
-        # the same timestamp: https://bugs.launchpad.net/gtimelog/+bug/708825
-        self.items.sort(key=itemgetter(0))
-        f.close()
+        self.virtual_midnight = virtual_midnight
 
     def last_time(self):
-        """Return the time of the last event (or None if there are no events).
+        """Return the time of the last entry.
+
+        Returns a datetime.datetime instance or None, if the window is empty.
         """
         if not self.items:
             return None
         return self.items[-1][0]
+
+    def last_entry(self):
+        """Return the last entry (or None if there are no events).
+
+        It is always true that
+
+            self.last_entry() == list(self.all_entries())[-1]
+
+        if self.items it not empty.
+        """
+        if not self.items:
+            return None
+        stop = self.items[-1][0]
+        entry = self.items[-1][1]
+        if len(self.items) == 1:
+            start = stop
+        else:
+            start = self.items[-2][0]
+        if different_days(start, stop, self.virtual_midnight):
+            start = stop
+        duration = stop - start
+        entry, tags = self._split_entry_and_tags(entry)
+        return Entry(start, stop, duration, tags, entry)
+
+    def all_entries(self):
+        """Iterate over all entries.
+
+        Yields Entry tuples.  The first entry in each day has a duration
+        of 0.
+        """
+        stop = None
+        for item in self.items:
+            start = stop
+            stop = item[0]
+            entry = item[1]
+            if start is None or different_days(start, stop,
+                                               self.virtual_midnight):
+                start = stop
+            duration = stop - start
+            entry, tags = self._split_entry_and_tags(entry)
+            yield Entry(start, stop, duration, tags, entry)
 
     @staticmethod
     def _split_entry_and_tags(entry):
@@ -226,71 +242,28 @@ class TimeWindow(object):
             tags = set()
         return entry, tags
 
-    def all_entries(self):
-        """Iterate over all entries.
-
-        Yields (start, stop, duration, tags, entry) tuples.  The first entry
-        has a duration of 0.
-        """
-        stop = None
-        for item in self.items:
-            start = stop
-            stop = item[0]
-            entry = item[1]
-            if start is None or different_days(start, stop,
-                                               self.virtual_midnight):
-                start = stop
-            duration = stop - start
-            # tags are appended to the entry title, separated by ' -- '
-            entry, tags = self._split_entry_and_tags(entry)
-            yield start, stop, duration, tags, entry
-
     def set_of_all_tags(self):
-        """
-        Return set of all tags mentioned in entries.
-        """
+        """Return the set of all tags mentioned in entries."""
         all_tags = set()
-        for _, _, _, entry_tags, _ in self.all_entries():
-            all_tags.update(entry_tags)
+        for entry in self.all_entries():
+            all_tags.update(entry.tags)
         return all_tags
 
     def count_days(self):
         """Count days that have entries."""
         count = 0
         last = None
-        for start, stop, duration, tags, entry in self.all_entries():
-            if last is None or different_days(last, start,
+        for entry in self.all_entries():
+            if last is None or different_days(last, entry.start,
                                               self.virtual_midnight):
-                last = start
+                last = entry.start
                 count += 1
         return count
-
-    def last_entry(self):
-        """Return the last entry (or None if there are no events).
-
-        It is always true that
-
-            self.last_entry() == list(self.all_entries())[-1]
-
-        """
-        if not self.items:
-            return None
-        stop = self.items[-1][0]
-        entry = self.items[-1][1]
-        if len(self.items) == 1:
-            start = stop
-        else:
-            start = self.items[-2][0]
-        if different_days(start, stop, self.virtual_midnight):
-            start = stop
-        duration = stop - start
-        entry, tags = self._split_entry_and_tags(entry)
-        return start, stop, duration, tags, entry
 
     def grouped_entries(self, skip_first=True):
         """Return consolidated entries (grouped by entry title).
 
-        Returns two list: work entries and slacking entries.  Slacking
+        Returns two lists: work entries and slacking entries.  Slacking
         entries are identified by finding two asterisks in the title.
         Entry lists are sorted, and contain (start, entry, duration) tuples.
         """
@@ -298,6 +271,8 @@ class TimeWindow(object):
         slack = {}
         for start, stop, duration, tags, entry in self.all_entries():
             if skip_first:
+                # XXX: in case of for multi-day windows, this should skip
+                # the 1st entry of each day
                 skip_first = False
                 continue
             if '***' in entry:
@@ -346,11 +321,14 @@ class TimeWindow(object):
                     None, datetime.timedelta(0)) + duration
         return entries, totals
 
-    def totals(self, tag=None):
+    def totals(self, tag=None, filter_text=None):
         """Calculate total time of work and slacking entries.
 
         If optional argument `tag` is given, only compute
         totals for entries marked with the given tag.
+
+        If optional argument `filter_text` is given, only compute
+        totals for entries matching the text.
 
         Returns (total_work, total_slacking) tuple.
 
@@ -373,24 +351,55 @@ class TimeWindow(object):
         for start, stop, duration, tags, entry in self.all_entries():
             if tag is not None and tag not in tags:
                 continue
+            if filter_text is not None and filter_text not in entry:
+                continue
             if '**' in entry:
                 total_slacking += duration
             else:
                 total_work += duration
         return total_work, total_slacking
 
+
+class TimeWindow(TimeCollection):
+    """A window into a time log.
+
+    Includes all events that took place between min_timestamp and
+    max_timestamp.  Includes events that took place at min_timestamp, but
+    excludes events that took place at max_timestamp.
+    """
+
+    def __init__(self, original, min_timestamp, max_timestamp):
+        super(TimeWindow, self).__init__(original.virtual_midnight)
+        self.min_timestamp = min_timestamp
+        self.max_timestamp = max_timestamp
+        self.items = [item for item in original.items
+                      if min_timestamp <= item[0] < max_timestamp]
+
+    def __repr__(self):
+        return '<TimeWindow: {}..{}>'.format(self.min_timestamp,
+                                             self.max_timestamp)
+
+
+class Exports(object):
+    """Exporting of events."""
+
+    def __init__(self, window):
+        self.window = window
+
+    @staticmethod
+    def _hash(start, stop, entry):
+        return md5(("%s%s%s" % (start, stop, entry)).encode('UTF-8')).hexdigest()
+
     def icalendar(self, output):
         """Create an iCalendar file with activities."""
         output.write("BEGIN:VCALENDAR\n")
-        output.write("PRODID:-//mg.pov.lt/NONSGML GTimeLog//EN\n")
+        output.write("PRODID:-//gtimelog.org/NONSGML GTimeLog//EN\n")
         output.write("VERSION:2.0\n")
         idhost = socket.getfqdn()
         dtstamp = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-        def _hash(start, stop, entry):
-            return md5(("%s%s%s" % (start, stop, entry)).encode('UTF-8')).hexdigest()
-        for start, stop, duration, tags, entry in self.all_entries():
+        for start, stop, duration, tags, entry in self.window.all_entries():
             output.write("BEGIN:VEVENT\n")
-            output.write("UID:%s@%s\n" % (_hash(start, stop, entry), idhost))
+            output.write("UID:%s@%s\n" % (self._hash(start, stop, entry), idhost))
             output.write("SUMMARY:%s\n" % (entry.replace('\\', '\\\\'))
                                                 .replace(';', '\\;')
                                                 .replace(',', '\\,'))
@@ -408,7 +417,7 @@ class TimeWindow(object):
         writer = CSVWriter(output)
         if title_row:
             writer.writerow(["task", "time (minutes)"])
-        work, slack = self.grouped_entries()
+        work, slack = self.window.grouped_entries()
         work = [(entry, as_minutes(duration))
                 for start, entry, duration in work
                 if duration] # skip empty "arrival" entries
@@ -432,7 +441,7 @@ class TimeWindow(object):
         d0 = datetime.timedelta(0)
         days = {} # date -> [time_started, slacking, work]
         dmin = None
-        for start, stop, duration, tags, entry in self.all_entries():
+        for start, stop, duration, tags, entry in self.window.all_entries():
             if dmin is None:
                 dmin = start.date()
             day = days.setdefault(start.date(),
@@ -461,8 +470,10 @@ class TimeWindow(object):
 class Reports(object):
     """Generation of reports."""
 
-    def __init__(self, window):
+    def __init__(self, window, email_headers=True, style='plain'):
         self.window = window
+        self.email_headers = email_headers
+        self.style = style
 
     def _categorizing_report(self, output, email, who, subject, period_name):
         """A report that displays entries by category.
@@ -499,9 +510,11 @@ class Reports(object):
         """
         window = self.window
 
-        output.write("To: %(email)s\n" % {'email': email})
-        output.write("Subject: %s\n" % subject)
-        output.write('\n')
+        if self.email_headers:
+            output.write("To: %(email)s\n" % {'email': email})
+            output.write("Subject: %s\n" % subject)
+            output.write('\n')
+
         items = list(window.all_entries())
         if not items:
             output.write("No work done this %s.\n" % period_name)
@@ -622,9 +635,11 @@ class Reports(object):
         """
         window = self.window
 
-        output.write("To: %(email)s\n" % {'email': email})
-        output.write('Subject: %s\n' % subject)
-        output.write('\n')
+        if self.email_headers:
+            output.write("To: %(email)s\n" % {'email': email})
+            output.write('Subject: %s\n' % subject)
+            output.write('\n')
+
         items = list(window.all_entries())
         if not items:
             output.write("No work done this %s.\n" % period_name)
@@ -663,42 +678,72 @@ class Reports(object):
         if tags:
             self._report_tags(output, tags)
 
-    def weekly_report_categorized(self, output, email, who):
-        """Format a weekly report with entries displayed  under categories."""
+    def weekly_report_subject(self, who):
         week = self.window.min_timestamp.isocalendar()[1]
-        subject = u'Weekly report for %s (week %02d)' % (who, week)
-        return self._categorizing_report(output, email, who, subject,
-                                         period_name='week')
+        return u'Weekly report for %s (week %02d)' % (who, week)
 
-    def monthly_report_categorized(self, output, email, who):
-        """Format a monthly report with entries displayed  under categories."""
-        month = self.window.min_timestamp.strftime('%Y/%m')
-        subject = u'Monthly report for %s (%s)' % (who, month)
-        return self._categorizing_report(output, email, who, subject,
-                                         period_name='month')
+    def weekly_report(self, output, email, who):
+        if self.style == 'categorized':
+            return self.weekly_report_categorized(output, email, who)
+        else:
+            return self.weekly_report_plain(output, email, who)
 
     def weekly_report_plain(self, output, email, who):
-        """Format a weekly report ."""
-        week = self.window.min_timestamp.isocalendar()[1]
-        subject = u'Weekly report for %s (week %02d)' % (who, week)
+        """Format a weekly report."""
+        subject = self.weekly_report_subject(who)
         return self._plain_report(output, email, who, subject,
                                   period_name='week')
 
+    def weekly_report_categorized(self, output, email, who):
+        """Format a weekly report with entries displayed  under categories."""
+        subject = self.weekly_report_subject(who)
+        return self._categorizing_report(output, email, who, subject,
+                                         period_name='week')
+
+    def monthly_report_subject(self, who):
+        month = self.window.min_timestamp.strftime('%Y/%m')
+        return u'Monthly report for %s (%s)' % (who, month)
+
+    def monthly_report(self, output, email, who):
+        if self.style == 'categorized':
+            return self.monthly_report_categorized(output, email, who)
+        else:
+            return self.monthly_report_plain(output, email, who)
+
     def monthly_report_plain(self, output, email, who):
         """Format a monthly report ."""
-        month = self.window.min_timestamp.strftime('%Y/%m')
-        subject = u'Monthly report for %s (%s)' % (who, month)
+        subject = self.monthly_report_subject(who)
         return self._plain_report(output, email, who, subject,
                                   period_name='month')
 
-    def custom_range_report_categorized(self, output, email, who):
-        """Format a custom range report with entries displayed  under categories."""
+    def monthly_report_categorized(self, output, email, who):
+        """Format a monthly report with entries displayed  under categories."""
+        subject = self.monthly_report_subject(who)
+        return self._categorizing_report(output, email, who, subject,
+                                         period_name='month')
+
+    def custom_range_report_subject(self, who):
         min = self.window.min_timestamp.strftime('%Y-%m-%d')
         max = self.window.max_timestamp - datetime.timedelta(1)
         max = max.strftime('%Y-%m-%d')
-        subject = u'Custom date range report for %s (%s - %s)' % (who, min, max)
+        return u'Custom date range report for %s (%s - %s)' % (who, min, max)
+
+    def custom_range_report_categorized(self, output, email, who):
+        """Format a custom range report with entries displayed under categories."""
+        subject = self.custom_range_report_subject(who)
         return self._categorizing_report(output, email, who, subject,
                                          period_name='custom range')
+
+    def daily_report_subject(self, who):
+        # strftime('%a') would give us translated names, but we want our
+        # reports to be standardized and machine-parseable
+        weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        weekday = weekday_names[self.window.min_timestamp.weekday()]
+        week = self.window.min_timestamp.isocalendar()[1]
+        return (u"{0:%Y-%m-%d} report for {who}"
+                u" ({weekday}, week {week:0>2})".format(
+                    self.window.min_timestamp, who=who,
+                    weekday=weekday, week=week))
 
     def daily_report(self, output, email, who):
         """Format a daily report.
@@ -706,18 +751,10 @@ class Reports(object):
         Writes a daily report template in RFC-822 format to output.
         """
         window = self.window
-
-        # Locale is set as a side effect of 'import gtk', so strftime('%a')
-        # would give us translated names
-        weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-        weekday = weekday_names[window.min_timestamp.weekday()]
-        week = window.min_timestamp.isocalendar()[1]
-        output.write(u"To: %s\n" % email)
-        output.write(u"Subject: {0:%Y-%m-%d} report for {who}"
-                     u" ({weekday}, week {week:0>2})\n".format(
-                         window.min_timestamp, who=who,
-                         weekday=weekday, week=week))
-        output.write('\n')
+        if self.email_headers:
+            output.write(u"To: %s\n" % email)
+            output.write(u"Subject: %s\n" % self.daily_report_subject(who))
+            output.write('\n')
         items = list(window.all_entries())
         if not items:
             output.write("No work done today.\n")
@@ -764,7 +801,89 @@ class Reports(object):
             self._report_tags(output, tags)
 
 
-class TimeLog(object):
+class ReportRecord(object):
+    """A record of sent reports."""
+
+    # Let's be compatible with https://github.com/ProgrammersOfVilnius/gtimesheet
+    DAILY = 'daily'
+    WEEKLY = 'weekly'
+    MONTHLY = 'monthly'
+
+    def __init__(self, filename):
+        self.filename = filename
+        self.last_mtime = None
+        self._records = defaultdict(list)
+
+    @classmethod
+    def get_report_id(cls, report_kind, date):
+        if report_kind == cls.DAILY:
+            return date.strftime('%Y-%m-%d')
+        elif report_kind == cls.WEEKLY:
+            # I'd prefer the ISO 8601 format (2015-W31 instead of 2015/31), but
+            # let's be compatible with https://github.com/ProgrammersOfVilnius/gtimesheet
+            return '{}/{}'.format(*date.isocalendar()[:2])
+        elif report_kind == cls.MONTHLY:
+            return date.strftime('%Y-%m')
+        else: # pragma: nocover
+            raise AssertionError('Bug: unexpected report kind: %r' % report_kind)
+
+    def record(self, report_kind, report_date, recipient, now=None):
+        """Record that a record has been sent.
+
+        report_kind is one of DAILY, WEEKLY, MONTHLY.
+
+        report_date is a date in the report period.
+
+        recipient is an email address.  The intent here is to distinguish
+        real reports sent to activity@yourcompany.example.com from test
+        reports sent to a test address.
+        """
+        assert report_kind in (self.DAILY, self.WEEKLY, self.MONTHLY)
+        assert isinstance(report_date, datetime.date)
+        if now is None:
+            now = datetime.datetime.now()
+        timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
+        report_id = self.get_report_id(report_kind, report_date)
+        with open(self.filename, 'a') as f:
+            f.write("{},{},{},{}\n".format(timestamp, report_kind, report_id, recipient))
+        if self.last_mtime is not None:
+            self.last_mtime = get_mtime(self.filename)
+            self._records[report_kind, report_id].append(recipient)
+
+    def check_reload(self):
+        mtime = get_mtime(self.filename)
+        if mtime != self.last_mtime:
+            self.reread()
+
+    def reread(self):
+        self.last_mtime = get_mtime(self.filename)
+        self._records.clear()
+        try:
+            with open(self.filename) as f:
+                for line in f:
+                    try:
+                        timestamp, report_kind, report_id, recipient = line.split(',', 3)
+                    except ValueError:
+                        continue
+                    self._records[report_kind, report_id].append(recipient.strip())
+        except IOError:
+            pass
+
+    def get_recipients(self, report_kind, report_date):
+        """Look up who received a particular report.
+
+        report_kind is one of DAILY, WEEKLY, MONTHLY.
+
+        report_date is a date in the report period.
+
+        Returns a list of recipients, in order.
+        """
+        self.check_reload()
+        report_id = self.get_report_id(report_kind, report_date)
+        return self._records.get((report_kind, report_id), [])
+
+
+class TimeLog(TimeCollection):
     """Time log.
 
     A time log contains a time window for today, and can add new entries at
@@ -772,8 +891,8 @@ class TimeLog(object):
     """
 
     def __init__(self, filename, virtual_midnight):
+        super(TimeLog, self).__init__(virtual_midnight)
         self.filename = filename
-        self.virtual_midnight = virtual_midnight
         self.reread()
 
     def virtual_today(self):
@@ -785,50 +904,60 @@ class TimeLog(object):
 
         Returns True if the file was reloaded.
         """
-        mtime = self.get_mtime()
+        mtime = get_mtime(self.filename)
         if mtime != self.last_mtime:
             self.reread()
             return True
         else:
             return False
 
-    def get_mtime(self):
-        """Return the mtime of self.filename, if it exists.
-
-        Returns None if the file doesn't exist.
-        """
-        # Accept any file-like object instead of a filename (for the benefit of
-        # unit tests).
-        if hasattr(self.filename, 'read'):
-            return None
-        try:
-            return os.stat(self.filename).st_mtime
-        except OSError:
-            return None
-
     def reread(self):
-        """Reload today's log."""
-        self.last_mtime = self.get_mtime()
+        """Reload the log file."""
         self.day = self.virtual_today()
-        min = datetime.datetime.combine(self.day, self.virtual_midnight)
-        max = min + datetime.timedelta(1)
-        self.history = []
-        self.window = TimeWindow(self.filename, min, max,
-                                 self.virtual_midnight,
-                                 callback=self.history.append)
-        self.need_space = not self.window.items
-        self._cache = {(min, max): self.window}
+        self.last_mtime = get_mtime(self.filename)
+        try:
+            if hasattr(self.filename, 'read'):
+                # accept any file-like object
+                # this is a hook for unit tests, really
+                self.filename.seek(0)
+                self.items = self._read(self.filename)
+            else:
+                with open(self.filename, 'rb') as f:
+                    data = f.read()
+                self.items = self._read(data.decode('UTF-8').splitlines())
+        except IOError:
+            self.items = []
+        self.window = self.window_for_day(self.day)
+
+    def _read(self, f):
+        items = []
+        for line in f:
+            time, sep, entry = line.partition(': ')
+            if not sep:
+                continue
+            try:
+                time = parse_datetime(time)
+            except ValueError:
+                continue
+            entry = entry.strip()
+            items.append((time, entry))
+        # There's code that relies on entries being sorted.  The entries really
+        # should be already sorted in the file, but sometimes the user edits
+        # timelog.txt directly and introduces errors.
+        # XXX: instead of quietly resorting them we should inform the user if
+        # there are errors
+        # Note that we must preserve the relative order of entries with
+        # the same timestamp: https://bugs.launchpad.net/gtimelog/+bug/708825
+        items.sort(key=itemgetter(0))
+        return items
 
     def window_for(self, min, max):
-        """Return a TimeWindow for a specified time interval."""
-        try:
-            return self._cache[min, max]
-        except KeyError:
-            window = TimeWindow(self.filename, min, max, self.virtual_midnight)
-            if len(self._cache) > 1000:
-                self._cache.clear()
-            self._cache[min, max] = window
-            return window
+        """Return a TimeWindow for a specified time interval.
+
+        ``min`` and ``max`` should be datetime.datetime instances.  The
+        interval is half-open (inclusive at ``min``, exclusive at ``max``).
+        """
+        return TimeWindow(self, min, max)
 
     def window_for_day(self, date):
         """Return a TimeWindow for the specified day."""
@@ -854,42 +983,38 @@ class TimeLog(object):
         return self.window_for(min, max)
 
     def window_for_date_range(self, min, max):
+        """Return a TimeWindow for a specified time interval.
+
+        ``min`` and ``max`` should be datetime.date instances.  The
+        interval is closed.
+        """
         min = datetime.datetime.combine(min, self.virtual_midnight)
         max = datetime.datetime.combine(max, self.virtual_midnight)
         max = max + datetime.timedelta(1)
         return self.window_for(min, max)
 
-    def whole_history(self):
-        """Return a TimeWindow for the whole history."""
-        # XXX I don't like this solution.  Better make the min/max filtering
-        # arguments optional in TimeWindow.reread
-        return self.window_for(self.window.earliest_timestamp,
-                               datetime.datetime.now())
-
-    def raw_append(self, line):
+    def raw_append(self, line, need_space):
         """Append a line to the time log file."""
         f = codecs.open(self.filename, "a", encoding='UTF-8')
-        if self.need_space:
-            self.need_space = False
+        if need_space:
             f.write('\n')
         f.write(line + '\n')
         f.close()
-        self.last_mtime = self.get_mtime()
+        self.last_mtime = get_mtime(self.filename)
 
     def append(self, entry, now=None):
         """Append a new entry to the time log."""
         if not now:
             now = datetime.datetime.now().replace(second=0, microsecond=0)
-        last = self.window.last_time()
+        self.check_reload()
+        need_space = False
+        last = self.last_time()
         if last and different_days(now, last, self.virtual_midnight):
-            # next day: reset self.window
-            self.reread()
+            need_space = True
+        self.items.append((now, entry))
         self.window.items.append((now, entry))
         line = '%s: %s' % (now.strftime("%Y-%m-%d %H:%M"), entry)
-        self.raw_append(line)
-        for (min, max), cached in self._cache.items():
-            if cached is not self.window and min <= now < max:
-                cached.items.append((now, entry))
+        self.raw_append(line, need_space)
 
     def valid_time(self, time):
         """Is this a valid time for a correction?
@@ -898,7 +1023,7 @@ class TimeLog(object):
         """
         if time > datetime.datetime.now():
             return False
-        last = self.window.last_time()
+        last = self.last_time()
         if last and time < last:
             return False
         return True
@@ -972,29 +1097,19 @@ class TaskList(object):
 
         Returns True if the file was reloaded.
         """
-        mtime = self.get_mtime()
+        mtime = get_mtime(self.filename)
         if mtime != self.last_mtime:
             self.load()
             return True
         else:
             return False
 
-    def get_mtime(self):
-        """Return the mtime of self.filename, if it exists.
-
-        Returns None if the file doesn't exist.
-        """
-        try:
-            return os.stat(self.filename).st_mtime
-        except OSError:
-            return None
-
     def load(self):
         """Load task list from a file named self.filename."""
         groups = {}
-        self.last_mtime = self.get_mtime()
+        self.last_mtime = get_mtime(self.filename)
         try:
-            with open(self.filename) as f:
+            with codecs.open(self.filename, encoding='UTF-8') as f:
                 for line in f:
                     line = line.strip()
                     if not line or line.startswith('#'):
@@ -1011,50 +1126,6 @@ class TaskList(object):
     def reload(self):
         """Reload the task list."""
         self.load()
-
-
-class RemoteTaskList(TaskList):
-    """Task list stored on a remote server.
-
-    Keeps a cached copy of the list in a local file, so you can use it offline.
-    """
-
-    def __init__(self, url, cache_filename):
-        self.url = url
-        TaskList.__init__(self, cache_filename)
-        self.first_time = True
-
-    def check_reload(self):
-        """Check whether the task list needs to be reloaded.
-
-        Download the task list if this is the first time, and a cached copy is
-        not found.
-
-        Returns True if the file was reloaded.
-        """
-        if self.first_time:
-            self.first_time = False
-            if not os.path.exists(self.filename):
-                self.download()
-                return True
-        return TaskList.check_reload(self)
-
-    def download(self):
-        """Download the task list from the server."""
-        if self.loading_callback:
-            self.loading_callback()
-        try:
-            urlretrieve(self.url, self.filename)
-        except IOError:
-            if self.error_callback:
-                self.error_callback()
-        self.load()
-        if self.loaded_callback:
-            self.loaded_callback()
-
-    def reload(self):
-        """Reload the task list."""
-        self.download()
 
 
 class CSVWriter(object):

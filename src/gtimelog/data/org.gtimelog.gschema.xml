@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<schemalist>
+
+    <enum id="org.gtimelog.DetailLevel">
+        <value nick="chronological" value="1"/>
+        <value nick="grouped" value="2"/>
+        <value nick="summary" value="3"/>
+    </enum>
+
+    <schema path="/org/gtimelog/" id="org.gtimelog">
+
+        <key name="settings-migrated" type="b">
+            <default>false</default>
+            <summary>Settings migrated</summary>
+            <description>Set to true after copying old settings from a gtimelogrc file.  If false, and if a gtimelogrc exists, settings from the gtimelogrc will be copied into GSettings.</description>
+        </key>
+
+        <key name="detail-level" enum="org.gtimelog.DetailLevel">
+            <default>"chronological"</default>
+            <summary>Detail level</summary>
+            <description>Detail level to show in the main pane.</description>
+        </key>
+
+        <key name="show-task-pane" type="b">
+            <default>false</default>
+            <summary>Show task pane</summary>
+            <description>If true, the sidebar with a list of tasks is shown.</description>
+        </key>
+
+        <key name="task-pane-position" type="i">
+            <default>600</default>
+            <summary>Task pane position</summary>
+            <description>The width of the time log area to the left of the task pane.</description>
+        </key>
+
+        <key name="window-size" type="(ii)">
+            <default>(850, 550)</default>
+            <summary>Window size</summary>
+            <description>Size of the application window (width and height).</description>
+        </key>
+
+        <key name="window-position" type="(ii)">
+            <default>(-1, -1)</default>
+            <summary>Window position</summary>
+            <description>Position of the application window (X and Y).</description>
+        </key>
+
+        <key name="hours" type="d">
+            <default>8</default>
+            <summary>Work hours</summary>
+            <description>Target hours of work, to be used for estimating time left to work.</description>
+            <range min="0" max="24" />
+        </key>
+
+        <key name="office-hours" type="d">
+            <default>9</default>
+            <summary>Office hours</summary>
+            <description>Target hours of work (including breaks), to be used for estimating time left at the office.</description>
+            <range min="0" max="24" />
+        </key>
+
+        <key name="virtual-midnight" type="(ii)">
+            <default>(2, 0)</default>
+            <summary>Virtual midnight</summary>
+            <description>Hour and minute that say when a work day ends and another begins.</description>
+        </key>
+
+        <key name="name" type="s">
+            <default>"Anonymous"</default>
+            <summary>Name</summary>
+            <description>Your name in activity reports.</description>
+        </key>
+
+        <key name="sender" type="s">
+            <default>"Anonymous &lt;me@example.com&gt;"</default>
+            <summary>Sender email</summary>
+            <description>Sender email for activity reports.</description>
+        </key>
+
+        <key name="list-email" type="s">
+            <default>"activity@example.com"</default>
+            <summary>Recipient email</summary>
+            <description>Email to send activity reports to.</description>
+        </key>
+
+        <key name="report-style" type="s">
+            <default>"plain"</default>
+            <summary>Report style</summary>
+            <description>Report style.</description>
+            <choices>
+                <choice value="plain"/>
+                <choice value="categorized"/>
+            </choices>
+        </key>
+
+        <key name="remote-task-list" type="b">
+            <default>false</default>
+            <summary>Use remote task list</summary>
+            <description>If true, the task sidebar will show tasks fetched from a specified task list URL.</description>
+        </key>
+
+        <key name="task-list-url" type="s">
+            <default>""</default>
+            <summary>Task list URL</summary>
+            <description>URL for fetching tasks for the task pane.  Expects a plain text response with one task name per line, with an optional category in front (delimited with a ':').</description>
+        </key>
+
+        <key name="task-list-edit-url" type="s">
+            <default>""</default>
+            <summary>Task list edit URL</summary>
+            <description>URL for editing tasks for the task pane.  Will be opened in a browser window if the user asks to edit tasks.</description>
+        </key>
+
+        <key name="gtk-completion" type="b">
+            <default>true</default>
+            <summary>Use completion</summary>
+            <description>If true, the task entry will use the standard GTK+ completion.  If false, it'll only use the custom prefix completion on PageUp/PageDown.</description>
+        </key>
+
+    </schema>
+
+</schemalist>

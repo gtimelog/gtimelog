@@ -1,25 +1,52 @@
 Changelog
 ---------
 
-0.10.3 (2016-10-07)
-~~~~~~~~~~~~~~~~~~~
+0.11 (2017-12-16)
+~~~~~~~~~~~~~~~~~
 
-- Make it work (again) when the AppIndicator bindings are not available.
+* A complete rewrite of the user interface, to better fit GNOME 3 (GH: #31).
+  Requires GTK+ 3.10, but newer versions are better.
 
+* History browsing can show you weeks/months, not just days.
 
-0.10.2 (2016-10-03)
-~~~~~~~~~~~~~~~~~~~
+* You can filter the displayed tasks, with a total shown at the bottom
+  (GH: #88).
 
-* Fix misleading name produced by ``--sample-config`` (GH: #94) when using
-  Python 3.
+* There's now a preferences dialog (GH: #47).
 
+* Window size and task pane size/visibility are remembered across
+  restarts (GH: #30).
 
-0.10.1 (2016-09-22)
-~~~~~~~~~~~~~~~~~~~
+* Settings are stored in GSettings.  The old config file will be imported
+  on first startup.
 
-* Fix error on Python 3 when using ``task_list_url`` (GH: #92).
+* Work hours and office hours are separate settings now (GH: #46).
 
-* Fix some PyGIWarnings about unspecified versions on startup.
+* Native support for emailing reports.  Requires a configured MTA on the
+  local machine (i.e. /usr/sbin/sendmail).
+
+* There's a help page listing all the keyboard shortcuts.
+
+* The user interface can be translated (and is translated into Lithuanian).
+  Reports are an exception (GH: #45).
+
+* More efficient file change watching (GH: #11).
+
+* Dropped features:
+
+  - No more tray icons.
+  - Dropped --tray, --toggle, --quit, --sample-config command
+    line options.
+  - The "Reload" menu option and hot key are gone -- reloading is automatic now.
+  - Report for a custom date range is gone.
+  - "Complete report in spreadsheet" is gone.
+  - "Work/slacking stats in spreadsheet" is gone.
+  - Setting for editor is gone: the default file association for text
+    files will be used.
+  - Settings for mailer is gone: mail sending is internal now.
+  - Setting for spreadsheet is gone.
+  - Separate setting to show remaining office hours is gone (set office hours
+    to 0 to hide the estimate).
 
 
 0.10.0 (2015-09-29)
@@ -216,12 +243,12 @@ Changelog
 * New command-line option: --tray.  Makes GTimeLog start minimized, or exit
   without doing anything if it's already running.
 * Added some documentation for contributors: HACKING.txt.
-* Daily reports include totals by category.  Contributed by Laurynas SpeiÄys
+* Daily reports include totals by category.  Contributed by Laurynas Speičys
   <laurynas@pov.lt>.
 * The tasks pane can be toggled by pressing F9 and has a close button.
 * Alternative weekly and monthly report style, can be chosen by adding
   ``report_style = categorized`` to ~/.gtimelog/gtimelogrc.
-  Contributed by Laurynas SpeiÄys <laurynas@pov.lt>.
+  Contributed by Laurynas Speičys <laurynas@pov.lt>.
 * Bugfix: always preserve the order of entries, even when they have the same
   timestamp (LP: #708825).
 
@@ -322,7 +349,7 @@ from gtimelog.gtimelog, you'll have to change them.
 
 0.2.2
 ~~~~~
-* Tweak setup.py to get a sane page at http://pypi.python.org/pypi/gtimelog/
+* Tweak setup.py to get a sane page at https://pypi.python.org/pypi/gtimelog/
 
 
 0.2.1

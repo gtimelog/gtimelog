@@ -1,0 +1,91 @@
+<interface>
+  <menu id="app_menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Preferences</attribute>
+        <attribute name="action">app.preferences</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Help</attribute>
+        <attribute name="action">app.help</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">About</attribute>
+        <attribute name="action">app.about</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Quit</attribute>
+        <attribute name="action">app.quit</attribute>
+      </item>
+    </section>
+  </menu>
+  <menu id="window_menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Edit log</attribute>
+        <attribute name="action">app.edit-log</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Edit tasks</attribute>
+        <attribute name="action">app.edit-tasks</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Refresh tasks</attribute>
+        <attribute name="action">app.refresh-tasks</attribute>
+        <attribute name="hidden-when">action-disabled</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Report...</attribute>
+        <attribute name="action">win.report</attribute>
+      </item>
+    </section>
+  </menu>
+  <menu id="view_menu">
+    <section>
+      <attribute name="label" translatable="yes">Detail level</attribute>
+      <item>
+        <attribute name="label" translatable="yes">Chronological</attribute>
+        <attribute name="action">win.detail-level</attribute>
+        <attribute name="target">chronological</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Grouped</attribute>
+        <attribute name="action">win.detail-level</attribute>
+        <attribute name="target">grouped</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Summary</attribute>
+        <attribute name="action">win.detail-level</attribute>
+        <attribute name="target">summary</attribute>
+      </item>
+    </section>
+    <section>
+      <attribute name="label" translatable="yes">Time range</attribute>
+      <item>
+        <attribute name="label" translatable="yes">Day</attribute>
+        <attribute name="action">win.time-range</attribute>
+        <attribute name="target">day</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Week</attribute>
+        <attribute name="action">win.time-range</attribute>
+        <attribute name="target">week</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Month</attribute>
+        <attribute name="action">win.time-range</attribute>
+        <attribute name="target">month</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Filter</attribute>
+        <attribute name="action">win.show-search-bar</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>

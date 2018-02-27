@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import datetime
-import readline  # make raw_input() friendlier
+import readline  # noqa: make raw_input() friendlier
 
 
 f = open("timelog.txt", "a")

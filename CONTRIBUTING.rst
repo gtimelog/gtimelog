@@ -6,7 +6,7 @@ Contributions are welcome, and not just code patches.  I'd love to see
 * user interface design sketches
 * icons
 * documentation
-* translations (this would need some coding to enable translation first)
+* translations
 * installers for Mac OS X and Windows
 
 
@@ -17,7 +17,8 @@ Please `use GitHub <https://github.com/gtimelog/gtimelog/issues>`_ to
 report bugs or feature requests.
 
 We also have an older issue tracker on `Launchpad
-<https://bugs.launchpad.net/gtimelog/>`_.
+<https://bugs.launchpad.net/gtimelog/>`_.  Some bugs haven't been moved
+over to GitHub yet.
 
 You may also contact Marius Gedminas <marius@gedmin.as> or Barry Warsaw
 <barry@python.org> by email.
@@ -35,6 +36,7 @@ Get the latest version with ::
 Run it without installing ::
 
     $ cd gtimelog
+    $ make
     $ ./gtimelog
 
 
@@ -45,4 +47,7 @@ Run the test suite with ::
 
     $ ./runtests
 
-The common ``python setup.py test`` idiom is also supported.
+or, to test against all supported Python versions ::
+
+    $ pip install tox
+    $ tox
