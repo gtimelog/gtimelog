@@ -1,4 +1,4 @@
-gtimelog (0.11-1) UNRELEASED; urgency=medium
+gtimelog (0.11-1) unstable; urgency=medium
 
   [ Barry Warsaw ]
   * d/control: Put PAPT in Maintainers and myself in Uploaders.
