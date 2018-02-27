@@ -13,3 +13,5 @@ gtimelogrc.sample
 *~
 tags
 coverage.xml
+locale
+.coverage.*

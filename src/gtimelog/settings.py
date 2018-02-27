@@ -31,6 +31,7 @@ class Settings(object):
     # Insane defaults
     email = 'activity-list@example.com'
     name = 'Anonymous'
+    sender = ''
 
     editor = 'xdg-open'
     mailer = 'x-terminal-emulator -e "mutt -H %s"'
@@ -42,6 +43,7 @@ class Settings(object):
     enable_gtk_completion = True  # False enables gvim-style completion
 
     hours = 8
+    office_hours = 9
     virtual_midnight = datetime.time(2, 0)
 
     task_list_url = ''
@@ -62,7 +64,7 @@ class Settings(object):
             return os.path.expanduser(legacy_default_home)
         return None
 
-    # http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
+    # https://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html
 
     def get_config_dir(self):
         legacy = self.check_legacy_config()
@@ -84,11 +86,20 @@ class Settings(object):
     def get_timelog_file(self):
         return os.path.join(self.get_data_dir(), 'timelog.txt')
 
+    def get_report_log_file(self):
+        return os.path.join(self.get_data_dir(), 'sentreports.log')
+
+    def get_task_list_file(self):
+        return os.path.join(self.get_data_dir(), 'tasks.txt')
+
+    def get_task_list_cache_file(self):
+        return os.path.join(self.get_data_dir(), 'remote-tasks.txt')
     def _config(self):
         config = RawConfigParser()
         config.add_section('gtimelog')
         config.set('gtimelog', 'list-email', self.email)
-        config.set('gtimelog', 'name', self._str(self.name))
+        config.set('gtimelog', 'name', self.from_unicode(self.name))
+        config.set('gtimelog', 'sender', self.from_unicode(self.sender))
         config.set('gtimelog', 'editor', self.editor)
         config.set('gtimelog', 'mailer', self.mailer)
         config.set('gtimelog', 'spreadsheet', self.spreadsheet)
@@ -98,6 +109,7 @@ class Settings(object):
         config.set('gtimelog', 'gtk-completion',
                    str(self.enable_gtk_completion))
         config.set('gtimelog', 'hours', str(self.hours))
+        config.set('gtimelog', 'office-hours', str(self.office_hours))
         config.set('gtimelog', 'virtual_midnight',
                    self.virtual_midnight.strftime('%H:%M'))
         config.set('gtimelog', 'task_list_url', self.task_list_url)
@@ -112,23 +124,24 @@ class Settings(object):
         return config
 
     if PY3:
-        def _str(self, value):
-            return value  # ConfigParser already accepts unicode
-
-        def _unicode(self, value):
+        def to_unicode(self, value):
             return value  # ConfigParser already gives us unicode
+        def from_unicode(self, value):
+            return value  # ConfigParser already accepts unicode
     else:
-        def _str(self, value):
+        def to_unicode(self, value):
+            return value.decode(self._encoding)
+        def from_unicode(self, value):
             return value.encode(self._encoding)
 
-        def _unicode(self, value):
-            return value.decode(self._encoding)
-
-    def load(self, filename):
+    def load(self, filename=None):
+        if filename is None:
+            filename = self.get_config_file()
         config = self._config()
         config.read([filename])
         self.email = config.get('gtimelog', 'list-email')
-        self.name = self._unicode(config.get('gtimelog', 'name'))
+        self.name = self.to_unicode(config.get('gtimelog', 'name'))
+        self.sender = self.to_unicode(config.get('gtimelog', 'sender'))
         self.editor = config.get('gtimelog', 'editor')
         self.mailer = config.get('gtimelog', 'mailer')
         self.spreadsheet = config.get('gtimelog', 'spreadsheet')
@@ -138,6 +151,7 @@ class Settings(object):
         self.enable_gtk_completion = config.getboolean('gtimelog',
                                                        'gtk-completion')
         self.hours = config.getfloat('gtimelog', 'hours')
+        self.office_hours = config.getfloat('gtimelog', 'office-hours')
         self.virtual_midnight = parse_time(config.get('gtimelog',
                                                       'virtual_midnight'))
         self.task_list_url = config.get('gtimelog', 'task_list_url')
@@ -154,3 +168,4 @@ class Settings(object):
         config = self._config()
         with open(filename, 'w') as f:
             config.write(f)
+

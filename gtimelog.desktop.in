@@ -1,8 +1,6 @@
 [Desktop Entry]
-Name=Time Log
-Name[lt]=Laiko žurnalas
-Comment=Track and time daily activities
-Comment[lt]=Sekite kasdieninius darbus
+_Name=Time Log
+_Comment=Track and time daily activities
 Exec=gtimelog
 Terminal=false
 Type=Application

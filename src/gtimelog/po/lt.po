@@ -1,0 +1,351 @@
+# GTimeLog translation to Lithuanian
+# Copyright (C) 2015 Marius Gedminas <marius@gedmin.as>
+# This file is distributed under the same license as the GTimeLog package.
+# Marius Gedminas <marius@gedmin.as>, 2015.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gtimelog 0.10.dev0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-10-07 20:45+0300\n"
+"PO-Revision-Date: 2015-09-04 10:53+0300\n"
+"Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
+"Language-Team: <marius@gedmin.as>\n"
+"Language: lt\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
+"%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "Time Log"
+msgstr "Laiko žurnalas"
+
+msgid "Track and time daily activities"
+msgstr "Sekti kasdieninus darbus"
+
+#, python-brace-format
+msgid "{0} h {1} min"
+msgstr "{0} val {1} min"
+
+msgid "Show version number and exit"
+msgstr "Rodyti programos versiją ir išeiti"
+
+msgid "Show debug information on the console"
+msgstr "Rodyti derinimo informaciją konsolėje"
+
+msgid ""
+"\n"
+"WARNING: GSettings schema for org.gtimelog is missing!  If you're running "
+"from a source checkout, be sure to run 'make'."
+msgstr ""
+"\n"
+"DĖMESIO: trūksta GSettings schemos „org.gtimelog“.  Jei leidžiate programą "
+"iš pradinio kodo katalogo, paleiskite „make“."
+
+#, python-brace-format
+msgid "Could not create {directory}: {error}"
+msgstr "Nepavyko sukurti {directory}: {error}"
+
+#, python-brace-format
+msgid "Created {directory}"
+msgstr "Sukurtas {directory}"
+
+msgid "GTimeLog version: {}"
+msgstr "GTimeLog versija: {}"
+
+msgid "Python version: {}"
+msgstr "Python versija: {}"
+
+msgid "GTK+ version: {}.{}.{}"
+msgstr "GTK+ versija: {}.{}.{}"
+
+msgid "PyGI version: {}"
+msgstr "PyGI versija: {}"
+
+msgid "Data directory: {}"
+msgstr "Duomenų katalogas: {}"
+
+msgid "Legacy config directory: {}"
+msgstr "Senų nustatymų katalogas: {}"
+
+msgid "Settings will be migrated to GSettings (org.gtimelog) on first launch"
+msgstr ""
+"Nustatymai bus perkelti į GSettings (org.gtimelog) pirmo paleidimo metu"
+
+msgid "Settings already migrated to GSettings (org.gtimelog)"
+msgstr "Nustatymai jau buvo perkelti į GSettings (org.gtimelog)"
+
+#, python-brace-format
+msgid "Settings from {filename} migrated to GSettings (org.gtimelog)"
+msgstr "Nustatymai perkelti iš {filename} į GSettings (org.gtimelog)"
+
+msgid "Report already sent"
+msgstr "Ataskaita jau buvo išsiųsta"
+
+msgid "Report already sent (to {})"
+msgstr "Ataskaita jau buvo išsiųsta kitam gavėjui ({})"
+
+msgid "Downloading tasks..."
+msgstr "Parsiunčiamos užduotys..."
+
+msgid "Download failed."
+msgstr "Nepavyko parsisiųsti užduočių."
+
+msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
+msgstr "{0:%A, %Y-%m-%d} ({1} savaitė)"
+
+msgid "{0}, week {1} ({2:%B %-d}-{3:%-d})"
+msgstr "{0}, {1} savaitė ({2:%B %-d}–{3:%-d})"
+
+msgid "{0:%B %Y}"
+msgstr "{0:%Y %B} mėn."
+
+msgid "Report"
+msgstr "Ataskaita"
+
+msgid "Couldn't send email to {}."
+msgstr "Nepavyko išsiųsti laiško {}."
+
+#, python-format
+msgid "Couldn't execute %s: %s"
+msgstr "Nepavyko paleisti %s: %s"
+
+#, python-format
+msgid "Couldn't send email: %s returned code %d"
+msgstr "Nepavyko išsiųsti laiško: %s grąžino kodą %d"
+
+msgid "Couldn't append to {}: {}"
+msgstr "Nepavyko rašyti į {}: {}"
+
+msgid "%H:%M"
+msgstr "%H:%M"
+
+msgid "{0:%A, %Y-%m-%d}\n"
+msgstr "{0:%A, %Y-%m-%d}\n"
+
+#, python-brace-format
+msgid "Total for {0}: {1} ({2} per day)"
+msgstr "Iš viso {0}: {1} (po {2} per dieną)"
+
+#, python-brace-format
+msgid "Total for {0}: {1} ({2} this week)"
+msgstr "Iš viso {0}: {1} (šią savaitę {2})"
+
+msgid "({0:%H:%M}-{1:%H:%M})"
+msgstr "({0:%H:%M}–{1:%H:%M})"
+
+#, python-brace-format
+msgid "Total work done: {0} ({1} this week, {2} per day)"
+msgstr "Iš viso dirbta: {0} (šią savaitę {1}, po {2} per dieną)"
+
+#, python-brace-format
+msgid "Total work done: {0} ({1} this week)"
+msgstr "Iš viso dirbta: {0} (šią savaitę {1})"
+
+#, python-brace-format
+msgid "Total work done this week: {0} ({1} per day)"
+msgstr "Iš viso dirbta šią savaitę: {0} (po {1} per dieną)"
+
+#, python-brace-format
+msgid "Total work done this week: {0}"
+msgstr "Iš viso dirbta šią savaitę: {0}"
+
+#, python-brace-format
+msgid "Total work done this month: {0} ({1} per day)"
+msgstr "Iš viso dirbta šį mėnesį: {0} (po {1} per dieną)"
+
+#, python-brace-format
+msgid "Total work done this month: {0}"
+msgstr "Iš viso dirbta šį mėnesį: {0}"
+
+#, python-brace-format
+msgid "Total slacking: {0} ({1} this week, {2} per day)"
+msgstr "Iš viso nedirbta: {0} (šią savaitę {1}, po {2} per dieną)"
+
+#, python-brace-format
+msgid "Total slacking: {0} ({1} this week)"
+msgstr "Iš viso nedirbta: {0} (šią savaitę {1})"
+
+#, python-brace-format
+msgid "Total slacking this week: {0} ({1} per day)"
+msgstr "Iš viso nedirbta šią savaitę: {0} (po {1} per dieną)"
+
+#, python-brace-format
+msgid "Total slacking this week: {0}"
+msgstr "Iš viso nedirbta šią savaitę: {0}"
+
+#, python-brace-format
+msgid "Total slacking this month: {0} ({1} per day)"
+msgstr "Iš viso nedirbta šį mėnesį: {0} (po {1} per dieną)"
+
+#, python-brace-format
+msgid "Total slacking this month: {0}"
+msgstr "Iš viso nedirbta šį mėnesį: {0}"
+
+msgid "Time left at work: {0} (should've finished at {1:%H:%M})"
+msgstr "Liko dirbti: {0} (reikėjo baigti {1:%H:%M})"
+
+msgid "Time left at work: {0} (till {1:%H:%M})"
+msgstr "Liko dirbti: {0} (iki {1:%H:%M})"
+
+#, python-brace-format
+msgid "At office today: {0} ({1} overtime)"
+msgstr "Šiandien darbe: {0} ({1} per daug)"
+
+#, python-brace-format
+msgid "At office today: {0} ({1} left)"
+msgstr "Šiandien darbe: {0} (liko {1})"
+
+msgid "Tasks"
+msgstr "Užduotys"
+
+msgid "Other"
+msgstr "Kitos"
+
+msgid "Preferences"
+msgstr "Nustatymai"
+
+msgid "Close"
+msgstr "Uždaryti"
+
+#. pragma: nocover
+#. https://github.com/gtimelog/gtimelog/issues/95#issuecomment-252299266
+msgid "Unable to configure translations: no locale.bindtextdomain()"
+msgstr "Nepavyko įjungti vertimų: nėra locale.bindtextdomain()"
+
+msgid "Copyright © 2004–2017 Marius Gedminas and contributors."
+msgstr "Autorinės teisės © 2004–2017 Marius Gedminas ir kiti."
+
+msgid "A time tracking application"
+msgstr "Programa darbo laiko sekimui"
+
+msgid "Add"
+msgstr "Pridėti"
+
+msgid "Daily"
+msgstr "Dienos"
+
+msgid "Weekly"
+msgstr "Savaitės"
+
+msgid "Monthly"
+msgstr "Mėnesio"
+
+msgid "Sender"
+msgstr "Siuntėjas"
+
+msgid "Your Name <youremail@example.com>"
+msgstr "Jūsų Vardas <emailas@example.com>"
+
+msgid "Recipient"
+msgstr "Gavėjas"
+
+msgid "email@example.com"
+msgstr "emailas@example.com"
+
+msgid "Subject"
+msgstr "Tema"
+
+msgid "Cancel"
+msgstr "Atšaukti"
+
+msgid "Send"
+msgstr "Siųsti"
+
+msgid "Data entry"
+msgstr "Duomenų įvedimas"
+
+msgid "Virtual midnight"
+msgstr "Virtualus vidurnaktis"
+
+msgid "Goals"
+msgstr "Tikslai"
+
+msgid "Work hours"
+msgstr "Darbo valandos"
+
+msgid "Office hours"
+msgstr "Valandos darbe"
+
+msgid "per day"
+msgstr "per dieną"
+
+msgid "(including lunch break)"
+msgstr "(įskaitant pietų pertrauką)"
+
+msgid "Reports by email"
+msgstr "Ataskaitos paštu"
+
+msgid "Name"
+msgstr "Vardas"
+
+msgid "From"
+msgstr "Nuo"
+
+msgid "To"
+msgstr "Kam"
+
+msgid "Nickname used in the Subject line"
+msgstr "Trumpas vardas temos laukeliui"
+
+msgid "Help"
+msgstr "Žinynas"
+
+msgid "About"
+msgstr "Apie"
+
+msgid "Quit"
+msgstr "Išeiti"
+
+msgid "Edit log"
+msgstr "Taisyti žurnalą"
+
+msgid "Edit tasks"
+msgstr "Tvarkyti užduotis"
+
+msgid "Refresh tasks"
+msgstr "Atnaujinti užduotis"
+
+msgid "Report..."
+msgstr "Ataskaita..."
+
+msgid "Detail level"
+msgstr "Detalumas"
+
+msgid "Chronological"
+msgstr "Chronologinis"
+
+msgid "Grouped"
+msgstr "Sugrupuotas"
+
+msgid "Summary"
+msgstr "Apžvalga"
+
+msgid "Time range"
+msgstr "Laiko intervalas"
+
+msgid "Day"
+msgstr "Diena"
+
+msgid "Week"
+msgstr "Savaitė"
+
+msgid "Month"
+msgstr "Mėnuo"
+
+msgid "Filter"
+msgstr "Filtruoti"
+
+#~ msgid "Total for {0}: {1}"
+#~ msgstr "Iš viso {0}: {1}"
+
+#~ msgid "J. Random Hacker <jrh@example.com>"
+#~ msgstr "Vardenis Pavardenis <vp@example.com>"
+
+#~ msgid "JRH"
+#~ msgstr "Vardenis"
+
+#~ msgid "Custom..."
+#~ msgstr "Kitas..."

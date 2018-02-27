@@ -1,0 +1,4 @@
+/* Workaround for https://github.com/gtimelog/gtimelog/issues/62 */
+GtkStack {
+    background-color: @bg_color;
+}

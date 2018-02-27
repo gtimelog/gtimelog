@@ -1,0 +1,8 @@
+# Line numbers in .po files change all this time, so do
+#
+#    git config filter.po.clean 'msgcat - --no-location'
+#
+# to make the diffs more readable
+
+*.po    filter=po
+*.pot   filter=po

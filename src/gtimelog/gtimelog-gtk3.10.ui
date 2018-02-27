@@ -196,8 +196,8 @@
               <object class="GtkBox" id="box2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="margin_start">6</property>
-                <property name="margin_end">6</property>
+                <property name="margin_left">6</property>
+                <property name="margin_right">6</property>
                 <child>
                   <object class="GtkLabel" id="time_label">
                     <property name="visible">True</property>
@@ -278,8 +278,8 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">center</property>
-                <property name="margin_start">6</property>
-                <property name="margin_end">6</property>
+                <property name="margin_left">6</property>
+                <property name="margin_right">6</property>
                 <property name="margin_top">6</property>
                 <property name="margin_bottom">6</property>
                 <property name="hexpand">False</property>
@@ -351,8 +351,8 @@
                   <object class="GtkBox" id="report_hbox1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_start">12</property>
-                    <property name="margin_end">6</property>
+                    <property name="margin_left">12</property>
+                    <property name="margin_right">6</property>
                     <property name="spacing">12</property>
                     <child>
                       <object class="GtkLabel" id="sender_label">
@@ -391,8 +391,8 @@
                   <object class="GtkBox" id="report_hbox2">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_start">12</property>
-                    <property name="margin_end">6</property>
+                    <property name="margin_left">12</property>
+                    <property name="margin_right">6</property>
                     <property name="spacing">12</property>
                     <child>
                       <object class="GtkLabel" id="recipient_label">
@@ -431,8 +431,8 @@
                   <object class="GtkBox" id="report_hbox3">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_start">12</property>
-                    <property name="margin_end">6</property>
+                    <property name="margin_left">12</property>
+                    <property name="margin_right">6</property>
                     <property name="spacing">12</property>
                     <child>
                       <object class="GtkLabel" id="subject_label">
@@ -586,7 +586,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">0</property>
+                
               </packing>
             </child>
             <child>
@@ -600,7 +600,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">1</property>
+                
               </packing>
             </child>
             <child>
@@ -614,7 +614,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">2</property>
+                
               </packing>
             </child>
             <style>
@@ -631,7 +631,7 @@
           </object>
           <packing>
             <property name="pack_type">end</property>
-            <property name="position">2</property>
+            
           </packing>
         </child>
         <child>
@@ -646,7 +646,7 @@
           </object>
           <packing>
             <property name="pack_type">end</property>
-            <property name="position">1</property>
+            
           </packing>
         </child>
         <child>
@@ -658,7 +658,7 @@
           </object>
           <packing>
             <property name="pack_type">end</property>
-            <property name="position">3</property>
+            
           </packing>
         </child>
         <child>
@@ -671,7 +671,7 @@
           </object>
           <packing>
             <property name="pack_type">end</property>
-            <property name="position">2</property>
+            
           </packing>
         </child>
         <child>
@@ -683,7 +683,7 @@
           </object>
           <packing>
             <property name="pack_type">end</property>
-            <property name="position">1</property>
+            
           </packing>
         </child>
       </object>

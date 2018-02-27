@@ -3,13 +3,13 @@ GTimeLog
 
 GTimeLog is a simple app for keeping track of time.
 
-.. image:: https://pypip.in/version/gtimelog/badge.svg?style=flat
-   :target: https://pypi.python.org/pypi/gtimelog/
-   :alt: latest version
-
 .. image:: https://travis-ci.org/gtimelog/gtimelog.svg?branch=master
    :target: https://travis-ci.org/gtimelog/gtimelog
    :alt: build status
+
+.. image:: https://ci.appveyor.com/api/projects/status/github/gtimelog/gtimelog?branch=master&svg=true
+   :target: https://ci.appveyor.com/project/mgedmin/gtimelog
+   :alt: build status (on Windows)
 
 .. image:: https://coveralls.io/repos/gtimelog/gtimelog/badge.svg?branch=master
    :target: https://coveralls.io/r/gtimelog/gtimelog?branch=master
@@ -41,6 +41,7 @@ You can run it from a source checkout without an explicit installation step::
 
   $ git clone https://github.com/gtimelog/gtimelog
   $ cd gtimelog
+  $ make
   $ ./gtimelog
 
 System requirements:
@@ -48,6 +49,7 @@ System requirements:
 - Python (2.7 or 3.3+)
 - PyGObject
 - gobject-introspection type libraries for GTK+, Pango
+- GTK+ 3.10 or newer (3.14 or newer for best results)
 
 
 Documentation
@@ -65,10 +67,10 @@ This is work in progress:
 Resources
 ---------
 
-Website: http://mg.pov.lt/gtimelog
+Website: https://gtimelog.org
 
 Mailing list: gtimelog@googlegroups.com
-(archive at http://groups.google.com/group/gtimelog)
+(archive at https://groups.google.com/group/gtimelog)
 
 IRC: #gtimelog on irc.freenode.net
 
@@ -81,7 +83,7 @@ There's an old bugtracker at https://bugs.launchpad.net/gtimelog
 I sometimes also browse distribution bugs:
 
 - Ubuntu https://bugs.launchpad.net/ubuntu/+source/gtimelog
-- Debian http://bugs.debian.org/gtimelog
+- Debian https://bugs.debian.org/gtimelog
 
 
 Credits
