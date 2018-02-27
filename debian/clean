@@ -1,2 +1,3 @@
 gtimelog.1
 src/gtimelog/locale/*/*/*
+src/gtimelog.egg-info/*
