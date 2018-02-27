@@ -3,8 +3,7 @@
 %:
 	dh $@ --with=python3 --buildsystem=pybuild
 
-override_dh_installman:
+override_dh_auto_install:
 	mkdir -p debian/tmp
-	rst2man gtimelog.rst > debian/tmp/gtimelog.man
-	rst2man gtimelogrc.rst > debian/tmp/gtimelogrc.man
-	dh_installman
+	make all
+	dh_auto_install --destdir=debian/tmp

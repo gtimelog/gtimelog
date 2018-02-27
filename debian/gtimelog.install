@@ -1,6 +1,12 @@
+usr/bin
+usr/lib/python*/dist-packages/*/data/*gschema.xml /usr/share/glib-2.0/schemas/
+usr/lib/python*/dist-packages/*/help /usr/share/
+usr/lib/python*/dist-packages/*/*.css /usr/share/gtimelog/
+usr/lib/python*/dist-packages/*/*.ui /usr/share/gtimelog/
+src/gtimelog/locale /usr/share/
+usr/lib/python*/dist-packages/*/*.py
+usr/lib/python*/dist-packages/*.egg-info
 gtimelog.desktop /usr/share/applications/
-gtimelogrc.example /usr/share/gtimelog
+gtimelog.appdata.xml /usr/share/appdata/
 src/gtimelog/gtimelog-large.png /usr/share/pixmaps/
-src/gtimelog/gtimelog-small-bright.png /usr/share/pixmaps/
-src/gtimelog/gtimelog-small.png /usr/share/pixmaps/
 src/gtimelog/gtimelog.png /usr/share/pixmaps/
