@@ -4,10 +4,20 @@ gtimelog (0.11-1) UNRELEASED; urgency=medium
   * d/control: Put PAPT in Maintainers and myself in Uploaders.
 
   [ Andrej Shadura ]
+  * Add myself to Uploaders.
   * Move to salsa.debian.org, update Vcs-* fields.
   * Add gbp.conf.
+  * Use python3-docutils, not python-docutils, since we're using Python 3.
+  * Update the home page.
+  * Update debian/docs.
+  * Use debhelper compat 11.
+  * Refresh the packaging.
+  * Drop an old Python 3 patch.
+  * Add a patch for gtimelog to find its files again since files are
+    not where the upstream expects them.
+  * Clean egg-info.
 
- -- Andrej Shadura <andrewsh@debian.org>  Tue, 27 Feb 2018 19:44:58 +0100
+ -- Andrej Shadura <andrewsh@debian.org>  Tue, 27 Feb 2018 20:52:41 +0100
 
 gtimelog (0.10.3-1) unstable; urgency=medium
 
