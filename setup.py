@@ -45,6 +45,7 @@ tests_require = ['freezegun']
 if sys.version_info < (3,):
     # Python 2 doesn't have unittest.mock
     tests_require.append('mock')
+
 setup(
     name='gtimelog',
     version=version,

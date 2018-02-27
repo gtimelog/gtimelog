@@ -51,6 +51,7 @@ Changelog
 
 0.10.0 (2015-09-29)
 ~~~~~~~~~~~~~~~~~~~
+
 * Use Tango colors in the main text buffer (GH: #13).
 
 * Allow tagging entries (GH: #19)

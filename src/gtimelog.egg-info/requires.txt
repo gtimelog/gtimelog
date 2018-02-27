@@ -1,0 +1,7 @@
+PyGObject
+
+[test]
+freezegun
+
+[test:python_version == "2.7"]
+mock

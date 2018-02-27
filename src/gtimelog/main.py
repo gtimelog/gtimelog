@@ -2,7 +2,6 @@
 from __future__ import print_function
 
 import time
-
 import os
 DEBUG = os.getenv('DEBUG')
 
@@ -64,6 +63,7 @@ if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
             subprocess.call([glib_compile_schemas, SCHEMA_DIR])
         except OSError as e:
             print("Failed: %s" % e)
+
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -1167,7 +1167,6 @@ class Window(Gtk.ApplicationWindow):
     def task_list_row_activated(self, treeview, path, view_column):
         task = self.task_list.get_task_for_row(path)
         self.task_entry.set_text(task)
-
         # There's a race here: sometimes the GDK_2BUTTON_PRESS signal is
         # handled _after_ row-activated, which makes the tree control steal
         # the focus back from the task entry.  To avoid this, wait until all
@@ -1945,6 +1944,7 @@ def main():
         sys.exit(app.run(sys.argv))
     finally:
         mark_time("exiting")
+
 
 if __name__ == '__main__':
     main()

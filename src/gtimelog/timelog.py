@@ -3,6 +3,7 @@ Non-GUI bits of gtimelog.
 """
 
 from __future__ import unicode_literals
+
 import codecs
 import collections
 import csv
@@ -107,6 +108,8 @@ def prev_month(date):
         return datetime.date(date.year - 1, 12, 1)
     else:
         return datetime.date(date.year, date.month - 1, 1)
+
+
 def next_month(date):
     """Return the first day of the next month."""
     if date.month == 12:
@@ -239,7 +242,6 @@ class TimeCollection(object):
             tags = set()
         return entry, tags
 
-
     def set_of_all_tags(self):
         """Return the set of all tags mentioned in entries."""
         all_tags = set()
@@ -257,7 +259,6 @@ class TimeCollection(object):
                 last = entry.start
                 count += 1
         return count
-
 
     def grouped_entries(self, skip_first=True):
         """Return consolidated entries (grouped by entry title).
@@ -328,6 +329,7 @@ class TimeCollection(object):
 
         If optional argument `filter_text` is given, only compute
         totals for entries matching the text.
+
         Returns (total_work, total_slacking) tuple.
 
         Slacking entries are identified by finding two asterisks in the title.
@@ -356,6 +358,7 @@ class TimeCollection(object):
             else:
                 total_work += duration
         return total_work, total_slacking
+
 
 class TimeWindow(TimeCollection):
     """A window into a time log.
@@ -386,6 +389,7 @@ class Exports(object):
     @staticmethod
     def _hash(start, stop, entry):
         return md5(("%s%s%s" % (start, stop, entry)).encode('UTF-8')).hexdigest()
+
     def icalendar(self, output):
         """Create an iCalendar file with activities."""
         output.write("BEGIN:VCALENDAR\n")
@@ -510,6 +514,7 @@ class Reports(object):
             output.write("To: %(email)s\n" % {'email': email})
             output.write("Subject: %s\n" % subject)
             output.write('\n')
+
         items = list(window.all_entries())
         if not items:
             output.write("No work done this %s.\n" % period_name)
@@ -634,6 +639,7 @@ class Reports(object):
             output.write("To: %(email)s\n" % {'email': email})
             output.write('Subject: %s\n' % subject)
             output.write('\n')
+
         items = list(window.all_entries())
         if not items:
             output.write("No work done this %s.\n" % period_name)
@@ -687,6 +693,7 @@ class Reports(object):
         subject = self.weekly_report_subject(who)
         return self._plain_report(output, email, who, subject,
                                   period_name='week')
+
     def weekly_report_categorized(self, output, email, who):
         """Format a weekly report with entries displayed  under categories."""
         subject = self.weekly_report_subject(who)
@@ -737,13 +744,13 @@ class Reports(object):
                 u" ({weekday}, week {week:0>2})".format(
                     self.window.min_timestamp, who=who,
                     weekday=weekday, week=week))
+
     def daily_report(self, output, email, who):
         """Format a daily report.
 
         Writes a daily report template in RFC-822 format to output.
         """
         window = self.window
-
         if self.email_headers:
             output.write(u"To: %s\n" % email)
             output.write(u"Subject: %s\n" % self.daily_report_subject(who))
@@ -903,7 +910,6 @@ class TimeLog(TimeCollection):
             return True
         else:
             return False
-
 
     def reread(self):
         """Reload the log file."""
@@ -1098,7 +1104,6 @@ class TaskList(object):
         else:
             return False
 
-
     def load(self):
         """Load task list from a file named self.filename."""
         groups = {}
@@ -1121,50 +1126,6 @@ class TaskList(object):
     def reload(self):
         """Reload the task list."""
         self.load()
-
-
-class RemoteTaskList(TaskList):
-    """Task list stored on a remote server.
-
-    Keeps a cached copy of the list in a local file, so you can use it offline.
-    """
-
-    def __init__(self, url, cache_filename):
-        self.url = url
-        TaskList.__init__(self, cache_filename)
-        self.first_time = True
-
-    def check_reload(self):
-        """Check whether the task list needs to be reloaded.
-
-        Download the task list if this is the first time, and a cached copy is
-        not found.
-
-        Returns True if the file was reloaded.
-        """
-        if self.first_time:
-            self.first_time = False
-            if not os.path.exists(self.filename):
-                self.download()
-                return True
-        return TaskList.check_reload(self)
-
-    def download(self):
-        """Download the task list from the server."""
-        if self.loading_callback:
-            self.loading_callback()
-        try:
-            urllib.urlretrieve(self.url, self.filename)
-        except IOError:
-            if self.error_callback:
-                self.error_callback()
-        self.load()
-        if self.loaded_callback:
-            self.loaded_callback()
-
-    def reload(self):
-        """Reload the task list."""
-        self.download()
 
 
 class CSVWriter(object):
