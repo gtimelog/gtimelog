@@ -3,7 +3,7 @@ Section: admin
 Priority: optional
 Maintainer: Python Applications Packaging Team <python-apps-team@lists.alioth.debian.org> 
 Uploaders: Barry Warsaw <barry@debian.org>
-Build-Depends: debhelper (>= 9),
+Build-Depends: debhelper (>= 11),
                python3-docutils,
                python3,
                python3-freezegun,
