@@ -1,3 +1,9 @@
+gtimelog (0.11-4) unstable; urgency=medium
+
+  * Add gtimelogrc.5, now really (Closes: #891751).
+
+ -- Andrej Shadura <andrewsh@debian.org>  Wed, 28 Feb 2018 15:42:37 +0100
+
 gtimelog (0.11-3) unstable; urgency=medium
 
   * Update the build dependencies for tests (Closes: #891719).
