@@ -1,3 +1,9 @@
+gtimelog (0.11-2) unstable; urgency=medium
+
+  * Fix the uploader's address
+
+ -- Andrej Shadura <andrewsh@debian.org>  Wed, 28 Feb 2018 08:20:46 +0100
+
 gtimelog (0.11-1) unstable; urgency=medium
 
   [ Barry Warsaw ]
