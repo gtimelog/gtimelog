@@ -1,3 +1,9 @@
+gtimelog (0.11-3) unstable; urgency=medium
+
+  * Update the build dependencies for tests (Closes: #891719).
+
+ -- Andrej Shadura <andrewsh@debian.org>  Wed, 28 Feb 2018 11:11:02 +0100
+
 gtimelog (0.11-2) unstable; urgency=medium
 
   * Fix the uploader's address
