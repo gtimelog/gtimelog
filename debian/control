@@ -1,8 +1,8 @@
 Source: gtimelog
 Section: admin
 Priority: optional
-Maintainer: Python Applications Packaging Team <python-apps-team@lists.alioth.debian.org> 
-Uploaders: Barry Warsaw <barry@debian.org>, Andrej Shadura <andrewsh@debian.org.
+Maintainer: Python Applications Packaging Team <python-apps-team@lists.alioth.debian.org>
+Uploaders: Barry Warsaw <barry@debian.org>, Andrej Shadura <andrewsh@debian.org>
 Build-Depends: debhelper (>= 11),
                python3-docutils,
                python3,
