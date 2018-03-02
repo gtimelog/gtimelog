@@ -4,7 +4,9 @@ Changelog
 0.11.1 (unreleased)
 ~~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+* The undocmented remote task list over HTTP(S) feature is now able to ask
+  for basic HTTP authentication credentials and store them in gnome-keyring
+  (GH: #109).
 
 
 0.11 (2017-12-16)
