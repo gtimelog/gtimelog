@@ -1,0 +1,42 @@
+From: Marius Gedminas <marius@gedmin.as>
+Subject: fix icon paths in UI files
+
+diff --git a/src/gtimelog/about.ui b/src/gtimelog/about.ui
+index 4f8a07e..c528a9d 100644
+--- a/src/gtimelog/about.ui
++++ b/src/gtimelog/about.ui
+@@ -42,7 +42,7 @@ Thom May
+ Tomaz Canabrava
+ "ijk"</property>
+     <property name="artists">Živilė Gedminaitė</property>
+-    <property name="logo">gtimelog.png</property>
++    <property name="logo">/usr/share/pixmaps/gtimelog.png</property>
+     <property name="license_type">gpl-2-0</property>
+     <child internal-child="vbox">
+       <object class="GtkBox" id="aboutdialog-vbox1">
+diff --git a/src/gtimelog/gtimelog-gtk3.10.ui b/src/gtimelog/gtimelog-gtk3.10.ui
+index a60ea33..86fd6a9 100644
+--- a/src/gtimelog/gtimelog-gtk3.10.ui
++++ b/src/gtimelog/gtimelog-gtk3.10.ui
+@@ -37,7 +37,7 @@
+     <property name="window_position">center</property>
+     <property name="default_width">850</property>
+     <property name="default_height">550</property>
+-    <property name="icon">gtimelog.png</property>
++    <property name="icon">/usr/share/pixmaps/gtimelog.png</property>
+     <child>
+       <object class="GtkStack" id="main_stack">
+         <property name="visible">True</property>
+diff --git a/src/gtimelog/gtimelog.ui b/src/gtimelog/gtimelog.ui
+index 7032f5f..157d2e7 100644
+--- a/src/gtimelog/gtimelog.ui
++++ b/src/gtimelog/gtimelog.ui
+@@ -37,7 +37,7 @@
+     <property name="window_position">center</property>
+     <property name="default_width">850</property>
+     <property name="default_height">550</property>
+-    <property name="icon">gtimelog.png</property>
++    <property name="icon">/usr/share/pixmaps/gtimelog.png</property>
+     <child>
+       <object class="GtkStack" id="main_stack">
+         <property name="visible">True</property>

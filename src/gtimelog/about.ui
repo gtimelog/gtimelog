@@ -42,7 +42,7 @@ Thom May
 Tomaz Canabrava
 "ijk"</property>
     <property name="artists">Živilė Gedminaitė</property>
-    <property name="logo">gtimelog.png</property>
+    <property name="logo">/usr/share/pixmaps/gtimelog.png</property>
     <property name="license_type">gpl-2-0</property>
     <child internal-child="vbox">
       <object class="GtkBox" id="aboutdialog-vbox1">

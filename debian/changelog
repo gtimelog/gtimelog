@@ -1,8 +1,9 @@
 gtimelog (0.11-4mg2) UNRELEASED; urgency=medium
 
   * Install help files in the correct place (GH #111).
+  * Fix broken logo image in About dialog (GH #110).
 
- -- Marius Gedminas <marius@gedmin.as>  Mon, 05 Mar 2018 17:59:49 +0200
+ -- Marius Gedminas <marius@gedmin.as>  Mon, 05 Mar 2018 18:23:41 +0200
 
 gtimelog (0.11-4mg1) xenial; urgency=medium
 

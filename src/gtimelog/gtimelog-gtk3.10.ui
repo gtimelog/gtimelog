@@ -37,7 +37,7 @@
     <property name="window_position">center</property>
     <property name="default_width">850</property>
     <property name="default_height">550</property>
-    <property name="icon">gtimelog.png</property>
+    <property name="icon">/usr/share/pixmaps/gtimelog.png</property>
     <child>
       <object class="GtkStack" id="main_stack">
         <property name="visible">True</property>
