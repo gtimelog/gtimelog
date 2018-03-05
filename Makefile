@@ -140,8 +140,8 @@ source := gtimelog
 version := $(shell dpkg-parsechangelog | awk '$$1 == "Version:" { print $$2 }')
 upstream_version := $(shell python setup.py --version)
 
-.PHONY: source-package
-source-package pkgbuild/$(source)_$(version)_source.changes:
+.PHONY: clean-source-tree
+clean-source-tree:
 	rm -rf pkgbuild
 	mkdir pkgbuild
 	cd pkgbuild && pip download --no-deps --no-binary :all: $(source)==$(upstream_version)
@@ -149,10 +149,20 @@ source-package pkgbuild/$(source)_$(version)_source.changes:
 	cd pkgbuild && mv $(source)-$(upstream_version) $(source)
 	cd pkgbuild && mv $(source)-$(upstream_version).tar.gz $(source)_$(upstream_version).orig.tar.gz
 	git archive --format=tar --prefix=pkgbuild/$(source)/ HEAD debian/ | tar -xf -
+
+.PHONY: source-package
+source-package pkgbuild/$(source)_$(version)_source.changes: clean-source-tree
 	cd pkgbuild/$(source) && dch -r -D $(TARGET_DISTRO) "" && debuild -S -i -k$(GPGKEY)
 	rm -rf pkgbuild/$(source)
 	@echo
 	@echo "Built pkgbuild/$(source)_$(version)_source.changes"
+
+.PHONY: binary-package
+binary-package: clean-source-tree
+	cd pkgbuild/$(source) && dch -r -D $(TARGET_DISTRO) "" && debuild -i -k$(GPGKEY)
+	rm -rf pkgbuild/$(source)
+	@echo
+	@echo "Built pkgbuild/$(source)_$(version)_all.deb"
 
 .PHONY: pbuilder-test-build
 pbuilder-test-build: pkgbuild/$(source)_$(version)_source.changes
