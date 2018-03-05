@@ -1,3 +1,10 @@
+gtimelog (0.11-4mg1) UNRELEASED; urgency=medium
+
+  * Drop debhelper compat to 9.
+  * Build PPA packages for Ubuntu.
+
+ -- Marius Gedminas <marius@gedmin.as>  Mon, 05 Mar 2018 16:24:00 +0200
+
 gtimelog (0.11-4) unstable; urgency=medium
 
   * Add gtimelogrc.5, now really (Closes: #891751).
