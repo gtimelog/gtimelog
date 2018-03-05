@@ -135,7 +135,7 @@ release: releasechecklist
 
 
 # Debian packaging
-TARGET_DISTRO := xenial
+TARGET_DISTRO := trusty
 source := gtimelog
 version := $(shell dpkg-parsechangelog | awk '$$1 == "Version:" { print $$2 }')
 upstream_version := $(shell python setup.py --version)
