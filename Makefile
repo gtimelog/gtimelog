@@ -132,3 +132,31 @@ release: releasechecklist
 
 %.5: %.rst
 	rst2man $< > $@
+
+
+# Debian packaging
+TARGET_DISTRO := xenial
+source := gtimelog
+version := $(shell dpkg-parsechangelog | awk '$$1 == "Version:" { print $$2 }')
+upstream_version := $(shell python setup.py --version)
+
+.PHONY: source-package
+source-package pkgbuild/$(source)_$(version)_source.changes:
+	rm -rf pkgbuild
+	mkdir pkgbuild
+	cd pkgbuild && pip download --no-deps --no-binary :all: $(source)==$(upstream_version)
+	cd pkgbuild && tar xf $(source)-$(upstream_version).tar.gz
+	cd pkgbuild && mv $(source)-$(upstream_version) $(source)
+	cd pkgbuild && mv $(source)-$(upstream_version).tar.gz $(source)_$(upstream_version).orig.tar.gz
+	git archive --format=tar --prefix=pkgbuild/$(source)/ HEAD debian/ | tar -xf -
+	cd pkgbuild/$(source) && dch -r -D $(TARGET_DISTRO) "" && debuild -S -i -k$(GPGKEY)
+	rm -rf pkgbuild/$(source)
+	@echo
+	@echo "Built pkgbuild/$(source)_$(version)_source.changes"
+
+.PHONY: pbuilder-test-build
+pbuilder-test-build: pkgbuild/$(source)_$(version)_source.changes
+	# NB: you need to periodically run pbuilder-dist $(TARGET_DISTRO) update
+	pbuilder-dist $(TARGET_DISTRO) build pkgbuild/$(source)_$(version).dsc
+	@echo
+	@echo "Built ~/pbuilder/$(TARGET_DISTRO)_result/$(source)_$(version)_all.deb"
