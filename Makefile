@@ -160,3 +160,7 @@ pbuilder-test-build: pkgbuild/$(source)_$(version)_source.changes
 	pbuilder-dist $(TARGET_DISTRO) build pkgbuild/$(source)_$(version).dsc
 	@echo
 	@echo "Built ~/pbuilder/$(TARGET_DISTRO)_result/$(source)_$(version)_all.deb"
+
+.PHONY: upload-to-ppa
+upload-to-ppa: pkgbuild/$(source)_$(version)_source.changes
+	dput ppa:gtimelog-dev/ppa pkgbuild/$(source)_$(version)_source.changes
