@@ -1,0 +1,328 @@
+gtimelog (0.11-4) unstable; urgency=medium
+
+  * Add gtimelogrc.5, now really (Closes: #891751).
+
+ -- Andrej Shadura <andrewsh@debian.org>  Wed, 28 Feb 2018 15:42:37 +0100
+
+gtimelog (0.11-3) unstable; urgency=medium
+
+  * Update the build dependencies for tests (Closes: #891719).
+
+ -- Andrej Shadura <andrewsh@debian.org>  Wed, 28 Feb 2018 11:11:02 +0100
+
+gtimelog (0.11-2) unstable; urgency=medium
+
+  * Fix the uploader's address
+
+ -- Andrej Shadura <andrewsh@debian.org>  Wed, 28 Feb 2018 08:20:46 +0100
+
+gtimelog (0.11-1) unstable; urgency=medium
+
+  [ Barry Warsaw ]
+  * d/control: Put PAPT in Maintainers and myself in Uploaders.
+
+  [ Andrej Shadura ]
+  * Add myself to Uploaders.
+  * Move to salsa.debian.org, update Vcs-* fields.
+  * Add gbp.conf.
+  * Use python3-docutils, not python-docutils, since we're using Python 3.
+  * Update the home page.
+  * Update debian/docs.
+  * Use debhelper compat 11.
+  * Refresh the packaging.
+  * Drop an old Python 3 patch.
+  * Add a patch for gtimelog to find its files again since files are
+    not where the upstream expects them.
+  * Clean egg-info.
+
+ -- Andrej Shadura <andrewsh@debian.org>  Tue, 27 Feb 2018 20:52:41 +0100
+
+gtimelog (0.10.3-1) unstable; urgency=medium
+
+  * New upstream release.
+  * d/control: Bump Standards-Version with no other changes necessary.
+
+ -- Barry Warsaw <barry@debian.org>  Mon, 24 Oct 2016 12:12:09 -0400
+
+gtimelog (0.10.0-1) unstable; urgency=medium
+
+  * New upstream release.
+  * d/control:
+    - Convert to gbp and move to collab-maint.
+    - Uploaders: Remove PAPT until that team switches to git.
+    - Vcs-* fields: updated.
+  * d/patches/fix-icon-path: No longer needed.  (Closes: #807047)
+  * d/patches/unittest-mock.patch: Use stdlib unittest.mock.
+
+ -- Barry Warsaw <barry@debian.org>  Thu, 10 Dec 2015 18:25:55 -0500
+
+gtimelog (0.9.2-1) unstable; urgency=medium
+
+  * New upstream release. (Closes: #783023)
+  * d/control:
+    - Bump Standards-Version with no other changes necessary.
+    - Bump debhelper Build-Depends to version 9.
+  * d/compat: Bump to version 9.
+  * d/patches/i18n-setup.patch: Removed; fixed upstream.
+  * d/watch: Use the pypi.debian.net redirector.
+
+ -- Barry Warsaw <barry@debian.org>  Thu, 11 Jun 2015 10:44:28 -0400
+
+gtimelog (0.9.1-2) unstable; urgency=medium
+
+  * d/control: Add python3-setuptools to Depends.  Closes: #734499
+
+ -- Barry Warsaw <barry@debian.org>  Tue, 21 Jan 2014 16:31:54 -0500
+
+gtimelog (0.9.1-1) unstable; urgency=low
+
+  [ Marius Gedminas ]
+  * gtimelog.desktop: use full icon pathname.  (LP: #1104303)
+  * debian/copyright: update upstream author's email.
+
+  [ Barry Warsaw ]
+  * New upstream release.
+  * debian/compat: Update to v8
+  * d/control:
+    - Set myself as new Debian maintainer and PAPT as Uploaders for team
+      maintenance.
+    - Standards-Version 3.9.5 with no other changes.
+    - Build-Depend on python3.
+    - Update Vcs-* branches.
+    - Set X-Python3-Version.
+    - Update Depends for Python 3.
+  * d/copyright: Updated
+  * d/gtimelog.manpages: Updated
+  * d/rules:
+    - Use --buildsystem=pybuild and --with=python3
+    - Use rst2man to process rewritten manpages.
+  * d/patches/i18n-setup.patch: Added.
+
+ -- Barry Warsaw <barry@debian.org>  Mon, 23 Dec 2013 15:03:14 -0500
+
+gtimelog (0.8.0-0ubuntu1) quantal; urgency=low
+
+  * New upstream release.  (LP: #1050539)
+  * Remove debian/patches/bug-1016212.patch as it has been applied upstream.
+
+ -- Barry Warsaw <barry@ubuntu.com>  Thu, 13 Sep 2012 14:08:20 -0400
+
+gtimelog (0.7.1-0ubuntu2) quantal; urgency=low
+
+  * Apply upstream patch to work around gobject menu reference counting
+    bug.  (LP: #1016212)
+
+ -- Barry Warsaw <barry@ubuntu.com>  Mon, 13 Aug 2012 13:30:21 -0400
+
+gtimelog (0.7.1-0ubuntu1) precise; urgency=low
+
+  * New upstream release.
+    - Fix reporting problems with non-ASCII characters (LP: #785578)
+    - Fix panel background color detection. (LP: #924390)
+  * debian/control:
+    - replace X[SB]-Python-Version with X-Python-Version
+    - remove ${python:Provides}
+
+ -- Gediminas Paulauskas <menesis@pov.lt>  Mon, 16 Apr 2012 10:53:52 +0200
+
+gtimelog (0.7.0-0ubuntu2) precise; urgency=low
+
+  * debian/control: Fix dependencies: python-gobject → python-gi.
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 13 Mar 2012 19:23:03 +0100
+
+gtimelog (0.7.0-0ubuntu1) oneiric; urgency=low
+
+  * New upstream release.
+  * debian/patches/force-gi: Upstream defaults to gi, so this patch is
+    unnecessary.  Removed.
+
+ -- Barry Warsaw <barry@ubuntu.com>  Thu, 22 Sep 2011 10:07:52 -0400
+
+gtimelog (0.6.1-0ubuntu1) oneiric; urgency=low
+
+  * New upstream release.
+  * debian/patches/gi-fixes: Merged upstream, so removed.
+
+ -- Barry Warsaw <barry@ubuntu.com>  Tue, 20 Sep 2011 16:05:52 -0400
+
+gtimelog (0.6.0-0ubuntu1) oneiric; urgency=low
+
+  * debian/watch: Update for new location on Launchpad.
+  * New upstream release. Changes since to our bzr snapshot and patches:
+    - Ctrl-Q now quits.  (LP: #750092)
+    - Fixed UnboundLocalError.  (LP: #778285)
+    - Hide the main window on Esc. (LP: #716257)
+  * Drop patches which are upstream now:
+    - fix-gobject-import
+    - fix-appindicator
+    - gi_require_version_api
+    - pango_tab_align
+  * debian/patches/force-gi: Unfuzz.
+  * Add debian/patches/gi-fixes: Fix working with current Pango, and missing
+    import.
+  * debian/control: Bump gir1.2-pango-1.0 dependency to a version with
+    unbroken GIR.
+  * debian/control: Bump GIR dependencies for GTK 3.
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Tue, 20 Sep 2011 12:12:26 +0200
+
+gtimelog (0.5.0+bzr185-0ubuntu4) oneiric; urgency=low
+
+  * Add debian/patches/fix-gobject-import: Move from static gobject to GI
+    GObject module, to be compatible to upcoming pygobject 3.0.
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Wed, 17 Aug 2011 07:28:08 +0200
+
+gtimelog (0.5.0+bzr185-0ubuntu3) oneiric; urgency=low
+
+  * Add debian/patches/pango_tab_align: Fix TabAlign constant for current
+    Pango.
+  * debian/rules: Fix --buildsystem handling to work with current debhelper.
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Fri, 08 Jul 2011 08:14:37 +0200
+
+gtimelog (0.5.0+bzr185-0ubuntu2) natty; urgency=low
+
+  * Add gi_require_version_api patch: Update require_version() call to current
+    pygobject API. Bump python-gobject dependency accordingly.
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Thu, 03 Mar 2011 17:24:17 +0100
+
+gtimelog (0.5.0+bzr185-0ubuntu1) natty; urgency=low
+
+  * New upstream release 0.5.0:
+    - Switched from Glade to GtkBuilder.
+    - Support Ubuntu's application indicators.
+    - Try to detect your theme color and make the tray icon dark or
+      bright, for good contrast. (LP: #700428)
+    - Made GTimeLog a single instance application.  Requires python-dbus.
+      (LP: #356495)
+    - New option: start_in_tray.  Defaults to false. (LP: #356495)
+    - New command-line option: --tray.
+    - Daily reports include totals by category.
+    - The tasks pane can be toggled by pressing F9 and has a close button.
+    - Alternative weekly and monthly report style.
+    - Always preserve the order of entries, even when they have the same
+      timestamp (LP: #708825)
+  * New upstream snapshot:
+    - Ported from PyGTK to GI. This supports GTK 2 and GTK 3 with GI now, but
+      still works with PyGTK.
+  * Drop debian/patches/setup-datafiles, it doesn't apply any more. Replace it
+    with debian/gtimelog.install and debian/gtimelog.manpages.
+  * debian/control, debian/rules: Change from pysupport to dh_python2.
+  * Drop debian/patches/glade-icon, obsolete now.
+  * Add debian/patches/force-gi: We want to use GI now, not gtk2.
+  * debian/control: Update dependencies for pygtk → pygi transition, and drop
+    obsolete python-glade2 dependency. Also add gir1.2-appindicator-0.1
+    dependency to ensure working AppIndicator for Ubuntu.
+  * Add debian/patches/fix-appindicator: Fix startup with appindicator.
+  * debian/control: Bump python-gobject dependency to ensure that we have
+    working PyGI.
+
+ -- Martin Pitt <martin.pitt@ubuntu.com>  Thu, 03 Feb 2011 16:20:15 +0100
+
+gtimelog (0.4.0-0ubuntu2) natty; urgency=low
+
+  * Rebuild with python 2.7 as the python default.
+
+ -- Matthias Klose <doko@ubuntu.com>  Wed, 08 Dec 2010 15:04:11 +0000
+
+gtimelog (0.4.0-0ubuntu1) maverick; urgency=low
+
+  * New packaging for new upstream.
+
+ -- Barry Warsaw <barry@ubuntu.com>  Fri, 10 Sep 2010 10:12:03 -0400
+
+gtimelog (0.3.3dev-1) unstable; urgency=low
+
+  * source package automatically created by stdeb 0.6.0
+
+ -- Marius Gedminas <marius@gedmin.as>  Thu, 02 Sep 2010 12:28:39 -0400
+
+gtimelog (0.0+svn88-3) unstable; urgency=low
+
+  * Use my debian.org address
+  * Depend on python-eggtrayicon in preference to python-gnome2-extras
+    (closes: #485317, #418885)
+
+ -- Simon McVittie <smcv@debian.org>  Tue, 24 Jun 2008 01:35:56 +0100
+
+gtimelog (0.0+svn88-2) unstable; urgency=low
+
+  * Correctly depend on python-gnome2-extras
+
+ -- Simon McVittie <smcv@ianadd.pseudorandom.co.uk>  Thu, 20 Mar 2008 21:21:05 +0000
+
+gtimelog (0.0+svn88-1) unstable; urgency=low
+
+  * New maintainers Simon McVittie and Dafydd Harries (closes: #459596)
+  * New VCS (moved to collab-maint bzr)
+  * Incorporate bigon's changes from Ubuntu into Debian, see below
+    - Edit menu entry has an accelerator (closes: #455549)
+    - No longer depends on vim-gnome (closes: #438858)
+  * Move python and python-support to Build-Depends-Indep (not needed for
+    clean)
+  * Add debian/pyversions, which python-support wants for versioning (*sigh*)
+  * Set XS-Dm-Upload-Allowed: yes so I can upload it
+
+ -- Simon McVittie <smcv@ianadd.pseudorandom.co.uk>  Thu, 10 Jan 2008 09:22:39 +0000
+
+gtimelog (0.0+svn88-0ubuntu1) hardy; urgency=low
+
+  * New svn snapshot (LP: #124911)
+    - add accelerator to the edit menu entry
+      (thanks to Kees Cook <kees@ubuntu.com>) (Closes: #455549)
+  * Add dpatch magic in debian/patches/01-glade.dpatch and refresh
+  * Drop debian/patches/02-gtimelog.dpatch: not needed any more
+  * Drop debian/patches/03-wrap_fix.dpatch: merged upstream
+  * debian/control:
+    - Bump Standards-Version
+    - Add Homepage field
+    - Add Vcs-Svn field
+    - Drop vim-gnome dependency to Suggests (Closes: #438858)
+  * Switch to dh_pysupport instead of dh_python
+
+ -- Laurent Bigonville <bigon@ubuntu.com>  Sun, 06 Jan 2008 22:34:47 +0100
+
+gtimelog (0.0+svn65-1debian2) unstable; urgency=low
+
+  * debian/control:
+    - Depends on vim-gnome. (Closes: #357826)
+    - Set Utnubu Team as Maintainer.
+    - Update Standards-Version to 3.7.2.
+    - Set debhelper dependency to 5.
+    - Add python as Build-Depends.
+    - Depends on ${python:Depends} and not python anymore.
+  * debian/rules: add dh_python call to replace ${python:Depends}  
+  * debian/copyright: license (GPL) disclaimer added.
+  * debian/changelog:
+    - Replace gdebi word with gtimelog.
+  * debian/patches/03-wrap_fix.patch: added to improve the
+    activity mail output. Thanks mvo. (Closes: #364916)
+
+ -- Gustavo Franco <stratus@debian.org>  Sat,  8 Jul 2006 21:28:11 -0300
+
+gtimelog (0.0+svn65-1debian1) unstable; urgency=low
+
+  * First Debian release (Closes: #351075)
+  * debian/control:
+    - Standards-Version bumped up
+    - Suggests on gvim and mutt
+    - Build-Depends on dpatch added
+  * debian/gtimelog.1: manpage added.
+  * debian/patches: two patches added (icon handling related)
+  
+ -- Gustavo Franco <stratus@debian.org>  Thu,  2 Feb 2006 11:32:24 -0200
+
+gtimelog (0.0+svn42-2) hoary; urgency=low
+
+  * Fix double build problem and copyright
+
+ -- Thom May <thom@ubuntu.com>  Wed,  9 Feb 2005 14:33:39 +0000
+
+gtimelog (0.0+svn42-1) hoary; urgency=low
+
+  * First upload.
+
+ -- Thom May <thom@ubuntu.com>  Wed, 09 Feb 2005 13:43:16 +0000

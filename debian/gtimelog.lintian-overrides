@@ -1,0 +1,3 @@
+# Use this until dh_python3 supports debian/package.pyremove files like
+# dh_python2 does.
+gtimelog binary: image-file-in-usr-lib

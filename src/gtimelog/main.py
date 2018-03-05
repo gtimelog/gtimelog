@@ -49,22 +49,6 @@ if '--debug' in sys.argv:
 
 HERE = os.path.dirname(__file__)
 
-SCHEMA_DIR = os.path.join(HERE, 'data')
-if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
-    # Have to do this before importing 'gi'.
-    os.environ['GSETTINGS_SCHEMA_DIR'] = SCHEMA_DIR
-    if not os.path.exists(os.path.join(SCHEMA_DIR, 'gschemas.compiled')):
-        # This, too, I have to do before importing 'gi'.
-        print("Compiling GSettings schema")
-        glib_compile_schemas = os.path.join(sys.prefix, 'lib', 'site-packages', 'gnome', 'glib-compile-schemas.exe')
-        if not os.path.exists(glib_compile_schemas):
-            glib_compile_schemas = 'glib-compile-schemas'
-        try:
-            subprocess.call([glib_compile_schemas, SCHEMA_DIR])
-        except OSError as e:
-            print("Failed: %s" % e)
-
-
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango
@@ -94,10 +78,10 @@ else:
 mark_time("gtimelog imports done")
 
 # When the app is properly installed, use HELP_URI = 'help:gtimelog'
-HELP_URI = ''
+HELP_URI = 'help:gtimelog'
 HELP_DIR = os.path.abspath(os.path.join(HERE, 'help'))
 
-UI_DIR = HERE
+UI_DIR = '/usr/share/gtimelog'
 
 if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 12):
     UI_FILE = os.path.join(UI_DIR, 'gtimelog-gtk3.10.ui')
@@ -109,9 +93,9 @@ else:
 ABOUT_DIALOG_UI_FILE = os.path.join(UI_DIR, 'about.ui')
 MENUS_UI_FILE = os.path.join(UI_DIR, 'menus.ui')
 CSS_FILE = os.path.join(UI_DIR, 'gtimelog.css')
-LOCALE_DIR = os.path.join(UI_DIR, 'locale')
+LOCALE_DIR = '/usr/share/locale'
 
-CONTRIBUTORS_FILE = os.path.join(UI_DIR, 'CONTRIBUTORS.rst')
+CONTRIBUTORS_FILE = os.path.join('/usr/share/doc/gtimelog', 'CONTRIBUTORS.rst')
 
 
 log = logging.getLogger('gtimelog')
