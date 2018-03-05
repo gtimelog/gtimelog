@@ -1,9 +1,15 @@
-gtimelog (0.11-4mg1) UNRELEASED; urgency=medium
+gtimelog (0.11-4mg2) UNRELEASED; urgency=medium
+
+  * Install help files in the correct place (GH #111).
+
+ -- Marius Gedminas <marius@gedmin.as>  Mon, 05 Mar 2018 17:59:49 +0200
+
+gtimelog (0.11-4mg1) xenial; urgency=medium
 
   * Drop debhelper compat to 9.
   * Build PPA packages for Ubuntu.
 
- -- Marius Gedminas <marius@gedmin.as>  Mon, 05 Mar 2018 16:24:00 +0200
+ -- Marius Gedminas <marius@gedmin.as>  Mon, 05 Mar 2018 17:59:47 +0200
 
 gtimelog (0.11-4) unstable; urgency=medium
 

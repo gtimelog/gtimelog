@@ -1,6 +1,8 @@
 usr/bin
 usr/lib/python*/dist-packages/*/data/*gschema.xml /usr/share/glib-2.0/schemas/
-usr/lib/python*/dist-packages/*/help /usr/share/
+usr/lib/python*/dist-packages/*/help/C/*.xml /usr/share/help/C/gtimelog/
+usr/lib/python*/dist-packages/*/help/C/*.page /usr/share/help/C/gtimelog/
+usr/lib/python*/dist-packages/*/help/C/figures /usr/share/help/C/gtimelog/
 usr/lib/python*/dist-packages/*/*.css /usr/share/gtimelog/
 usr/lib/python*/dist-packages/*/*.ui /usr/share/gtimelog/
 src/gtimelog/locale /usr/share/
