@@ -33,6 +33,10 @@ class Checker(doctest.OutputChecker):
     def check_output(self, want, got, optionflags):
         # u'...' -> '...'; u"..." -> "..."
         got = re.sub(r'''\bu('[^']*'|"[^"]*")''', r'\1', got)
+        # Python 3.7: datetime.timedelta(seconds=1860) ->
+        # Python < 3.7: datetime.timedelta(0, 1860)
+        got = re.sub(r'datetime[.]timedelta[(]seconds=(\d+)[)]',
+                     r'datetime.timedelta(0, \1)', got)
         return doctest.OutputChecker.check_output(self, want, got, optionflags)
 
 
