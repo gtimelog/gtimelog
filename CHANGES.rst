@@ -8,6 +8,8 @@ Changelog
   for basic HTTP authentication credentials and store them in gnome-keyring
   (GH: #109).
 
+* Drop Python 3.3 support.
+
 
 0.11 (2017-12-16)
 ~~~~~~~~~~~~~~~~~
