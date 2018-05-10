@@ -1,5 +1,5 @@
 """An application for keeping track of your time."""
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 
 import time
 import os
