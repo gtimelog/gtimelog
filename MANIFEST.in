@@ -23,3 +23,6 @@ prune docs/build
 
 # added by check_manifest.py
 include *.mk
+
+# added by check_manifest.py
+recursive-include flatpak *.json

@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-0.11.1 (unreleased)
+0.11.1 (2018-07-18)
 ~~~~~~~~~~~~~~~~~~~
 
 * The undocmented remote task list over HTTP(S) feature is now able to ask
