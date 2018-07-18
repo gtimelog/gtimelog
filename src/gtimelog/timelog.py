@@ -309,16 +309,12 @@ class TimeCollection(object):
         for start, entry, duration in work:
             if ': ' in entry:
                 cat, clipped_entry = entry.split(': ', 1)
-                entry_list = entries.get(cat, [])
-                entry_list.append((start, clipped_entry, duration))
-                entries[cat] = entry_list
-                totals[cat] = totals.get(cat, datetime.timedelta(0)) + duration
             else:
-                entry_list = entries.get(None, [])
-                entry_list.append((start, entry, duration))
-                entries[None] = entry_list
-                totals[None] = totals.get(
-                    None, datetime.timedelta(0)) + duration
+                cat, clipped_entry = None, entry
+            entry_list = entries.get(cat, [])
+            entry_list.append((start, clipped_entry, duration))
+            entries[cat] = entry_list
+            totals[cat] = totals.get(cat, datetime.timedelta(0)) + duration
         return entries, totals
 
     def totals(self, tag=None, filter_text=None):
@@ -658,11 +654,10 @@ class Reports(object):
 
                 if ': ' in entry:
                     cat, task = entry.split(': ', 1)
-                    categories[cat] = categories.get(
-                        cat, datetime.timedelta(0)) + duration
                 else:
-                    categories[None] = categories.get(
-                        None, datetime.timedelta(0)) + duration
+                    cat, task = None, entry
+                categories[cat] = categories.get(
+                    cat, datetime.timedelta(0)) + duration
 
                 entry = entry[:1].upper() + entry[1:]
                 output.write(u"%-62s  %s\n" %
@@ -773,11 +768,10 @@ class Reports(object):
                                                format_duration_long(duration)))
                 if ': ' in entry:
                     cat, task = entry.split(': ', 1)
-                    categories[cat] = categories.get(
-                        cat, datetime.timedelta(0)) + duration
                 else:
-                    categories[None] = categories.get(
-                        None, datetime.timedelta(0)) + duration
+                    cat, task = None, entry
+                categories[cat] = categories.get(
+                    cat, datetime.timedelta(0)) + duration
 
             output.write('\n')
         output.write("Total work done: %s\n" % format_duration_long(total_work))
