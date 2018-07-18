@@ -12,6 +12,8 @@ Changelog
   a trailing space after the ':' were considered to be uncategorized
   (GH: #117).
 
+* Add Python 3.7 support.
+
 * Drop Python 3.3 support.
 
 
