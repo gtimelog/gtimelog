@@ -250,6 +250,8 @@ class TimeCollection(object):
         """
         if ': ' in entry:
             return tuple(entry.split(': ', 1))
+        elif entry.endswith(':'):
+            return entry.partition(':')[0], ''
         else:
             return None, entry
 

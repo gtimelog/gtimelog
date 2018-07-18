@@ -1021,6 +1021,12 @@ class TestTimeCollection(unittest.TestCase):
         self.assertEqual(sp('project: some task: etc'),
                          ('project', 'some task: etc'))
 
+    def test_split_category_no_task_just_category(self):
+        # Regression test for https://github.com/gtimelog/gtimelog/issues/117
+        sp = TimeCollection.split_category
+        self.assertEqual(sp('project: '), ('project', ''))
+        self.assertEqual(sp('project:'), ('project', ''))
+
 
 class TestTaskList(Mixins, unittest.TestCase):
 
