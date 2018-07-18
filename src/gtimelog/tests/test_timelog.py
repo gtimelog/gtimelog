@@ -24,7 +24,9 @@ except ImportError:
     # Python 2
     import mock
 
-from gtimelog.timelog import TimeLog, Reports, ReportRecord, Exports, TaskList
+from gtimelog.timelog import (
+    TimeLog, Reports, ReportRecord, Exports, TaskList, TimeCollection,
+)
 
 
 class Checker(doctest.OutputChecker):
@@ -1008,6 +1010,16 @@ class Mixins(object):
         with codecs.open(filename, 'w', encoding='UTF-8') as f:
             f.write(content)
         return filename
+
+
+class TestTimeCollection(unittest.TestCase):
+
+    def test_split_category(self):
+        sp = TimeCollection.split_category
+        self.assertEqual(sp('some task'), (None, 'some task'))
+        self.assertEqual(sp('project: some task'), ('project', 'some task'))
+        self.assertEqual(sp('project: some task: etc'),
+                         ('project', 'some task: etc'))
 
 
 class TestTaskList(Mixins, unittest.TestCase):
