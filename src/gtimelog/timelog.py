@@ -730,6 +730,18 @@ class Reports(object):
         max = max.strftime('%Y-%m-%d')
         return u'Custom date range report for %s (%s - %s)' % (who, min, max)
 
+    def custom_range_report(self, output, email, who):
+        if self.style == 'categorized':
+            return self.custom_range_report_categorized(output, email, who)
+        else:
+            return self.custom_range_report_plain(output, email, who)
+
+    def custom_range_report_plain(self, output, email, who):
+        """Format a custom range report."""
+        subject = self.custom_range_report_subject(who)
+        return self._plain_report(output, email, who, subject,
+                                  period_name='custom range')
+
     def custom_range_report_categorized(self, output, email, who):
         """Format a custom range report with entries displayed under categories."""
         subject = self.custom_range_report_subject(who)
@@ -806,6 +818,7 @@ class ReportRecord(object):
     DAILY = 'daily'
     WEEKLY = 'weekly'
     MONTHLY = 'monthly'
+    CUSTOM = 'custom'
 
     def __init__(self, filename):
         self.filename = filename
@@ -813,7 +826,7 @@ class ReportRecord(object):
         self._records = defaultdict(list)
 
     @classmethod
-    def get_report_id(cls, report_kind, date):
+    def get_report_id(cls, report_kind, date, duration=None):
         if report_kind == cls.DAILY:
             return date.strftime('%Y-%m-%d')
         elif report_kind == cls.WEEKLY:
@@ -822,26 +835,34 @@ class ReportRecord(object):
             return '{}/{}'.format(*date.isocalendar()[:2])
         elif report_kind == cls.MONTHLY:
             return date.strftime('%Y-%m')
+        elif report_kind == cls.CUSTOM:
+            assert isinstance(duration, datetime.timedelta)
+            end_date = date + duration - datetime.timedelta(1)
+            return '{:%Y-%m-%d}/{:%Y-%m-%d}'.format(date, end_date)
         else: # pragma: nocover
             raise AssertionError('Bug: unexpected report kind: %r' % report_kind)
 
-    def record(self, report_kind, report_date, recipient, now=None):
+    def record(self, report_kind, report_date, recipient, duration=None, now=None):
         """Record that a record has been sent.
 
-        report_kind is one of DAILY, WEEKLY, MONTHLY.
+        report_kind is one of DAILY, WEEKLY, MONTHLY, or CUSTOM.
 
         report_date is a date in the report period.
 
         recipient is an email address.  The intent here is to distinguish
         real reports sent to activity@yourcompany.example.com from test
         reports sent to a test address.
+
+        duration is the length of the report period (a datetime.timedelta),
+        used when report_kind is CUSTOM.
         """
+        # TODO: handle CUSTOM
         assert report_kind in (self.DAILY, self.WEEKLY, self.MONTHLY)
         assert isinstance(report_date, datetime.date)
         if now is None:
             now = datetime.datetime.now()
         timestamp = now.strftime('%Y-%m-%d %H:%M:%S')
-        report_id = self.get_report_id(report_kind, report_date)
+        report_id = self.get_report_id(report_kind, report_date, duration)
         with open(self.filename, 'a') as f:
             f.write("{},{},{},{}\n".format(timestamp, report_kind, report_id, recipient))
         if self.last_mtime is not None:
@@ -867,17 +888,20 @@ class ReportRecord(object):
         except IOError:
             pass
 
-    def get_recipients(self, report_kind, report_date):
+    def get_recipients(self, report_kind, report_date, duration=None):
         """Look up who received a particular report.
 
-        report_kind is one of DAILY, WEEKLY, MONTHLY.
+        report_kind is one of DAILY, WEEKLY, MONTHLY, or CUSTOM.
 
         report_date is a date in the report period.
+
+        duration is the length of the report period (a datetime.timedelta),
+        used when report_kind is CUSTOM.
 
         Returns a list of recipients, in order.
         """
         self.check_reload()
-        report_id = self.get_report_id(report_kind, report_date)
+        report_id = self.get_report_id(report_kind, report_date, duration)
         return self._records.get((report_kind, report_id), [])
 
 

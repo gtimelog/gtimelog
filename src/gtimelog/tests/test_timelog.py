@@ -1503,7 +1503,7 @@ class TestReportRecord(Mixins, unittest.TestCase):
     def test_record_then_load_when_empty(self):
         rr = ReportRecord(self.filename)
         now = datetime.datetime(2016, 1, 8, 9, 34, 50)
-        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.com', now)
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.com', now=now)
         self.assertEqual(
             rr.get_recipients(rr.DAILY, datetime.date(2016, 1, 6)),
             ['test@example.com']
@@ -1515,12 +1515,12 @@ class TestReportRecord(Mixins, unittest.TestCase):
         # by itself.
         rr = ReportRecord(self.filename)
         now = datetime.datetime(2016, 1, 8, 9, 34, 50)
-        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.com', now)
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.com', now=now)
         self.assertEqual(
             rr.get_recipients(rr.DAILY, datetime.date(2016, 1, 6)),
             ['test@example.com']
         )
-        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.org', now)
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.org', now=now)
         self.assertEqual(
             rr.get_recipients(rr.DAILY, datetime.date(2016, 1, 6)),
             ['test@example.com', 'test@example.org']
@@ -1537,7 +1537,7 @@ class TestReportRecord(Mixins, unittest.TestCase):
         ])
         rr = ReportRecord(self.filename)
         now = datetime.datetime(2016, 1, 8, 9, 34, 50)
-        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.org', now)
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.org', now=now)
         self.assertEqual(
             rr.get_recipients(rr.DAILY, datetime.date(2016, 1, 6)),
             ['test@example.com', 'test@example.org']
@@ -1553,8 +1553,8 @@ class TestReportRecord(Mixins, unittest.TestCase):
         ])
         rr = ReportRecord(self.filename)
         now = datetime.datetime(2016, 1, 8, 9, 34, 50)
-        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.org', now)
-        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.net', now)
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.org', now=now)
+        rr.record(rr.DAILY, datetime.date(2016, 1, 6), 'test@example.net', now=now)
         self.assertEqual(
             rr.get_recipients(rr.DAILY, datetime.date(2016, 1, 6)),
             ['test@example.com', 'test@example.org', 'test@example.net']

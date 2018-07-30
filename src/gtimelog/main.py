@@ -75,7 +75,8 @@ mark_time("Gtk imports done")
 from gtimelog import __version__
 from gtimelog.settings import Settings
 from gtimelog.timelog import (
-    as_minutes, virtual_day, different_days, prev_month, next_month, uniq, parse_time,
+    as_minutes, virtual_day, different_days, prev_month, next_month, uniq,
+    parse_time, first_of_month,
     Reports, ReportRecord, TaskList, TimeLog)
 
 
@@ -614,6 +615,7 @@ REPORT_KINDS = {
     'day': ReportRecord.DAILY,
     'week': ReportRecord.WEEKLY,
     'month': ReportRecord.MONTHLY,
+    'custom': ReportRecord.CUSTOM,
 }
 
 
@@ -1059,6 +1061,25 @@ class Window(Gtk.ApplicationWindow):
             return self.timelog.window_for_week(self.date)
         elif self.time_range == 'month':
             return self.timelog.window_for_month(self.date)
+        elif self.time_range == 'custom':
+            # XXX: get dates somehow
+            return self.timelog.window_for_date_range(self.date, self.date)
+        else:
+            raise AssertionError('Unexpected time range: %r' % self.time_range)
+
+    @property
+    def period(self):
+        if self.time_range == 'day':
+            return datetime.timedelta(1)
+        elif self.time_range == 'week':
+            return datetime.timedelta(7)
+        elif self.time_range == 'month':
+            return next_month(self.date) - first_of_month(self.date)
+        elif self.time_range == 'custom':
+            # XXX: get dates somehow
+            return datetime.timedelta(1)
+        else:
+            raise AssertionError('Unexpected time range: %r' % self.time_range)
 
     def get_now(self):
         return datetime.datetime.now().replace(second=0, microsecond=0)
@@ -1134,13 +1155,17 @@ class Window(Gtk.ApplicationWindow):
                 isoyear, isoweek, monday, sunday)
         elif self.time_range == 'month':
             return _("{0:%B %Y}").format(date)
+        elif self.time_range == 'custom':
+            return _("Custom range")
+        else:
+            raise AssertionError('Unexpected time range: %r' % self.time_range)
 
     def detail_level_changed(self, obj, param_spec):
         assert self.detail_level in {'chronological', 'grouped', 'summary'}
         self.notify('subtitle')
 
     def time_range_changed(self, obj, param_spec):
-        assert self.time_range in {'day', 'week', 'month'}
+        assert self.time_range in {'day', 'week', 'month', 'custom'}
         self.notify('subtitle')
 
     def on_search_changed(self, *args):
@@ -1153,6 +1178,10 @@ class Window(Gtk.ApplicationWindow):
             self.date -= datetime.timedelta(7)
         elif self.time_range == 'month':
             self.date = prev_month(self.date)
+        elif self.time_range == 'custom':
+            self.date -= self.period
+        else:
+            raise AssertionError('Unexpected time range: %r' % self.time_range)
 
     def on_go_forward(self, action, parameter):
         if self.time_range == 'day':
@@ -1161,9 +1190,14 @@ class Window(Gtk.ApplicationWindow):
             self.date += datetime.timedelta(7)
         elif self.time_range == 'month':
             self.date = next_month(self.date)
+        elif self.time_range == 'custom':
+            self.date += self.period
+        else:
+            raise AssertionError('Unexpected time range: %r' % self.time_range)
 
     def on_go_home(self, action, parameter):
         self.date = None
+        # XXX: might do the wrong thing for custom periods
 
     def on_add_entry(self, action, parameter):
         mark_time()
@@ -1224,7 +1258,8 @@ class Window(Gtk.ApplicationWindow):
         if self.email(sender, recipient, subject, body):
             self.record_sent_email(self.report_view.time_range,
                                    self.report_view.date,
-                                   recipient)
+                                   recipient,
+                                   self.report_view.duration)
             self.on_cancel_report()
         else:
             self.infobar_label.set_text(_("Couldn't send email to {}.").format(recipient))
@@ -1256,11 +1291,11 @@ class Window(Gtk.ApplicationWindow):
                           command, sendmail.returncode)
             return sendmail.returncode == 0
 
-    def record_sent_email(self, time_range, date, recipient):
+    def record_sent_email(self, time_range, date, recipient, duration):
         record = self.report_view.record
         try:
             report_kind = REPORT_KINDS[time_range]
-            record.record(report_kind, date, recipient)
+            record.record(report_kind, date, recipient, duration)
         except IOError as e:
             log.error(_("Couldn't append to {}: {}").format(record.filename, e))
 
@@ -1557,6 +1592,11 @@ class LogView(Gtk.TextView):
             return self.timelog.window_for_week(self.date)
         elif self.time_range == 'month':
             return self.timelog.window_for_month(self.date)
+        elif self.time_range == 'custom':
+            # XXX: get dates somehow
+            return self.timelog.window_for_date_range(self.date, self.date)
+        else:
+            raise AssertionError('Unexpected time range: %r' % self.time_range)
 
     def get_last_time(self):
         assert self.timelog is not None
@@ -1615,7 +1655,8 @@ class LogView(Gtk.TextView):
                     self.write_group(category, duration)
                     total += duration
         else:
-            return # bug!
+            raise AssertionError(
+                'Unexpected detail level: %r' % self.detail_level)
         if self.filter_text:
             self.w('\n')
             args = [
@@ -1741,6 +1782,11 @@ class LogView(Gtk.TextView):
         elif self.time_range == 'month':
             fmt1 = _('Total work done this month: {0} ({1} per day)')
             fmt2 = _('Total work done this month: {0}')
+        elif self.time_range == 'custom':
+            fmt1 = _('Total work done this period: {0} ({1} per day)')
+            fmt2 = _('Total work done this period: {0}')
+        else:
+            raise AssertionError('Unexpected time range: %r' % self.time_range)
         args = [(format_duration(total_work), 'duration')]
         if self.time_range == 'day':
             weekly_window = self.timelog.window_for_week(self.date)
@@ -1767,6 +1813,11 @@ class LogView(Gtk.TextView):
         elif self.time_range == 'month':
             fmt1 = _('Total slacking this month: {0} ({1} per day)')
             fmt2 = _('Total slacking this month: {0}')
+        elif self.time_range == 'custom':
+            fmt1 = _('Total slacking this period: {0} ({1} per day)')
+            fmt2 = _('Total slacking this period: {0}')
+        else:
+            raise AssertionError('Unexpected time range: %r' % self.time_range)
         args = [(format_duration(total_slacking), 'duration')]
         if self.time_range == 'day':
             args.append((format_duration(week_total_slacking), 'duration'))
@@ -1843,7 +1894,7 @@ class ReportView(Gtk.TextView):
 
     time_range = GObject.Property(
         type=str, default='day', nick='Time range',
-        blurb='Time range to show (day/week/month)')
+        blurb='Time range to show (day/week/month/custom)')
 
     report_style = GObject.Property(
         type=str, nick='Report style',
@@ -1907,10 +1958,29 @@ class ReportView(Gtk.TextView):
             return self.timelog.window_for_week(self.date)
         elif self.time_range == 'month':
             return self.timelog.window_for_month(self.date)
+        elif self.time_range == 'custom':
+            # XXX: get dates somehow
+            return self.timelog.window_for_date_range(self.date, self.date)
+        else:
+            raise AssertionError('Unexpected time range: %r' % self.time_range)
 
     @GObject.Property(type=str, nick='Name', blurb='Report subject')
     def subject(self):
         return self._subject
+
+    @property
+    def duration(self):
+        if self.time_range == 'day':
+            return datetime.timedelta(1)
+        elif self.time_range == 'week':
+            return datetime.timedelta(7)
+        elif self.time_range == 'month':
+            return next_month(self.date) - first_of_month(self.date)
+        elif self.time_range == 'custom':
+            # XXX: get dates somehow
+            return datetime.timedelta(1)
+        else:
+            raise AssertionError('Unexpected time range: %r' % self.time_range)
 
     def update_subject(self, *args):
         self._subject = ''
@@ -1926,6 +1996,10 @@ class ReportView(Gtk.TextView):
             self._subject = reports.weekly_report_subject(name)
         elif self.time_range == 'month':
             self._subject = reports.monthly_report_subject(name)
+        elif self.time_range == 'custom':
+            self._subject = reports.custom_range_report_subject(name)
+        else:
+            raise AssertionError('Unexpected time range: %r' % self.time_range)
         self.notify('subject')
 
     def populate_report(self):
@@ -1945,6 +2019,10 @@ class ReportView(Gtk.TextView):
             reports.weekly_report(output, recipient, name)
         elif self.time_range == 'month':
             reports.monthly_report(output, recipient, name)
+        elif self.time_range == 'custom':
+            reports.custom_range_report(output, recipient, name)
+        else:
+            raise AssertionError('Unexpected time range: %r' % self.time_range)
         textbuf = self.get_buffer()
         textbuf.set_text(output.getvalue())
         textbuf.place_cursor(textbuf.get_start_iter())
@@ -1954,7 +2032,7 @@ class ReportView(Gtk.TextView):
         if not self.date:
             return
         report_kind = REPORT_KINDS[self.time_range]
-        recipients = self.record.get_recipients(report_kind, self.date)
+        recipients = self.record.get_recipients(report_kind, self.date, self.duration)
         self.report_sent_to = ', '.join(sorted(set(recipients) - {self.recipient}))
         if not recipients:
             self.report_status = 'not-sent'
