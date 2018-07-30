@@ -735,6 +735,7 @@ class Window(Gtk.ApplicationWindow):
         self.today_button = builder.get_object("today_button")
         self.send_report_button = builder.get_object("send_report_button")
         self.cancel_report_button = builder.get_object("cancel_report_button")
+        self.custom_range_hbox = builder.get_object("custom_range_hbox")
         self.sender_entry = builder.get_object("sender_entry")
         self.recipient_entry = builder.get_object("recipient_entry")
         self.subject_entry = builder.get_object("subject_entry")
@@ -758,6 +759,7 @@ class Window(Gtk.ApplicationWindow):
         self.bind_property('date', self.log_view, 'date', GObject.BindingFlags.DEFAULT)
         self.bind_property('detail_level', self.log_view, 'detail_level', GObject.BindingFlags.SYNC_CREATE)
         self.bind_property('time_range', self.log_view, 'time_range', GObject.BindingFlags.SYNC_CREATE)
+        self.bind_property('custom_time_range', self.custom_range_hbox, 'visible', GObject.BindingFlags.DEFAULT)
         self.task_entry.bind_property('text', self.log_view, 'current_task', GObject.BindingFlags.DEFAULT)
         self.bind_property('subtitle', self.headerbar, 'subtitle', GObject.BindingFlags.DEFAULT)
         self.bind_property('filter_text', self.log_view, 'filter_text', GObject.BindingFlags.DEFAULT)
@@ -1167,6 +1169,13 @@ class Window(Gtk.ApplicationWindow):
     def time_range_changed(self, obj, param_spec):
         assert self.time_range in {'day', 'week', 'month', 'custom'}
         self.notify('subtitle')
+        self.notify('custom_time_range')
+
+    @GObject.Property(
+        type=bool, default=False, nick='Showing a custom time range',
+        blurb='Time range is set to custom')
+    def custom_time_range(self):
+        return self.time_range == 'custom'
 
     def on_search_changed(self, *args):
         self.filter_text = self.search_entry.get_text()
