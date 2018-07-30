@@ -363,63 +363,71 @@
                 <property name="orientation">vertical</property>
                 <property name="margin_bottom">6</property>
                 <child>
-                  <object class="GtkBox" id="custom_range_hbox">
-                    <property name="visible">False</property>
+                  <object class="GtkRevealer" id="custom_range_revealer">
+                    <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_start">12</property>
-                    <property name="margin_end">6</property>
-                    <property name="spacing">12</property>
+                    <property name="reveal_child">False</property>
+                    <property name="transition_type">slide-down</property>
                     <child>
-                      <object class="GtkLabel" id="custom_range_label">
+                      <object class="GtkBox" id="custom_range_hbox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">Dates</property>
-                        <property name="mnemonic_widget">start_date_entry</property>
-                        <property name="xalign">1</property>
+                        <property name="margin_start">12</property>
+                        <property name="margin_end">6</property>
+                        <property name="spacing">12</property>
+                        <child>
+                          <object class="GtkLabel" id="custom_range_label">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">Dates</property>
+                            <property name="mnemonic_widget">start_date_entry</property>
+                            <property name="xalign">1</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="start_date_entry">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="placeholder_text" translatable="yes">YYYY-MM-DD</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="range_separator_label">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes"> - </property>
+                            <property name="mnemonic_widget">end_date_entry</property>
+                            <property name="xalign">1</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="end_date_entry">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="placeholder_text" translatable="yes">YYYY-MM-DD</property>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">3</property>
+                          </packing>
+                        </child>
                       </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">0</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkEntry" id="start_date_entry">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="placeholder_text" translatable="yes">YYYY-MM-DD</property>
-                      </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">1</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="range_separator_label">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="label" translatable="yes"> - </property>
-                        <property name="mnemonic_widget">end_date_entry</property>
-                        <property name="xalign">1</property>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkEntry" id="end_date_entry">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="placeholder_text" translatable="yes">YYYY-MM-DD</property>
-                      </object>
-                      <packing>
-                        <property name="expand">True</property>
-                        <property name="fill">True</property>
-                        <property name="position">3</property>
-                      </packing>
                     </child>
                   </object>
                   <packing>
