@@ -1,3 +1,9 @@
+gtimelog (0.11-5) unstable; urgency=medium
+
+  * Update debian/copyright (Closes: #891988).
+
+ -- Andrej Shadura <andrewsh@debian.org>  Sun, 16 Sep 2018 10:28:45 +0200
+
 gtimelog (0.11-4) unstable; urgency=medium
 
   * Add gtimelogrc.5, now really (Closes: #891751).
