@@ -1,6 +1,22 @@
 Changelog
 ---------
 
+0.11.1 (2018-07-18)
+~~~~~~~~~~~~~~~~~~~
+
+* The undocmented remote task list over HTTP(S) feature is now able to ask
+  for basic HTTP authentication credentials and store them in gnome-keyring
+  (GH: #109).
+
+* Bugfix: entries with just a category and no task that did not have
+  a trailing space after the ':' were considered to be uncategorized
+  (GH: #117).
+
+* Add Python 3.7 support.
+
+* Drop Python 3.3 support.
+
+
 0.11 (2017-12-16)
 ~~~~~~~~~~~~~~~~~
 
