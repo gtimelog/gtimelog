@@ -1,12 +1,11 @@
-Metadata-Version: 1.1
+Metadata-Version: 2.1
 Name: gtimelog
-Version: 0.11
+Version: 0.11.1
 Summary: A Gtk+ time tracking application
 Home-page: https://gtimelog.org/
 Author: Marius Gedminas
 Author-email: marius@gedmin.as
 License: GPL
-Description-Content-Type: UNKNOWN
 Description: GTimeLog
         ========
         
@@ -105,11 +104,27 @@ Description: GTimeLog
         
         Many excellent contributors are listed in `CONTRIBUTORS.rst`_
         
-        .. _CONTRIBUTORS.rst: https://github.com/gtimelog/gtimelog/blob/master/CONTRIBUTORS.rst
+        .. _CONTRIBUTORS.rst: https://github.com/gtimelog/gtimelog/blob/master/src/gtimelog/CONTRIBUTORS.rst
         
         
         Changelog
         ---------
+        
+        0.11.1 (2018-07-18)
+        ~~~~~~~~~~~~~~~~~~~
+        
+        * The undocmented remote task list over HTTP(S) feature is now able to ask
+          for basic HTTP authentication credentials and store them in gnome-keyring
+          (GH: #109).
+        
+        * Bugfix: entries with just a category and no task that did not have
+          a trailing space after the ':' were considered to be uncategorized
+          (GH: #117).
+        
+        * Add Python 3.7 support.
+        
+        * Drop Python 3.3 support.
+        
         
         0.11 (2017-12-16)
         ~~~~~~~~~~~~~~~~~
@@ -189,12 +204,6 @@ Description: GTimeLog
         * Improve tray icon selection logic for best contrast (GH: #29).
         
         
-        0.9.3 (2015-09-29)
-        ~~~~~~~~~~~~~~~~~~
-        
-        * Adding new entries didn't update total weekly numbers (GH: #28).
-        
-        
         Older versions
         ~~~~~~~~~~~~~~
         
@@ -207,8 +216,9 @@ Classifier: Development Status :: 4 - Beta
 Classifier: Environment :: X11 Applications :: GTK
 Classifier: License :: OSI Approved :: GNU General Public License (GPL)
 Classifier: Programming Language :: Python :: 2.7
-Classifier: Programming Language :: Python :: 3.3
 Classifier: Programming Language :: Python :: 3.4
 Classifier: Programming Language :: Python :: 3.5
 Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
 Classifier: Topic :: Office/Business
+Provides-Extra: test

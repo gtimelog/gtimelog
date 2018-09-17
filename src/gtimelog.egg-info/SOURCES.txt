@@ -18,13 +18,19 @@ gtimelog.desktop
 gtimelog.desktop.in
 gtimelog.rst
 other-requirements.txt
+release.mk
 runtests
 setup.cfg
 setup.py
 tox.ini
+docs/Makefile
+docs/footer.rst
 docs/formats.rst
 docs/gtimelog.png
 docs/index.rst
+docs/mg.css
+docs/website.rst
+flatpak/org.gtimelog.GTimeLog.json
 scripts/README.rst
 scripts/difftime.py
 scripts/export-my-calendar.py
@@ -51,7 +57,6 @@ src/gtimelog.egg-info/SOURCES.txt
 src/gtimelog.egg-info/dependency_links.txt
 src/gtimelog.egg-info/entry_points.txt
 src/gtimelog.egg-info/not-zip-safe
-src/gtimelog.egg-info/pbr.json
 src/gtimelog.egg-info/requires.txt
 src/gtimelog.egg-info/top_level.txt
 src/gtimelog/data/gschemas.compiled
