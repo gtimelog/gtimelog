@@ -8,4 +8,4 @@ Terminal=false
 Type=Application
 StartupNotify=true
 Icon=gtimelog
-Categories=Application;Utility;
+Categories=Utility;

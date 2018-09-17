@@ -24,7 +24,9 @@ except ImportError:
     # Python 2
     import mock
 
-from gtimelog.timelog import TimeLog, Reports, ReportRecord, Exports, TaskList
+from gtimelog.timelog import (
+    TimeLog, Reports, ReportRecord, Exports, TaskList, TimeCollection,
+)
 
 
 class Checker(doctest.OutputChecker):
@@ -33,6 +35,10 @@ class Checker(doctest.OutputChecker):
     def check_output(self, want, got, optionflags):
         # u'...' -> '...'; u"..." -> "..."
         got = re.sub(r'''\bu('[^']*'|"[^"]*")''', r'\1', got)
+        # Python 3.7: datetime.timedelta(seconds=1860) ->
+        # Python < 3.7: datetime.timedelta(0, 1860)
+        got = re.sub(r'datetime[.]timedelta[(]seconds=(\d+)[)]',
+                     r'datetime.timedelta(0, \1)', got)
         return doctest.OutputChecker.check_output(self, want, got, optionflags)
 
 
@@ -1004,6 +1010,22 @@ class Mixins(object):
         with codecs.open(filename, 'w', encoding='UTF-8') as f:
             f.write(content)
         return filename
+
+
+class TestTimeCollection(unittest.TestCase):
+
+    def test_split_category(self):
+        sp = TimeCollection.split_category
+        self.assertEqual(sp('some task'), (None, 'some task'))
+        self.assertEqual(sp('project: some task'), ('project', 'some task'))
+        self.assertEqual(sp('project: some task: etc'),
+                         ('project', 'some task: etc'))
+
+    def test_split_category_no_task_just_category(self):
+        # Regression test for https://github.com/gtimelog/gtimelog/issues/117
+        sp = TimeCollection.split_category
+        self.assertEqual(sp('project: '), ('project', ''))
+        self.assertEqual(sp('project:'), ('project', ''))
 
 
 class TestTaskList(Mixins, unittest.TestCase):

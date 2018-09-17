@@ -4,6 +4,8 @@ Data Formats
 These tools were designed for easy interoperability.  The data formats are
 both human and machine readable, easy to edit, easy to parse.
 
+.. contents::
+
 
 timelog.txt
 -----------
@@ -81,8 +83,8 @@ Example::
   project-bar: daily standup
 
 
-Daily reports
--------------
+Daily report emails
+-------------------
 
 Daily reports look like this::
 
@@ -134,3 +136,6 @@ Example::
     2015-09-09 13:12:39,weekly,2015/37,activity@example.com
     2015-09-09 13:12:44,monthly,2015-09,activity@example.com
     2015-09-09 13:12:57,daily,2015-09-09,activity@example.com
+
+
+.. include:: footer.rst

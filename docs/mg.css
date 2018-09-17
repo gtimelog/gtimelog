@@ -1,0 +1,89 @@
+body {
+  margin: 1em;
+  color: black;
+  background: white;
+}
+
+h1, h2, h3 {
+  color: #134D73;
+  margin: 0.5em 0 0.5ex 0;
+}
+h1.title {
+  font-size: 2em;
+  font-weight: bold;
+}
+h2.subtitle {
+  color: #134D73;
+  margin: 0 0.5ex 2em 2ex;
+  font-size: large;
+  font-weight: normal;
+}
+h1 {
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+div.introduction {
+  font-size: small;
+  color: gray;
+  margin: 0 1em 2em 0;
+}
+
+a {
+  color: #869ABF;
+}
+a:visited {
+  color: purple;
+}
+a:active, a:hover {
+  color: #B22222;
+}
+
+img {
+  border: 0;
+}
+
+tt {
+  font-family: Andale Mono, monospace;
+}
+
+pre {
+  margin-left: 40px;
+}
+
+span.prompt {
+  color: #00cc00;
+}
+span.typing {
+  color: #0000cc;
+}
+
+hr {
+  height: 1px;
+  border: none;
+  border-top: 1px dotted gray;
+  margin: 2em 10em 1em 10em;
+}
+
+p.footer {
+  margin-top: 0.5em;
+  font-size: x-small;
+  color: gray;
+  margin: 1em 2em;
+}
+
+/* Nonintrusive hyperlinks */
+
+p.footer a {
+  color: gray;
+  font-weight: normal;
+  text-decoration: none;
+  border-bottom: 1px dotted gray;
+}
+p.footer a:visited {
+  color: gray;
+}
+p.footer a:active,
+p.footer a:hover {
+  color: #b22222;
+}
