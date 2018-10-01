@@ -14,7 +14,6 @@ Standards-Version: 3.9.8
 Homepage: http://gtimelog.org/
 Vcs-Git: https://salsa.debian.org/debian/gtimelog.git
 Vcs-Browser: https://salsa.debian.org/debian/gtimelog
-X-Python3-Version: >= 3.3
 
 Package: gtimelog
 Architecture: all
