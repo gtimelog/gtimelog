@@ -4,7 +4,8 @@ Changelog
 0.11.2 (unreleased)
 ~~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- Window menu now includes items previously shown only in the app menu:
+  Preferences, Help, About (GH: #126).
 
 
 0.11.1 (2018-07-18)
