@@ -396,9 +396,10 @@ class Application(Gtk.Application):
             screen, css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         mark_time("CSS loaded")
 
-        builder = Gtk.Builder.new_from_file(MENUS_UI_FILE)
-        self.set_app_menu(builder.get_object('app_menu'))
-        mark_time("menus loaded")
+        if Gtk.Settings.get_default().get_property('gtk-shell-shows-app-menu'):
+            builder = Gtk.Builder.new_from_file(MENUS_UI_FILE)
+            self.set_app_menu(builder.get_object('app_menu'))
+            mark_time("menus loaded")
 
         self.actions = self.Actions(self)
 
