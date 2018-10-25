@@ -1,10 +1,15 @@
-gtimelog (0.11.1-2) UNRELEASED; urgency=medium
+gtimelog (0.11.1-2) unstable; urgency=medium
 
-  * d/control: Remove ancient X-Python3-Version field
-  * d/changelog: Remove trailing whitespaces
-  * d/watch: Use https protocol
+  [ Ondřej Nový ]
+  * d/control: Remove ancient X-Python3-Version field.
+  * d/changelog: Remove trailing whitespaces.
+  * d/watch: Use https protocol.
 
- -- Ondřej Nový <onovy@debian.org>  Mon, 01 Oct 2018 10:28:17 +0200
+  [ Andrej Shadura ]
+  * Don’t suggest mutt.
+  * Depend on gir1.2-soup-2.4 (Closes: #911073).
+
+ -- Andrej Shadura <andrewsh@debian.org>  Thu, 25 Oct 2018 17:15:14 +0200
 
 gtimelog (0.11.1-1) unstable; urgency=medium
 
