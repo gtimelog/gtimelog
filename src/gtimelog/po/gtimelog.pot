@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-07 20:46+0300\n"
+"POT-Creation-Date: 2018-10-31 17:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,6 +25,12 @@ msgstr ""
 
 #, python-brace-format
 msgid "{0} h {1} min"
+msgstr ""
+
+#, python-format
+msgid ""
+"Authentication is required for \"%s\"\n"
+"You need a username and a password to access %s"
 msgstr ""
 
 msgid "Show version number and exit"
@@ -303,6 +309,9 @@ msgid "Refresh tasks"
 msgstr ""
 
 msgid "Report..."
+msgstr ""
+
+msgid "About Time Log"
 msgstr ""
 
 msgid "Detail level"

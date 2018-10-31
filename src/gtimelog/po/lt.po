@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-07 20:45+0300\n"
+"POT-Creation-Date: 2018-10-31 17:44+0200\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -28,6 +28,14 @@ msgstr "Sekti kasdieninus darbus"
 #, python-brace-format
 msgid "{0} h {1} min"
 msgstr "{0} val {1} min"
+
+#, python-format
+msgid ""
+"Authentication is required for \"%s\"\n"
+"You need a username and a password to access %s"
+msgstr ""
+"Reikia prisijungti prie \"%s\"\n"
+"Reikia naudotojo vardo ir slaptažodžio, kad pasiektumėte %s"
 
 msgid "Show version number and exit"
 msgstr "Rodyti programos versiją ir išeiti"
@@ -310,6 +318,9 @@ msgstr "Atnaujinti užduotis"
 
 msgid "Report..."
 msgstr "Ataskaita..."
+
+msgid "About Time Log"
+msgstr "Apie Laiko žurnalą"
 
 msgid "Detail level"
 msgstr "Detalumas"
