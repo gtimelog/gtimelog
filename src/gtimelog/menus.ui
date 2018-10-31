@@ -48,14 +48,12 @@
         <attribute name="label" translatable="yes">Preferences</attribute>
         <attribute name="action">app.preferences</attribute>
       </item>
-    </section>
-    <section>
       <item>
         <attribute name="label" translatable="yes">Help</attribute>
         <attribute name="action">app.help</attribute>
       </item>
       <item>
-        <attribute name="label" translatable="yes">About</attribute>
+        <attribute name="label" translatable="yes">About Time Log</attribute>
         <attribute name="action">app.about</attribute>
       </item>
     </section>
