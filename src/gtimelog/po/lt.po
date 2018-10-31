@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-31 18:46+0200\n"
+"POT-Creation-Date: 2018-10-31 18:55+0200\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -299,7 +299,7 @@ msgid "Nickname used in the Subject line"
 msgstr "Trumpas vardas temos laukeliui"
 
 msgid "Keyboard Shortcuts"
-msgstr ""
+msgstr "Trumpiniai"
 
 msgid "Help"
 msgstr "Žinynas"
@@ -352,6 +352,10 @@ msgstr "Mėnuo"
 msgid "Filter"
 msgstr "Filtruoti"
 
+msgctxt "shortcuts window"
+msgid "Entry"
+msgstr "Įvedimas"
+
 msgctxt "shortcut window"
 msgid "Detail level"
 msgstr "Detalumas"
@@ -401,18 +405,6 @@ msgid "Go back to today"
 msgstr "Grįžti į šiandieną"
 
 msgctxt "shortcut window"
-msgid "Task pane"
-msgstr "Užduočių skiltis"
-
-msgctxt "shortcut window"
-msgid "Toggle task pane"
-msgstr "Rodyti/slėpti užduočių skiltį"
-
-msgctxt "shortcut window"
-msgid "Edit task list"
-msgstr "Tvarkyti užduotis"
-
-msgctxt "shortcut window"
 msgid "General"
 msgstr "Bendri"
 
@@ -443,6 +435,22 @@ msgstr "Nustatymai"
 msgctxt "shortcut window"
 msgid "Quit"
 msgstr "Užverti programą"
+
+msgctxt "shortcut window"
+msgid "Task pane"
+msgstr "Užduočių skiltis"
+
+msgctxt "shortcut window"
+msgid "Toggle task pane"
+msgstr "Rodyti/slėpti užduočių skiltį"
+
+msgctxt "shortcut window"
+msgid "Edit task list"
+msgstr "Tvarkyti užduotis"
+
+msgctxt "shortcuts window"
+msgid "Reports"
+msgstr "Ataskaitos"
 
 msgctxt "shortcut window"
 msgid "Reporting"

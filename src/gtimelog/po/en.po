@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-31 18:46+0200\n"
+"POT-Creation-Date: 2018-10-31 18:56+0200\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -345,6 +345,10 @@ msgstr ""
 msgid "Filter"
 msgstr ""
 
+msgctxt "shortcuts window"
+msgid "Entry"
+msgstr ""
+
 msgctxt "shortcut window"
 msgid "Detail level"
 msgstr ""
@@ -394,18 +398,6 @@ msgid "Go back to today"
 msgstr ""
 
 msgctxt "shortcut window"
-msgid "Task pane"
-msgstr ""
-
-msgctxt "shortcut window"
-msgid "Toggle task pane"
-msgstr ""
-
-msgctxt "shortcut window"
-msgid "Edit task list"
-msgstr ""
-
-msgctxt "shortcut window"
 msgid "General"
 msgstr ""
 
@@ -435,6 +427,22 @@ msgstr ""
 
 msgctxt "shortcut window"
 msgid "Quit"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Task pane"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Toggle task pane"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Edit task list"
+msgstr ""
+
+msgctxt "shortcuts window"
+msgid "Reports"
 msgstr ""
 
 msgctxt "shortcut window"
