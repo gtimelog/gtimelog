@@ -175,33 +175,6 @@
         <child>
           <object class="GtkShortcutsGroup">
             <property name="visible">True</property>
-            <property name="title" translatable="yes" context="shortcut window">Detail level</property>
-            <child>
-              <object class="GtkShortcutsShortcut">
-                <property name="visible">True</property>
-                <property name="accelerator">&lt;alt&gt;1</property>
-                <property name="title" translatable="yes" context="shortcut window">Full chronological list</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkShortcutsShortcut">
-                <property name="visible">True</property>
-                <property name="accelerator">&lt;alt&gt;2</property>
-                <property name="title" translatable="yes" context="shortcut window">Group by description</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkShortcutsShortcut">
-                <property name="visible">True</property>
-                <property name="accelerator">&lt;alt&gt;3</property>
-                <property name="title" translatable="yes" context="shortcut window">Group by category</property>
-              </object>
-            </child>
-          </object>
-        </child>
-        <child>
-          <object class="GtkShortcutsGroup">
-            <property name="visible">True</property>
             <property name="title" translatable="yes" context="shortcut window">Time range</property>
             <child>
               <object class="GtkShortcutsShortcut">
