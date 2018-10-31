@@ -7,6 +7,8 @@ Changelog
 - Window menu now includes items previously shown only in the app menu:
   Preferences, Help, About (GH: #126).
 
+- Keyboard shortcuts window (press Ctrl+Shift+?).
+
 
 0.11.1 (2018-07-18)
 ~~~~~~~~~~~~~~~~~~~

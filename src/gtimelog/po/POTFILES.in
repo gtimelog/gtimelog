@@ -5,3 +5,4 @@ main.py
 [type: gettext/glade]gtimelog.ui
 [type: gettext/glade]preferences.ui
 [type: gettext/glade]menus.ui
+[type: gettext/glade]shortcuts.ui

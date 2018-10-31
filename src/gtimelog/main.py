@@ -109,6 +109,7 @@ else:
     PREFERENCES_UI_FILE = os.path.join(UI_DIR, 'preferences.ui')
 
 ABOUT_DIALOG_UI_FILE = os.path.join(UI_DIR, 'about.ui')
+SHORTCUTS_UI_FILE = os.path.join(UI_DIR, 'shortcuts.ui')
 MENUS_UI_FILE = os.path.join(UI_DIR, 'menus.ui')
 CSS_FILE = os.path.join(UI_DIR, 'gtimelog.css')
 LOCALE_DIR = os.path.join(UI_DIR, 'locale')
@@ -324,8 +325,19 @@ class Application(Gtk.Application):
 
     class Actions(object):
 
+        actions = [
+            'preferences',
+            'shortcuts',
+            'help',
+            'about',
+            'quit',
+            'edit-log',
+            'edit-tasks',
+            'refresh-tasks',
+        ]
+
         def __init__(self, app):
-            for action_name in ['preferences', 'help', 'about', 'quit', 'edit-log', 'edit-tasks', 'refresh-tasks']:
+            for action_name in self.actions:
                 action = Gio.SimpleAction.new(action_name, None)
                 action.connect('activate', getattr(app, 'on_' + action_name.replace('-', '_')))
                 app.add_action(action)
@@ -421,6 +433,7 @@ class Application(Gtk.Application):
         self.set_accels_for_action("app.edit-log", ["<Primary>E"])
         self.set_accels_for_action("app.edit-tasks", ["<Primary>T"])
         self.set_accels_for_action("app.help", ["F1"])
+        self.set_accels_for_action("app.shortcuts", ["<Primary>question"])
         self.set_accels_for_action("app.preferences", ["<Primary>P"])
         self.set_accels_for_action("app.quit", ["<Primary>Q"])
         self.set_accels_for_action("win.report", ["<Primary>D"])
@@ -468,6 +481,12 @@ class Application(Gtk.Application):
     def create_if_missing(self, filename):
         if not os.path.exists(filename):
             open(filename, 'a').close()
+
+    def on_shortcuts(self, action, parameter):
+        builder = Gtk.Builder.new_from_file(SHORTCUTS_UI_FILE)
+        shortcuts_window = builder.get_object('shortcuts_window')
+        shortcuts_window.set_transient_for(self.get_active_window())
+        shortcuts_window.show_all()
 
     def on_help(self, action, parameter):
         if HELP_URI:
