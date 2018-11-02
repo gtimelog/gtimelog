@@ -506,11 +506,16 @@ class Application(Gtk.Application):
         preferences.connect("response", lambda *args: preferences.destroy())
         preferences.run()
 
+    def are_there_any_modals(self):
+        # Fix for https://github.com/gtimelog/gtimelog/issues/127
+        return any(window.get_modal()
+                   for window in Gtk.Window.list_toplevels())
+
     def do_activate(self):
         mark_time("in app activate")
         window = self.get_active_window()
         if window is not None:
-            if not window.is_active():
+            if not window.is_active() and not self.are_there_any_modals():
                 # If I don't hide the window before calling present(), GNOME
                 # Shell (on Wayland) ignores the presentation request:
                 # https://bugzilla.gnome.org/show_bug.cgi?id=756202 and
