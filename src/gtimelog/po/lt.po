@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-31 18:55+0200\n"
+"POT-Creation-Date: 2018-11-02 18:07+0200\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -301,9 +301,6 @@ msgstr "Trumpas vardas temos laukeliui"
 msgid "Keyboard Shortcuts"
 msgstr "Trumpiniai"
 
-msgid "Help"
-msgstr "Žinynas"
-
 msgid "About"
 msgstr "Apie"
 
@@ -409,16 +406,12 @@ msgid "General"
 msgstr "Bendri"
 
 msgctxt "shortcut window"
-msgid "Keyboard shortcuts"
-msgstr "Trumpiniai"
-
-msgctxt "shortcut window"
-msgid "Help"
-msgstr "Žinynas"
-
-msgctxt "shortcut window"
 msgid "Menu"
 msgstr "Meniu"
+
+msgctxt "shortcut window"
+msgid "Keyboard shortcuts"
+msgstr "Trumpiniai"
 
 msgctxt "shortcut window"
 msgid "Toggle search bar"
@@ -467,6 +460,13 @@ msgstr "Siųsti el. paštu"
 msgctxt "shortcut window"
 msgid "Return to task entry mode"
 msgstr "Grįžti į įvedimo režimą"
+
+#~ msgid "Help"
+#~ msgstr "Žinynas"
+
+#~ msgctxt "shortcut window"
+#~ msgid "Help"
+#~ msgstr "Žinynas"
 
 #~ msgid "Total for {0}: {1}"
 #~ msgstr "Iš viso {0}: {1}"
