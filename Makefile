@@ -52,6 +52,25 @@ update-translations:
 	cd $(po_dir) && intltool-update -g gtimelog -p
 	for po in $(po_files); do msgmerge -U $$po $(po_dir)/gtimelog.pot; done
 
+.PHONY: mo-files
+mo-files: $(mo_files)
+
+.PHONY: flatpak
+flatpak:
+	# you may need to install the platform and sdk before this will work
+	# flatpak install flathub org.gnome.Platform//3.30 org.gnome.Sdk//3.30
+	flatpak-builder --force-clean build/flatpak flatpak/org.gtimelog.GTimeLog.yaml
+	# to run it do
+	# flatpak-builder --run build/flatpak flatpak/org.gtimelog.GTimeLog.yaml gtimelog
+
+.PHONY: flatpak-install
+flatpak-install:
+	# you may need to install the platform and sdk before this will work
+	# flatpak install flathub org.gnome.Platform//3.30 org.gnome.Sdk//3.30
+	flatpak-builder --force-clean build/flatpak flatpak/org.gtimelog.GTimeLog.yaml --install --user
+	# to run it do
+	# flatpak run org.gtimelog.GTimeLog
+
 %-gtk3.10.ui: %.ui
 	sed -e 's/margin_start/margin_left/' \
 	    -e 's/margin_end/margin_right/' \
