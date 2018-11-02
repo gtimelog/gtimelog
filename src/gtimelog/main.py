@@ -95,10 +95,6 @@ else:
 
 mark_time("gtimelog imports done")
 
-# When the app is properly installed, use HELP_URI = 'help:gtimelog'
-HELP_URI = ''
-HELP_DIR = os.path.abspath(os.path.join(HERE, 'help'))
-
 UI_DIR = HERE
 
 if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 12):
@@ -328,7 +324,6 @@ class Application(Gtk.Application):
         actions = [
             'preferences',
             'shortcuts',
-            'help',
             'about',
             'quit',
             'edit-log',
@@ -432,7 +427,6 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.go-home", ["<Alt>Home"])
         self.set_accels_for_action("app.edit-log", ["<Primary>E"])
         self.set_accels_for_action("app.edit-tasks", ["<Primary>T"])
-        self.set_accels_for_action("app.help", ["F1"])
         self.set_accels_for_action("app.shortcuts", ["<Primary>question"])
         self.set_accels_for_action("app.preferences", ["<Primary>P"])
         self.set_accels_for_action("app.quit", ["<Primary>Q"])
@@ -487,14 +481,6 @@ class Application(Gtk.Application):
         shortcuts_window = builder.get_object('shortcuts_window')
         shortcuts_window.set_transient_for(self.get_active_window())
         shortcuts_window.show_all()
-
-    def on_help(self, action, parameter):
-        if HELP_URI:
-            uri = HELP_URI
-        else:
-            filename = os.path.join(HELP_DIR, 'C', 'index.page')
-            uri = 'ghelp:' + GLib.filename_to_uri(filename, None).partition(':')[-1]
-        Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
 
     def get_contributors(self):
         contributors = []

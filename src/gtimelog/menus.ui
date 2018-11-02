@@ -10,10 +10,6 @@
         <attribute name="action">app.shortcuts</attribute>
       </item>
       <item>
-        <attribute name="label" translatable="yes">Help</attribute>
-        <attribute name="action">app.help</attribute>
-      </item>
-      <item>
         <attribute name="label" translatable="yes">About</attribute>
         <attribute name="action">app.about</attribute>
       </item>
@@ -53,10 +49,6 @@
       <item>
         <attribute name="label" translatable="yes">Keyboard Shortcuts</attribute>
         <attribute name="action">app.shortcuts</attribute>
-      </item>
-      <item>
-        <attribute name="label" translatable="yes">Help</attribute>
-        <attribute name="action">app.help</attribute>
       </item>
       <item>
         <attribute name="label" translatable="yes">About Time Log</attribute>
