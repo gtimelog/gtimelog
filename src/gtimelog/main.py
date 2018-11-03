@@ -31,21 +31,17 @@ import locale
 import logging
 import re
 import signal
-import subprocess
+import smtplib
 import sys
 from gettext import gettext as _
 from email.utils import parseaddr, formataddr
 from io import StringIO
 
-try:
-    from subprocess import DEVNULL
-except ImportError:
-    DEVNULL = open(os.devnull, 'w')
-
 mark_time("Python imports done")
 
 
-if '--debug' in sys.argv:
+DEBUG = '--debug' in sys.argv
+if DEBUG:
     os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
 
 
@@ -149,7 +145,7 @@ def make_option(long_name, short_name=None, flags=0, arg=GLib.OptionArg.NONE,
 # Global HTTP stuff
 
 class Authenticator(object):
-    # try to use GNOME Keyring if available
+    # Try to use GNOME Keyring if available
     try:
         gi.require_version('GnomeKeyring', '1.0')
         from gi.repository import GnomeKeyring as gnomekeyring
@@ -157,7 +153,6 @@ class Authenticator(object):
         gnomekeyring = None
 
     def __init__(self):
-        object.__init__(self)
         self.pending = []
         self.lookup_in_progress = False
         self.username = None
@@ -237,6 +232,11 @@ class Authenticator(object):
 
             callback(username, password)
 
+        flags = (Gio.AskPasswordFlags.NEED_PASSWORD
+                 | Gio.AskPasswordFlags.NEED_USERNAME)
+        if self.gnomekeyring:
+            flags |= Gio.AskPasswordFlags.SAVING_SUPPORTED
+
         mountoperation.connect('reply', on_reply)
         mountoperation.set_password_save(Gio.PasswordSave.PERMANENTLY)
         mountoperation.do_ask_password(mountoperation,
@@ -244,9 +244,7 @@ class Authenticator(object):
               'You need a username and a password to access %s') % (auth.get_realm(), uri.get_host()),
             '',
             auth.get_realm(),
-            Gio.AskPasswordFlags.NEED_PASSWORD
-            | Gio.AskPasswordFlags.NEED_USERNAME
-            | (Gio.AskPasswordFlags.SAVING_SUPPORTED if self.gnomekeyring else 0))
+            flags)
 
     def find_password(self, auth, uri, retrying, callback):
         def keyring_callback(username, password):
@@ -1232,27 +1230,43 @@ class Window(Gtk.ApplicationWindow):
         sender_name, sender_address = parseaddr(sender)
         recipient_name, recipient_address = parseaddr(recipient)
         msg = prepare_message(sender, recipient, subject, body)
-        command = ['/usr/sbin/sendmail']
-        if sender_address:
-            command += ['-f', sender_address]
-        command.append(recipient_address)
+
+        mail_protocol = self.gsettings.get_string('mail-protocol')
+        factory = {
+            'SMTP': smtplib.SMTP,
+            'SMTPS': smtplib.SMTP_SSL,
+            'SMTP/StartTLS': smtplib.SMTP,
+        }[mail_protocol]
+
+        smtp_server = self.gsettings.get_string('smtp-server')
+        smtp_port = self.gsettings.get_int('smtp-port')
+
+        smtp_username = self.gsettings.get_string('smtp-username')
+        smtp_password = ''  # TODO: use the keyring
+
         try:
-            sendmail = subprocess.Popen(
-                command,
-                stdin=subprocess.PIPE,
-                stdout=DEVNULL,
-                stderr=subprocess.STDOUT,
-            )
-            stdin = to_bytes(msg.as_string())
-            stdout, stderr = sendmail.communicate(stdin)
-        except OSError as e:
-            log.error(_("Couldn't execute %s: %s"), command, e)
+            log.debug('Connecting to %s port %s',
+                      smtp_server, smtp_port or '(default)')
+            # XXX: can't use with on python 2!
+            with factory(smtp_server, smtp_port) as smtp:
+                if DEBUG:
+                    smtp.set_debuglevel(1)
+                if mail_protocol == 'SMTP/StartTLS':
+                    log.debug('Issuing STARTTLS')
+                    smtp.starttls()
+                if smtp_username:
+                    log.debug('Logging in as %s', smtp_username)
+                    smtp.login(smtp_username, smtp_password)
+                log.debug('Sending email from %s to %s',
+                          sender_address, recipient_address)
+                smtp.sendmail(sender_address, [recipient_address], msg.as_string())
+                log.debug('Closing SMTP connection')
+        except (OSError, smtplib.SMTPException) as e:
+            log.error(_("Couldn't send mail: %s"), e)
             return False
         else:
-            if sendmail.returncode != 0:
-                log.error(_("Couldn't send email: %s returned code %d"),
-                          command, sendmail.returncode)
-            return sendmail.returncode == 0
+            log.debug('Email sent!')
+            return True
 
     def record_sent_email(self, time_range, date, recipient):
         record = self.report_view.record
@@ -2079,7 +2093,7 @@ def main():
 
     root_logger = logging.getLogger()
     root_logger.addHandler(logging.StreamHandler())
-    if '--debug' in sys.argv:
+    if DEBUG:
         root_logger.setLevel(logging.DEBUG)
     else:
         root_logger.setLevel(logging.INFO)

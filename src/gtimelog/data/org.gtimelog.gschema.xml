@@ -8,6 +8,13 @@
         <value nick="summary" value="3"/>
     </enum>
 
+    <enum id="org.gtimelog.MailProtocol">
+        <!-- maybe /usr/sbin/sendmail should be an allowed option? -->
+        <value nick="SMTP" value="1"/>
+        <value nick="SMTPS" value="2"/>
+        <value nick="SMTP (StartTLS)" value="3"/>
+    </enum>
+
     <schema path="/org/gtimelog/" id="org.gtimelog">
 
         <key name="settings-migrated" type="b">
@@ -76,6 +83,31 @@
             <default>"Anonymous &lt;me@example.com&gt;"</default>
             <summary>Sender email</summary>
             <description>Sender email for activity reports.</description>
+        </key>
+
+        <key name="mail-protocol" enum="org.gtimelog.MailProtocol">
+            <default>"SMTP"</default>
+            <summary>Email protocol</summary>
+            <description>Mechanism for sending outgoing mail.</description>
+        </key>
+
+        <key name="smtp-server" type="s">
+            <default>"localhost"</default>
+            <summary>SMTP server</summary>
+            <description>SMTP server hostname for outgoing email.</description>
+        </key>
+
+        <key name="smtp-port" type="i">
+            <default>0</default>
+            <summary>SMTP port</summary>
+            <description>SMTP server port for outgoing email (0 = default: 25 for SMTP, 465 for SMTPS).</description>
+            <range min="0" max="65535" />
+        </key>
+
+        <key name="smtp-username" type="s">
+            <default>""</default>
+            <summary>SMTP username</summary>
+            <description>Username for SMTP authentication.</description>
         </key>
 
         <key name="list-email" type="s">
