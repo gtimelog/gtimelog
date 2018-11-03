@@ -1003,6 +1003,10 @@ class Window(Gtk.ApplicationWindow):
         if self.editing_remote_tasks:
             self.download_tasks()
             self.editing_remote_tasks = False
+        # In case inotify magic fails, let's allow the user to refresh by
+        # switching focus.
+        self.check_reload()
+        self.check_reload_tasks()
 
     def virtual_midnight_changed(self, *args):
         if self.timelog:
