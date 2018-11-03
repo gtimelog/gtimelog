@@ -1049,14 +1049,23 @@ class Window(Gtk.ApplicationWindow):
         return (self.props.window.get_state() & MAXIMIZED_IN_ANY_WAY) != 0
 
     def watch_file(self, filename, callback):
+        log.debug('adding watch on %s', filename)
         gf = Gio.File.new_for_path(filename)
         gfm = gf.monitor_file(Gio.FileMonitorFlags.NONE, None)
         gfm.connect('changed', callback)
-        self._watches[filename] = gfm  # keep a reference so it doesn't get garbage collected
+        self._watches[filename] = (gfm, None)  # keep a reference so it doesn't get garbage collected
+        if os.path.islink(filename):
+            realpath = os.path.join(os.path.dirname(filename), os.readlink(filename))
+            log.debug('%s is a symlink, adding a watch on %s', filename, realpath)
+            self._watches[filename] = (gfm, realpath)
+            if realpath not in self._watches:  # protect against infinite loops
+                self.watch_file(realpath, callback)
 
     def unwatch_file(self, filename):
-        if filename in self._watches:
-            del self._watches[filename]
+        # watch_file(a_symlink, callback) creates multiple watches, so be sure to unwatch them all
+        while filename in self._watches:
+            log.debug('removing watch on %s', filename)
+            filename = self._watches.pop(filename)[1]
 
     def get_last_time(self):
         if self.timelog is None:
@@ -1307,12 +1316,14 @@ class Window(Gtk.ApplicationWindow):
         # systems/OSes don't ever send it, react to other events after a
         # short delay, so we wouldn't have to reload the file more than
         # once.
+        log.debug('watch on %s reports %s', file.get_path(), event_type.value_nick.upper())
         if event_type == Gio.FileMonitorEvent.CHANGES_DONE_HINT:
             self.check_reload()
         else:
             GLib.timeout_add_seconds(1, self.check_reload)
 
     def on_tasks_file_changed(self, monitor, file, other_file, event_type):
+        log.debug('watch on %s reports %s', file.get_path(), event_type.value_nick.upper())
         if event_type == Gio.FileMonitorEvent.CHANGES_DONE_HINT:
             self.check_reload_tasks()
         else:
