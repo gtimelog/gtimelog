@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-0.11.2 (unreleased)
+0.11.2 (2018-11-03)
 ~~~~~~~~~~~~~~~~~~~
 
 - Window menu now includes items previously shown only in the app menu:
