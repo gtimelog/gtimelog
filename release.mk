@@ -1,4 +1,4 @@
-# Makefile.rules version 1.2.1 (2018-11-03)
+# release.mk version 1.3 (2018-11-03)
 #
 # Helpful Makefile rules for releasing Python packages.
 # https://github.com/mgedmin/python-project-skel
@@ -12,6 +12,7 @@ CHANGELOG_FORMAT ?= $(changelog_ver) ($(changelog_date))
 # These should be fine
 PYTHON ?= python
 PYPI_PUBLISH ?= rm -rf dist && $(PYTHON) setup.py -q sdist bdist_wheel && twine check dist/* && twine upload dist/*
+LATEST_RELEASE_MK_URL = https://raw.githubusercontent.com/mgedmin/python-project-skel/master/release.mk
 
 # These should be fine, as long as you use Git
 VCS_GET_LATEST ?= git pull
@@ -69,8 +70,11 @@ distcheck-sdist:
 	  rm -rf tmp && \
 	  echo "sdist seems to be ok"
 
-# NB: do not use $(MAKE) because then make -n releasechecklist will
-# actually run the distcheck instead of just printing what it does
+.PHONY: check-latest-rules
+check-latest-rules:
+ifndef FORCE
+	@curl -s $(LATEST_RELEASE_MK_URL) | cmp -s release.mk || { printf "\nYour release.mk does not match the latest version at\n$(LATEST_RELEASE_MK_URL)\n\n" 1>&2; exit 1; }
+endif
 
 .PHONY: check-latest-version
 check-latest-version:
@@ -91,8 +95,11 @@ check-changelog:
 	    grep -q "^$$ver_and_date$$" $(FILE_WITH_CHANGELOG) || { \
 	        echo "$(FILE_WITH_CHANGELOG) has no entry for $$ver_and_date"; exit 1; }
 
+# NB: do not use $(MAKE) because then make -n releasechecklist will
+# actually run the distcheck instead of just printing what it does
+
 .PHONY: releasechecklist
-releasechecklist: check-latest-version check-version-number check-long-description check-changelog
+releasechecklist: check-latest-rules check-latest-version check-version-number check-long-description check-changelog
 	make distcheck
 
 .PHONY: release
