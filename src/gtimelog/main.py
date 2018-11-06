@@ -95,10 +95,6 @@ else:
 
 mark_time("gtimelog imports done")
 
-# When the app is properly installed, use HELP_URI = 'help:gtimelog'
-HELP_URI = ''
-HELP_DIR = os.path.abspath(os.path.join(HERE, 'help'))
-
 UI_DIR = HERE
 
 if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 12):
@@ -109,6 +105,7 @@ else:
     PREFERENCES_UI_FILE = os.path.join(UI_DIR, 'preferences.ui')
 
 ABOUT_DIALOG_UI_FILE = os.path.join(UI_DIR, 'about.ui')
+SHORTCUTS_UI_FILE = os.path.join(UI_DIR, 'shortcuts.ui')
 MENUS_UI_FILE = os.path.join(UI_DIR, 'menus.ui')
 CSS_FILE = os.path.join(UI_DIR, 'gtimelog.css')
 LOCALE_DIR = os.path.join(UI_DIR, 'locale')
@@ -324,8 +321,18 @@ class Application(Gtk.Application):
 
     class Actions(object):
 
+        actions = [
+            'preferences',
+            'shortcuts',
+            'about',
+            'quit',
+            'edit-log',
+            'edit-tasks',
+            'refresh-tasks',
+        ]
+
         def __init__(self, app):
-            for action_name in ['preferences', 'help', 'about', 'quit', 'edit-log', 'edit-tasks', 'refresh-tasks']:
+            for action_name in self.actions:
                 action = Gio.SimpleAction.new(action_name, None)
                 action.connect('activate', getattr(app, 'on_' + action_name.replace('-', '_')))
                 app.add_action(action)
@@ -396,9 +403,10 @@ class Application(Gtk.Application):
             screen, css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         mark_time("CSS loaded")
 
-        builder = Gtk.Builder.new_from_file(MENUS_UI_FILE)
-        self.set_app_menu(builder.get_object('app_menu'))
-        mark_time("menus loaded")
+        if Gtk.Settings.get_default().get_property('gtk-shell-shows-app-menu'):
+            builder = Gtk.Builder.new_from_file(MENUS_UI_FILE)
+            self.set_app_menu(builder.get_object('app_menu'))
+            mark_time("menus loaded")
 
         self.actions = self.Actions(self)
 
@@ -419,7 +427,7 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.go-home", ["<Alt>Home"])
         self.set_accels_for_action("app.edit-log", ["<Primary>E"])
         self.set_accels_for_action("app.edit-tasks", ["<Primary>T"])
-        self.set_accels_for_action("app.help", ["F1"])
+        self.set_accels_for_action("app.shortcuts", ["<Primary>question"])
         self.set_accels_for_action("app.preferences", ["<Primary>P"])
         self.set_accels_for_action("app.quit", ["<Primary>Q"])
         self.set_accels_for_action("win.report", ["<Primary>D"])
@@ -468,13 +476,11 @@ class Application(Gtk.Application):
         if not os.path.exists(filename):
             open(filename, 'a').close()
 
-    def on_help(self, action, parameter):
-        if HELP_URI:
-            uri = HELP_URI
-        else:
-            filename = os.path.join(HELP_DIR, 'C', 'index.page')
-            uri = 'ghelp:' + GLib.filename_to_uri(filename, None).partition(':')[-1]
-        Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
+    def on_shortcuts(self, action, parameter):
+        builder = Gtk.Builder.new_from_file(SHORTCUTS_UI_FILE)
+        shortcuts_window = builder.get_object('shortcuts_window')
+        shortcuts_window.set_transient_for(self.get_active_window())
+        shortcuts_window.show_all()
 
     def get_contributors(self):
         contributors = []
@@ -500,11 +506,16 @@ class Application(Gtk.Application):
         preferences.connect("response", lambda *args: preferences.destroy())
         preferences.run()
 
+    def are_there_any_modals(self):
+        # Fix for https://github.com/gtimelog/gtimelog/issues/127
+        return any(window.get_modal()
+                   for window in Gtk.Window.list_toplevels())
+
     def do_activate(self):
         mark_time("in app activate")
         window = self.get_active_window()
         if window is not None:
-            if not window.is_active():
+            if not window.is_active() and not self.are_there_any_modals():
                 # If I don't hide the window before calling present(), GNOME
                 # Shell (on Wayland) ignores the presentation request:
                 # https://bugzilla.gnome.org/show_bug.cgi?id=756202 and
@@ -992,6 +1003,10 @@ class Window(Gtk.ApplicationWindow):
         if self.editing_remote_tasks:
             self.download_tasks()
             self.editing_remote_tasks = False
+        # In case inotify magic fails, let's allow the user to refresh by
+        # switching focus.
+        self.check_reload()
+        self.check_reload_tasks()
 
     def virtual_midnight_changed(self, *args):
         if self.timelog:
@@ -1038,14 +1053,23 @@ class Window(Gtk.ApplicationWindow):
         return (self.props.window.get_state() & MAXIMIZED_IN_ANY_WAY) != 0
 
     def watch_file(self, filename, callback):
+        log.debug('adding watch on %s', filename)
         gf = Gio.File.new_for_path(filename)
         gfm = gf.monitor_file(Gio.FileMonitorFlags.NONE, None)
         gfm.connect('changed', callback)
-        self._watches[filename] = gfm  # keep a reference so it doesn't get garbage collected
+        self._watches[filename] = (gfm, None)  # keep a reference so it doesn't get garbage collected
+        if os.path.islink(filename):
+            realpath = os.path.join(os.path.dirname(filename), os.readlink(filename))
+            log.debug('%s is a symlink, adding a watch on %s', filename, realpath)
+            self._watches[filename] = (gfm, realpath)
+            if realpath not in self._watches:  # protect against infinite loops
+                self.watch_file(realpath, callback)
 
     def unwatch_file(self, filename):
-        if filename in self._watches:
-            del self._watches[filename]
+        # watch_file(a_symlink, callback) creates multiple watches, so be sure to unwatch them all
+        while filename in self._watches:
+            log.debug('removing watch on %s', filename)
+            filename = self._watches.pop(filename)[1]
 
     def get_last_time(self):
         if self.timelog is None:
@@ -1296,12 +1320,14 @@ class Window(Gtk.ApplicationWindow):
         # systems/OSes don't ever send it, react to other events after a
         # short delay, so we wouldn't have to reload the file more than
         # once.
+        log.debug('watch on %s reports %s', file.get_path(), event_type.value_nick.upper())
         if event_type == Gio.FileMonitorEvent.CHANGES_DONE_HINT:
             self.check_reload()
         else:
             GLib.timeout_add_seconds(1, self.check_reload)
 
     def on_tasks_file_changed(self, monitor, file, other_file, event_type):
+        log.debug('watch on %s reports %s', file.get_path(), event_type.value_nick.upper())
         if event_type == Gio.FileMonitorEvent.CHANGES_DONE_HINT:
             self.check_reload_tasks()
         else:

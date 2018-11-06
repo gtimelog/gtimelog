@@ -1,6 +1,21 @@
 Changelog
 ---------
 
+0.11.2 (2018-11-03)
+~~~~~~~~~~~~~~~~~~~
+
+- Window menu now includes items previously shown only in the app menu:
+  Preferences, About (GH: #126).
+
+- Keyboard shortcuts window (press Ctrl+Shift+?).
+
+- Dropped the help page (there was only one and it was only listing keyboard
+  shortucts, and it was also incomplete and had no translations).
+
+- Bugfix: if timelog.txt was a symlink, changes to the symlink target would
+  not get noticed automatically (GH: #128).
+
+
 0.11.1 (2018-07-18)
 ~~~~~~~~~~~~~~~~~~~
 
