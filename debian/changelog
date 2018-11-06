@@ -1,9 +1,8 @@
-gtimelog (0.11.1-2mg1) UNRELEASED; urgency=medium
+gtimelog (0.11.2-0mg1) UNRELEASED; urgency=medium
 
+  * New upstream release.
   * Drop debhelper compat to 9.
   * Build PPA packages for Ubuntu.
-  * Install help files in the correct place (GH #111).
-  * Fix broken logo image in About dialog (GH #110).
 
  -- Marius Gedminas <marius@gedmin.as>  Mon, 05 Mar 2018 17:59:47 +0200
 
