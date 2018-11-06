@@ -3,7 +3,7 @@ Subject: point gtimelog into the right places
 
 --- a/src/gtimelog/main.py
 +++ b/src/gtimelog/main.py
-@@ -49,22 +49,6 @@
+@@ -50,22 +50,6 @@
  
  HERE = os.path.dirname(__file__)
  
@@ -25,8 +25,8 @@ Subject: point gtimelog into the right places
 -
  import gi
  gi.require_version('Gtk', '3.0')
- from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango
-@@ -94,10 +78,10 @@
+ gi.require_version('Soup', '2.4')
+@@ -96,10 +80,10 @@
  mark_time("gtimelog imports done")
  
  # When the app is properly installed, use HELP_URI = 'help:gtimelog'
@@ -39,7 +39,7 @@ Subject: point gtimelog into the right places
  
  if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 12):
      UI_FILE = os.path.join(UI_DIR, 'gtimelog-gtk3.10.ui')
-@@ -109,9 +93,9 @@
+@@ -111,9 +95,9 @@
  ABOUT_DIALOG_UI_FILE = os.path.join(UI_DIR, 'about.ui')
  MENUS_UI_FILE = os.path.join(UI_DIR, 'menus.ui')
  CSS_FILE = os.path.join(UI_DIR, 'gtimelog.css')

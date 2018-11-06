@@ -224,7 +224,7 @@ class TimeCollection(object):
         anything *before* the marker is the entry title,
         anything *following* it is the (space-separated) set of tags.
 
-        Return a tuple consisting of entry title and set of tags.
+        Returns a tuple consisting of entry title and set of tags.
         """
         if ' -- ' in entry:
             entry, tags_bundle = entry.split(' -- ', 1)
@@ -241,6 +241,19 @@ class TimeCollection(object):
         else:
             tags = set()
         return entry, tags
+
+    @staticmethod
+    def split_category(entry):
+        """Split the entry category from the entry itself.
+
+        Return a tuple (category, task).
+        """
+        if ': ' in entry:
+            return tuple(entry.split(': ', 1))
+        elif entry.endswith(':'):
+            return entry.partition(':')[0], ''
+        else:
+            return None, entry
 
     def set_of_all_tags(self):
         """Return the set of all tags mentioned in entries."""
@@ -307,18 +320,11 @@ class TimeCollection(object):
         entries = {}
         totals = {}
         for start, entry, duration in work:
-            if ': ' in entry:
-                cat, clipped_entry = entry.split(': ', 1)
-                entry_list = entries.get(cat, [])
-                entry_list.append((start, clipped_entry, duration))
-                entries[cat] = entry_list
-                totals[cat] = totals.get(cat, datetime.timedelta(0)) + duration
-            else:
-                entry_list = entries.get(None, [])
-                entry_list.append((start, entry, duration))
-                entries[None] = entry_list
-                totals[None] = totals.get(
-                    None, datetime.timedelta(0)) + duration
+            cat, task = self.split_category(entry)
+            entry_list = entries.get(cat, [])
+            entry_list.append((start, task, duration))
+            entries[cat] = entry_list
+            totals[cat] = totals.get(cat, datetime.timedelta(0)) + duration
         return entries, totals
 
     def totals(self, tag=None, filter_text=None):
@@ -656,13 +662,9 @@ class Reports(object):
                 if not duration:
                     continue # skip empty "arrival" entries
 
-                if ': ' in entry:
-                    cat, task = entry.split(': ', 1)
-                    categories[cat] = categories.get(
-                        cat, datetime.timedelta(0)) + duration
-                else:
-                    categories[None] = categories.get(
-                        None, datetime.timedelta(0)) + duration
+                cat, task = TimeCollection.split_category(entry)
+                categories[cat] = categories.get(
+                    cat, datetime.timedelta(0)) + duration
 
                 entry = entry[:1].upper() + entry[1:]
                 output.write(u"%-62s  %s\n" %
@@ -771,13 +773,9 @@ class Reports(object):
                 entry = entry[:1].upper() + entry[1:]
                 output.write(u"%-62s  %s\n" % (entry,
                                                format_duration_long(duration)))
-                if ': ' in entry:
-                    cat, task = entry.split(': ', 1)
-                    categories[cat] = categories.get(
-                        cat, datetime.timedelta(0)) + duration
-                else:
-                    categories[None] = categories.get(
-                        None, datetime.timedelta(0)) + duration
+                cat, task = TimeCollection.split_category(entry)
+                categories[cat] = categories.get(
+                    cat, datetime.timedelta(0)) + duration
 
             output.write('\n')
         output.write("Total work done: %s\n" % format_duration_long(total_work))

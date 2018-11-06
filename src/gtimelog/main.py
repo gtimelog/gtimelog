@@ -1,5 +1,5 @@
 """An application for keeping track of your time."""
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 
 import time
 import os
@@ -24,6 +24,7 @@ import datetime
 import email
 import email.header
 import email.mime.text
+import functools
 import gettext
 import io
 import locale
@@ -51,7 +52,8 @@ HERE = os.path.dirname(__file__)
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango
+gi.require_version('Soup', '2.4')
+from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango, Soup
 mark_time("Gtk imports done")
 
 from gtimelog import __version__
@@ -154,6 +156,152 @@ def make_option(long_name, short_name=None, flags=0, arg=GLib.OptionArg.NONE,
     option.description = description
     option.arg_description = arg_description
     return option
+
+
+# Global HTTP stuff
+
+class Authenticator(object):
+    # try to use GNOME Keyring if available
+    try:
+        gi.require_version('GnomeKeyring', '1.0')
+        from gi.repository import GnomeKeyring as gnomekeyring
+    except (ValueError, ImportError):
+        gnomekeyring = None
+
+    def __init__(self):
+        object.__init__(self)
+        self.pending = []
+        self.lookup_in_progress = False
+        self.username = None
+        self.password = None
+
+    def find_in_keyring(self, uri, callback):
+        """
+        Attempt to load a username and password from the keyring.
+        If the keyring is not available, return the last username
+        and password entered, if any.
+        """
+        username = self.username
+        password = self.password
+
+        if self.gnomekeyring is None:
+            callback(username, password)
+            return
+
+        # FIXME - would be nice to make all keyring calls async, to dodge
+        # the possibility of blocking the UI. The code is all set up for
+        # that, but there's no easy way to use the keyring asynchronously
+        # from Python (as of Gnome 3.20)...
+        result, keys = self.gnomekeyring.find_network_password_sync(
+                None,           # user
+                uri.get_host(), # domain
+                uri.get_host(), # server
+                None,           # object
+                uri.get_scheme(),# protocol
+                None,           # authtype
+                uri.get_port()) # port
+
+        if result == self.gnomekeyring.Result.NO_MATCH:
+            # We didn't find any passwords, just continue
+            pass
+        elif result == self.gnomekeyring.Result.NO_KEYRING_DAEMON:
+            pass
+        else:
+            entry = keys[-1] # take the last key (Why?)
+            username = entry.user
+            password = entry.password
+
+        callback(username, password)
+
+    def save_to_keyring(self, uri, username, password):
+        self.gnomekeyring.set_network_password_sync (
+                None,           # keyring
+                username,       # user
+                uri.get_host(), # domain
+                uri.get_host(), # server
+                None,           # object
+                uri.get_scheme(),# protocol
+                None,           # authtype
+                uri.get_port(), # port
+                password)       # password
+
+    def ask_the_user(self, auth, uri, callback):
+        """
+        Pop up a username/password dialog for uri
+        """
+        mountoperation = Gtk.MountOperation.new()
+
+        def on_reply(m, r):
+            if r == Gio.MountOperationResult.HANDLED:
+                username = m.get_username()
+                password = m.get_password()
+
+                if username and password:
+                    if self.gnomekeyring and (m.get_password_save() == Gio.PasswordSave.PERMANENTLY):
+                        self.save_to_keyring(uri, username, password)
+                    elif m.get_password_save() == Gio.PasswordSave.FOR_SESSION:
+                        self.username = username
+                        self.password = password
+
+            else:
+                username = None
+                password = None
+
+            callback(username, password)
+
+        mountoperation.connect('reply', on_reply)
+        mountoperation.set_password_save(Gio.PasswordSave.PERMANENTLY)
+        mountoperation.do_ask_password(mountoperation,
+            _('Authentication is required for "%s"\n'
+              'You need a username and a password to access %s') % (auth.get_realm(), uri.get_host()),
+            '',
+            auth.get_realm(),
+            Gio.AskPasswordFlags.NEED_PASSWORD |
+                Gio.AskPasswordFlags.NEED_USERNAME |
+                (Gio.AskPasswordFlags.SAVING_SUPPORTED if self.gnomekeyring else 0))
+
+    def find_password(self, auth, uri, retrying, callback):
+        def keyring_callback(username, password):
+            # If not found, ask the user for it
+            if username is None or retrying:
+                GObject.idle_add(lambda: self.ask_the_user(auth, uri, callback))
+            else:
+                callback(username, password)
+
+        self.find_in_keyring(uri, keyring_callback)
+
+    def http_auth_cb(self, session, message, auth, retrying, *args):
+        session.pause_message(message)
+        self.pending.insert(0, (session, message, auth, retrying))
+        self.maybe_pop_queue()
+
+    def maybe_pop_queue(self):
+        # I don't think we need any locking, because GIL.
+        if self.lookup_in_progress:
+            return
+
+        try:
+            (session, message, auth, retrying) = self.pending.pop()
+        except IndexError:
+            pass
+        else:
+            self.lookup_in_progress = True
+            uri = message.get_uri()
+            self.find_password(auth, uri, retrying,
+                callback=functools.partial(
+                    self.http_auth_finish, session, message, auth))
+
+    def http_auth_finish(self, session, message, auth, username, password):
+        if username and password:
+            auth.authenticate(username, password)
+
+        session.unpause_message(message)
+        self.lookup_in_progress = False
+        self.maybe_pop_queue()
+
+soup_session = Soup.SessionAsync()
+authenticator = Authenticator()
+soup_session.connect('authenticate', authenticator.http_auth_cb)
 
 
 class Application(Gtk.Application):
@@ -573,7 +721,6 @@ class Window(Gtk.ApplicationWindow):
         self.recipient_entry = builder.get_object("recipient_entry")
         self.subject_entry = builder.get_object("subject_entry")
         self.tasks_infobar = builder.get_object("tasks_infobar")
-        self.tasks_infobar.connect('response', lambda *args: self.tasks_infobar.hide())
         self.tasks_infobar_label = builder.get_object("tasks_infobar_label")
         self.infobar = builder.get_object("report_infobar")
         self.infobar.connect('response', lambda *args: self.infobar.hide())
@@ -778,9 +925,19 @@ class Window(Gtk.ApplicationWindow):
         else:
             self.infobar.hide()
 
-    def download_tasks(self):
+    def cancel_tasks_download(self, hide=True):
         if self._download:
-            return
+            old_message, old_url = self._download
+            soup_session.cancel_message(old_message, Soup.Status.CANCELLED)
+            self._download = None
+        if hide:
+            self.tasks_infobar.hide()
+
+    def download_tasks(self):
+        # hide=False and queue_resize() are needed to work around
+        # this bug: https://github.com/gtimelog/gtimelog/issues/89
+        self.cancel_tasks_download(hide=False)
+
         url = self.gsettings.get_string('task-list-url')
         if not url:
             log.debug("Not downloading tasks: URL not specified")
@@ -788,25 +945,27 @@ class Window(Gtk.ApplicationWindow):
         cache_filename = Settings().get_task_list_cache_file()
         self.tasks_infobar.set_message_type(Gtk.MessageType.INFO)
         self.tasks_infobar_label.set_text(_("Downloading tasks..."))
+        self.tasks_infobar.connect('response', lambda *args: self.cancel_tasks_download())
         self.tasks_infobar.show()
+        self.tasks_infobar.queue_resize()
         log.debug("Downloading tasks from %s", url)
-        cancellable = Gio.Cancellable()
-        gfile = Gio.File.new_for_uri(url)
-        self._download = (gfile, cancellable, url)
-        gfile.load_contents_async(cancellable, self.tasks_downloaded, cache_filename)
+        message = Soup.Message.new('GET', url)
+        self._download = (message, url)
+        soup_session.queue_message(message, self.tasks_downloaded, cache_filename)
 
-    def tasks_downloaded(self, source, result, cache_filename):
-        try:
-            success, content, etag = source.load_contents_finish(result)
-        except GLib.GError as e:
-            url = self._download[2]
-            log.error("Failed to download tasks from %s: %s", url, e)
+    def tasks_downloaded(self, session, message, cache_filename):
+        content = message.response_body.data
+        if message.status_code != Soup.Status.OK:
+            url = message.get_uri().to_string(just_path_and_query=False)
+
+            log.error("Failed to download tasks from %s: %d %s", url, message.status_code, message.reason_phrase)
             self.tasks_infobar.set_message_type(Gtk.MessageType.ERROR)
             self.tasks_infobar_label.set_text(_("Download failed."))
+            self.tasks_infobar.connect('response', lambda *args: self.infobar.hide())
             self.tasks_infobar.show()
         else:
-            log.debug("Successfully downloaded tasks (etag: %s):\n  %s",
-                      etag, content.decode('UTF-8', 'replace').replace('\n', '\n  '))
+            log.debug("Successfully downloaded tasks:\n  %s",
+                      content.decode('UTF-8', 'replace').replace('\n', '\n  '))
             with open(cache_filename, 'wb') as f:
                 f.write(content)
             self.check_reload_tasks()
