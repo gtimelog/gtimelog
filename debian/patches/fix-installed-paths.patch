@@ -1,9 +1,11 @@
 From: Andrej Shadura <andrewsh@debian.org>
 Subject: point gtimelog into the right places
 
---- a/src/gtimelog/main.py
-+++ b/src/gtimelog/main.py
-@@ -50,22 +50,6 @@
+Index: gtimelog/src/gtimelog/main.py
+===================================================================
+--- gtimelog.orig/src/gtimelog/main.py
++++ gtimelog/src/gtimelog/main.py
+@@ -50,22 +50,6 @@ if '--debug' in sys.argv:
  
  HERE = os.path.dirname(__file__)
  
@@ -26,21 +28,17 @@ Subject: point gtimelog into the right places
  import gi
  gi.require_version('Gtk', '3.0')
  gi.require_version('Soup', '2.4')
-@@ -96,10 +80,10 @@
- mark_time("gtimelog imports done")
+@@ -95,7 +79,7 @@ else:
  
- # When the app is properly installed, use HELP_URI = 'help:gtimelog'
--HELP_URI = ''
-+HELP_URI = 'help:gtimelog'
- HELP_DIR = os.path.abspath(os.path.join(HERE, 'help'))
+ mark_time("gtimelog imports done")
  
 -UI_DIR = HERE
 +UI_DIR = '/usr/share/gtimelog'
  
  if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 12):
      UI_FILE = os.path.join(UI_DIR, 'gtimelog-gtk3.10.ui')
-@@ -111,9 +95,9 @@
- ABOUT_DIALOG_UI_FILE = os.path.join(UI_DIR, 'about.ui')
+@@ -108,9 +92,9 @@ ABOUT_DIALOG_UI_FILE = os.path.join(UI_D
+ SHORTCUTS_UI_FILE = os.path.join(UI_DIR, 'shortcuts.ui')
  MENUS_UI_FILE = os.path.join(UI_DIR, 'menus.ui')
  CSS_FILE = os.path.join(UI_DIR, 'gtimelog.css')
 -LOCALE_DIR = os.path.join(UI_DIR, 'locale')
