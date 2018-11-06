@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: gtimelog
-Version: 0.11.1
+Version: 0.11.2
 Summary: A Gtk+ time tracking application
 Home-page: https://gtimelog.org/
 Author: Marius Gedminas
@@ -110,6 +110,21 @@ Description: GTimeLog
         Changelog
         ---------
         
+        0.11.2 (2018-11-03)
+        ~~~~~~~~~~~~~~~~~~~
+        
+        - Window menu now includes items previously shown only in the app menu:
+          Preferences, About (GH: #126).
+        
+        - Keyboard shortcuts window (press Ctrl+Shift+?).
+        
+        - Dropped the help page (there was only one and it was only listing keyboard
+          shortucts, and it was also incomplete and had no translations).
+        
+        - Bugfix: if timelog.txt was a symlink, changes to the symlink target would
+          not get noticed automatically (GH: #128).
+        
+        
         0.11.1 (2018-07-18)
         ~~~~~~~~~~~~~~~~~~~
         
@@ -174,36 +189,6 @@ Description: GTimeLog
             to 0 to hide the estimate).
         
         
-        0.10.0 (2015-09-29)
-        ~~~~~~~~~~~~~~~~~~~
-        
-        * Use Tango colors in the main text buffer (GH: #13).
-        
-        * Allow tagging entries (GH: #19)
-        
-          - The syntax is ``category: text -- tag1 tag2``
-          - Per-tag summaries show up in reports
-        
-        * Use GtkApplication instead of own DBus server for enforcing single-instance.
-        
-          - Drop --replace, --ignore-dbus command-line options because of this.
-          - Require glib and gio to be version 2.40 or newer for sane
-            GtkApplication-based command line parsing
-            (check with ``pkg-config --modversion glib-2.0 gio-2.0``).
-        
-        * Remove obsolete code:
-        
-          - Drop support for Python 2.6 (PyGObject dropped support for it long ago).
-          - Drop PyGtk/Gtk+ 2 support code (it didn't work since 0.9.1 anyway).
-          - Drop EggTrayIcon support (it was for Gtk+ 2 only anyway).
-          - Drop the --prefer-pygtk command-line option.
-        
-        * Disable tray icon by default for new users (existing gtimelogrc files will be
-          untouched).
-        
-        * Improve tray icon selection logic for best contrast (GH: #29).
-        
-        
         Older versions
         ~~~~~~~~~~~~~~
         
@@ -211,6 +196,7 @@ Description: GTimeLog
         
         .. _full changelog: https://github.com/gtimelog/gtimelog/blob/master/CHANGES.rst
         
+Keywords: time log logging timesheets gnome gtk
 Platform: UNKNOWN
 Classifier: Development Status :: 4 - Beta
 Classifier: Environment :: X11 Applications :: GTK

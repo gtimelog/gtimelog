@@ -55,6 +55,7 @@ setup(
     description=short_description,
     long_description=long_description,
     license='GPL',
+    keywords='time log logging timesheets gnome gtk',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: X11 Applications :: GTK',
