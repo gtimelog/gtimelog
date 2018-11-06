@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-07 20:45+0300\n"
+"POT-Creation-Date: 2018-11-02 18:07+0200\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -28,6 +28,14 @@ msgstr "Sekti kasdieninus darbus"
 #, python-brace-format
 msgid "{0} h {1} min"
 msgstr "{0} val {1} min"
+
+#, python-format
+msgid ""
+"Authentication is required for \"%s\"\n"
+"You need a username and a password to access %s"
+msgstr ""
+"Reikia prisijungti prie \"%s\"\n"
+"Reikia naudotojo vardo ir slaptažodžio, kad pasiektumėte %s"
 
 msgid "Show version number and exit"
 msgstr "Rodyti programos versiją ir išeiti"
@@ -215,8 +223,8 @@ msgstr "Uždaryti"
 msgid "Unable to configure translations: no locale.bindtextdomain()"
 msgstr "Nepavyko įjungti vertimų: nėra locale.bindtextdomain()"
 
-msgid "Copyright © 2004–2017 Marius Gedminas and contributors."
-msgstr "Autorinės teisės © 2004–2017 Marius Gedminas ir kiti."
+msgid "Copyright © 2004–2018 Marius Gedminas and contributors."
+msgstr "Autorinės teisės © 2004–2018 Marius Gedminas ir kiti."
 
 msgid "A time tracking application"
 msgstr "Programa darbo laiko sekimui"
@@ -290,8 +298,8 @@ msgstr "Kam"
 msgid "Nickname used in the Subject line"
 msgstr "Trumpas vardas temos laukeliui"
 
-msgid "Help"
-msgstr "Žinynas"
+msgid "Keyboard Shortcuts"
+msgstr "Trumpiniai"
 
 msgid "About"
 msgstr "Apie"
@@ -310,6 +318,9 @@ msgstr "Atnaujinti užduotis"
 
 msgid "Report..."
 msgstr "Ataskaita..."
+
+msgid "About Time Log"
+msgstr "Apie Laiko žurnalą"
 
 msgid "Detail level"
 msgstr "Detalumas"
@@ -337,6 +348,125 @@ msgstr "Mėnuo"
 
 msgid "Filter"
 msgstr "Filtruoti"
+
+msgctxt "shortcuts window"
+msgid "Entry"
+msgstr "Įvedimas"
+
+msgctxt "shortcut window"
+msgid "Detail level"
+msgstr "Detalumas"
+
+msgctxt "shortcut window"
+msgid "Full chronological list"
+msgstr "Chronologinis"
+
+msgctxt "shortcut window"
+msgid "Group by description"
+msgstr "Grupuoti pagal pavadinimą"
+
+msgctxt "shortcut window"
+msgid "Group by category"
+msgstr "Grupuoti pagal kategoriją"
+
+msgctxt "shortcut window"
+msgid "Time range"
+msgstr "Laiko intervalas"
+
+msgctxt "shortcut window"
+msgid "Day view"
+msgstr "Diena"
+
+msgctxt "shortcut window"
+msgid "Week view"
+msgstr "Savaitė"
+
+msgctxt "shortcut window"
+msgid "Month view"
+msgstr "Mėnuo"
+
+msgctxt "shortcut window"
+msgid "Time navigation"
+msgstr "Navigacija"
+
+msgctxt "shortcut window"
+msgid "Go back in time"
+msgstr "Eiti atgal laike"
+
+msgctxt "shortcut window"
+msgid "Go forward in time"
+msgstr "Eiti pirmyn laike"
+
+msgctxt "shortcut window"
+msgid "Go back to today"
+msgstr "Grįžti į šiandieną"
+
+msgctxt "shortcut window"
+msgid "General"
+msgstr "Bendri"
+
+msgctxt "shortcut window"
+msgid "Menu"
+msgstr "Meniu"
+
+msgctxt "shortcut window"
+msgid "Keyboard shortcuts"
+msgstr "Trumpiniai"
+
+msgctxt "shortcut window"
+msgid "Toggle search bar"
+msgstr "Rodyti/slėpti paieškos lauką"
+
+msgctxt "shortcut window"
+msgid "Edit task log"
+msgstr "Taisyti žurnalą"
+
+msgctxt "shortcut window"
+msgid "Preferences"
+msgstr "Nustatymai"
+
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Užverti programą"
+
+msgctxt "shortcut window"
+msgid "Task pane"
+msgstr "Užduočių skiltis"
+
+msgctxt "shortcut window"
+msgid "Toggle task pane"
+msgstr "Rodyti/slėpti užduočių skiltį"
+
+msgctxt "shortcut window"
+msgid "Edit task list"
+msgstr "Tvarkyti užduotis"
+
+msgctxt "shortcuts window"
+msgid "Reports"
+msgstr "Ataskaitos"
+
+msgctxt "shortcut window"
+msgid "Reporting"
+msgstr "Ataskaitos"
+
+msgctxt "shortcut window"
+msgid "Switch to report mode"
+msgstr "Ataskaitų režimas"
+
+msgctxt "shortcut window"
+msgid "Send report via email"
+msgstr "Siųsti el. paštu"
+
+msgctxt "shortcut window"
+msgid "Return to task entry mode"
+msgstr "Grįžti į įvedimo režimą"
+
+#~ msgid "Help"
+#~ msgstr "Žinynas"
+
+#~ msgctxt "shortcut window"
+#~ msgid "Help"
+#~ msgstr "Žinynas"
 
 #~ msgid "Total for {0}: {1}"
 #~ msgstr "Iš viso {0}: {1}"

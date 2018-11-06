@@ -30,7 +30,7 @@ docs/gtimelog.png
 docs/index.rst
 docs/mg.css
 docs/website.rst
-flatpak/org.gtimelog.GTimeLog.json
+flatpak/org.gtimelog.GTimeLog.yaml
 scripts/README.rst
 scripts/difftime.py
 scripts/export-my-calendar.py
@@ -51,6 +51,7 @@ src/gtimelog/menus.ui
 src/gtimelog/preferences-gtk3.10.ui
 src/gtimelog/preferences.ui
 src/gtimelog/settings.py
+src/gtimelog/shortcuts.ui
 src/gtimelog/timelog.py
 src/gtimelog.egg-info/PKG-INFO
 src/gtimelog.egg-info/SOURCES.txt
@@ -61,10 +62,6 @@ src/gtimelog.egg-info/requires.txt
 src/gtimelog.egg-info/top_level.txt
 src/gtimelog/data/gschemas.compiled
 src/gtimelog/data/org.gtimelog.gschema.xml
-src/gtimelog/help/C/index.page
-src/gtimelog/help/C/legal.xml
-src/gtimelog/help/C/shortcuts.page
-src/gtimelog/help/C/figures/gtimelog.png
 src/gtimelog/po/POTFILES.in
 src/gtimelog/po/en.po
 src/gtimelog/po/gtimelog.pot

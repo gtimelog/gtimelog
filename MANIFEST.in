@@ -1,6 +1,6 @@
 include COPYING
 include *.rst *.txt
-include Makefile
+include Makefile *.mk
 include gtimelog
 include gtimelog.desktop
 include gtimelog.desktop.in
@@ -16,13 +16,7 @@ include benchmark.py
 recursive-include src *.png *.ui *.xml *.css *.rst gschemas.compiled
 recursive-include docs *.png *.rst *.css Makefile
 recursive-include scripts *.py *.rst
-recursive-include src/gtimelog/help *.page *.xml *.png
 recursive-include src/gtimelog/po *.po *.pot *.in
+recursive-include flatpak *.yaml
 
 prune docs/build
-
-# added by check_manifest.py
-include *.mk
-
-# added by check_manifest.py
-recursive-include flatpak *.json

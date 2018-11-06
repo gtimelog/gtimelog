@@ -68,6 +68,14 @@ Tags must be separated from the rest of the entry by " -- ", i.e.,
 double-dash surrounded by spaces.  Tags will *not* be shown in the
 main UI pane.
 
+Back-dating Entries
+===================
+
+If you forget to enter an activity, you can enter it after the fact by
+prefixing it with a full time ("09:30 morning meeting") or a two digit minute-offset
+("-10 morning meeting").  Note that the new activity must still be after
+the last entered event, or things will become confusing!
+
 
 Tasks pane
 ==========
@@ -125,11 +133,6 @@ which is outside the scope of this document.)
 
 Correcting mistakes
 ===================
-
-If you forget to enter an activity, you can enter it after the fact by
-prefixing it with a full time ("09:30 morning meeting") or a minute-offset
-("-10 morning meeting").  Note that the new activity must still be after
-the last entered event, or things will become confusing!
 
 If you make a mistake and type in the wrong activity name, don't worry.
 GTimeLog stores the time log in a simple plain text file.  You can edit it
