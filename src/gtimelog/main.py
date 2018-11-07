@@ -48,22 +48,14 @@ mark_time("Python imports done")
 if '--debug' in sys.argv:
     os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
 
-HERE = os.path.dirname(__file__)
 
-SCHEMA_DIR = os.path.join(HERE, 'data')
-if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
-    # Have to do this before importing 'gi'.
-    os.environ['GSETTINGS_SCHEMA_DIR'] = SCHEMA_DIR
-    if not os.path.exists(os.path.join(SCHEMA_DIR, 'gschemas.compiled')):
-        # This, too, I have to do before importing 'gi'.
-        print("Compiling GSettings schema")
-        glib_compile_schemas = os.path.join(sys.prefix, 'lib', 'site-packages', 'gnome', 'glib-compile-schemas.exe')
-        if not os.path.exists(glib_compile_schemas):
-            glib_compile_schemas = 'glib-compile-schemas'
-        try:
-            subprocess.call([glib_compile_schemas, SCHEMA_DIR])
-        except OSError as e:
-            print("Failed: %s" % e)
+# The gtimelog.paths import has important side effects and must be done before
+# importing 'gi'.
+
+from .paths import (
+    UI_FILE, PREFERENCES_UI_FILE, ABOUT_DIALOG_UI_FILE, SHORTCUTS_UI_FILE,
+    MENUS_UI_FILE, CSS_FILE, LOCALE_DIR, CONTRIBUTORS_FILE,
+)
 
 
 import gi
@@ -94,23 +86,6 @@ else:
 
 
 mark_time("gtimelog imports done")
-
-UI_DIR = HERE
-
-if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 12):
-    UI_FILE = os.path.join(UI_DIR, 'gtimelog-gtk3.10.ui')
-    PREFERENCES_UI_FILE = os.path.join(UI_DIR, 'preferences-gtk3.10.ui')
-else:
-    UI_FILE = os.path.join(UI_DIR, 'gtimelog.ui')
-    PREFERENCES_UI_FILE = os.path.join(UI_DIR, 'preferences.ui')
-
-ABOUT_DIALOG_UI_FILE = os.path.join(UI_DIR, 'about.ui')
-SHORTCUTS_UI_FILE = os.path.join(UI_DIR, 'shortcuts.ui')
-MENUS_UI_FILE = os.path.join(UI_DIR, 'menus.ui')
-CSS_FILE = os.path.join(UI_DIR, 'gtimelog.css')
-LOCALE_DIR = os.path.join(UI_DIR, 'locale')
-
-CONTRIBUTORS_FILE = os.path.join(UI_DIR, 'CONTRIBUTORS.rst')
 
 
 log = logging.getLogger('gtimelog')
