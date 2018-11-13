@@ -1,6 +1,10 @@
 [run]
 source = src/gtimelog
-omit = src/gtimelog/tests/*,src/gtimelog/main.py
+omit =
+    src/gtimelog/main.py
+    src/gtimelog/paths.py
+    src/gtimelog/debian-paths.py
+    src/gtimelog/tests/*
 cover_pylib = False
 
 [report]

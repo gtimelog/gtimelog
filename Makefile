@@ -39,7 +39,7 @@ test:
 coverage:
 	detox -e coverage,coverage3 -- -p
 	coverage combine
-	coverage report
+	coverage report -m --fail-under=100
 
 .PHONY: coverage-diff
 coverage-diff: coverage
