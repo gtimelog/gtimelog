@@ -4,7 +4,7 @@ Changelog
 0.11.3 (unreleased)
 ~~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- Use a better workaround for window.present() not working on Wayland.
 
 
 0.11.2 (2018-11-03)

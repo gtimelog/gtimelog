@@ -490,16 +490,9 @@ class Application(Gtk.Application):
         mark_time("in app activate")
         window = self.get_active_window()
         if window is not None:
-            if not window.is_active() and not self.are_there_any_modals():
-                # If I don't hide the window before calling present(), GNOME
-                # Shell (on Wayland) ignores the presentation request:
-                # https://bugzilla.gnome.org/show_bug.cgi?id=756202 and
-                # https://bugzilla.gnome.org/show_bug.cgi?id=766284
-                # If I do hide the window, present() works, but -- again, under
-                # Wayland -- forgets the window position and jumps to the
-                # top-left corner of the 1st screen :(
-                window.hide()
-            window.present()
+            # window.present() doesn't work on wayland:
+            # https://gitlab.gnome.org/GNOME/gtk/issues/624#note_119092
+            window.present_with_time(GLib.get_monotonic_time() // 1000)
             return
 
         window = Window(self)
