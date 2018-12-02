@@ -423,11 +423,17 @@ class Application(Gtk.Application):
     def on_quit(self, action, parameter):
         self.quit()
 
+    def open_in_editor(self, filename):
+        self.create_if_missing(filename)
+        if os.name == 'nt':
+            os.startfile(filename)
+        else:
+            uri = GLib.filename_to_uri(filename, None)
+            Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
+
     def on_edit_log(self, action, parameter):
         filename = Settings().get_timelog_file()
-        uri = GLib.filename_to_uri(filename, None)
-        self.create_if_missing(filename)
-        Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
+        self.open_in_editor(filename)
 
     def on_edit_tasks(self, action, parameter):
         gsettings = Gio.Settings.new("org.gtimelog")
@@ -435,11 +441,10 @@ class Application(Gtk.Application):
             uri = gsettings.get_string('task-list-edit-url')
             if self.get_active_window() is not None:
                 self.get_active_window().editing_remote_tasks = True
+            Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
         else:
             filename = Settings().get_task_list_file()
-            self.create_if_missing(filename)
-            uri = GLib.filename_to_uri(filename, None)
-        Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
+            self.open_in_editor(filename)
 
     def on_refresh_tasks(self, action, parameter):
         gsettings = Gio.Settings.new("org.gtimelog")
