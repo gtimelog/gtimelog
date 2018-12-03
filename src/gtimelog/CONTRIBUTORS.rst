@@ -16,6 +16,7 @@ In alphabetic order:
 - Gaute Amundsen
 - Gintautas Miliauskas
 - Harald Friessnegger
+- Holger Brandhorst
 - Ignas Mikalajūnas
 - Jamu Kakar
 - Jean Jordaan

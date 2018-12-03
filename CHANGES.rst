@@ -6,6 +6,8 @@ Changelog
 
 - Use a better workaround for window.present() not working on Wayland.
 
+- Fix problem with "Edit log" and "Edit tasks" menu entries on Windows.
+
 
 0.11.2 (2018-11-03)
 ~~~~~~~~~~~~~~~~~~~
