@@ -44,12 +44,46 @@ You can run it from a source checkout without an explicit installation step::
   $ make
   $ ./gtimelog
 
-System requirements:
+
+Dependencies
+------------
 
 - Python (2.7 or 3.3+)
 - PyGObject
 - gobject-introspection type libraries for GTK+, Pango
 - GTK+ 3.10 or newer (3.14 or newer for best results)
+
+## PyPI dependencies (for installing using `pip`)
+
+- python-pip
+- pkg-config
+- libcairo-dev
+- libgirepository1.0-dev
+
+## runtime dependencies
+
+- python-gobject
+- python-gi-cairo
+- gir1.2-appindicator3
+- gir1.2-gtk-3.0
+- gir1.2-gtk-3.0
+- gir1.2-pango-1.0
+- gir1.2-soup-2.4
+
+## build dependencies
+
+- python-docutils  # for rst2man
+- libglib2.0-bin   # for glib-compile-schemas
+- gettext          # for msgfmt
+
+## test dependencies (in a clean VM, so you have GTK+ themes etc.)
+
+- dbus-x11
+- gnome-themes-standard
+- gnome-icon-theme-full
+- gnome-icon-theme-symbolic
+- libcanberra-gtk3-module
+- gedit
 
 
 Documentation
