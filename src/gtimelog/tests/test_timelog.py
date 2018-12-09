@@ -1245,6 +1245,30 @@ class TestTimeLog(Mixins, unittest.TestCase):
                          ("-200 did stuff", None))
 
 
+class TestTotals(unittest.TestCase):
+
+    TEST_TIMELOG = textwrap.dedent(
+        """
+        2018-12-09 08:30: start at home
+        2018-12-09 08:40: emails
+        2018-12-09 08:45: coffee **
+        2018-12-09 11:45: coding
+        """)
+
+    def setUp(self):
+        self.tw = make_time_window(
+            StringIO(self.TEST_TIMELOG),
+            datetime.datetime(2018, 12, 9, 8, 0),
+            datetime.datetime(2018, 12, 9, 23, 59),
+            datetime.time(2, 0),
+        )
+
+    def test_TimeWindow_totals(self):
+        work, slack = self.tw.totals()
+        self.assertEqual(work, datetime.timedelta(hours=3, minutes=10))
+        self.assertEqual(slack, datetime.timedelta(hours=0, minutes=5))
+
+
 class TestFiltering(unittest.TestCase):
 
     TEST_TIMELOG = textwrap.dedent("""
