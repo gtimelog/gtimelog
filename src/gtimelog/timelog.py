@@ -359,7 +359,9 @@ class TimeCollection(object):
                 continue
             if filter_text is not None and filter_text not in entry:
                 continue
-            if '**' in entry:
+            if '***' in entry:
+                continue
+            elif '**' in entry:
                 total_slacking += duration
             else:
                 total_work += duration

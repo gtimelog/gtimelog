@@ -1251,8 +1251,9 @@ class TestTotals(unittest.TestCase):
         """
         2018-12-09 08:30: start at home
         2018-12-09 08:40: emails
-        2018-12-09 08:45: coffee **
-        2018-12-09 11:45: coding
+        2018-12-09 09:10: travel to work ***
+        2018-12-09 09:15: coffee **
+        2018-12-09 12:15: coding
         """)
 
     def setUp(self):
