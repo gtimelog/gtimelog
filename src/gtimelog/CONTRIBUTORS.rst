@@ -34,6 +34,7 @@ In alphabetic order:
 - Rohan Mitchell
 - Shirish Agarwal  शिरीष अग्रवाल
 - Thom May
+- Till Hofmann
 - Tomaz Canabrava
 - Živilė Gedminaitė
 
