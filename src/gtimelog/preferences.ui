@@ -228,7 +228,7 @@
       <packing>
         <property name="name">entry</property>
         <property name="position">0</property>
-        <property name="title">Entry</property>
+        <property name="title" translatable="yes">Entry</property>
       </packing>
     </child>
     <child>
@@ -363,7 +363,7 @@
       </object>
       <packing>
         <property name="name">email</property>
-        <property name="title">Email</property>
+        <property name="title" translatable="yes">Email</property>
         <property name="position">1</property>
       </packing>
     </child>

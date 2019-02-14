@@ -12,14 +12,14 @@
     <property name="step_increment">0.5</property>
     <property name="page_increment">1</property>
   </object>
-  <object class="GtkBox" id="dialog-vbox">
+  <object class="GtkStack" id="dialog_stack">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="margin_left">18</property>
     <property name="margin_right">18</property>
     <property name="margin_top">18</property>
     <property name="margin_bottom">18</property>
-    <property name="orientation">vertical</property>
+    <property name="vhomogeneous">False</property>
     <child>
       <object class="GtkBox" id="box1">
         <property name="visible">True</property>
@@ -221,6 +221,20 @@
             <property name="position">1</property>
           </packing>
         </child>
+      </object>
+      <packing>
+        <property name="name">entry</property>
+        <property name="position">0</property>
+        <property name="title" translatable="yes">Entry</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkBox" id="box2">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="vexpand">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">18</property>
         <child>
           <object class="GtkBox" id="reports_box">
             <property name="visible">True</property>
@@ -228,7 +242,7 @@
             <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
-              <object class="GtkLabel" id="ireports_label">
+              <object class="GtkLabel" id="reports_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Reports by email</property>
@@ -345,18 +359,23 @@
         </child>
       </object>
       <packing>
-        <property name="expand">False</property>
-        <property name="fill">True</property>
-        <property name="position">0</property>
+        <property name="name">email</property>
+        <property name="title" translatable="yes">Email</property>
+        <property name="position">1</property>
       </packing>
     </child>
   </object>
-  <object class="GtkSizeGroup" id="labels">
+  <object class="GtkSizeGroup" id="entry_labels">
     <property name="mode">GTK_SIZE_GROUP_HORIZONTAL</property>
     <widgets>
       <widget name="virtual_midnight_label"/>
       <widget name="hours_label"/>
       <widget name="office_hours_label"/>
+    </widgets>
+  </object>
+  <object class="GtkSizeGroup" id="email_labels">
+    <property name="mode">GTK_SIZE_GROUP_HORIZONTAL</property>
+    <widgets>
       <widget name="sender_label"/>
       <widget name="recipient_label"/>
       <widget name="name_label"/>

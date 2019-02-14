@@ -39,6 +39,9 @@ msgstr ""
 msgid "Show debug information on the console"
 msgstr ""
 
+msgid "Open the preferences dialog"
+msgstr ""
+
 msgid ""
 "\n"
 "WARNING: GSettings schema for org.gtimelog is missing!  If you're running "
@@ -109,11 +112,7 @@ msgid "Couldn't send email to {}."
 msgstr ""
 
 #, python-format
-msgid "Couldn't execute %s: %s"
-msgstr ""
-
-#, python-format
-msgid "Couldn't send email: %s returned code %d"
+msgid "Couldn't send mail: %s"
 msgstr ""
 
 msgid "Couldn't append to {}: {}"
@@ -275,6 +274,9 @@ msgstr ""
 msgid "(including lunch break)"
 msgstr ""
 
+msgid "Entry"
+msgstr ""
+
 msgid "Reports by email"
 msgstr ""
 
@@ -288,6 +290,9 @@ msgid "To"
 msgstr ""
 
 msgid "Nickname used in the Subject line"
+msgstr ""
+
+msgid "Email"
 msgstr ""
 
 msgid "Keyboard Shortcuts"
