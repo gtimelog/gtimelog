@@ -33,8 +33,9 @@ import re
 import signal
 import smtplib
 import sys
-from gettext import gettext as _
+from contextlib import closing
 from email.utils import parseaddr, formataddr
+from gettext import gettext as _
 from io import StringIO
 
 mark_time("Python imports done")
@@ -1247,8 +1248,7 @@ class Window(Gtk.ApplicationWindow):
         try:
             log.debug('Connecting to %s port %s',
                       smtp_server, smtp_port or '(default)')
-            # XXX: can't use with on python 2!
-            with factory(smtp_server, smtp_port) as smtp:
+            with closing(factory(smtp_server, smtp_port)) as smtp:
                 if DEBUG:
                     smtp.set_debuglevel(1)
                 if starttls:
