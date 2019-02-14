@@ -1232,10 +1232,10 @@ class Window(Gtk.ApplicationWindow):
         msg = prepare_message(sender, recipient, subject, body)
 
         mail_protocol = self.gsettings.get_string('mail-protocol')
-        factory = {
-            'SMTP': smtplib.SMTP,
-            'SMTPS': smtplib.SMTP_SSL,
-            'SMTP/StartTLS': smtplib.SMTP,
+        factory, starttls = {
+            'SMTP': (smtplib.SMTP, False),
+            'SMTPS': (smtplib.SMTP_SSL, False),
+            'SMTP (StartTLS)': (smtplib.SMTP, True),
         }[mail_protocol]
 
         smtp_server = self.gsettings.get_string('smtp-server')
@@ -1251,7 +1251,7 @@ class Window(Gtk.ApplicationWindow):
             with factory(smtp_server, smtp_port) as smtp:
                 if DEBUG:
                     smtp.set_debuglevel(1)
-                if mail_protocol == 'SMTP/StartTLS':
+                if starttls:
                     log.debug('Issuing STARTTLS')
                     smtp.starttls()
                 if smtp_username:
