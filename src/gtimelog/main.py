@@ -2060,6 +2060,12 @@ class PreferencesDialog(Gtk.Dialog):
         sender_entry = builder.get_object('sender_entry')
         recipient_entry = builder.get_object('recipient_entry')
 
+        protocol_combo = builder.get_object('protocol_combo')
+        server_entry = builder.get_object('server_entry')
+        port_entry = builder.get_object('port_entry')
+        self.port_entry = port_entry
+        username_entry = builder.get_object('username_entry')
+
         self.gsettings = Gio.Settings.new("org.gtimelog")
         self.gsettings.bind('hours', hours_entry, 'value', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('office-hours', office_hours_entry, 'value', Gio.SettingsBindFlags.DEFAULT)
@@ -2069,6 +2075,14 @@ class PreferencesDialog(Gtk.Dialog):
         self.gsettings.connect('changed::virtual-midnight', self.virtual_midnight_changed)
         self.virtual_midnight_changed()
         self.virtual_midnight_entry.connect('focus-out-event', self.virtual_midnight_set)
+        for value in self.gsettings.get_range('mail-protocol')[1]:
+            protocol_combo.append(value, value)
+        self.gsettings.bind('mail-protocol', protocol_combo, 'active-id', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('smtp-server', server_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.connect('changed::smtp-port', self.smtp_port_changed)
+        self.smtp_port_changed()
+        port_entry.connect('focus-out-event', self.smtp_port_set)
+        self.gsettings.bind('smtp-username', username_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
 
     def make_enter_close_the_dialog(self):
         hb = self.get_header_bar()
@@ -2095,6 +2109,20 @@ class PreferencesDialog(Gtk.Dialog):
             h, m = self.gsettings.get_value('virtual-midnight')
             if (h, m) != (vm.hour, vm.minute):
                 self.gsettings.set_value('virtual-midnight', GLib.Variant('(ii)', (vm.hour, vm.minute)))
+
+    def smtp_port_changed(self, *args):
+        port = self.gsettings.get_int('smtp-port')
+        self.port_entry.set_text(str(port))
+
+    def smtp_port_set(self, *args):
+        try:
+            port = int(self.port_entry.get_text())
+            if not 0 <= port <= 65535:
+                raise ValueError('value out of range')
+        except ValueError:
+            self.smtp_port_changed()
+        else:
+            self.gsettings.set_int('smtp-port', port)
 
 
 def main():
