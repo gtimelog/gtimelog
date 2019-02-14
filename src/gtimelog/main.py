@@ -323,6 +323,7 @@ class Application(Gtk.Application):
         self.add_main_option_entries([
             make_option("--version", description=_("Show version number and exit")),
             make_option("--debug", description=_("Show debug information on the console")),
+            make_option("--prefs", description=_("Open the preferences dialog")),
         ])
 
     def check_schema(self):
@@ -359,6 +360,8 @@ class Application(Gtk.Application):
 
     def do_command_line(self, command_line):
         self.do_activate()
+        if command_line.get_options_dict().contains('prefs'):
+            self.on_preferences()
         return 0
 
     def do_startup(self):
@@ -481,7 +484,10 @@ class Application(Gtk.Application):
         about_dialog.connect("response", lambda *args: about_dialog.destroy())
         about_dialog.show()
 
-    def on_preferences(self, action, parameter):
+    def on_preferences(self, action=None, parameter=None):
+        if self.are_there_any_modals():
+            # Don't let a user invoke this recursively via gtimelog --prefs
+            return
         preferences = PreferencesDialog(self.get_active_window())
         preferences.connect("response", lambda *args: preferences.destroy())
         preferences.run()
