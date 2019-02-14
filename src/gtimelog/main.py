@@ -2045,8 +2045,11 @@ class PreferencesDialog(Gtk.Dialog):
             GLib.idle_add(self.make_enter_close_the_dialog)
 
         builder = Gtk.Builder.new_from_file(PREFERENCES_UI_FILE)
-        vbox = builder.get_object('dialog-vbox')
-        self.get_content_area().add(vbox)
+        stack = builder.get_object('dialog_stack')
+        self.get_content_area().add(stack)
+        stack_switcher = Gtk.StackSwitcher(stack=stack)
+        self.get_header_bar().set_custom_title(stack_switcher)
+        stack_switcher.show()
 
         virtual_midnight_entry = builder.get_object('virtual_midnight_entry')
         self.virtual_midnight_entry = virtual_midnight_entry
