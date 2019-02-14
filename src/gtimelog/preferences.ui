@@ -397,7 +397,7 @@
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">0</property>
+                    <property name="top_attach">2</property>
                   </packing>
                 </child>
                 <child>
@@ -408,7 +408,8 @@
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
-                    <property name="top_attach">0</property>
+                    <property name="top_attach">2</property>
+                    <property name="width">3</property>
                   </packing>
                 </child>
                 <child>
@@ -420,7 +421,7 @@
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">1</property>
+                    <property name="top_attach">0</property>
                   </packing>
                 </child>
                 <child>
@@ -433,7 +434,7 @@
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
-                    <property name="top_attach">1</property>
+                    <property name="top_attach">0</property>
                   </packing>
                 </child>
                 <child>
@@ -444,8 +445,8 @@
                     <property name="xalign">1</property>
                   </object>
                   <packing>
-                    <property name="left_attach">0</property>
-                    <property name="top_attach">2</property>
+                    <property name="left_attach">2</property>
+                    <property name="top_attach">0</property>
                   </packing>
                 </child>
                 <child>
@@ -459,8 +460,8 @@
                     <property name="activates_default">True</property>
                   </object>
                   <packing>
-                    <property name="left_attach">1</property>
-                    <property name="top_attach">2</property>
+                    <property name="left_attach">3</property>
+                    <property name="top_attach">0</property>
                   </packing>
                 </child>
                 <child>
@@ -472,7 +473,7 @@
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
-                    <property name="top_attach">3</property>
+                    <property name="top_attach">1</property>
                   </packing>
                 </child>
                 <child>
@@ -481,12 +482,12 @@
                     <property name="can_focus">True</property>
                     <property name="expand">True</property>
                     <property name="text"></property>
-                    <property name="placeholder_text" translatable="yes">(blank turns off authentication)</property>
                     <property name="activates_default">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
-                    <property name="top_attach">3</property>
+                    <property name="top_attach">1</property>
+                    <property name="width">3</property>
                   </packing>
                 </child>
               </object>
@@ -527,7 +528,6 @@
       <widget name="name_label"/>
       <widget name="protocol_label"/>
       <widget name="server_label"/>
-      <widget name="port_label"/>
       <widget name="username_label"/>
     </widgets>
   </object>
