@@ -2117,11 +2117,17 @@ class PreferencesDialog(Gtk.Dialog):
 
     def smtp_port_changed(self, *args):
         port = self.gsettings.get_int('smtp-port')
-        self.port_entry.set_text(str(port))
+        if port == 0:
+            self.port_entry.set_text('auto')
+        else:
+            self.port_entry.set_text(str(port))
 
     def smtp_port_set(self, *args):
+        port = self.port_entry.get_text()
+        if not port or port.lower() == "auto":
+            port = 0
         try:
-            port = int(self.port_entry.get_text())
+            port = int(port)
             if not 0 <= port <= 65535:
                 raise ValueError('value out of range')
         except ValueError:
