@@ -1008,7 +1008,7 @@ class Window(Gtk.ApplicationWindow):
             self.gsettings.set_int('task-pane-position', tpp)
 
     def store_window_size(self):
-        if not self.is_maximized_in_any_way():
+        if self.props.window is not None and not self.is_maximized_in_any_way():
             self._store_window_size()
         GLib.source_remove(self._window_size_update_timeout)
         self._window_size_update_timeout = None
