@@ -292,6 +292,30 @@ msgstr ""
 msgid "Nickname used in the Subject line"
 msgstr ""
 
+msgid "SMTP server"
+msgstr ""
+
+msgid "Security"
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid "TLS"
+msgstr ""
+
+msgid "StartTLS"
+msgstr ""
+
+msgid "Server"
+msgstr ""
+
+msgid "Port"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
 msgid "Email"
 msgstr ""
 
