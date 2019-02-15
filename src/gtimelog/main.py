@@ -20,6 +20,7 @@ def mark_time(what=None, _prev=[0, 0]):
 mark_time()
 mark_time("in script")
 
+import collections
 import datetime
 import email
 import email.header
@@ -86,6 +87,15 @@ mark_time("gtimelog imports done")
 
 
 log = logging.getLogger('gtimelog')
+
+
+MailProtocol = collections.namedtuple('MailProtocol', 'factory, startssl')
+
+MAIL_PROTOCOLS = {
+    'SMTP': MailProtocol(smtplib.SMTP, False),
+    'SMTPS': MailProtocol(smtplib.SMTP_SSL, False),
+    'SMTP (StartTLS)': MailProtocol(smtplib.SMTP, True),
+}
 
 
 def format_duration(duration):
@@ -1243,11 +1253,7 @@ class Window(Gtk.ApplicationWindow):
         msg = prepare_message(sender, recipient, subject, body)
 
         mail_protocol = self.gsettings.get_string('mail-protocol')
-        factory, starttls = {
-            'SMTP': (smtplib.SMTP, False),
-            'SMTPS': (smtplib.SMTP_SSL, False),
-            'SMTP (StartTLS)': (smtplib.SMTP, True),
-        }[mail_protocol]
+        factory, starttls = MAIL_PROTOCOLS[mail_protocol]
 
         smtp_server = self.gsettings.get_string('smtp-server')
         smtp_port = self.gsettings.get_int('smtp-port')
@@ -2085,6 +2091,7 @@ class PreferencesDialog(Gtk.Dialog):
         self.gsettings.bind('mail-protocol', protocol_combo, 'active-id', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('smtp-server', server_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.connect('changed::smtp-port', self.smtp_port_changed)
+        self.gsettings.connect('changed::mail-protocol', self.smtp_port_changed)
         self.smtp_port_changed()
         port_entry.connect('focus-out-event', self.smtp_port_set)
         self.gsettings.bind('smtp-username', username_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
@@ -2118,13 +2125,15 @@ class PreferencesDialog(Gtk.Dialog):
     def smtp_port_changed(self, *args):
         port = self.gsettings.get_int('smtp-port')
         if port == 0:
-            self.port_entry.set_text('auto')
+            mail_protocol = self.gsettings.get_string('mail-protocol')
+            default_port = MAIL_PROTOCOLS[mail_protocol].factory.default_port
+            self.port_entry.set_text('auto (%d)' % default_port)
         else:
             self.port_entry.set_text(str(port))
 
     def smtp_port_set(self, *args):
         port = self.port_entry.get_text()
-        if not port or port.lower() == "auto":
+        if not port or port.lower().startswith("auto"):
             port = 0
         try:
             port = int(port)
