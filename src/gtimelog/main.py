@@ -2,19 +2,24 @@
 from __future__ import print_function, absolute_import
 
 import time
-import os
-DEBUG = os.getenv('DEBUG')
+import sys
 
 
-def mark_time(what=None, _prev=[0, 0]):
-    t = time.time()
-    if DEBUG:
+DEBUG = '--debug' in sys.argv
+
+
+if DEBUG:
+    def mark_time(what=None, _prev=[0, 0]):
+        t = time.time()
         if what:
             print("{:.3f} ({:+.3f}) {}".format(t - _prev[1], t - _prev[0], what))
         else:
             print()
             _prev[1] = t
-    _prev[0] = t
+        _prev[0] = t
+else:
+    def mark_time(what=None):
+        pass
 
 
 mark_time()
@@ -30,10 +35,10 @@ import gettext
 import io
 import locale
 import logging
+import os
 import re
 import signal
 import smtplib
-import sys
 from contextlib import closing
 from email.utils import parseaddr, formataddr
 from gettext import gettext as _
@@ -42,7 +47,6 @@ from io import StringIO
 mark_time("Python imports done")
 
 
-DEBUG = '--debug' in sys.argv
 if DEBUG:
     os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
 
