@@ -2075,8 +2075,6 @@ class PreferencesDialog(Gtk.Dialog):
         self.gsettings.connect('changed::virtual-midnight', self.virtual_midnight_changed)
         self.virtual_midnight_changed()
         self.virtual_midnight_entry.connect('focus-out-event', self.virtual_midnight_set)
-        for value in self.gsettings.get_range('mail-protocol')[1]:
-            protocol_combo.append(value, value)
         self.gsettings.bind('mail-protocol', protocol_combo, 'active-id', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('smtp-server', server_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.connect('changed::smtp-port', self.smtp_port_changed)

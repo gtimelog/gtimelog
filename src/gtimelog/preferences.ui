@@ -405,6 +405,11 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="expand">True</property>
+                    <items>
+                      <item translatable="yes" id="SMTP">None</item>
+                      <item translatable="yes" id="SMTPS">TLS</item>
+                      <item translatable="yes" id="SMTP (StartTLS)">StartTLS</item>
+                    </items>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
