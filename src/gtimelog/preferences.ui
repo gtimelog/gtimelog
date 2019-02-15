@@ -21,7 +21,7 @@
     <property name="margin_bottom">18</property>
     <property name="vhomogeneous">False</property>
     <child>
-      <object class="GtkBox" id="box1">
+      <object class="GtkBox" id="entry_page">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="vexpand">False</property>
@@ -232,7 +232,7 @@
       </packing>
     </child>
     <child>
-      <object class="GtkBox" id="box2">
+      <object class="GtkBox" id="email_page">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="vexpand">False</property>

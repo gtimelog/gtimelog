@@ -324,6 +324,7 @@ class Application(Gtk.Application):
             make_option("--version", description=_("Show version number and exit")),
             make_option("--debug", description=_("Show debug information on the console")),
             make_option("--prefs", description=_("Open the preferences dialog")),
+            make_option("--email-prefs", description=_("Open the preferences dialog on the email page")),
         ])
 
     def check_schema(self):
@@ -360,7 +361,10 @@ class Application(Gtk.Application):
 
     def do_command_line(self, command_line):
         self.do_activate()
-        if command_line.get_options_dict().contains('prefs'):
+        options = command_line.get_options_dict()
+        if options.contains('email-prefs'):
+            self.on_preferences(page="email")
+        elif options.contains('prefs'):
             self.on_preferences()
         return 0
 
@@ -484,11 +488,11 @@ class Application(Gtk.Application):
         about_dialog.connect("response", lambda *args: about_dialog.destroy())
         about_dialog.show()
 
-    def on_preferences(self, action=None, parameter=None):
+    def on_preferences(self, action=None, parameter=None, page=None):
         if self.are_there_any_modals():
             # Don't let a user invoke this recursively via gtimelog --prefs
             return
-        preferences = PreferencesDialog(self.get_active_window())
+        preferences = PreferencesDialog(self.get_active_window(), page=page)
         preferences.connect("response", lambda *args: preferences.destroy())
         preferences.run()
 
@@ -2029,7 +2033,7 @@ class PreferencesDialog(Gtk.Dialog):
 
     use_header_bar = hasattr(Gtk.DialogFlags, 'USE_HEADER_BAR')
 
-    def __init__(self, transient_for):
+    def __init__(self, transient_for, page=None):
         kwargs = {}
         if self.use_header_bar:
             kwargs['use_header_bar'] = True
@@ -2050,6 +2054,9 @@ class PreferencesDialog(Gtk.Dialog):
         stack_switcher = Gtk.StackSwitcher(stack=stack)
         self.get_header_bar().set_custom_title(stack_switcher)
         stack_switcher.show()
+
+        if page:
+            stack.set_visible_child_name(page)
 
         virtual_midnight_entry = builder.get_object('virtual_midnight_entry')
         self.virtual_midnight_entry = virtual_midnight_entry
