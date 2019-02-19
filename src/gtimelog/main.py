@@ -67,7 +67,7 @@ mark_time("Gtk imports done")
 from gtimelog import __version__
 from gtimelog.settings import Settings
 from gtimelog.timelog import (
-    as_minutes, virtual_day, different_days, prev_month, next_month, uniq, parse_time,
+    as_minutes, virtual_day, different_days, prev_month, next_month, prev_year, next_year, uniq, parse_time,
     Reports, ReportRecord, TaskList, TimeLog)
 
 
@@ -598,6 +598,7 @@ REPORT_KINDS = {
     'day': ReportRecord.DAILY,
     'week': ReportRecord.WEEKLY,
     'month': ReportRecord.MONTHLY,
+    'year': ReportRecord.YEARLY,
 }
 
 
@@ -621,7 +622,7 @@ class Window(Gtk.ApplicationWindow):
 
     time_range = GObject.Property(
         type=str, default='day', nick='Time range',
-        blurb='Time range to show (day/week/month)')
+        blurb='Time range to show (day/week/month/year)')
 
     filter_text = GObject.Property(
         type=str, default='', nick='Filter text',
@@ -1056,6 +1057,8 @@ class Window(Gtk.ApplicationWindow):
             return self.timelog.window_for_week(self.date)
         elif self.time_range == 'month':
             return self.timelog.window_for_month(self.date)
+        elif self.time_range == 'year':
+            return self.timelog.window_for_year(self.date)
 
     def get_now(self):
         return datetime.datetime.now().replace(second=0, microsecond=0)
@@ -1131,13 +1134,15 @@ class Window(Gtk.ApplicationWindow):
                 isoyear, isoweek, monday, sunday)
         elif self.time_range == 'month':
             return _("{0:%B %Y}").format(date)
+        elif self.time_range == 'year':
+            return _("{0:%Y}").format(date)
 
     def detail_level_changed(self, obj, param_spec):
         assert self.detail_level in {'chronological', 'grouped', 'summary'}
         self.notify('subtitle')
 
     def time_range_changed(self, obj, param_spec):
-        assert self.time_range in {'day', 'week', 'month'}
+        assert self.time_range in {'day', 'week', 'month', 'year'}
         self.notify('subtitle')
 
     def on_search_changed(self, *args):
@@ -1150,6 +1155,8 @@ class Window(Gtk.ApplicationWindow):
             self.date -= datetime.timedelta(7)
         elif self.time_range == 'month':
             self.date = prev_month(self.date)
+        elif self.time_range == 'year':
+            self.date = prev_year(self.date)
 
     def on_go_forward(self, action, parameter):
         if self.time_range == 'day':
@@ -1158,6 +1165,8 @@ class Window(Gtk.ApplicationWindow):
             self.date += datetime.timedelta(7)
         elif self.time_range == 'month':
             self.date = next_month(self.date)
+        elif self.time_range == 'year':
+            self.date = next_year(self.date)
 
     def on_go_home(self, action, parameter):
         self.date = None
@@ -1481,7 +1490,7 @@ class LogView(Gtk.TextView):
 
     time_range = GObject.Property(
         type=str, default='day', nick='Time range',
-        blurb='Time range to show (day/week/month)')
+        blurb='Time range to show (day/week/month/year)')
 
     hours = GObject.Property(
         type=float, default=0, nick='Hours',
@@ -1556,6 +1565,8 @@ class LogView(Gtk.TextView):
             return self.timelog.window_for_week(self.date)
         elif self.time_range == 'month':
             return self.timelog.window_for_month(self.date)
+        elif self.time_range == 'year':
+            return self.timelog.window_for_year(self.date)
 
     def get_last_time(self):
         assert self.timelog is not None
@@ -1740,6 +1751,9 @@ class LogView(Gtk.TextView):
         elif self.time_range == 'month':
             fmt1 = _('Total work done this month: {0} ({1} per day)')
             fmt2 = _('Total work done this month: {0}')
+        elif self.time_range == 'year':
+            fmt1 = _('Total work done this year: {0} ({1} per day)')
+            fmt2 = _('Total work done this year: {0}')
         args = [(format_duration(total_work), 'duration')]
         if self.time_range == 'day':
             weekly_window = self.timelog.window_for_week(self.date)
@@ -1766,6 +1780,9 @@ class LogView(Gtk.TextView):
         elif self.time_range == 'month':
             fmt1 = _('Total slacking this month: {0} ({1} per day)')
             fmt2 = _('Total slacking this month: {0}')
+        elif self.time_range == 'year':
+            fmt1 = _('Total slacking this year: {0} ({1} per day)')
+            fmt2 = _('Total slacking this year: {0}')
         args = [(format_duration(total_slacking), 'duration')]
         if self.time_range == 'day':
             args.append((format_duration(week_total_slacking), 'duration'))
@@ -1842,7 +1859,7 @@ class ReportView(Gtk.TextView):
 
     time_range = GObject.Property(
         type=str, default='day', nick='Time range',
-        blurb='Time range to show (day/week/month)')
+        blurb='Time range to show (day/week/month/year)')
 
     report_style = GObject.Property(
         type=str, nick='Report style',
@@ -1906,6 +1923,8 @@ class ReportView(Gtk.TextView):
             return self.timelog.window_for_week(self.date)
         elif self.time_range == 'month':
             return self.timelog.window_for_month(self.date)
+        elif self.time_range == 'year':
+            return self.timelog.window_for_year(self.date)
 
     @GObject.Property(type=str, nick='Name', blurb='Report subject')
     def subject(self):
@@ -1925,6 +1944,8 @@ class ReportView(Gtk.TextView):
             self._subject = reports.weekly_report_subject(name)
         elif self.time_range == 'month':
             self._subject = reports.monthly_report_subject(name)
+        elif self.time_range == 'year':
+            self._subject = reports.yearly_report_subject(name)
         self.notify('subject')
 
     def populate_report(self):
@@ -1944,6 +1965,8 @@ class ReportView(Gtk.TextView):
             reports.weekly_report(output, recipient, name)
         elif self.time_range == 'month':
             reports.monthly_report(output, recipient, name)
+        elif self.time_range == 'year':
+            reports.yearly_report(output, recipient, name)
         textbuf = self.get_buffer()
         textbuf.set_text(output.getvalue())
         textbuf.place_cursor(textbuf.get_start_iter())

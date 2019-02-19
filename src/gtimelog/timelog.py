@@ -118,6 +118,21 @@ def next_month(date):
         return datetime.date(date.year, date.month + 1, 1)
 
 
+def first_of_year(date):
+    """Return the first day of the year for a given date."""
+    return datetime.date(date.year, 1, 1)
+
+
+def prev_year(date):
+    """Return the first day of the previous year."""
+    return datetime.date(date.year - 1, 1, 1)
+
+
+def next_year(date):
+    """Return the first day of the next year."""
+    return datetime.date(date.year + 1, 1, 1)
+
+
 def uniq(l):
     """Return list with consecutive duplicates removed."""
     result = l[:1]
@@ -726,6 +741,28 @@ class Reports(object):
         return self._categorizing_report(output, email, who, subject,
                                          period_name='month')
 
+    def yearly_report_subject(self, who):
+        year = self.window.min_timestamp.strftime('%Y')
+        return u'Yearly report for %s (%s)' % (who, year)
+
+    def yearly_report(self, output, email, who):
+        if self.style == 'categorized':
+            return self.yearly_report_categorized(output, email, who)
+        else:
+            return self.yearly_report_plain(output, email, who)
+
+    def yearly_report_plain(self, output, email, who):
+        """Format a yearly report ."""
+        subject = self.yearly_report_subject(who)
+        return self._plain_report(output, email, who, subject,
+                                  period_name='year')
+
+    def yearly_report_categorized(self, output, email, who):
+        """Format a yearly report with entries displayed  under categories."""
+        subject = self.yearly_report_subject(who)
+        return self._categorizing_report(output, email, who, subject,
+                                         period_name='year')
+
     def custom_range_report_subject(self, who):
         min = self.window.min_timestamp.strftime('%Y-%m-%d')
         max = self.window.max_timestamp - datetime.timedelta(1)
@@ -808,6 +845,7 @@ class ReportRecord(object):
     DAILY = 'daily'
     WEEKLY = 'weekly'
     MONTHLY = 'monthly'
+    YEARLY = 'yearly'
 
     def __init__(self, filename):
         self.filename = filename
@@ -824,13 +862,15 @@ class ReportRecord(object):
             return '{}/{}'.format(*date.isocalendar()[:2])
         elif report_kind == cls.MONTHLY:
             return date.strftime('%Y-%m')
+        elif report_kind == cls.YEARLY:
+            return date.strftime('%Y')
         else: # pragma: nocover
             raise AssertionError('Bug: unexpected report kind: %r' % report_kind)
 
     def record(self, report_kind, report_date, recipient, now=None):
         """Record that a record has been sent.
 
-        report_kind is one of DAILY, WEEKLY, MONTHLY.
+        report_kind is one of DAILY, WEEKLY, MONTHLY, YEARLY.
 
         report_date is a date in the report period.
 
@@ -838,7 +878,7 @@ class ReportRecord(object):
         real reports sent to activity@yourcompany.example.com from test
         reports sent to a test address.
         """
-        assert report_kind in (self.DAILY, self.WEEKLY, self.MONTHLY)
+        assert report_kind in (self.DAILY, self.WEEKLY, self.MONTHLY, self.YEARLY)
         assert isinstance(report_date, datetime.date)
         if now is None:
             now = datetime.datetime.now()
@@ -872,7 +912,7 @@ class ReportRecord(object):
     def get_recipients(self, report_kind, report_date):
         """Look up who received a particular report.
 
-        report_kind is one of DAILY, WEEKLY, MONTHLY.
+        report_kind is one of DAILY, WEEKLY, MONTHLY, YEARLY.
 
         report_date is a date in the report period.
 
@@ -980,6 +1020,16 @@ class TimeLog(TimeCollection):
             first_of_this_month, self.virtual_midnight)
         max = datetime.datetime.combine(
             first_of_next_month, self.virtual_midnight)
+        return self.window_for(min, max)
+
+    def window_for_year(self, date):
+        """Return a TimeWindow for the year that contains date."""
+        first_of_this_year = first_of_year(date)
+        first_of_next_year = next_year(date)
+        min = datetime.datetime.combine(
+            first_of_this_year, self.virtual_midnight)
+        max = datetime.datetime.combine(
+            first_of_next_year, self.virtual_midnight)
         return self.window_for(min, max)
 
     def window_for_date_range(self, min, max):
