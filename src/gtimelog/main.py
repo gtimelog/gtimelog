@@ -1628,11 +1628,14 @@ class LogView(Gtk.TextView):
                 self.wfmt(_('Total for {0}: {1} ({2} per day)'), *args)
             else:
                 weekly_window = self.timelog.window_for_week(self.date)
+                work_days_in_week = weekly_window.count_days() or 1
                 week_work, week_slacking = weekly_window.totals(
                     filter_text=self.filter_text)
                 week_total = week_work + week_slacking
                 args.append((format_duration(week_total), 'duration'))
-                self.wfmt(_('Total for {0}: {1} ({2} this week)'), *args)
+                per_diem = week_total / work_days_in_week
+                args.append((format_duration(per_diem), 'duration'))
+                self.wfmt(_('Total for {0}: {1} ({2} this week, {3} per day)'), *args)
             self.w('\n')
         self.reposition_cursor()
         self.add_footer()
