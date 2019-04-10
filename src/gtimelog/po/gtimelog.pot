@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-02 18:07+0200\n"
+"POT-Creation-Date: 2019-04-10 17:28+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -130,7 +130,7 @@ msgid "Total for {0}: {1} ({2} per day)"
 msgstr ""
 
 #, python-brace-format
-msgid "Total for {0}: {1} ({2} this week)"
+msgid "Total for {0}: {1} ({2} this week, {3} per day)"
 msgstr ""
 
 msgid "({0:%H:%M}-{1:%H:%M})"

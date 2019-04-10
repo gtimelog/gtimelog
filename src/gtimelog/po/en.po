@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-02 18:07+0200\n"
+"POT-Creation-Date: 2019-04-10 17:28+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -131,7 +131,7 @@ msgid "Total for {0}: {1} ({2} per day)"
 msgstr ""
 
 #, python-brace-format
-msgid "Total for {0}: {1} ({2} this week)"
+msgid "Total for {0}: {1} ({2} this week, {3} per day)"
 msgstr ""
 
 msgid "({0:%H:%M}-{1:%H:%M})"
