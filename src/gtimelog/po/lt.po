@@ -139,7 +139,7 @@ msgstr "Iš viso {0}: {1} (po {2} per dieną)"
 
 #, python-brace-format
 msgid "Total for {0}: {1} ({2} this week, {3} per day)"
-msgstr "Iš viso {0}: {1} (šią savaitę {2}, po {2} per dieną)"
+msgstr "Iš viso {0}: {1} (šią savaitę {2}, po {3} per dieną)"
 
 msgid "({0:%H:%M}-{1:%H:%M})"
 msgstr "({0:%H:%M}–{1:%H:%M})"
