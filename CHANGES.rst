@@ -8,6 +8,8 @@ Changelog
 
 - Fix problem with "Edit log" and "Edit tasks" menu entries on Windows.
 
+- Show average time per day spent on filtered tasks (GH: #146).
+
 
 0.11.2 (2018-11-03)
 ~~~~~~~~~~~~~~~~~~~
