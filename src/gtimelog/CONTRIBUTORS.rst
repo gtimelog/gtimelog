@@ -36,6 +36,7 @@ In alphabetic order:
 - Thom May
 - Till Hofmann
 - Tomaz Canabrava
+- Vikas Yadav
 - Živilė Gedminaitė
 
 Their contributions include patches (including those that didn't make it into
