@@ -6,6 +6,8 @@ omit =
     src/gtimelog/debian-paths.py
     src/gtimelog/tests/*
 cover_pylib = False
+plugins =
+    coverage_python_version
 
 [report]
 exclude_lines =

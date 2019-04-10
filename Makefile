@@ -6,6 +6,10 @@ PYTHON = python
 FILE_WITH_VERSION = src/gtimelog/__init__.py
 FILE_WITH_CHANGELOG = CHANGES.rst
 
+# Let's use the tox-installed coverage because we'll be sure it's there and has
+# the necessary plugins.
+COVERAGE = .tox/coverage/bin/coverage
+
 #
 # Interesting targets
 #
@@ -38,12 +42,12 @@ test:
 .PHONY: coverage
 coverage:
 	tox -p auto -e coverage,coverage3 -- -p
-	coverage combine
-	coverage report -m --fail-under=100
+	$(COVERAGE) combine
+	$(COVERAGE) report -m --fail-under=100
 
 .PHONY: coverage-diff
 coverage-diff: coverage
-	coverage xml
+	$(COVERAGE) xml
 	diff-cover coverage.xml
 
 .PHONY: update-translations

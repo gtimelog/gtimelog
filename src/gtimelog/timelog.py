@@ -1133,10 +1133,10 @@ class CSVWriter(object):
     def __init__(self, *args, **kw):
         self._writer = csv.writer(*args, **kw)
 
-    if PY3:
+    if PY3:  # pragma: PY3
         def writerow(self, row):
             self._writer.writerow(row)
-    else:
+    else:  # pragma: PY2
         def writerow(self, row):
             self._writer.writerow([s.encode('UTF-8') if isinstance(s, unicode)
                                    else s for s in row])

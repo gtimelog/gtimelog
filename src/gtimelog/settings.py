@@ -126,12 +126,12 @@ class Settings(object):
         config.set('gtimelog', 'start_in_tray', str(self.start_in_tray))
         return config
 
-    if PY3:
+    if PY3:  # pragma: PY3
         def to_unicode(self, value):
             return value  # ConfigParser already gives us unicode
         def from_unicode(self, value):
             return value  # ConfigParser already accepts unicode
-    else:
+    else:  # pragma: PY2
         def to_unicode(self, value):
             return value.decode(self._encoding)
         def from_unicode(self, value):
