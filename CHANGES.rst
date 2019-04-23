@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-0.11.3 (unreleased)
+0.11.3 (2019-04-23)
 ~~~~~~~~~~~~~~~~~~~
 
 - Use a better workaround for window.present() not working on Wayland.
@@ -11,7 +11,7 @@ Changelog
 - Fix problem with "Edit log" and "Edit tasks" menu entries on Windows
   (GH: #133).
 
-- Do not include '***' entries in slacking total (GH: #138).
+- Do not include ``***`` entries in slacking total (GH: #138).
 
 - Show average time per day spent on filtered tasks (GH: #146).
 
