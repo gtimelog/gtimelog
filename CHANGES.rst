@@ -10,6 +10,8 @@ Changelog
 
 - Show average time per day spent on filtered tasks (GH: #146).
 
+- Drop Python 3.4 support.
+
 
 0.11.2 (2018-11-03)
 ~~~~~~~~~~~~~~~~~~~
