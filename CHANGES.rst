@@ -6,7 +6,12 @@ Changelog
 
 - Use a better workaround for window.present() not working on Wayland.
 
-- Fix problem with "Edit log" and "Edit tasks" menu entries on Windows.
+- Fix a rare AssertionError on quit.
+
+- Fix problem with "Edit log" and "Edit tasks" menu entries on Windows
+  (GH: #133).
+
+- Do not include '***' entries in slacking total (GH: #138).
 
 - Show average time per day spent on filtered tasks (GH: #146).
 
