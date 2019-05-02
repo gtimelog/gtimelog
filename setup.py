@@ -3,6 +3,7 @@ import os
 import re
 import io
 import sys
+import ast
 from setuptools import setup, find_packages
 
 here = os.path.dirname(__file__)
@@ -13,11 +14,14 @@ def read(filename):
         return f.read()
 
 
-metadata = dict(
-    (k, eval(v)) for k, v in
-    re.findall('^(__version__|__author__|__url__|__licence__) = (.*)$',
-               read('src/gtimelog/__init__.py'), flags=re.MULTILINE)
-)
+metadata = {
+    k: ast.literal_eval(v)
+    for k, v in re.findall(
+        '^(__version__|__author__|__url__|__licence__) = (.*)$',
+        read('src/gtimelog/__init__.py'),
+        flags=re.MULTILINE,
+    )
+}
 
 version = metadata['__version__']
 
@@ -33,13 +37,13 @@ See the `full changelog`_.
 '''
 
 short_description = 'A Gtk+ time tracking application'
-long_description = (
-    read('README.rst') +
-    '\n\n' +
-    changes_in_latest_versions +
-    '\n\n' +
-    older_changes
-)
+long_description = ''.join([
+    read('README.rst'),
+    '\n\n',
+    changes_in_latest_versions,
+    '\n\n',
+    older_changes,
+])
 
 tests_require = ['freezegun']
 if sys.version_info < (3,):
@@ -64,6 +68,8 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: Implementation :: CPython',
+        'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Office/Business',
     ],
 
