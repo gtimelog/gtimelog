@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import argparse
+import os
 from sum import parse_time
 
 
@@ -36,6 +37,22 @@ def format_file(input_file, output_file):
         output_file.write('%s\n' % formatted)
 
 
+def choose_output_file_name(input_file, output_file):
+    name = output_file
+    if not name:
+        base, ext = os.path.splitext(input_file)
+        name = '%s.csv' % base
+
+    candidate = name
+    iterator = 0
+    while os.path.exists(candidate):
+        iterator += 1
+        base, ext = os.path.splitext(name)
+        candidate = '%s(%d)%s' % (base, iterator, ext)
+
+    return candidate
+
+
 def parse_arguments():
     """Parse command line arguments"""
     parser = argparse.ArgumentParser(
@@ -49,9 +66,7 @@ def parse_arguments():
 
     args = parser.parse_args()
     input_file = args.input_file
-    output_file = (args.output_file
-                if args.output_file
-                else os.path.basename(input_file).replace('.txt', '.csv'))
+    output_file = choose_output_file_name(input_file, args.output_file)
 
     return input_file, output_file
 
