@@ -1,7 +1,0 @@
-[encoding: UTF-8]
-gtimelog.desktop.in
-src/gtimelog/main.py
-[type: gettext/glade]src/gtimelog/about.ui
-[type: gettext/glade]src/gtimelog/gtimelog.ui
-[type: gettext/glade]src/gtimelog/preferences.ui
-[type: gettext/glade]src/gtimelog/menus.ui

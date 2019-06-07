@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import readline
+import readline  # noqa
 
 
 def parse_time(s):

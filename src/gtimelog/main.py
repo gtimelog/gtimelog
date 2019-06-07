@@ -1,5 +1,5 @@
 """An application for keeping track of your time."""
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 
 import time
 import os
@@ -16,6 +16,7 @@ def mark_time(what=None, _prev=[0, 0]):
             _prev[1] = t
     _prev[0] = t
 
+
 mark_time()
 mark_time("in script")
 
@@ -23,6 +24,7 @@ import datetime
 import email
 import email.header
 import email.mime.text
+import functools
 import gettext
 import io
 import locale
@@ -46,26 +48,20 @@ mark_time("Python imports done")
 if '--debug' in sys.argv:
     os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
 
-ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SCHEMA_DIR = ROOT
-if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
-    # Have to do this before importing 'gi'.
-    os.environ['GSETTINGS_SCHEMA_DIR'] = SCHEMA_DIR
-    if not os.path.exists(os.path.join(SCHEMA_DIR, 'gschemas.compiled')):
-        # This, too, I have to do before importing 'gi'.
-        print("Compiling GSettings schema")
-        glib_compile_schemas = os.path.join(sys.prefix, 'lib', 'site-packages', 'gnome', 'glib-compile-schemas.exe')
-        if not os.path.exists(glib_compile_schemas):
-            glib_compile_schemas = 'glib-compile-schemas'
-        try:
-            subprocess.call([glib_compile_schemas, SCHEMA_DIR])
-        except OSError as e:
-            print("Failed: %s" % e)
+
+# The gtimelog.paths import has important side effects and must be done before
+# importing 'gi'.
+
+from .paths import (
+    UI_FILE, PREFERENCES_UI_FILE, ABOUT_DIALOG_UI_FILE, SHORTCUTS_UI_FILE,
+    MENUS_UI_FILE, CSS_FILE, LOCALE_DIR, CONTRIBUTORS_FILE,
+)
 
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango
+gi.require_version('Soup', '2.4')
+from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango, Soup
 mark_time("Gtk imports done")
 
 from gtimelog import __version__
@@ -90,26 +86,6 @@ else:
 
 
 mark_time("gtimelog imports done")
-
-# When the app is properly installed, use HELP_URI = 'help:gtimelog'
-HELP_URI = ''
-HELP_DIR = os.path.abspath(os.path.join(ROOT, 'help'))
-
-UI_DIR = os.path.join(ROOT, 'src', 'gtimelog')
-
-if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 12):
-    UI_FILE = os.path.join(UI_DIR, 'gtimelog-gtk3.10.ui')
-    PREFERENCES_UI_FILE = os.path.join(UI_DIR, 'preferences-gtk3.10.ui')
-else:
-    UI_FILE = os.path.join(UI_DIR, 'gtimelog.ui')
-    PREFERENCES_UI_FILE = os.path.join(UI_DIR, 'preferences.ui')
-
-ABOUT_DIALOG_UI_FILE = os.path.join(UI_DIR, 'about.ui')
-MENUS_UI_FILE = os.path.join(UI_DIR, 'menus.ui')
-CSS_FILE = os.path.join(UI_DIR, 'gtimelog.css')
-LOCALE_DIR = os.path.join(ROOT, 'locale')
-
-CONTRIBUTORS_FILE = os.path.join(ROOT, 'CONTRIBUTORS.rst')
 
 
 log = logging.getLogger('gtimelog')
@@ -170,12 +146,168 @@ def make_option(long_name, short_name=None, flags=0, arg=GLib.OptionArg.NONE,
     return option
 
 
+# Global HTTP stuff
+
+class Authenticator(object):
+    # try to use GNOME Keyring if available
+    try:
+        gi.require_version('GnomeKeyring', '1.0')
+        from gi.repository import GnomeKeyring as gnomekeyring
+    except (ValueError, ImportError):
+        gnomekeyring = None
+
+    def __init__(self):
+        object.__init__(self)
+        self.pending = []
+        self.lookup_in_progress = False
+        self.username = None
+        self.password = None
+
+    def find_in_keyring(self, uri, callback):
+        """
+        Attempt to load a username and password from the keyring.
+        If the keyring is not available, return the last username
+        and password entered, if any.
+        """
+        username = self.username
+        password = self.password
+
+        if self.gnomekeyring is None:
+            callback(username, password)
+            return
+
+        # FIXME - would be nice to make all keyring calls async, to dodge
+        # the possibility of blocking the UI. The code is all set up for
+        # that, but there's no easy way to use the keyring asynchronously
+        # from Python (as of Gnome 3.20)...
+        result, keys = self.gnomekeyring.find_network_password_sync(
+                None,           # user
+                uri.get_host(), # domain
+                uri.get_host(), # server
+                None,           # object
+                uri.get_scheme(),# protocol
+                None,           # authtype
+                uri.get_port()) # port
+
+        if result == self.gnomekeyring.Result.NO_MATCH:
+            # We didn't find any passwords, just continue
+            pass
+        elif result == self.gnomekeyring.Result.NO_KEYRING_DAEMON:
+            pass
+        else:
+            entry = keys[-1] # take the last key (Why?)
+            username = entry.user
+            password = entry.password
+
+        callback(username, password)
+
+    def save_to_keyring(self, uri, username, password):
+        self.gnomekeyring.set_network_password_sync (
+                None,           # keyring
+                username,       # user
+                uri.get_host(), # domain
+                uri.get_host(), # server
+                None,           # object
+                uri.get_scheme(),# protocol
+                None,           # authtype
+                uri.get_port(), # port
+                password)       # password
+
+    def ask_the_user(self, auth, uri, callback):
+        """
+        Pop up a username/password dialog for uri
+        """
+        mountoperation = Gtk.MountOperation.new()
+
+        def on_reply(m, r):
+            if r == Gio.MountOperationResult.HANDLED:
+                username = m.get_username()
+                password = m.get_password()
+
+                if username and password:
+                    if self.gnomekeyring and (m.get_password_save() == Gio.PasswordSave.PERMANENTLY):
+                        self.save_to_keyring(uri, username, password)
+                    elif m.get_password_save() == Gio.PasswordSave.FOR_SESSION:
+                        self.username = username
+                        self.password = password
+
+            else:
+                username = None
+                password = None
+
+            callback(username, password)
+
+        mountoperation.connect('reply', on_reply)
+        mountoperation.set_password_save(Gio.PasswordSave.PERMANENTLY)
+        mountoperation.do_ask_password(mountoperation,
+            _('Authentication is required for "%s"\n'
+              'You need a username and a password to access %s') % (auth.get_realm(), uri.get_host()),
+            '',
+            auth.get_realm(),
+            Gio.AskPasswordFlags.NEED_PASSWORD |
+                Gio.AskPasswordFlags.NEED_USERNAME |
+                (Gio.AskPasswordFlags.SAVING_SUPPORTED if self.gnomekeyring else 0))
+
+    def find_password(self, auth, uri, retrying, callback):
+        def keyring_callback(username, password):
+            # If not found, ask the user for it
+            if username is None or retrying:
+                GObject.idle_add(lambda: self.ask_the_user(auth, uri, callback))
+            else:
+                callback(username, password)
+
+        self.find_in_keyring(uri, keyring_callback)
+
+    def http_auth_cb(self, session, message, auth, retrying, *args):
+        session.pause_message(message)
+        self.pending.insert(0, (session, message, auth, retrying))
+        self.maybe_pop_queue()
+
+    def maybe_pop_queue(self):
+        # I don't think we need any locking, because GIL.
+        if self.lookup_in_progress:
+            return
+
+        try:
+            (session, message, auth, retrying) = self.pending.pop()
+        except IndexError:
+            pass
+        else:
+            self.lookup_in_progress = True
+            uri = message.get_uri()
+            self.find_password(auth, uri, retrying,
+                callback=functools.partial(
+                    self.http_auth_finish, session, message, auth))
+
+    def http_auth_finish(self, session, message, auth, username, password):
+        if username and password:
+            auth.authenticate(username, password)
+
+        session.unpause_message(message)
+        self.lookup_in_progress = False
+        self.maybe_pop_queue()
+
+soup_session = Soup.SessionAsync()
+authenticator = Authenticator()
+soup_session.connect('authenticate', authenticator.http_auth_cb)
+
+
 class Application(Gtk.Application):
 
     class Actions(object):
 
+        actions = [
+            'preferences',
+            'shortcuts',
+            'about',
+            'quit',
+            'edit-log',
+            'edit-tasks',
+            'refresh-tasks',
+        ]
+
         def __init__(self, app):
-            for action_name in ['preferences', 'help', 'about', 'quit', 'edit-log', 'edit-tasks', 'refresh-tasks']:
+            for action_name in self.actions:
                 action = Gio.SimpleAction.new(action_name, None)
                 action.connect('activate', getattr(app, 'on_' + action_name.replace('-', '_')))
                 app.add_action(action)
@@ -246,9 +378,10 @@ class Application(Gtk.Application):
             screen, css, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
         mark_time("CSS loaded")
 
-        builder = Gtk.Builder.new_from_file(MENUS_UI_FILE)
-        self.set_app_menu(builder.get_object('app_menu'))
-        mark_time("menus loaded")
+        if Gtk.Settings.get_default().get_property('gtk-shell-shows-app-menu'):
+            builder = Gtk.Builder.new_from_file(MENUS_UI_FILE)
+            self.set_app_menu(builder.get_object('app_menu'))
+            mark_time("menus loaded")
 
         self.actions = self.Actions(self)
 
@@ -269,7 +402,7 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.go-home", ["<Alt>Home"])
         self.set_accels_for_action("app.edit-log", ["<Primary>E"])
         self.set_accels_for_action("app.edit-tasks", ["<Primary>T"])
-        self.set_accels_for_action("app.help", ["F1"])
+        self.set_accels_for_action("app.shortcuts", ["<Primary>question"])
         self.set_accels_for_action("app.preferences", ["<Primary>P"])
         self.set_accels_for_action("app.quit", ["<Primary>Q"])
         self.set_accels_for_action("win.report", ["<Primary>D"])
@@ -290,11 +423,17 @@ class Application(Gtk.Application):
     def on_quit(self, action, parameter):
         self.quit()
 
+    def open_in_editor(self, filename):
+        self.create_if_missing(filename)
+        if os.name == 'nt':
+            os.startfile(filename)
+        else:
+            uri = GLib.filename_to_uri(filename, None)
+            Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
+
     def on_edit_log(self, action, parameter):
         filename = Settings().get_timelog_file()
-        uri = GLib.filename_to_uri(filename, None)
-        self.create_if_missing(filename)
-        Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
+        self.open_in_editor(filename)
 
     def on_edit_tasks(self, action, parameter):
         gsettings = Gio.Settings.new("org.gtimelog")
@@ -302,11 +441,10 @@ class Application(Gtk.Application):
             uri = gsettings.get_string('task-list-edit-url')
             if self.get_active_window() is not None:
                 self.get_active_window().editing_remote_tasks = True
+            Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
         else:
             filename = Settings().get_task_list_file()
-            self.create_if_missing(filename)
-            uri = GLib.filename_to_uri(filename, None)
-        Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
+            self.open_in_editor(filename)
 
     def on_refresh_tasks(self, action, parameter):
         gsettings = Gio.Settings.new("org.gtimelog")
@@ -318,13 +456,11 @@ class Application(Gtk.Application):
         if not os.path.exists(filename):
             open(filename, 'a').close()
 
-    def on_help(self, action, parameter):
-        if HELP_URI:
-            uri = HELP_URI
-        else:
-            filename = os.path.join(HELP_DIR, 'C', 'index.page')
-            uri = 'ghelp:' + GLib.filename_to_uri(filename, None).partition(':')[-1]
-        Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
+    def on_shortcuts(self, action, parameter):
+        builder = Gtk.Builder.new_from_file(SHORTCUTS_UI_FILE)
+        shortcuts_window = builder.get_object('shortcuts_window')
+        shortcuts_window.set_transient_for(self.get_active_window())
+        shortcuts_window.show_all()
 
     def get_contributors(self):
         contributors = []
@@ -350,10 +486,18 @@ class Application(Gtk.Application):
         preferences.connect("response", lambda *args: preferences.destroy())
         preferences.run()
 
+    def are_there_any_modals(self):
+        # Fix for https://github.com/gtimelog/gtimelog/issues/127
+        return any(window.get_modal()
+                   for window in Gtk.Window.list_toplevels())
+
     def do_activate(self):
         mark_time("in app activate")
-        if self.get_active_window() is not None:
-            self.get_active_window().present()
+        window = self.get_active_window()
+        if window is not None:
+            # window.present() doesn't work on wayland:
+            # https://gitlab.gnome.org/GNOME/gtk/issues/624#note_119092
+            window.present_with_time(GLib.get_monotonic_time() // 1000)
             return
 
         window = Window(self)
@@ -490,7 +634,7 @@ class Window(Gtk.ApplicationWindow):
             # On Ubuntu 15.04 we can use Gio.PropertyAction
             # But what's the actual difference -- PyGI version?  GTK version?
             # What test do I make to determine which one to use?
-            if gi.__version__ < '3.14':
+            if gi.__version__ < '3.20':
                 PropertyAction = FakePropertyAction
             else:
                 PropertyAction = Gio.PropertyAction
@@ -577,7 +721,6 @@ class Window(Gtk.ApplicationWindow):
         self.recipient_entry = builder.get_object("recipient_entry")
         self.subject_entry = builder.get_object("subject_entry")
         self.tasks_infobar = builder.get_object("tasks_infobar")
-        self.tasks_infobar.connect('response', lambda *args: self.tasks_infobar.hide())
         self.tasks_infobar_label = builder.get_object("tasks_infobar_label")
         self.infobar = builder.get_object("report_infobar")
         self.infobar.connect('response', lambda *args: self.infobar.hide())
@@ -782,9 +925,19 @@ class Window(Gtk.ApplicationWindow):
         else:
             self.infobar.hide()
 
-    def download_tasks(self):
+    def cancel_tasks_download(self, hide=True):
         if self._download:
-            return
+            old_message, old_url = self._download
+            soup_session.cancel_message(old_message, Soup.Status.CANCELLED)
+            self._download = None
+        if hide:
+            self.tasks_infobar.hide()
+
+    def download_tasks(self):
+        # hide=False and queue_resize() are needed to work around
+        # this bug: https://github.com/gtimelog/gtimelog/issues/89
+        self.cancel_tasks_download(hide=False)
+
         url = self.gsettings.get_string('task-list-url')
         if not url:
             log.debug("Not downloading tasks: URL not specified")
@@ -792,25 +945,27 @@ class Window(Gtk.ApplicationWindow):
         cache_filename = Settings().get_task_list_cache_file()
         self.tasks_infobar.set_message_type(Gtk.MessageType.INFO)
         self.tasks_infobar_label.set_text(_("Downloading tasks..."))
+        self.tasks_infobar.connect('response', lambda *args: self.cancel_tasks_download())
         self.tasks_infobar.show()
+        self.tasks_infobar.queue_resize()
         log.debug("Downloading tasks from %s", url)
-        cancellable = Gio.Cancellable()
-        gfile = Gio.File.new_for_uri(url)
-        self._download = (gfile, cancellable, url)
-        gfile.load_contents_async(cancellable, self.tasks_downloaded, cache_filename)
+        message = Soup.Message.new('GET', url)
+        self._download = (message, url)
+        soup_session.queue_message(message, self.tasks_downloaded, cache_filename)
 
-    def tasks_downloaded(self, source, result, cache_filename):
-        try:
-            success, content, etag = source.load_contents_finish(result)
-        except GLib.GError as e:
-            url = self._download[2]
-            log.error("Failed to download tasks from %s: %s", url, e)
+    def tasks_downloaded(self, session, message, cache_filename):
+        content = message.response_body.data
+        if message.status_code != Soup.Status.OK:
+            url = message.get_uri().to_string(just_path_and_query=False)
+
+            log.error("Failed to download tasks from %s: %d %s", url, message.status_code, message.reason_phrase)
             self.tasks_infobar.set_message_type(Gtk.MessageType.ERROR)
             self.tasks_infobar_label.set_text(_("Download failed."))
+            self.tasks_infobar.connect('response', lambda *args: self.infobar.hide())
             self.tasks_infobar.show()
         else:
-            log.debug("Successfully downloaded tasks (etag: %s):\n  %s",
-                      etag, content.decode('UTF-8', 'replace').replace('\n', '\n  '))
+            log.debug("Successfully downloaded tasks:\n  %s",
+                      content.decode('UTF-8', 'replace').replace('\n', '\n  '))
             with open(cache_filename, 'wb') as f:
                 f.write(content)
             self.check_reload_tasks()
@@ -821,6 +976,10 @@ class Window(Gtk.ApplicationWindow):
         if self.editing_remote_tasks:
             self.download_tasks()
             self.editing_remote_tasks = False
+        # In case inotify magic fails, let's allow the user to refresh by
+        # switching focus.
+        self.check_reload()
+        self.check_reload_tasks()
 
     def virtual_midnight_changed(self, *args):
         if self.timelog:
@@ -849,7 +1008,7 @@ class Window(Gtk.ApplicationWindow):
             self.gsettings.set_int('task-pane-position', tpp)
 
     def store_window_size(self):
-        if not self.is_maximized_in_any_way():
+        if self.props.window is not None and not self.is_maximized_in_any_way():
             self._store_window_size()
         GLib.source_remove(self._window_size_update_timeout)
         self._window_size_update_timeout = None
@@ -867,14 +1026,23 @@ class Window(Gtk.ApplicationWindow):
         return (self.props.window.get_state() & MAXIMIZED_IN_ANY_WAY) != 0
 
     def watch_file(self, filename, callback):
+        log.debug('adding watch on %s', filename)
         gf = Gio.File.new_for_path(filename)
         gfm = gf.monitor_file(Gio.FileMonitorFlags.NONE, None)
         gfm.connect('changed', callback)
-        self._watches[filename] = gfm  # keep a reference so it doesn't get garbage collected
+        self._watches[filename] = (gfm, None)  # keep a reference so it doesn't get garbage collected
+        if os.path.islink(filename):
+            realpath = os.path.join(os.path.dirname(filename), os.readlink(filename))
+            log.debug('%s is a symlink, adding a watch on %s', filename, realpath)
+            self._watches[filename] = (gfm, realpath)
+            if realpath not in self._watches:  # protect against infinite loops
+                self.watch_file(realpath, callback)
 
     def unwatch_file(self, filename):
-        if filename in self._watches:
-            del self._watches[filename]
+        # watch_file(a_symlink, callback) creates multiple watches, so be sure to unwatch them all
+        while filename in self._watches:
+            log.debug('removing watch on %s', filename)
+            filename = self._watches.pop(filename)[1]
 
     def get_last_time(self):
         if self.timelog is None:
@@ -1125,12 +1293,14 @@ class Window(Gtk.ApplicationWindow):
         # systems/OSes don't ever send it, react to other events after a
         # short delay, so we wouldn't have to reload the file more than
         # once.
+        log.debug('watch on %s reports %s', file.get_path(), event_type.value_nick.upper())
         if event_type == Gio.FileMonitorEvent.CHANGES_DONE_HINT:
             self.check_reload()
         else:
             GLib.timeout_add_seconds(1, self.check_reload)
 
     def on_tasks_file_changed(self, monitor, file, other_file, event_type):
+        log.debug('watch on %s reports %s', file.get_path(), event_type.value_nick.upper())
         if event_type == Gio.FileMonitorEvent.CHANGES_DONE_HINT:
             self.check_reload_tasks()
         else:
@@ -1458,11 +1628,14 @@ class LogView(Gtk.TextView):
                 self.wfmt(_('Total for {0}: {1} ({2} per day)'), *args)
             else:
                 weekly_window = self.timelog.window_for_week(self.date)
+                work_days_in_week = weekly_window.count_days() or 1
                 week_work, week_slacking = weekly_window.totals(
                     filter_text=self.filter_text)
                 week_total = week_work + week_slacking
                 args.append((format_duration(week_total), 'duration'))
-                self.wfmt(_('Total for {0}: {1} ({2} this week)'), *args)
+                per_diem = week_total / work_days_in_week
+                args.append((format_duration(per_diem), 'duration'))
+                self.wfmt(_('Total for {0}: {1} ({2} this week, {3} per day)'), *args)
             self.w('\n')
         self.reposition_cursor()
         self.add_footer()
@@ -1928,7 +2101,10 @@ def main():
     # Run the app
     app = Application()
     mark_time("app created")
-    sys.exit(app.run(sys.argv))
+    try:
+        sys.exit(app.run(sys.argv))
+    finally:
+        mark_time("exiting")
 
 
 if __name__ == '__main__':

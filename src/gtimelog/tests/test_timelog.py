@@ -1,5 +1,6 @@
 """Tests for gtimelog.timelog"""
 
+import codecs
 import datetime
 import doctest
 import os
@@ -7,9 +8,9 @@ import re
 import shutil
 import tempfile
 import textwrap
+import time
 import unittest
 import sys
-from pprint import pprint
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -23,7 +24,9 @@ except ImportError:
     # Python 2
     import mock
 
-from gtimelog.timelog import TimeLog, Reports, ReportRecord, Exports, TaskList
+from gtimelog.timelog import (
+    TimeLog, Reports, ReportRecord, Exports, TaskList, TimeCollection,
+)
 
 
 class Checker(doctest.OutputChecker):
@@ -32,6 +35,10 @@ class Checker(doctest.OutputChecker):
     def check_output(self, want, got, optionflags):
         # u'...' -> '...'; u"..." -> "..."
         got = re.sub(r'''\bu('[^']*'|"[^"]*")''', r'\1', got)
+        # Python 3.7: datetime.timedelta(seconds=1860) ->
+        # Python < 3.7: datetime.timedelta(0, 1860)
+        got = re.sub(r'datetime[.]timedelta[(]seconds=(\d+)[)]',
+                     r'datetime.timedelta(0, \1)', got)
         return doctest.OutputChecker.check_output(self, want, got, optionflags)
 
 
@@ -985,74 +992,94 @@ def doctest_Reports_custom_range_report_categorized():
     """
 
 
-def doctest_TaskList_missing_file():
-    """Test for TaskList
+class Mixins(object):
 
-        >>> tasklist = TaskList('/nosuchfile')
-        >>> tasklist.check_reload()
-        False
-        >>> tasklist.reload()
-
-    """
-
-
-def doctest_TaskList_real_file():
-    r"""Test for TaskList
-
-        >>> import time
-        >>> tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
-        >>> taskfile = os.path.join(tempdir, 'tasks.txt')
-        >>> with open(taskfile, 'w') as f:
-        ...     _ = f.write('\n'.join([
-        ...         '# comments are skipped',
-        ...         'some task',
-        ...         'other task',
-        ...         'project: do it',
-        ...         'project: fix bugs',
-        ...         'misc: paperwork',
-        ...         ]) + '\n')
-        >>> one_second_ago = time.time() - 2
-        >>> os.utime(taskfile, (one_second_ago, one_second_ago))
-
-        >>> tasklist = TaskList(taskfile)
-        >>> pprint(tasklist.groups)
-        [('Other', ['some task', 'other task']),
-         ('misc', ['paperwork']),
-         ('project', ['do it', 'fix bugs'])]
-
-        >>> tasklist.check_reload()
-        False
-
-        >>> with open(taskfile, 'w') as f:
-        ...     _ = f.write('new tasks\n')
-
-        >>> tasklist.check_reload()
-        True
-
-        >>> pprint(tasklist.groups)
-        [('Other', ['new tasks'])]
-
-        >>> shutil.rmtree(tempdir)
-
-    """
-
-
-class TestTimeLog(unittest.TestCase):
-
-    def setUp(self):
-        self.tempdir = None
-
-    def tearDown(self):
-        if self.tempdir:
-            shutil.rmtree(self.tempdir)
+    tempdir = None
 
     def mkdtemp(self):
         if self.tempdir is None:
             self.tempdir = tempfile.mkdtemp(prefix='gtimelog-test-')
+            self.addCleanup(shutil.rmtree, self.tempdir)
         return self.tempdir
 
     def tempfile(self, filename='timelog.txt'):
         return os.path.join(self.mkdtemp(), filename)
+
+    def write_file(self, filename, content):
+        filename = os.path.join(self.mkdtemp(), filename)
+        with codecs.open(filename, 'w', encoding='UTF-8') as f:
+            f.write(content)
+        return filename
+
+
+class TestTimeCollection(unittest.TestCase):
+
+    def test_split_category(self):
+        sp = TimeCollection.split_category
+        self.assertEqual(sp('some task'), (None, 'some task'))
+        self.assertEqual(sp('project: some task'), ('project', 'some task'))
+        self.assertEqual(sp('project: some task: etc'),
+                         ('project', 'some task: etc'))
+
+    def test_split_category_no_task_just_category(self):
+        # Regression test for https://github.com/gtimelog/gtimelog/issues/117
+        sp = TimeCollection.split_category
+        self.assertEqual(sp('project: '), ('project', ''))
+        self.assertEqual(sp('project:'), ('project', ''))
+
+
+class TestTaskList(Mixins, unittest.TestCase):
+
+    def test_missing_file(self):
+        tasklist = TaskList('/nosuchfile')
+        self.assertFalse(tasklist.check_reload())
+        tasklist.reload()  # no crash
+
+    def test_parsing(self):
+        taskfile = self.write_file('tasks.txt', textwrap.dedent('''\
+            # comments are skipped
+            some task
+            other task
+            project: do it
+            project: fix bugs
+            misc: paperwork
+        '''))
+        tasklist = TaskList(taskfile)
+        self.assertEqual(tasklist.groups, [
+            ('Other', ['some task', 'other task']),
+            ('misc', ['paperwork']),
+            ('project', ['do it', 'fix bugs']),
+        ])
+
+    def test_unicode(self):
+        taskfile = self.write_file('tasks.txt', u'\N{SNOWMAN}')
+        tasklist = TaskList(taskfile)
+        self.assertEqual(tasklist.groups, [
+            ('Other', [u'\N{SNOWMAN}']),
+        ])
+
+    def test_reloading(self):
+        taskfile = self.write_file('tasks.txt', 'some tasks\n')
+        couple_seconds_ago = time.time() - 2
+        os.utime(taskfile, (couple_seconds_ago, couple_seconds_ago))
+
+        tasklist = TaskList(taskfile)
+        self.assertEqual(tasklist.groups, [
+            ('Other', ['some tasks']),
+        ])
+        self.assertFalse(tasklist.check_reload())
+
+        with open(taskfile, 'w') as f:
+            f.write('new tasks\n')
+
+        self.assertTrue(tasklist.check_reload())
+
+        self.assertEqual(tasklist.groups, [
+            ('Other', ['new tasks']),
+        ])
+
+
+class TestTimeLog(Mixins, unittest.TestCase):
 
     def test_reloading(self):
         logfile = self.tempfile()
@@ -1216,6 +1243,31 @@ class TestTimeLog(unittest.TestCase):
         timelog = TimeLog(StringIO(), datetime.time(2, 0))
         self.assertEqual(timelog.parse_correction("-200 did stuff"),
                          ("-200 did stuff", None))
+
+
+class TestTotals(unittest.TestCase):
+
+    TEST_TIMELOG = textwrap.dedent(
+        """
+        2018-12-09 08:30: start at home
+        2018-12-09 08:40: emails
+        2018-12-09 09:10: travel to work ***
+        2018-12-09 09:15: coffee **
+        2018-12-09 12:15: coding
+        """)
+
+    def setUp(self):
+        self.tw = make_time_window(
+            StringIO(self.TEST_TIMELOG),
+            datetime.datetime(2018, 12, 9, 8, 0),
+            datetime.datetime(2018, 12, 9, 23, 59),
+            datetime.time(2, 0),
+        )
+
+    def test_TimeWindow_totals(self):
+        work, slack = self.tw.totals()
+        self.assertEqual(work, datetime.timedelta(hours=3, minutes=10))
+        self.assertEqual(slack, datetime.timedelta(hours=0, minutes=5))
 
 
 class TestFiltering(unittest.TestCase):
@@ -1393,12 +1445,10 @@ class TestTagging(unittest.TestCase):
         self.assertIn('Time spent in each area', txt.getvalue())
 
 
-class TestReportRecord(unittest.TestCase):
+class TestReportRecord(Mixins, unittest.TestCase):
 
     def setUp(self):
-        self.tmpdir = tempfile.mkdtemp(prefix='gtimelog-test-')
-        self.addCleanup(shutil.rmtree, self.tmpdir)
-        self.filename = os.path.join(self.tmpdir, 'sentreports.log')
+        self.filename = self.tempfile('sentreports.log')
 
     def load_fixture(self, lines):
         with open(self.filename, 'w') as f:

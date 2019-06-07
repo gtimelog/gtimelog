@@ -1,0 +1,8 @@
+[encoding: UTF-8]
+../../gtimelog.desktop.in
+main.py
+[type: gettext/glade]about.ui
+[type: gettext/glade]gtimelog.ui
+[type: gettext/glade]preferences.ui
+[type: gettext/glade]menus.ui
+[type: gettext/glade]shortcuts.ui

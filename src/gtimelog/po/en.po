@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-10-07 20:45+0300\n"
+"POT-Creation-Date: 2019-04-10 17:28+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -26,6 +26,12 @@ msgstr ""
 
 #, python-brace-format
 msgid "{0} h {1} min"
+msgstr ""
+
+#, python-format
+msgid ""
+"Authentication is required for \"%s\"\n"
+"You need a username and a password to access %s"
 msgstr ""
 
 msgid "Show version number and exit"
@@ -125,7 +131,7 @@ msgid "Total for {0}: {1} ({2} per day)"
 msgstr ""
 
 #, python-brace-format
-msgid "Total for {0}: {1} ({2} this week)"
+msgid "Total for {0}: {1} ({2} this week, {3} per day)"
 msgstr ""
 
 msgid "({0:%H:%M}-{1:%H:%M})"
@@ -210,7 +216,7 @@ msgstr ""
 msgid "Unable to configure translations: no locale.bindtextdomain()"
 msgstr ""
 
-msgid "Copyright © 2004–2016 Marius Gedminas and contributors."
+msgid "Copyright © 2004–2018 Marius Gedminas and contributors."
 msgstr ""
 
 msgid "A time tracking application"
@@ -285,7 +291,7 @@ msgstr ""
 msgid "Nickname used in the Subject line"
 msgstr ""
 
-msgid "Help"
+msgid "Keyboard Shortcuts"
 msgstr ""
 
 msgid "About"
@@ -304,6 +310,9 @@ msgid "Refresh tasks"
 msgstr ""
 
 msgid "Report..."
+msgstr ""
+
+msgid "About Time Log"
 msgstr ""
 
 msgid "Detail level"
@@ -331,4 +340,116 @@ msgid "Month"
 msgstr ""
 
 msgid "Filter"
+msgstr ""
+
+msgctxt "shortcuts window"
+msgid "Entry"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Detail level"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Full chronological list"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Group by description"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Group by category"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Time range"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Day view"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Week view"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Month view"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Time navigation"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Go back in time"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Go forward in time"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Go back to today"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "General"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Menu"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Keyboard shortcuts"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Toggle search bar"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Edit task log"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Preferences"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Task pane"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Toggle task pane"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Edit task list"
+msgstr ""
+
+msgctxt "shortcuts window"
+msgid "Reports"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Reporting"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Switch to report mode"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Send report via email"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Return to task entry mode"
 msgstr ""

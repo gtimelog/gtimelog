@@ -4,17 +4,25 @@
 
 PYTHON = python
 FILE_WITH_VERSION = src/gtimelog/__init__.py
-FILE_WITH_CHANGELOG = NEWS.rst
+FILE_WITH_CHANGELOG = CHANGES.rst
+
+# Let's use the tox-installed coverage because we'll be sure it's there and has
+# the necessary plugins.
+COVERAGE = .tox/coverage/bin/coverage
 
 #
 # Interesting targets
 #
 
 manpages = gtimelog.1
-po_files = $(wildcard po/*.po)
-mo_files = $(patsubst po/%.po,locale/%/LC_MESSAGES/gtimelog.mo,$(po_files))
+po_dir = src/gtimelog/po
+po_files = $(wildcard $(po_dir)/*.po)
+mo_dir = src/gtimelog/locale
+mo_files = $(patsubst $(po_dir)/%.po,$(mo_dir)/%/LC_MESSAGES/gtimelog.mo,$(po_files))
 fallback_ui_files = src/gtimelog/gtimelog-gtk3.10.ui src/gtimelog/preferences-gtk3.10.ui
-runtime_files = gschemas.compiled $(mo_files) $(fallback_ui_files)
+schema_dir = src/gtimelog/data
+schema_files = $(schema_dir)/gschemas.compiled
+runtime_files = $(schema_files) $(mo_files) $(fallback_ui_files)
 
 .PHONY: all
 all: $(manpages) $(runtime_files)
@@ -24,25 +32,48 @@ run: $(runtime_files)
 	./gtimelog
 
 .PHONY: check test
-check test:
+check: test
+	desktop-file-validate gtimelog.desktop
+	appstream-util validate-relax gtimelog.appdata.xml
+
+test:
 	./runtests
 
 .PHONY: coverage
 coverage:
-	detox -e coverage,coverage3 -- -p
-	coverage combine
-	coverage report
+	tox -p auto -e coverage,coverage3 -- -p
+	$(COVERAGE) combine
+	$(COVERAGE) report -m --fail-under=100
 
 .PHONY: coverage-diff
 coverage-diff: coverage
-	coverage xml
+	$(COVERAGE) xml
 	diff-cover coverage.xml
 
 .PHONY: update-translations
 update-translations:
 	git config filter.po.clean 'msgcat - --no-location'
-	cd po && intltool-update -g gtimelog -p
-	for po in $(po_files); do msgmerge -U $$po po/gtimelog.pot; done
+	cd $(po_dir) && intltool-update -g gtimelog -p
+	for po in $(po_files); do msgmerge -U $$po $(po_dir)/gtimelog.pot; done
+
+.PHONY: mo-files
+mo-files: $(mo_files)
+
+.PHONY: flatpak
+flatpak:
+	# you may need to install the platform and sdk before this will work
+	# flatpak install flathub org.gnome.Platform//3.30 org.gnome.Sdk//3.30
+	flatpak-builder --force-clean build/flatpak flatpak/org.gtimelog.GTimeLog.yaml
+	# to run it do
+	# flatpak-builder --run build/flatpak flatpak/org.gtimelog.GTimeLog.yaml gtimelog
+
+.PHONY: flatpak-install
+flatpak-install:
+	# you may need to install the platform and sdk before this will work
+	# flatpak install flathub org.gnome.Platform//3.30 org.gnome.Sdk//3.30
+	flatpak-builder --force-clean build/flatpak flatpak/org.gtimelog.GTimeLog.yaml --install --user
+	# to run it do
+	# flatpak run org.gtimelog.GTimeLog
 
 %-gtk3.10.ui: %.ui
 	sed -e 's/margin_start/margin_left/' \
@@ -52,72 +83,29 @@ update-translations:
 	    < $< > $@.tmp
 	mv $@.tmp $@
 
-locale/%/LC_MESSAGES/gtimelog.mo: po/%.po
-	mkdir -p $(@D)
+$(mo_dir)/%/LC_MESSAGES/gtimelog.mo: $(po_dir)/%.po
+	@mkdir -p $(@D)
 	msgfmt -o $@ $<
 
-gschemas.compiled: org.gtimelog.gschema.xml
-	glib-compile-schemas .
+$(schema_files): $(schema_dir)/org.gtimelog.gschema.xml
+	glib-compile-schemas $(schema_dir)
 
 .PHONY: clean
 clean:
-	rm -rf temp tmp build gtimelog.egg-info $(runtime_files) locale
+	rm -rf temp tmp build gtimelog.egg-info $(runtime_files) $(mo_dir)
 	find -name '*.pyc' -delete
 
-.PHONY: dist
-dist:
-	$(PYTHON) setup.py sdist
+include release.mk
 
 .PHONY: distcheck
-distcheck: check dist
-	# Bit of a chicken-and-egg here, but if the tree is unclean, make
-	# distcheck will fail.
-	@test -z "`git status -s 2>&1`" || { echo; echo "Your working tree is not clean" 1>&2; git status; exit 1; }
-	make dist
-	pkg_and_version=`$(PYTHON) setup.py --name`-`$(PYTHON) setup.py --version` && \
-	rm -rf tmp && \
-	mkdir tmp && \
-	git archive --format=tar --prefix=tmp/tree/ HEAD | tar -xf - && \
-	cd tmp && \
-	tar xvzf ../dist/$$pkg_and_version.tar.gz && \
-	diff -ur $$pkg_and_version tree -x PKG-INFO -x setup.cfg -x '*.egg-info' && \
-	cd $$pkg_and_version && \
-	make dist check && \
-	cd .. && \
-	mkdir one two && \
-	cd one && \
-	tar xvzf ../../dist/$$pkg_and_version.tar.gz && \
-	cd ../two/ && \
-	tar xvzf ../$$pkg_and_version/dist/$$pkg_and_version.tar.gz && \
-	cd .. && \
-	diff -ur one two -x SOURCES.txt && \
-	cd .. && \
-	rm -rf tmp && \
-	echo "sdist seems to be ok"
+distcheck: distcheck-wheel  # add to the list of checks defined in release.mk
 
-.PHONY: releasechecklist
-releasechecklist:
-	@$(PYTHON) setup.py --version | grep -qv dev || { \
-	    echo "Please remove the 'dev' suffix from the version number in $(FILE_WITH_VERSION)"; exit 1; }
-	@$(PYTHON) setup.py --long-description | rst2html --exit-status=2 > /dev/null
-	@ver_and_date="`$(PYTHON) setup.py --version` (`date +%Y-%m-%d`)" && \
-	    grep -q "^$$ver_and_date$$" NEWS.rst || { \
-	        echo "$(FILE_WITH_CHANGELOG) has no entry for $$ver_and_date"; exit 1; }
-	make distcheck
-
-.PHONY: release
-release: releasechecklist
-	# I'm chicken so I won't actually do these things yet
-	@echo "Please run"
-	@echo
-	@echo "  rm -rf dist && $(PYTHON) setup.py sdist && twine upload dist/* && git tag `$(PYTHON) setup.py --version`"
-	@echo
-	@echo "Please increment the version number in $(FILE_WITH_VERSION)"
-	@echo "and add a new empty entry at the top of $(FILE_WITH_CHANGELOG), then"
-	@echo
-	@echo '  git commit -a -m "Post-release version bump" && git push && git push --tags'
-	@echo
-
+.PHONY: distcheck-wheel
+distcheck-wheel:
+	@pkg_and_version=`$(PYTHON) setup.py --name`-`$(PYTHON) setup.py --version` && \
+	  unzip -l dist/$$pkg_and_version-py2.py3-none-any.whl | \
+	  grep -q gtimelog.mo && \
+	  echo "wheel seems to be ok"
 
 %.1: %.rst
 	rst2man $< > $@
