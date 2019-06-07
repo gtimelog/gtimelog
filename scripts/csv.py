@@ -29,11 +29,11 @@ def format_line(line):
     return '%s %s %s' % (desc, FIELD_DELIMITER, format_pseudo_iso_time(time))
 
 
-def format_file(in_file, out_file):
-    """Read an in_file object and output it formatted into out_file object."""
-    for line in in_file:
+def format_file(input_file, output_file):
+    """Read an input_file object and output it formatted into output_file object."""
+    for line in input_file:
         formatted = format_line(line)
-        out_file.write('%s\n' % formatted)
+        output_file.write('%s\n' % formatted)
 
 
 def parse_arguments():
@@ -42,12 +42,16 @@ def parse_arguments():
         description='Prepare gtimelog rows for import into XLS')
     parser.add_argument(
         'input_file',
-        help='a name of an input file that contains gtimelog report lines')
-    parser.add_argument('output_file', nargs='?', help='an output file name')
+        help='an <input_file>.txt that contains gtimelog report lines')
+    parser.add_argument(
+        'output_file', nargs='?',
+        help='an <output_file> to create; the default is <input_file.csv>')
 
     args = parser.parse_args()
     input_file = args.input_file
-    output_file = args.output_file if args.output_file else '%s.csv' % input_file
+    output_file = (args.output_file
+                if args.output_file
+                else os.path.basename(input_file).replace('.txt', '.csv'))
 
     return input_file, output_file
 
@@ -56,10 +60,10 @@ if __name__ == '__main__':
 
     input_file, output_file = parse_arguments()
 
-    in_file = open(input_file, mode='r')
-    out_file = open(output_file, mode='w+')
+    input_file = open(input_file, mode='r')
+    output_file = open(output_file, mode='w+')
 
-    format_file(in_file, out_file)
+    format_file(input_file, output_file)
 
-    in_file.close()
-    out_file.close()
+    input_file.close()
+    output_file.close()
