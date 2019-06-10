@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import argparse
 import sys
 import re
 
@@ -33,7 +34,13 @@ def format_float_time(t):
     return '%.2f' % (t/60.0)
 
 
-if __name__ == '__main__':
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description='Compute the total time in gtimelog rows from stdin.')
+    parser.add_argument('-d', '--decimal-output', action='store_true',
+                        required=False, help='output time in a decimal format')
+    args = parser.parse_args(argv)
+
     total = 0
     for line in sys.stdin:
         if '  ' not in line:
@@ -44,4 +51,11 @@ if __name__ == '__main__':
         print line.rstrip()
         total += time
 
-    print "** Total: %s" % format_float_time(total)
+    total_formatted = (format_float_time(total)
+                       if args.decimal_output
+                       else format_time(total))
+    print "** Total: %s" % total_formatted
+
+
+if __name__ == '__main__':
+    main()
