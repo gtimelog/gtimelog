@@ -330,6 +330,21 @@
                     <property name="position">2</property>
                   </packing>
                 </child>
+                <child>
+                  <object class="GtkToggleButton" id="yearly_report_toggle">
+                    <property name="label" translatable="yes">Yearly</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="action_name">win.time-range</property>
+                    <property name="action_target">"year"</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">3</property>
+                  </packing>
+                </child>
                 <style>
                   <class name="linked"/>
                 </style>
