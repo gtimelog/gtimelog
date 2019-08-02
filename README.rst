@@ -46,7 +46,7 @@ You can run it from a source checkout without an explicit installation step::
 
 System requirements:
 
-- Python (2.7 or 3.3+)
+- Python (2.7 or 3.5+)
 - PyGObject
 - gobject-introspection type libraries for GTK+, Pango
 - GTK+ 3.10 or newer (3.14 or newer for best results)
