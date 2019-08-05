@@ -554,8 +554,7 @@ def copy_properties(src, dest):
         'completion', 'model', 'type',
         'progress-', 'primary-icon-', 'secondary-icon-',
     )
-    # GObject.ParamFlags.READWRITE is missing on Ubuntu 14.04 LTS, which has GTK+ 3.10
-    RW = GObject.ParamFlags.READABLE | GObject.ParamFlags.WRITABLE
+    RW = GObject.ParamFlags.READWRITE
     for prop in src.props:
         if prop.flags & GObject.ParamFlags.DEPRECATED != 0:
             continue
@@ -2108,6 +2107,7 @@ def main():
         locale.textdomain('gtimelog')
     else:  # pragma: nocover
         # https://github.com/gtimelog/gtimelog/issues/95#issuecomment-252299266
+        # locale.bindtextdomain is missing on Windows!
         log.error(_("Unable to configure translations: no locale.bindtextdomain()"))
 
     # Make ^C terminate the process
