@@ -28,7 +28,7 @@ GTimeLog is packaged for Debian and Ubuntu::
 
   sudo apt-get install gtimelog
 
-For Ubuntu, a newer version can usually be found in the PPA:
+For Ubuntu, sometimes a newer version can usually be found in the PPA:
 
   https://launchpad.net/~gtimelog-dev/+archive/ppa
 
@@ -37,19 +37,19 @@ You can fetch the latest released version from PyPI ::
   $ pip install gtimelog
   $ gtimelog
 
-You can run it from a source checkout without an explicit installation step::
+You can run it from a source checkout (without an explicit installation step)::
 
   $ git clone https://github.com/gtimelog/gtimelog
   $ cd gtimelog
-  $ make
   $ ./gtimelog
 
 System requirements:
 
 - Python (2.7 or 3.5+)
 - PyGObject
-- gobject-introspection type libraries for GTK+, Pango
-- GTK+ 3.10 or newer (3.14 or newer for best results)
+- gobject-introspection type libraries for Gtk, Gdk, GLib, Gio, GObject, Pango,
+  Soup, GnomeKeyring
+- GTK+ 3.18 or newer
 
 
 Documentation
