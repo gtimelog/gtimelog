@@ -65,7 +65,7 @@ mo-files: $(mo_files)
 .PHONY: flatpak
 flatpak:
 	# you may need to install the platform and sdk before this will work
-	# flatpak install flathub org.gnome.Platform//3.30 org.gnome.Sdk//3.30
+	# flatpak install flathub org.gnome.Platform//3.32 org.gnome.Sdk//3.32
 	flatpak-builder --force-clean build/flatpak flatpak/org.gtimelog.GTimeLog.yaml
 	# to run it do
 	# flatpak-builder --run build/flatpak flatpak/org.gtimelog.GTimeLog.yaml gtimelog
