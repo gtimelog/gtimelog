@@ -12,16 +12,16 @@
     <property name="step_increment">0.5</property>
     <property name="page_increment">1</property>
   </object>
-  <object class="GtkBox" id="dialog-vbox">
+  <object class="GtkStack" id="dialog_stack">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="margin_start">18</property>
     <property name="margin_end">18</property>
     <property name="margin_top">18</property>
     <property name="margin_bottom">18</property>
-    <property name="orientation">vertical</property>
+    <property name="vhomogeneous">True</property>
     <child>
-      <object class="GtkBox" id="box1">
+      <object class="GtkBox" id="entry_page">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="vexpand">False</property>
@@ -224,6 +224,20 @@
             <property name="position">1</property>
           </packing>
         </child>
+      </object>
+      <packing>
+        <property name="name">entry</property>
+        <property name="position">0</property>
+        <property name="title" translatable="yes">Entry</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkBox" id="email_page">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="vexpand">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">18</property>
         <child>
           <object class="GtkBox" id="reports_box">
             <property name="visible">True</property>
@@ -231,11 +245,10 @@
             <property name="orientation">vertical</property>
             <property name="spacing">6</property>
             <child>
-              <object class="GtkLabel" id="ireports_label">
+              <object class="GtkLabel" id="reports_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="label" translatable="yes">Reports by email</property>
-                <property name="lines">5</property>
                 <property name="xalign">0</property>
                 <attributes>
                   <attribute name="weight" value="bold"/>
@@ -343,26 +356,210 @@
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">2</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="smtp_box">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">6</property>
+            <child>
+              <object class="GtkLabel" id="smtp_label">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">SMTP server</property>
+                <property name="xalign">0</property>
+                <attributes>
+                  <attribute name="weight" value="bold"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkGrid" id="smtp_grid">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="margin_start">12</property>
+                <property name="row_spacing">6</property>
+                <property name="column_spacing">12</property>
+                <child>
+                  <object class="GtkLabel" id="server_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Server</property>
+                    <property name="xalign">1</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="server_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="expand">True</property>
+                    <property name="text">localhost</property>
+                    <property name="activates_default">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="port_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Port</property>
+                    <property name="xalign">1</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">2</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="port_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="width_chars">9</property>
+                    <property name="max_width_chars">9</property>
+                    <property name="text">0</property>
+                    <property name="input_purpose">digits</property>
+                    <property name="activates_default">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">3</property>
+                    <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="protocol_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Security</property>
+                    <property name="xalign">1</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="protocol_combo">
+                    <property name="visible">True</property>
+                    <property name="expand">True</property>
+                    <items>
+                      <item translatable="yes" id="SMTP">None</item>
+                      <item translatable="yes" id="SMTPS">TLS</item>
+                      <item translatable="yes" id="SMTP (StartTLS)">StartTLS</item>
+                    </items>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">1</property>
+                    <property name="width">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="username_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Username</property>
+                    <property name="xalign">1</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">2</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="username_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="expand">True</property>
+                    <property name="text"></property>
+                    <property name="activates_default">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">2</property>
+                    <property name="width">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="password_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Password</property>
+                    <property name="xalign">1</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">3</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkEntry" id="password_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="expand">True</property>
+                    <property name="visibility">False</property>
+                    <property name="text"></property>
+                    <property name="activates_default">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">3</property>
+                    <property name="width">3</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
           </packing>
         </child>
       </object>
       <packing>
-        <property name="expand">False</property>
-        <property name="fill">True</property>
-        <property name="position">0</property>
+        <property name="name">email</property>
+        <property name="title" translatable="yes">Email</property>
+        <property name="position">1</property>
       </packing>
     </child>
   </object>
-  <object class="GtkSizeGroup" id="labels">
+  <object class="GtkSizeGroup" id="entry_labels">
     <property name="mode">GTK_SIZE_GROUP_HORIZONTAL</property>
     <widgets>
       <widget name="virtual_midnight_label"/>
       <widget name="hours_label"/>
       <widget name="office_hours_label"/>
+    </widgets>
+  </object>
+  <object class="GtkSizeGroup" id="email_labels">
+    <property name="mode">GTK_SIZE_GROUP_HORIZONTAL</property>
+    <widgets>
       <widget name="sender_label"/>
       <widget name="recipient_label"/>
       <widget name="name_label"/>
+      <widget name="protocol_label"/>
+      <widget name="server_label"/>
+      <widget name="username_label"/>
     </widgets>
   </object>
 </interface>

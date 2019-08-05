@@ -2,24 +2,30 @@
 from __future__ import print_function, absolute_import
 
 import time
-import os
-DEBUG = os.getenv('DEBUG')
+import sys
 
 
-def mark_time(what=None, _prev=[0, 0]):
-    t = time.time()
-    if DEBUG:
+DEBUG = '--debug' in sys.argv
+
+
+if DEBUG:
+    def mark_time(what=None, _prev=[0, 0]):
+        t = time.time()
         if what:
             print("{:.3f} ({:+.3f}) {}".format(t - _prev[1], t - _prev[0], what))
         else:
             print()
             _prev[1] = t
-    _prev[0] = t
+        _prev[0] = t
+else:
+    def mark_time(what=None):
+        pass
 
 
 mark_time()
 mark_time("in script")
 
+import collections
 import datetime
 import email
 import email.header
@@ -29,23 +35,19 @@ import gettext
 import io
 import locale
 import logging
+import os
 import re
 import signal
-import subprocess
-import sys
-from gettext import gettext as _
+import smtplib
+from contextlib import closing
 from email.utils import parseaddr, formataddr
+from gettext import gettext as _
 from io import StringIO
-
-try:
-    from subprocess import DEVNULL
-except ImportError:
-    DEVNULL = open(os.devnull, 'w')
 
 mark_time("Python imports done")
 
 
-if '--debug' in sys.argv:
+if DEBUG:
     os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
 
 
@@ -61,7 +63,8 @@ from .paths import (
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Soup', '2.4')
-from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango, Soup
+gi.require_version('GnomeKeyring', '1.0')
+from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango, Soup, GnomeKeyring
 mark_time("Gtk imports done")
 
 from gtimelog import __version__
@@ -89,6 +92,47 @@ mark_time("gtimelog imports done")
 
 
 log = logging.getLogger('gtimelog')
+
+
+MailProtocol = collections.namedtuple('MailProtocol', 'factory, startssl')
+
+MAIL_PROTOCOLS = {
+    'SMTP': MailProtocol(smtplib.SMTP, False),
+    'SMTPS': MailProtocol(smtplib.SMTP_SSL, False),
+    'SMTP (StartTLS)': MailProtocol(smtplib.SMTP, True),
+}
+
+
+class EmailError(Exception):
+    pass
+
+
+def get_smtp_password(server, username):
+    result, keys = GnomeKeyring.find_network_password_sync(
+        user=username,
+        domain=server,
+        server=server,
+        object=None,
+        protocol='smtp',
+        authtype=None,
+        port=0)
+    if result == GnomeKeyring.Result.OK:
+        return keys[-1].password
+    else:
+        return ''
+
+
+def set_smtp_password(server, username, password):
+    GnomeKeyring.set_network_password_sync(
+        keyring=None,
+        user=username,
+        domain=server,
+        server=server,
+        object=None,
+        protocol='smtp',
+        authtype=None,
+        port=0,
+        password=password)
 
 
 def format_duration(duration):
@@ -149,15 +193,7 @@ def make_option(long_name, short_name=None, flags=0, arg=GLib.OptionArg.NONE,
 # Global HTTP stuff
 
 class Authenticator(object):
-    # try to use GNOME Keyring if available
-    try:
-        gi.require_version('GnomeKeyring', '1.0')
-        from gi.repository import GnomeKeyring as gnomekeyring
-    except (ValueError, ImportError):
-        gnomekeyring = None
-
     def __init__(self):
-        object.__init__(self)
         self.pending = []
         self.lookup_in_progress = False
         self.username = None
@@ -172,27 +208,23 @@ class Authenticator(object):
         username = self.username
         password = self.password
 
-        if self.gnomekeyring is None:
-            callback(username, password)
-            return
-
         # FIXME - would be nice to make all keyring calls async, to dodge
         # the possibility of blocking the UI. The code is all set up for
         # that, but there's no easy way to use the keyring asynchronously
         # from Python (as of Gnome 3.20)...
-        result, keys = self.gnomekeyring.find_network_password_sync(
-                None,           # user
-                uri.get_host(), # domain
-                uri.get_host(), # server
-                None,           # object
-                uri.get_scheme(),# protocol
-                None,           # authtype
-                uri.get_port()) # port
+        result, keys = GnomeKeyring.find_network_password_sync(
+            user=None,
+            domain=uri.get_host(),
+            server=uri.get_host(),
+            object=None,
+            protocol=uri.get_scheme(),
+            authtype=None,
+            port=uri.get_port())
 
-        if result == self.gnomekeyring.Result.NO_MATCH:
+        if result == GnomeKeyring.Result.NO_MATCH:
             # We didn't find any passwords, just continue
             pass
-        elif result == self.gnomekeyring.Result.NO_KEYRING_DAEMON:
+        elif result == GnomeKeyring.Result.NO_KEYRING_DAEMON:
             pass
         else:
             entry = keys[-1] # take the last key (Why?)
@@ -202,16 +234,16 @@ class Authenticator(object):
         callback(username, password)
 
     def save_to_keyring(self, uri, username, password):
-        self.gnomekeyring.set_network_password_sync(
-                None,           # keyring
-                username,       # user
-                uri.get_host(), # domain
-                uri.get_host(), # server
-                None,           # object
-                uri.get_scheme(),# protocol
-                None,           # authtype
-                uri.get_port(), # port
-                password)       # password
+        GnomeKeyring.set_network_password_sync(
+            keyring=None,
+            user=username,
+            domain=uri.get_host(),
+            server=uri.get_host(),
+            object=None,
+            protocol=uri.get_scheme(),
+            authtype=None,
+            port=uri.get_port(),
+            password=password)
 
     def ask_the_user(self, auth, uri, callback):
         """
@@ -225,7 +257,7 @@ class Authenticator(object):
                 password = m.get_password()
 
                 if username and password:
-                    if self.gnomekeyring and (m.get_password_save() == Gio.PasswordSave.PERMANENTLY):
+                    if m.get_password_save() == Gio.PasswordSave.PERMANENTLY:
                         self.save_to_keyring(uri, username, password)
                     elif m.get_password_save() == Gio.PasswordSave.FOR_SESSION:
                         self.username = username
@@ -237,16 +269,19 @@ class Authenticator(object):
 
             callback(username, password)
 
+        flags = (Gio.AskPasswordFlags.NEED_PASSWORD
+                 | Gio.AskPasswordFlags.NEED_USERNAME
+                 | Gio.AskPasswordFlags.SAVING_SUPPORTED)
+
         mountoperation.connect('reply', on_reply)
         mountoperation.set_password_save(Gio.PasswordSave.PERMANENTLY)
         mountoperation.do_ask_password(mountoperation,
             _('Authentication is required for "%s"\n'
-              'You need a username and a password to access %s') % (auth.get_realm(), uri.get_host()),
+              'You need a username and a password to access %s') % (
+                  auth.get_realm(), uri.get_host()),
             '',
             auth.get_realm(),
-            Gio.AskPasswordFlags.NEED_PASSWORD
-            | Gio.AskPasswordFlags.NEED_USERNAME
-            | (Gio.AskPasswordFlags.SAVING_SUPPORTED if self.gnomekeyring else 0))
+            flags)
 
     def find_password(self, auth, uri, retrying, callback):
         def keyring_callback(username, password):
@@ -324,6 +359,8 @@ class Application(Gtk.Application):
         self.add_main_option_entries([
             make_option("--version", description=_("Show version number and exit")),
             make_option("--debug", description=_("Show debug information on the console")),
+            make_option("--prefs", description=_("Open the preferences dialog")),
+            make_option("--email-prefs", description=_("Open the preferences dialog on the email page")),
         ])
 
     def check_schema(self):
@@ -360,6 +397,11 @@ class Application(Gtk.Application):
 
     def do_command_line(self, command_line):
         self.do_activate()
+        options = command_line.get_options_dict()
+        if options.contains('email-prefs'):
+            self.on_preferences(page="email")
+        elif options.contains('prefs'):
+            self.on_preferences()
         return 0
 
     def do_startup(self):
@@ -482,8 +524,11 @@ class Application(Gtk.Application):
         about_dialog.connect("response", lambda *args: about_dialog.destroy())
         about_dialog.show()
 
-    def on_preferences(self, action, parameter):
-        preferences = PreferencesDialog(self.get_active_window())
+    def on_preferences(self, action=None, parameter=None, page=None):
+        if self.are_there_any_modals():
+            # Don't let a user invoke this recursively via gtimelog --prefs
+            return
+        preferences = PreferencesDialog(self.get_active_window(), page=page)
         preferences.connect("response", lambda *args: preferences.destroy())
         preferences.run()
 
@@ -962,7 +1007,7 @@ class Window(Gtk.ApplicationWindow):
             log.error("Failed to download tasks from %s: %d %s", url, message.status_code, message.reason_phrase)
             self.tasks_infobar.set_message_type(Gtk.MessageType.ERROR)
             self.tasks_infobar_label.set_text(_("Download failed."))
-            self.tasks_infobar.connect('response', lambda *args: self.infobar.hide())
+            self.tasks_infobar.connect('response', lambda *args: self.tasks_infobar.hide())
             self.tasks_infobar.show()
         else:
             log.debug("Successfully downloaded tasks:\n  %s",
@@ -1219,40 +1264,53 @@ class Window(Gtk.ApplicationWindow):
         if not recipient:
             log.debug("Not sending report: no destination")
             return
-        if self.email(sender, recipient, subject, body):
+        try:
+            self.send_email(sender, recipient, subject, body)
+        except EmailError as e:
+            self.infobar_label.set_text(
+                _("Couldn't send email to {}: {}.").format(recipient, e))
+            self.infobar.show()
+        else:
             self.record_sent_email(self.report_view.time_range,
                                    self.report_view.date,
                                    recipient)
             self.on_cancel_report()
-        else:
-            self.infobar_label.set_text(_("Couldn't send email to {}.").format(recipient))
-            self.infobar.show()
 
-    def email(self, sender, recipient, subject, body):
+    def send_email(self, sender, recipient, subject, body):
         sender_name, sender_address = parseaddr(sender)
         recipient_name, recipient_address = parseaddr(recipient)
         msg = prepare_message(sender, recipient, subject, body)
-        command = ['/usr/sbin/sendmail']
-        if sender_address:
-            command += ['-f', sender_address]
-        command.append(recipient_address)
+
+        mail_protocol = self.gsettings.get_string('mail-protocol')
+        factory, starttls = MAIL_PROTOCOLS[mail_protocol]
+
+        smtp_server = self.gsettings.get_string('smtp-server')
+        smtp_port = self.gsettings.get_int('smtp-port')
+
+        smtp_username = self.gsettings.get_string('smtp-username')
+        smtp_password = get_smtp_password(smtp_server, smtp_username)
+
         try:
-            sendmail = subprocess.Popen(
-                command,
-                stdin=subprocess.PIPE,
-                stdout=DEVNULL,
-                stderr=subprocess.STDOUT,
-            )
-            stdin = to_bytes(msg.as_string())
-            stdout, stderr = sendmail.communicate(stdin)
-        except OSError as e:
-            log.error(_("Couldn't execute %s: %s"), command, e)
-            return False
+            log.debug('Connecting to %s port %s',
+                      smtp_server, smtp_port or '(default)')
+            with closing(factory(smtp_server, smtp_port)) as smtp:
+                if DEBUG:
+                    smtp.set_debuglevel(1)
+                if starttls:
+                    log.debug('Issuing STARTTLS')
+                    smtp.starttls()
+                if smtp_username:
+                    log.debug('Logging in as %s', smtp_username)
+                    smtp.login(smtp_username, smtp_password)
+                log.debug('Sending email from %s to %s',
+                          sender_address, recipient_address)
+                smtp.sendmail(sender_address, [recipient_address], msg.as_string())
+                log.debug('Closing SMTP connection')
+        except (OSError, smtplib.SMTPException) as e:
+            log.error(_("Couldn't send mail: %s"), e)
+            raise EmailError(e)
         else:
-            if sendmail.returncode != 0:
-                log.error(_("Couldn't send email: %s returned code %d"),
-                          command, sendmail.returncode)
-            return sendmail.returncode == 0
+            log.debug('Email sent!')
 
     def record_sent_email(self, time_range, date, recipient):
         record = self.report_view.record
@@ -2009,7 +2067,7 @@ class PreferencesDialog(Gtk.Dialog):
 
     use_header_bar = hasattr(Gtk.DialogFlags, 'USE_HEADER_BAR')
 
-    def __init__(self, transient_for):
+    def __init__(self, transient_for, page=None):
         kwargs = {}
         if self.use_header_bar:
             kwargs['use_header_bar'] = True
@@ -2025,8 +2083,14 @@ class PreferencesDialog(Gtk.Dialog):
             GLib.idle_add(self.make_enter_close_the_dialog)
 
         builder = Gtk.Builder.new_from_file(PREFERENCES_UI_FILE)
-        vbox = builder.get_object('dialog-vbox')
-        self.get_content_area().add(vbox)
+        stack = builder.get_object('dialog_stack')
+        self.get_content_area().add(stack)
+        stack_switcher = Gtk.StackSwitcher(stack=stack)
+        self.get_header_bar().set_custom_title(stack_switcher)
+        stack_switcher.show()
+
+        if page:
+            stack.set_visible_child_name(page)
 
         virtual_midnight_entry = builder.get_object('virtual_midnight_entry')
         self.virtual_midnight_entry = virtual_midnight_entry
@@ -2037,6 +2101,13 @@ class PreferencesDialog(Gtk.Dialog):
         sender_entry = builder.get_object('sender_entry')
         recipient_entry = builder.get_object('recipient_entry')
 
+        protocol_combo = builder.get_object('protocol_combo')
+        server_entry = builder.get_object('server_entry')
+        port_entry = builder.get_object('port_entry')
+        self.port_entry = port_entry
+        self.username_entry = builder.get_object('username_entry')
+        self.password_entry = builder.get_object('password_entry')
+
         self.gsettings = Gio.Settings.new("org.gtimelog")
         self.gsettings.bind('hours', hours_entry, 'value', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('office-hours', office_hours_entry, 'value', Gio.SettingsBindFlags.DEFAULT)
@@ -2046,6 +2117,17 @@ class PreferencesDialog(Gtk.Dialog):
         self.gsettings.connect('changed::virtual-midnight', self.virtual_midnight_changed)
         self.virtual_midnight_changed()
         self.virtual_midnight_entry.connect('focus-out-event', self.virtual_midnight_set)
+        self.gsettings.bind('mail-protocol', protocol_combo, 'active-id', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('smtp-server', server_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.connect('changed::smtp-port', self.smtp_port_changed)
+        self.gsettings.connect('changed::mail-protocol', self.smtp_port_changed)
+        self.smtp_port_changed()
+        port_entry.connect('focus-out-event', self.smtp_port_set)
+        self.gsettings.bind('smtp-username', self.username_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
+        self.refresh_password_field()
+        server_entry.connect('focus-out-event', self.refresh_password_field)
+        self.username_entry.connect('focus-out-event', self.refresh_password_field)
+        self.password_entry.connect('focus-out-event', self.update_password)
 
     def make_enter_close_the_dialog(self):
         hb = self.get_header_bar()
@@ -2073,13 +2155,46 @@ class PreferencesDialog(Gtk.Dialog):
             if (h, m) != (vm.hour, vm.minute):
                 self.gsettings.set_value('virtual-midnight', GLib.Variant('(ii)', (vm.hour, vm.minute)))
 
+    def smtp_port_changed(self, *args):
+        port = self.gsettings.get_int('smtp-port')
+        if port == 0:
+            mail_protocol = self.gsettings.get_string('mail-protocol')
+            default_port = MAIL_PROTOCOLS[mail_protocol].factory.default_port
+            self.port_entry.set_text('auto (%d)' % default_port)
+        else:
+            self.port_entry.set_text(str(port))
+
+    def smtp_port_set(self, *args):
+        port = self.port_entry.get_text()
+        if not port or port.lower().startswith("auto"):
+            port = 0
+        try:
+            port = int(port)
+            if not 0 <= port <= 65535:
+                raise ValueError('value out of range')
+        except ValueError:
+            self.smtp_port_changed()
+        else:
+            self.gsettings.set_int('smtp-port', port)
+
+    def refresh_password_field(self, *args):
+        server = self.gsettings.get_string("smtp-server")
+        username = self.gsettings.get_string("smtp-username")
+        self.password_entry.set_text(get_smtp_password(server, username))
+
+    def update_password(self, *args):
+        server = self.gsettings.get_string("smtp-server")
+        username = self.gsettings.get_string("smtp-username")
+        password = self.password_entry.get_text()
+        set_smtp_password(server, username, password)
+
 
 def main():
     mark_time("in main()")
 
     root_logger = logging.getLogger()
     root_logger.addHandler(logging.StreamHandler())
-    if '--debug' in sys.argv:
+    if DEBUG:
         root_logger.setLevel(logging.DEBUG)
     else:
         root_logger.setLevel(logging.INFO)

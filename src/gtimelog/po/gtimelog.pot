@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-10 17:28+0300\n"
+"POT-Creation-Date: 2019-08-05 16:23+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -37,6 +37,12 @@ msgid "Show version number and exit"
 msgstr ""
 
 msgid "Show debug information on the console"
+msgstr ""
+
+msgid "Open the preferences dialog"
+msgstr ""
+
+msgid "Open the preferences dialog on the email page"
 msgstr ""
 
 msgid ""
@@ -105,15 +111,11 @@ msgstr ""
 msgid "Report"
 msgstr ""
 
-msgid "Couldn't send email to {}."
+msgid "Couldn't send email to {}: {}."
 msgstr ""
 
 #, python-format
-msgid "Couldn't execute %s: %s"
-msgstr ""
-
-#, python-format
-msgid "Couldn't send email: %s returned code %d"
+msgid "Couldn't send mail: %s"
 msgstr ""
 
 msgid "Couldn't append to {}: {}"
@@ -275,6 +277,9 @@ msgstr ""
 msgid "(including lunch break)"
 msgstr ""
 
+msgid "Entry"
+msgstr ""
+
 msgid "Reports by email"
 msgstr ""
 
@@ -288,6 +293,36 @@ msgid "To"
 msgstr ""
 
 msgid "Nickname used in the Subject line"
+msgstr ""
+
+msgid "SMTP server"
+msgstr ""
+
+msgid "Server"
+msgstr ""
+
+msgid "Port"
+msgstr ""
+
+msgid "Security"
+msgstr ""
+
+msgid "None"
+msgstr ""
+
+msgid "TLS"
+msgstr ""
+
+msgid "StartTLS"
+msgstr ""
+
+msgid "Username"
+msgstr ""
+
+msgid "Password"
+msgstr ""
+
+msgid "Email"
 msgstr ""
 
 msgid "Keyboard Shortcuts"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-10 17:28+0300\n"
+"POT-Creation-Date: 2019-08-05 16:23+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -42,6 +42,12 @@ msgstr "Rodyti programos versiją ir išeiti"
 
 msgid "Show debug information on the console"
 msgstr "Rodyti derinimo informaciją konsolėje"
+
+msgid "Open the preferences dialog"
+msgstr "Atidaryti nustatymų dialogą"
+
+msgid "Open the preferences dialog on the email page"
+msgstr "Atidaryti nustatymų dialogo el. pašto puslapį"
 
 msgid ""
 "\n"
@@ -113,16 +119,12 @@ msgstr "{0:%Y %B} mėn."
 msgid "Report"
 msgstr "Ataskaita"
 
-msgid "Couldn't send email to {}."
-msgstr "Nepavyko išsiųsti laiško {}."
+msgid "Couldn't send email to {}: {}."
+msgstr "Nepavyko išsiųsti laiško {}: {}."
 
 #, python-format
-msgid "Couldn't execute %s: %s"
-msgstr "Nepavyko paleisti %s: %s"
-
-#, python-format
-msgid "Couldn't send email: %s returned code %d"
-msgstr "Nepavyko išsiųsti laiško: %s grąžino kodą %d"
+msgid "Couldn't send mail: %s"
+msgstr "Nepavyko išsiųsti laiško: %s."
 
 msgid "Couldn't append to {}: {}"
 msgstr "Nepavyko rašyti į {}: {}"
@@ -283,6 +285,9 @@ msgstr "per dieną"
 msgid "(including lunch break)"
 msgstr "(įskaitant pietų pertrauką)"
 
+msgid "Entry"
+msgstr "Įvedimas"
+
 msgid "Reports by email"
 msgstr "Ataskaitos paštu"
 
@@ -297,6 +302,36 @@ msgstr "Kam"
 
 msgid "Nickname used in the Subject line"
 msgstr "Trumpas vardas temos laukeliui"
+
+msgid "SMTP server"
+msgstr "SMTP serveris"
+
+msgid "Server"
+msgstr "Serveris"
+
+msgid "Port"
+msgstr "Prievadas"
+
+msgid "Security"
+msgstr "Saugumas"
+
+msgid "None"
+msgstr "nėra"
+
+msgid "TLS"
+msgstr "TLS"
+
+msgid "StartTLS"
+msgstr "StartTLS"
+
+msgid "Username"
+msgstr "Naudotojo vardas"
+
+msgid "Password"
+msgstr "Slaptažodis"
+
+msgid "Email"
+msgstr "Paštas"
 
 msgid "Keyboard Shortcuts"
 msgstr "Trumpiniai"
@@ -460,6 +495,12 @@ msgstr "Siųsti el. paštu"
 msgctxt "shortcut window"
 msgid "Return to task entry mode"
 msgstr "Grįžti į įvedimo režimą"
+
+#~ msgid "Couldn't execute %s: %s"
+#~ msgstr "Nepavyko paleisti %s: %s"
+
+#~ msgid "Couldn't send email: %s returned code %d"
+#~ msgstr "Nepavyko išsiųsti laiško: %s grąžino kodą %d"
 
 #~ msgid "Help"
 #~ msgstr "Žinynas"
