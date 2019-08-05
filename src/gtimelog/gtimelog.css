@@ -1,4 +1,1 @@
-/* Workaround for https://github.com/gtimelog/gtimelog/issues/62 */
-GtkStack {
-    background-color: @bg_color;
-}
+/* We don't have any custom CSS today! */
