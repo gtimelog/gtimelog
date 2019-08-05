@@ -9,5 +9,5 @@ basedir = os.path.dirname(os.path.realpath(__file__))
 pkgdir = os.path.join(basedir, 'src')
 sys.path.insert(0, pkgdir)
 
-from gtimelog.main import main
+from gtimelog.main import main  # noqa: E402
 main()

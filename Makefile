@@ -50,6 +50,10 @@ coverage-diff: coverage
 	$(COVERAGE) xml
 	diff-cover coverage.xml
 
+.PHONY: flake8
+flake8:
+	tox -e flake8
+
 .PHONY: update-translations
 update-translations:
 	git config filter.po.clean 'msgcat - --no-location'
