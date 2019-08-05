@@ -349,6 +349,8 @@ class Application(Gtk.Application):
                 app.add_action(action)
                 setattr(self, action_name.replace('-', '_'), action)
 
+            self.shortcuts.set_enabled(hasattr(Gtk, 'ShortcutsWindow'))
+
     def __init__(self):
         super(Application, self).__init__(
             application_id='org.gtimelog',
