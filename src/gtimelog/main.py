@@ -579,54 +579,6 @@ def swap_widget(builder, name, replacement):
     original.destroy()
 
 
-class FakePropertyAction(object):
-    """A replacement for Gio.PropertyAction.
-
-    The original doesn't work on Ubuntu 14.04 LTS.
-    """
-
-    def __init__(self):
-        raise AssertionError("Please use FakePropertyAction.new()")
-
-    @classmethod
-    def new(cls, action_name, obj, property_name):
-        default = obj.get_property(property_name)
-        self = cls.__new__(cls)
-        self.obj = obj
-        self.property_name = property_name
-        if isinstance(default, str):
-            self.type_name = "s"
-            param_type = GLib.VariantType.new("s")
-        elif isinstance(default, bool):
-            self.type_name = "b"
-            param_type = None
-        else:
-            raise AssertionError("Don't know what to do with {}".format(type(default)))
-        self.action = Gio.SimpleAction.new_stateful(action_name, param_type, GLib.Variant(self.type_name, default))
-        if isinstance(default, str):
-            self.action.connect('change-state', self.change_state)
-        elif isinstance(default, bool):
-            self.action.connect('activate', self.activate)
-        obj.connect('notify::' + property_name, self.changed)
-        return self.action
-
-    def change_state(self, action, value):
-        if action.get_state() != value:
-            action.set_state(value)
-            self.obj.set_property(self.property_name, value.unpack())
-
-    def activate(self, action, value):
-        new_state = not action.get_state().unpack()
-        action.set_state(GLib.Variant(self.type_name, new_state))
-        self.obj.set_property(self.property_name, new_state)
-
-    def changed(self, widget, param_spec):
-        new_value = self.obj.get_property(self.property_name)
-        new_state = GLib.Variant(self.type_name, new_value)
-        if self.action.get_state() != new_state:
-            self.action.set_state(new_state)
-
-
 REPORT_KINDS = {
     # map time_range values to report_kind values
     'day': ReportRecord.DAILY,
@@ -664,14 +616,7 @@ class Window(Gtk.ApplicationWindow):
     class Actions(object):
 
         def __init__(self, win):
-            # On Ubuntu 14.04 LTS we must use FakePropertyAction
-            # On Ubuntu 15.04 we can use Gio.PropertyAction
-            # But what's the actual difference -- PyGI version?  GTK version?
-            # What test do I make to determine which one to use?
-            if gi.__version__ < '3.20':
-                PropertyAction = FakePropertyAction
-            else:
-                PropertyAction = Gio.PropertyAction
+            PropertyAction = Gio.PropertyAction
 
             self.detail_level = PropertyAction.new("detail-level", win, "detail-level")
             win.add_action(self.detail_level)
