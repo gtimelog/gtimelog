@@ -63,7 +63,8 @@ from .paths import (
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Soup', '2.4')
-from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango, Soup
+gi.require_version('GnomeKeyring', '1.0')
+from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango, Soup, GnomeKeyring
 mark_time("Gtk imports done")
 
 from gtimelog import __version__
@@ -100,6 +101,38 @@ MAIL_PROTOCOLS = {
     'SMTPS': MailProtocol(smtplib.SMTP_SSL, False),
     'SMTP (StartTLS)': MailProtocol(smtplib.SMTP, True),
 }
+
+
+class EmailError(Exception):
+    pass
+
+
+def get_smtp_password(server, username):
+    result, keys = GnomeKeyring.find_network_password_sync(
+        user=username,
+        domain=server,
+        server=server,
+        object=None,
+        protocol='smtp',
+        authtype=None,
+        port=0)
+    if result == GnomeKeyring.Result.OK:
+        return keys[-1].password
+    else:
+        return ''
+
+
+def set_smtp_password(server, username, password):
+    GnomeKeyring.set_network_password_sync(
+        keyring=None,
+        user=username,
+        domain=server,
+        server=server,
+        object=None,
+        protocol='smtp',
+        authtype=None,
+        port=0,
+        password=password)
 
 
 def format_duration(duration):
@@ -160,13 +193,6 @@ def make_option(long_name, short_name=None, flags=0, arg=GLib.OptionArg.NONE,
 # Global HTTP stuff
 
 class Authenticator(object):
-    # Try to use GNOME Keyring if available
-    try:
-        gi.require_version('GnomeKeyring', '1.0')
-        from gi.repository import GnomeKeyring as gnomekeyring
-    except (ValueError, ImportError):
-        gnomekeyring = None
-
     def __init__(self):
         self.pending = []
         self.lookup_in_progress = False
@@ -182,27 +208,23 @@ class Authenticator(object):
         username = self.username
         password = self.password
 
-        if self.gnomekeyring is None:
-            callback(username, password)
-            return
-
         # FIXME - would be nice to make all keyring calls async, to dodge
         # the possibility of blocking the UI. The code is all set up for
         # that, but there's no easy way to use the keyring asynchronously
         # from Python (as of Gnome 3.20)...
-        result, keys = self.gnomekeyring.find_network_password_sync(
-                None,           # user
-                uri.get_host(), # domain
-                uri.get_host(), # server
-                None,           # object
-                uri.get_scheme(),# protocol
-                None,           # authtype
-                uri.get_port()) # port
+        result, keys = GnomeKeyring.find_network_password_sync(
+            user=None,
+            domain=uri.get_host(),
+            server=uri.get_host(),
+            object=None,
+            protocol=uri.get_scheme(),
+            authtype=None,
+            port=uri.get_port())
 
-        if result == self.gnomekeyring.Result.NO_MATCH:
+        if result == GnomeKeyring.Result.NO_MATCH:
             # We didn't find any passwords, just continue
             pass
-        elif result == self.gnomekeyring.Result.NO_KEYRING_DAEMON:
+        elif result == GnomeKeyring.Result.NO_KEYRING_DAEMON:
             pass
         else:
             entry = keys[-1] # take the last key (Why?)
@@ -212,16 +234,16 @@ class Authenticator(object):
         callback(username, password)
 
     def save_to_keyring(self, uri, username, password):
-        self.gnomekeyring.set_network_password_sync(
-                None,           # keyring
-                username,       # user
-                uri.get_host(), # domain
-                uri.get_host(), # server
-                None,           # object
-                uri.get_scheme(),# protocol
-                None,           # authtype
-                uri.get_port(), # port
-                password)       # password
+        GnomeKeyring.set_network_password_sync(
+            keyring=None,
+            user=username,
+            domain=uri.get_host(),
+            server=uri.get_host(),
+            object=None,
+            protocol=uri.get_scheme(),
+            authtype=None,
+            port=uri.get_port(),
+            password=password)
 
     def ask_the_user(self, auth, uri, callback):
         """
@@ -235,7 +257,7 @@ class Authenticator(object):
                 password = m.get_password()
 
                 if username and password:
-                    if self.gnomekeyring and (m.get_password_save() == Gio.PasswordSave.PERMANENTLY):
+                    if m.get_password_save() == Gio.PasswordSave.PERMANENTLY:
                         self.save_to_keyring(uri, username, password)
                     elif m.get_password_save() == Gio.PasswordSave.FOR_SESSION:
                         self.username = username
@@ -248,15 +270,15 @@ class Authenticator(object):
             callback(username, password)
 
         flags = (Gio.AskPasswordFlags.NEED_PASSWORD
-                 | Gio.AskPasswordFlags.NEED_USERNAME)
-        if self.gnomekeyring:
-            flags |= Gio.AskPasswordFlags.SAVING_SUPPORTED
+                 | Gio.AskPasswordFlags.NEED_USERNAME
+                 | Gio.AskPasswordFlags.SAVING_SUPPORTED)
 
         mountoperation.connect('reply', on_reply)
         mountoperation.set_password_save(Gio.PasswordSave.PERMANENTLY)
         mountoperation.do_ask_password(mountoperation,
             _('Authentication is required for "%s"\n'
-              'You need a username and a password to access %s') % (auth.get_realm(), uri.get_host()),
+              'You need a username and a password to access %s') % (
+                  auth.get_realm(), uri.get_host()),
             '',
             auth.get_realm(),
             flags)
@@ -985,7 +1007,7 @@ class Window(Gtk.ApplicationWindow):
             log.error("Failed to download tasks from %s: %d %s", url, message.status_code, message.reason_phrase)
             self.tasks_infobar.set_message_type(Gtk.MessageType.ERROR)
             self.tasks_infobar_label.set_text(_("Download failed."))
-            self.tasks_infobar.connect('response', lambda *args: self.infobar.hide())
+            self.tasks_infobar.connect('response', lambda *args: self.tasks_infobar.hide())
             self.tasks_infobar.show()
         else:
             log.debug("Successfully downloaded tasks:\n  %s",
@@ -1242,16 +1264,19 @@ class Window(Gtk.ApplicationWindow):
         if not recipient:
             log.debug("Not sending report: no destination")
             return
-        if self.email(sender, recipient, subject, body):
+        try:
+            self.send_email(sender, recipient, subject, body)
+        except EmailError as e:
+            self.infobar_label.set_text(
+                _("Couldn't send email to {}: {}.").format(recipient, e))
+            self.infobar.show()
+        else:
             self.record_sent_email(self.report_view.time_range,
                                    self.report_view.date,
                                    recipient)
             self.on_cancel_report()
-        else:
-            self.infobar_label.set_text(_("Couldn't send email to {}.").format(recipient))
-            self.infobar.show()
 
-    def email(self, sender, recipient, subject, body):
+    def send_email(self, sender, recipient, subject, body):
         sender_name, sender_address = parseaddr(sender)
         recipient_name, recipient_address = parseaddr(recipient)
         msg = prepare_message(sender, recipient, subject, body)
@@ -1263,7 +1288,7 @@ class Window(Gtk.ApplicationWindow):
         smtp_port = self.gsettings.get_int('smtp-port')
 
         smtp_username = self.gsettings.get_string('smtp-username')
-        smtp_password = ''  # TODO: use the keyring
+        smtp_password = get_smtp_password(smtp_server, smtp_username)
 
         try:
             log.debug('Connecting to %s port %s',
@@ -1283,10 +1308,9 @@ class Window(Gtk.ApplicationWindow):
                 log.debug('Closing SMTP connection')
         except (OSError, smtplib.SMTPException) as e:
             log.error(_("Couldn't send mail: %s"), e)
-            return False
+            raise EmailError(e)
         else:
             log.debug('Email sent!')
-            return True
 
     def record_sent_email(self, time_range, date, recipient):
         record = self.report_view.record
@@ -2081,7 +2105,8 @@ class PreferencesDialog(Gtk.Dialog):
         server_entry = builder.get_object('server_entry')
         port_entry = builder.get_object('port_entry')
         self.port_entry = port_entry
-        username_entry = builder.get_object('username_entry')
+        self.username_entry = builder.get_object('username_entry')
+        self.password_entry = builder.get_object('password_entry')
 
         self.gsettings = Gio.Settings.new("org.gtimelog")
         self.gsettings.bind('hours', hours_entry, 'value', Gio.SettingsBindFlags.DEFAULT)
@@ -2098,7 +2123,11 @@ class PreferencesDialog(Gtk.Dialog):
         self.gsettings.connect('changed::mail-protocol', self.smtp_port_changed)
         self.smtp_port_changed()
         port_entry.connect('focus-out-event', self.smtp_port_set)
-        self.gsettings.bind('smtp-username', username_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('smtp-username', self.username_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
+        self.refresh_password_field()
+        server_entry.connect('focus-out-event', self.refresh_password_field)
+        self.username_entry.connect('focus-out-event', self.refresh_password_field)
+        self.password_entry.connect('focus-out-event', self.update_password)
 
     def make_enter_close_the_dialog(self):
         hb = self.get_header_bar()
@@ -2147,6 +2176,17 @@ class PreferencesDialog(Gtk.Dialog):
             self.smtp_port_changed()
         else:
             self.gsettings.set_int('smtp-port', port)
+
+    def refresh_password_field(self, *args):
+        server = self.gsettings.get_string("smtp-server")
+        username = self.gsettings.get_string("smtp-username")
+        self.password_entry.set_text(get_smtp_password(server, username))
+
+    def update_password(self, *args):
+        server = self.gsettings.get_string("smtp-server")
+        username = self.gsettings.get_string("smtp-username")
+        password = self.password_entry.get_text()
+        set_smtp_password(server, username, password)
 
 
 def main():
