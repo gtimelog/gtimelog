@@ -63,8 +63,8 @@ from .paths import (
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Soup', '2.4')
-gi.require_version('GnomeKeyring', '1.0')
-from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango, Soup, GnomeKeyring
+gi.require_version('Secret', '1')
+from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango, Soup, Secret
 mark_time("Gtk imports done")
 
 from gtimelog import __version__
@@ -108,31 +108,22 @@ class EmailError(Exception):
 
 
 def get_smtp_password(server, username):
-    result, keys = GnomeKeyring.find_network_password_sync(
-        user=username,
-        domain=server,
-        server=server,
-        object=None,
-        protocol='smtp',
-        authtype=None,
-        port=0)
-    if result == GnomeKeyring.Result.OK:
-        return keys[-1].password
-    else:
-        return ''
+    schema = Secret.get_schema(Secret.SchemaType.COMPAT_NETWORK)
+    attrs = dict(user=username, server=server, protocol='smtp')
+    # XXX: This method may block indefinitely and should not be used in
+    # user interface threads.
+    return Secret.password_lookup_sync(schema, attrs) or ''
 
 
 def set_smtp_password(server, username, password):
-    GnomeKeyring.set_network_password_sync(
-        keyring=None,
-        user=username,
-        domain=server,
-        server=server,
-        object=None,
-        protocol='smtp',
-        authtype=None,
-        port=0,
-        password=password)
+    schema = Secret.get_schema(Secret.SchemaType.COMPAT_NETWORK)
+    attrs = dict(user=username, server=server, protocol='smtp')
+    label = '{user}@{server}'.format_map(attrs)
+    # XXX: This method may block indefinitely and should not be used in
+    # user interface threads.
+    Secret.password_store_sync(schema, attrs,
+                               collection=Secret.COLLECTION_DEFAULT,
+                               label=label, password=password)
 
 
 def format_duration(duration):
@@ -208,42 +199,41 @@ class Authenticator(object):
         username = self.username
         password = self.password
 
-        # FIXME - would be nice to make all keyring calls async, to dodge
-        # the possibility of blocking the UI. The code is all set up for
-        # that, but there's no easy way to use the keyring asynchronously
-        # from Python (as of Gnome 3.20)...
-        result, keys = GnomeKeyring.find_network_password_sync(
-            user=None,
-            domain=uri.get_host(),
-            server=uri.get_host(),
-            object=None,
-            protocol=uri.get_scheme(),
-            authtype=None,
-            port=uri.get_port())
+        # NB: we cannot use the simpler Secret.password_lookup_sync() because
+        # it won't give us access to the username!
+        service = Secret.Service.get_sync(
+            Secret.ServiceFlags.OPEN_SESSION
+            | Secret.ServiceFlags.LOAD_COLLECTIONS
+        )
+        schema = Secret.get_schema(Secret.SchemaType.COMPAT_NETWORK)
+        attrs = dict(server=uri.get_host(),
+                     protocol=uri.get_scheme(),
+                     port=str(uri.get_port()))
+        flags = Secret.SearchFlags.UNLOCK | Secret.SearchFlags.LOAD_SECRETS
+        # XXX: should use the async one
+        result = service.search_sync(schema, attrs, flags)
 
-        if result == GnomeKeyring.Result.NO_MATCH:
+        if not result:
             # We didn't find any passwords, just continue
             pass
-        elif result == GnomeKeyring.Result.NO_KEYRING_DAEMON:
-            pass
         else:
-            entry = keys[-1] # take the last key (Why?)
-            username = entry.user
-            password = entry.password
+            username = result[0].get_attributes()['user']
+            password = result[0].get_secret().get_text()
 
         callback(username, password)
 
     def save_to_keyring(self, uri, username, password):
-        GnomeKeyring.set_network_password_sync(
-            keyring=None,
-            user=username,
-            domain=uri.get_host(),
-            server=uri.get_host(),
-            object=None,
-            protocol=uri.get_scheme(),
-            authtype=None,
-            port=uri.get_port(),
-            password=password)
+        schema = Secret.get_schema(Secret.SchemaType.COMPAT_NETWORK)
+        attrs = dict(server=uri.get_host(),
+                     protocol=uri.get_scheme(),
+                     port=str(uri.get_port()),
+                     user=username)
+        label = '{user}@{server}:{port}'.format_map(attrs)
+        # XXX: This method may block indefinitely and should not be used in
+        # user interface threads.
+        Secret.password_store_sync(schema, attrs,
+                                   collection=Secret.COLLECTION_DEFAULT,
+                                   label=label, password=password)
 
     def ask_the_user(self, auth, uri, callback):
         """
