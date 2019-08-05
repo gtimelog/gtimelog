@@ -27,7 +27,6 @@ if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
 
 ui_dir = here
 
-# XXX: can't check Gtk version here to use fallback 3.10 .ui files!
 UI_FILE = os.path.join(ui_dir, 'gtimelog.ui')
 PREFERENCES_UI_FILE = os.path.join(ui_dir, 'preferences.ui')
 ABOUT_DIALOG_UI_FILE = os.path.join(ui_dir, 'about.ui')

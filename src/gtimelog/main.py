@@ -728,9 +728,6 @@ class Window(Gtk.ApplicationWindow):
         builder.add_from_file(MENUS_UI_FILE)
         mark_time("menus loaded")
 
-        if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 14):
-            builder.get_object('menu_image').props.icon_name = 'emblem-system-symbolic'
-
         # I want to use a custom Gtk.ApplicationWindow subclass, but I
         # also want to be able to edit the .ui file with Glade.  So I use
         # a regular ApplicationWindow in the .ui file, then steal its
@@ -743,9 +740,6 @@ class Window(Gtk.ApplicationWindow):
         main_window.remove(main_stack)
         self.add(main_stack)
         self.set_titlebar(headerbar)
-
-        if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 14):
-            main_stack.connect('draw', self.draw_main_stack)
 
         # Cannot store these in the same .ui file nor hook them up in the
         # .ui because glade doesn't support that and strips both the
@@ -817,11 +811,6 @@ class Window(Gtk.ApplicationWindow):
         self.report_view.connect('notify::report-status', self.update_already_sent_indication)
         self.update_send_report_availability()
 
-        # Workaround for a GTK+ 3.10 bug (https://bugzilla.gnome.org/show_bug.cgi?id=705673)
-        builder.get_object('back_button').connect('button-press-event', self.disable_double_click)
-        builder.get_object('forward_button').connect('button-press-event', self.disable_double_click)
-        builder.get_object('today_button').connect('button-press-event', self.disable_double_click)
-
         mark_time('window created')
 
         self.load_settings()
@@ -843,18 +832,6 @@ class Window(Gtk.ApplicationWindow):
         # minute boundary, so we would delay updating the current time
         # unnecessarily.
         GLib.timeout_add_seconds(1, self.tick)
-
-    def draw_main_stack(self, widget, cr):
-        w = widget.get_allocated_width()
-        h = widget.get_allocated_height()
-        context = widget.get_style_context()
-        Gtk.render_background(context, cr, 0, 0, w, h)
-        return False
-
-    def disable_double_click(self, widget, event):
-        if event.type == Gdk.EventType._2BUTTON_PRESS:
-            return True
-        return False
 
     def load_settings(self):
         self.gsettings = Gio.Settings.new("org.gtimelog")
@@ -1935,25 +1912,12 @@ class ReportView(Gtk.TextView):
         self.connect('notify::recipient', self.update_already_sent_indication)
         self.bind_property('body', self.get_buffer(), 'text',
                            GObject.BindingFlags.BIDIRECTIONAL)
-        if (Gtk.MAJOR_VERSION, Gtk.MINOR_VERSION) < (3, 16):
-            # Seems like a bug on GTK+ 3.10 where editing text doesn't emit the
-            # notify::text signal, and so property bindings don't get updated.
-            # I don't have the patience to dig through bugzilla to find when
-            # the bug was fixed, or to test GTK+ 3.12/3.14, so I'll just apply
-            # the workaround for all GTK+ versions older than the one I
-            # currently use, which doesn't have the bug.  The workaround should
-            # be harmless.
-            self.get_buffer().connect('changed', self.buffer_changed_workaround)
-        # GTK+ versions before 3.16 did not have a 'monospace' property.
         # GTK+ themes other than Adwaita ignore the 'monospace' property and
         # use a proportional font for text widgets.
         self.override_font(Pango.FontDescription.from_string("Monospace"))
 
         filename = Settings().get_report_log_file()
         self.record = ReportRecord(filename)
-
-    def buffer_changed_workaround(self, *args):
-        self.get_buffer().notify('text')
 
     def queue_update(self, *args):
         if not self._update_pending:

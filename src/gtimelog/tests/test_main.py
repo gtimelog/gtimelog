@@ -14,7 +14,7 @@ except ImportError:
 
 gi = mock.MagicMock()
 gi.repository.Gtk.MAJOR_VERSION = 3
-gi.repository.Gtk.MINOR_VERSION = 16
+gi.repository.Gtk.MINOR_VERSION = 18
 mock_gi = mock.patch.dict('sys.modules', {'gi': gi, 'gi.repository': gi.repository})
 
 

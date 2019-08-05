@@ -11,6 +11,8 @@ Changelog
 
 - gnome-keyring is now a mandatory dependency.
 
+- GTK 3.18 or newer is now required.
+
 
 0.11.3 (2019-04-23)
 ~~~~~~~~~~~~~~~~~~~

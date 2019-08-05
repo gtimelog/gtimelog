@@ -19,10 +19,9 @@ po_dir = src/gtimelog/po
 po_files = $(wildcard $(po_dir)/*.po)
 mo_dir = src/gtimelog/locale
 mo_files = $(patsubst $(po_dir)/%.po,$(mo_dir)/%/LC_MESSAGES/gtimelog.mo,$(po_files))
-fallback_ui_files = src/gtimelog/gtimelog-gtk3.10.ui src/gtimelog/preferences-gtk3.10.ui
 schema_dir = src/gtimelog/data
 schema_files = $(schema_dir)/gschemas.compiled
-runtime_files = $(schema_files) $(mo_files) $(fallback_ui_files)
+runtime_files = $(schema_files) $(mo_files)
 
 .PHONY: all
 all: $(manpages) $(runtime_files)
@@ -78,14 +77,6 @@ flatpak-install:
 	flatpak-builder --force-clean build/flatpak flatpak/org.gtimelog.GTimeLog.yaml --install --user
 	# to run it do
 	# flatpak run org.gtimelog.GTimeLog
-
-%-gtk3.10.ui: %.ui
-	sed -e 's/margin_start/margin_left/' \
-	    -e 's/margin_end/margin_right/' \
-	    -e '/property name="max_width_chars"/d' \
-	    -e '/GtkHeaderBar/,$$ s/<property name="position">.*<\/property>//' \
-	    < $< > $@.tmp
-	mv $@.tmp $@
 
 $(mo_dir)/%/LC_MESSAGES/gtimelog.mo: $(po_dir)/%.po
 	@mkdir -p $(@D)
