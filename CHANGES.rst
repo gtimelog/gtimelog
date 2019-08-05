@@ -4,7 +4,12 @@ Changelog
 0.11.4 (unreleased)
 ~~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- This version talks to an SMTP server instead of relying on /usr/sbin/sendmail
+  for email sending.  This should work even in flatpaks.
+
+- New command line options: --prefs, --email-prefs.
+
+- gnome-keyring is now a mandatory dependency.
 
 
 0.11.3 (2019-04-23)
