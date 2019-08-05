@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-10 17:28+0300\n"
+"POT-Creation-Date: 2019-08-05 16:23+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -40,6 +40,9 @@ msgid "Show debug information on the console"
 msgstr ""
 
 msgid "Open the preferences dialog"
+msgstr ""
+
+msgid "Open the preferences dialog on the email page"
 msgstr ""
 
 msgid ""
@@ -108,7 +111,7 @@ msgstr ""
 msgid "Report"
 msgstr ""
 
-msgid "Couldn't send email to {}."
+msgid "Couldn't send email to {}: {}."
 msgstr ""
 
 #, python-format
@@ -295,6 +298,12 @@ msgstr ""
 msgid "SMTP server"
 msgstr ""
 
+msgid "Server"
+msgstr ""
+
+msgid "Port"
+msgstr ""
+
 msgid "Security"
 msgstr ""
 
@@ -307,13 +316,10 @@ msgstr ""
 msgid "StartTLS"
 msgstr ""
 
-msgid "Server"
-msgstr ""
-
-msgid "Port"
-msgstr ""
-
 msgid "Username"
+msgstr ""
+
+msgid "Password"
 msgstr ""
 
 msgid "Email"

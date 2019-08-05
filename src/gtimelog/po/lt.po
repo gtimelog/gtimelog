@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-10 17:28+0300\n"
+"POT-Creation-Date: 2019-08-05 16:23+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -45,6 +45,9 @@ msgstr "Rodyti derinimo informaciją konsolėje"
 
 msgid "Open the preferences dialog"
 msgstr "Atidaryti nustatymų dialogą"
+
+msgid "Open the preferences dialog on the email page"
+msgstr "Atidaryti nustatymų dialogo el. pašto puslapį"
 
 msgid ""
 "\n"
@@ -116,8 +119,8 @@ msgstr "{0:%Y %B} mėn."
 msgid "Report"
 msgstr "Ataskaita"
 
-msgid "Couldn't send email to {}."
-msgstr "Nepavyko išsiųsti laiško {}."
+msgid "Couldn't send email to {}: {}."
+msgstr "Nepavyko išsiųsti laiško {}: {}."
 
 #, python-format
 msgid "Couldn't send mail: %s"
@@ -303,6 +306,12 @@ msgstr "Trumpas vardas temos laukeliui"
 msgid "SMTP server"
 msgstr "SMTP serveris"
 
+msgid "Server"
+msgstr "Serveris"
+
+msgid "Port"
+msgstr "Prievadas"
+
 msgid "Security"
 msgstr "Saugumas"
 
@@ -315,14 +324,11 @@ msgstr "TLS"
 msgid "StartTLS"
 msgstr "StartTLS"
 
-msgid "Server"
-msgstr "Serveris"
-
-msgid "Port"
-msgstr "Prievadas"
-
 msgid "Username"
 msgstr "Naudotojo vardas"
+
+msgid "Password"
+msgstr "Slaptažodis"
 
 msgid "Email"
 msgstr "Paštas"
