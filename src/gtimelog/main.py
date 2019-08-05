@@ -202,7 +202,7 @@ class Authenticator(object):
         callback(username, password)
 
     def save_to_keyring(self, uri, username, password):
-        self.gnomekeyring.set_network_password_sync (
+        self.gnomekeyring.set_network_password_sync(
                 None,           # keyring
                 username,       # user
                 uri.get_host(), # domain
@@ -244,9 +244,9 @@ class Authenticator(object):
               'You need a username and a password to access %s') % (auth.get_realm(), uri.get_host()),
             '',
             auth.get_realm(),
-            Gio.AskPasswordFlags.NEED_PASSWORD |
-                Gio.AskPasswordFlags.NEED_USERNAME |
-                (Gio.AskPasswordFlags.SAVING_SUPPORTED if self.gnomekeyring else 0))
+            Gio.AskPasswordFlags.NEED_PASSWORD
+            | Gio.AskPasswordFlags.NEED_USERNAME
+            | (Gio.AskPasswordFlags.SAVING_SUPPORTED if self.gnomekeyring else 0))
 
     def find_password(self, auth, uri, retrying, callback):
         def keyring_callback(username, password):
@@ -286,6 +286,7 @@ class Authenticator(object):
         session.unpause_message(message)
         self.lookup_in_progress = False
         self.maybe_pop_queue()
+
 
 soup_session = Soup.SessionAsync()
 authenticator = Authenticator()
