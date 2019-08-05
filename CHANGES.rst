@@ -1,7 +1,7 @@
 Changelog
 ---------
 
-0.11.4 (unreleased)
+0.12.0 (unreleased)
 ~~~~~~~~~~~~~~~~~~~
 
 - This version talks to an SMTP server instead of relying on /usr/sbin/sendmail

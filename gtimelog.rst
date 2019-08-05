@@ -7,9 +7,9 @@ minimal time logging application
 --------------------------------
 
 :Author: Marius Gedminas <mgedmin@gedmin.as>
-:Date: 2017-12-16
+:Date: 2019-08-05
 :Copyright: Marius Gedminas
-:Version: 0.11
+:Version: 0.12
 :Manual section: 1
 
 
@@ -96,6 +96,12 @@ OPTIONS
 --debug
     Show debug information.
 
+--prefs
+    Open the preferences window.
+
+--email-prefs
+    Open the preferences window on the email page.
+
 
 FILES
 =====
@@ -128,5 +134,6 @@ gtimelog uses XDG-compliant config and data directories by default
 | **~/.gtimelog/gtimelogrc**
 | **~/.config/gtimelog/gtimelogrc**
 
-    Legacy configuration file.  If it exists when gtimelog 0.11 starts
-    for the first time, settings from it will be migrated to gsettings.
+    Legacy configuration file for gtimelog 0.10 and older.  If it exists when
+    gtimelog 0.11 or newer starts for the first time, settings from it will be
+    migrated to gsettings.
