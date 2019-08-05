@@ -1971,7 +1971,7 @@ class PreferencesDialog(Gtk.Dialog):
             kwargs['use_header_bar'] = True
         Gtk.Dialog.__init__(self, transient_for=transient_for,
                             title=_("Preferences"), **kwargs)
-        self.set_default_size(500, -1)
+        self.set_default_size(500, 0)
 
         if not self.use_header_bar:
             self.add_button(_("Close"), Gtk.ResponseType.CLOSE)
