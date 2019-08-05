@@ -37,7 +37,7 @@ check: test
 	appstream-util validate-relax gtimelog.appdata.xml
 
 test:
-	./runtests
+	tox -p auto
 
 .PHONY: coverage
 coverage:
