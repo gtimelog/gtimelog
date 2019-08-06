@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-05 16:23+0300\n"
+"POT-Creation-Date: 2019-08-06 18:55+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -25,9 +25,15 @@ msgstr "Laiko žurnalas"
 msgid "Track and time daily activities"
 msgstr "Sekti kasdieninus darbus"
 
+msgid "Failed to store SMTP password in the keyring."
+msgstr "Nepavyko išsaugoti SMTP slaptažodžio raktinėje."
+
 #, python-brace-format
 msgid "{0} h {1} min"
 msgstr "{0} val {1} min"
+
+msgid "Failed to store HTTP password in the keyring."
+msgstr "Nepavyko išsaugoti HTTP slaptažodžio raktinėje."
 
 #, python-format
 msgid ""
@@ -222,6 +228,7 @@ msgstr "Uždaryti"
 
 #. pragma: nocover
 #. https://github.com/gtimelog/gtimelog/issues/95#issuecomment-252299266
+#. locale.bindtextdomain is missing on Windows!
 msgid "Unable to configure translations: no locale.bindtextdomain()"
 msgstr "Nepavyko įjungti vertimų: nėra locale.bindtextdomain()"
 
