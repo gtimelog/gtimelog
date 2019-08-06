@@ -107,23 +107,39 @@ class EmailError(Exception):
     pass
 
 
-def get_smtp_password(server, username):
+def start_smtp_password_lookup(server, username, callback):
     schema = Secret.get_schema(Secret.SchemaType.COMPAT_NETWORK)
     attrs = dict(user=username, server=server, protocol='smtp')
-    # XXX: This method may block indefinitely and should not be used in
-    # user interface threads.
-    return Secret.password_lookup_sync(schema, attrs) or ''
+
+    def password_callback(source, result):
+        password = Secret.password_lookup_finish(result)
+        if password:
+            log.debug("Found the SMTP password in the keyring.")
+        else:
+            log.debug("Did not find the SMTP password in the keyring.")
+        callback(password or '')
+
+    log.debug("Looking up the SMTP password for %s@%s in the keyring.",
+              username, server)
+    Secret.password_lookup(schema, attrs, cancellable=None,
+                           callback=password_callback)
 
 
 def set_smtp_password(server, username, password):
     schema = Secret.get_schema(Secret.SchemaType.COMPAT_NETWORK)
     attrs = dict(user=username, server=server, protocol='smtp')
     label = '{user}@{server}'.format_map(attrs)
-    # XXX: This method may block indefinitely and should not be used in
-    # user interface threads.
-    Secret.password_store_sync(schema, attrs,
-                               collection=Secret.COLLECTION_DEFAULT,
-                               label=label, password=password)
+
+    def callback(source, result):
+        if not Secret.password_store_finish(result):
+            log.error(_("Failed to store SMTP password in the keyring."))
+        else:
+            log.debug("SMTP password stored in the keyring.")
+
+    log.debug("Storing the SMTP password for %s in the keyring.", label)
+    Secret.password_store(schema, attrs, collection=Secret.COLLECTION_DEFAULT,
+                          label=label, password=password, cancellable=None,
+                          callback=callback)
 
 
 def format_duration(duration):
@@ -1215,19 +1231,25 @@ class Window(Gtk.ApplicationWindow):
             self.on_cancel_report()
 
     def send_email(self, sender, recipient, subject, body):
+        smtp_server = self.gsettings.get_string('smtp-server')
+        smtp_username = self.gsettings.get_string('smtp-username')
+        callback = functools.partial(self._send_email, sender, recipient, subject, body)
+        if smtp_username:
+            start_smtp_password_lookup(smtp_server, smtp_username, callback)
+        else:
+            callback('')
+
+    def _send_email(self, sender, recipient, subject, body, smtp_password):
+        smtp_server = self.gsettings.get_string('smtp-server')
+        smtp_port = self.gsettings.get_int('smtp-port')
+        smtp_username = self.gsettings.get_string('smtp-username')
+
         sender_name, sender_address = parseaddr(sender)
         recipient_name, recipient_address = parseaddr(recipient)
         msg = prepare_message(sender, recipient, subject, body)
 
         mail_protocol = self.gsettings.get_string('mail-protocol')
         factory, starttls = MAIL_PROTOCOLS[mail_protocol]
-
-        smtp_server = self.gsettings.get_string('smtp-server')
-        smtp_port = self.gsettings.get_int('smtp-port')
-
-        smtp_username = self.gsettings.get_string('smtp-username')
-        smtp_password = get_smtp_password(smtp_server, smtp_username)
-
         try:
             log.debug('Connecting to %s port %s',
                       smtp_server, smtp_port or '(default)')
@@ -2105,7 +2127,17 @@ class PreferencesDialog(Gtk.Dialog):
     def refresh_password_field(self, *args):
         server = self.gsettings.get_string("smtp-server")
         username = self.gsettings.get_string("smtp-username")
-        self.password_entry.set_text(get_smtp_password(server, username))
+
+        def callback(password):
+            # In theory the user could've focused the password field
+            # and started typing in a new password, in which case we shouldn't
+            # overwrite it!
+            self.password_entry.set_text(password)
+
+        if username:
+            start_smtp_password_lookup(server, username, callback)
+        else:
+            self.password_entry.set_text("")
 
     def update_password(self, *args):
         server = self.gsettings.get_string("smtp-server")
