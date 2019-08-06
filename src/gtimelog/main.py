@@ -196,31 +196,56 @@ class Authenticator(object):
         If the keyring is not available, return the last username
         and password entered, if any.
         """
-        username = self.username
-        password = self.password
 
         # NB: we cannot use the simpler Secret.password_lookup_sync() because
         # it won't give us access to the username!
-        service = Secret.Service.get_sync(
+        Secret.Service.get(
             Secret.ServiceFlags.OPEN_SESSION
-            | Secret.ServiceFlags.LOAD_COLLECTIONS
+            | Secret.ServiceFlags.LOAD_COLLECTIONS,
+            cancellable=None,
+            callback=functools.partial(self._find_in_keyring, uri, callback),
         )
+
+    def _find_in_keyring(self, uri, callback, source, result):
+        service = Secret.Service.get_finish(result)
         schema = Secret.get_schema(Secret.SchemaType.COMPAT_NETWORK)
         attrs = dict(server=uri.get_host(),
                      protocol=uri.get_scheme(),
                      port=str(uri.get_port()))
-        flags = Secret.SearchFlags.UNLOCK | Secret.SearchFlags.LOAD_SECRETS
-        # XXX: should use the async one
-        result = service.search_sync(schema, attrs, flags)
+        flags = (Secret.SearchFlags.UNLOCK
+                 | Secret.SearchFlags.LOAD_SECRETS)
 
-        if not result:
-            # We didn't find any passwords, just continue
-            pass
-        else:
-            username = result[0].get_attributes()['user']
-            password = result[0].get_secret().get_text()
+        def search_callback(source, result):
+            items = service.search_finish(result)
+            if items:
+                # Note: the search will give us the most recently used password
+                # if several ones match (e.g. the user tried several different
+                # usernames).  This is good because if the wrong username gets
+                # picked and is rejected by the server, we'll ask the user
+                # again and then rememebr the more recently provided answer.
+                # This is bad only if multiple sets of credentials are valid
+                # but cause different data to be returned -- the user will
+                # be forced to launch Seahorse and remove the saved credentials
+                # manually to log in into a different account.
+                log.debug("Found the HTTP password for %s in the keyring.",
+                          items[0].get_label())
+                username = items[0].get_attributes()['user']
+                password = items[0].get_secret().get_text()
+                if len(items) > 1:
+                    # This will never happen.  If you want this to happen,
+                    # add Secret.SearchFlags.ALL to the search flags.
+                    log.debug("Ignoring the other %d found passwords.",
+                              len(items) - 1)
+            else:
+                log.debug("Did not find any HTTP passwords for %s://%s:%s"
+                          " in the keyring.",
+                          uri.get_scheme(), uri.get_host(), uri.get_port())
+                username = self.username
+                password = self.password
+            callback(username, password)
 
-        callback(username, password)
+        service.search(schema, attrs, flags, cancellable=None,
+                       callback=search_callback)
 
     def save_to_keyring(self, uri, username, password):
         schema = Secret.get_schema(Secret.SchemaType.COMPAT_NETWORK)
@@ -229,11 +254,19 @@ class Authenticator(object):
                      port=str(uri.get_port()),
                      user=username)
         label = '{user}@{server}:{port}'.format_map(attrs)
-        # XXX: This method may block indefinitely and should not be used in
-        # user interface threads.
-        Secret.password_store_sync(schema, attrs,
-                                   collection=Secret.COLLECTION_DEFAULT,
-                                   label=label, password=password)
+
+        def password_stored_callback(source, result):
+            if not Secret.password_store_finish(result):
+                log.error(_("Failed to store HTTP password in the keyring."))
+            else:
+                log.debug("HTTP password stored in the keyring.")
+
+        log.debug("Storing the HTTP password for %s in the keyring.", label)
+        Secret.password_store(
+            schema, attrs, collection=Secret.COLLECTION_DEFAULT, label=label,
+            password=password, cancellable=None,
+            callback=password_stored_callback,
+        )
 
     def ask_the_user(self, auth, uri, callback):
         """
@@ -248,6 +281,10 @@ class Authenticator(object):
 
                 if username and password:
                     if m.get_password_save() == Gio.PasswordSave.PERMANENTLY:
+                        # NB: we're saving the password before even testing if
+                        # it actually works!  This is not too big of a problem:
+                        # if it fails to work, the user will get another prompt
+                        # and we will store the other password.
                         self.save_to_keyring(uri, username, password)
                     elif m.get_password_save() == Gio.PasswordSave.FOR_SESSION:
                         self.username = username
