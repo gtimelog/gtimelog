@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <!-- interface-requires gtk+ 3.17 -->
+  <!-- interface-requires gtk+ 3.18 -->
 
   <object class="GtkShortcutsWindow" id="shortcuts_window">
     <property name="modal">True</property>
