@@ -48,7 +48,7 @@ System requirements:
 - Python (2.7 or 3.5+)
 - PyGObject
 - gobject-introspection type libraries for Gtk, Gdk, GLib, Gio, GObject, Pango,
-  Soup, GnomeKeyring
+  Soup, Secret
 - GTK+ 3.18 or newer
 
 

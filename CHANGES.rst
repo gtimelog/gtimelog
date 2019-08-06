@@ -9,7 +9,7 @@ Changelog
 
 - New command line options: --prefs, --email-prefs.
 
-- gnome-keyring is now a mandatory dependency.
+- Use libsecret instead of gnome-keyring.
 
 - GTK 3.18 or newer is now required (GH: #131).
 

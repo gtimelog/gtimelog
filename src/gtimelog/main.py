@@ -63,8 +63,8 @@ from .paths import (
 import gi
 gi.require_version('Gtk', '3.0')
 gi.require_version('Soup', '2.4')
-gi.require_version('GnomeKeyring', '1.0')
-from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango, Soup, GnomeKeyring
+gi.require_version('Secret', '1')
+from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango, Soup, Secret
 mark_time("Gtk imports done")
 
 from gtimelog import __version__
@@ -107,32 +107,39 @@ class EmailError(Exception):
     pass
 
 
-def get_smtp_password(server, username):
-    result, keys = GnomeKeyring.find_network_password_sync(
-        user=username,
-        domain=server,
-        server=server,
-        object=None,
-        protocol='smtp',
-        authtype=None,
-        port=0)
-    if result == GnomeKeyring.Result.OK:
-        return keys[-1].password
-    else:
-        return ''
+def start_smtp_password_lookup(server, username, callback):
+    schema = Secret.get_schema(Secret.SchemaType.COMPAT_NETWORK)
+    attrs = dict(user=username, server=server, protocol='smtp')
+
+    def password_callback(source, result):
+        password = Secret.password_lookup_finish(result)
+        if password:
+            log.debug("Found the SMTP password in the keyring.")
+        else:
+            log.debug("Did not find the SMTP password in the keyring.")
+        callback(password or '')
+
+    log.debug("Looking up the SMTP password for %s@%s in the keyring.",
+              username, server)
+    Secret.password_lookup(schema, attrs, cancellable=None,
+                           callback=password_callback)
 
 
 def set_smtp_password(server, username, password):
-    GnomeKeyring.set_network_password_sync(
-        keyring=None,
-        user=username,
-        domain=server,
-        server=server,
-        object=None,
-        protocol='smtp',
-        authtype=None,
-        port=0,
-        password=password)
+    schema = Secret.get_schema(Secret.SchemaType.COMPAT_NETWORK)
+    attrs = dict(user=username, server=server, protocol='smtp')
+    label = '{user}@{server}'.format_map(attrs)
+
+    def callback(source, result):
+        if not Secret.password_store_finish(result):
+            log.error(_("Failed to store SMTP password in the keyring."))
+        else:
+            log.debug("SMTP password stored in the keyring.")
+
+    log.debug("Storing the SMTP password for %s in the keyring.", label)
+    Secret.password_store(schema, attrs, collection=Secret.COLLECTION_DEFAULT,
+                          label=label, password=password, cancellable=None,
+                          callback=callback)
 
 
 def format_duration(duration):
@@ -205,45 +212,77 @@ class Authenticator(object):
         If the keyring is not available, return the last username
         and password entered, if any.
         """
-        username = self.username
-        password = self.password
 
-        # FIXME - would be nice to make all keyring calls async, to dodge
-        # the possibility of blocking the UI. The code is all set up for
-        # that, but there's no easy way to use the keyring asynchronously
-        # from Python (as of Gnome 3.20)...
-        result, keys = GnomeKeyring.find_network_password_sync(
-            user=None,
-            domain=uri.get_host(),
-            server=uri.get_host(),
-            object=None,
-            protocol=uri.get_scheme(),
-            authtype=None,
-            port=uri.get_port())
+        # NB: we cannot use the simpler Secret.password_lookup_sync() because
+        # it won't give us access to the username!
+        Secret.Service.get(
+            Secret.ServiceFlags.OPEN_SESSION
+            | Secret.ServiceFlags.LOAD_COLLECTIONS,
+            cancellable=None,
+            callback=functools.partial(self._find_in_keyring, uri, callback),
+        )
 
-        if result == GnomeKeyring.Result.NO_MATCH:
-            # We didn't find any passwords, just continue
-            pass
-        elif result == GnomeKeyring.Result.NO_KEYRING_DAEMON:
-            pass
-        else:
-            entry = keys[-1] # take the last key (Why?)
-            username = entry.user
-            password = entry.password
+    def _find_in_keyring(self, uri, callback, source, result):
+        service = Secret.Service.get_finish(result)
+        schema = Secret.get_schema(Secret.SchemaType.COMPAT_NETWORK)
+        attrs = dict(server=uri.get_host(),
+                     protocol=uri.get_scheme(),
+                     port=str(uri.get_port()))
+        flags = (Secret.SearchFlags.UNLOCK
+                 | Secret.SearchFlags.LOAD_SECRETS)
 
-        callback(username, password)
+        def search_callback(source, result):
+            items = service.search_finish(result)
+            if items:
+                # Note: the search will give us the most recently used password
+                # if several ones match (e.g. the user tried several different
+                # usernames).  This is good because if the wrong username gets
+                # picked and is rejected by the server, we'll ask the user
+                # again and then rememebr the more recently provided answer.
+                # This is bad only if multiple sets of credentials are valid
+                # but cause different data to be returned -- the user will
+                # be forced to launch Seahorse and remove the saved credentials
+                # manually to log in into a different account.
+                log.debug("Found the HTTP password for %s in the keyring.",
+                          items[0].get_label())
+                username = items[0].get_attributes()['user']
+                password = items[0].get_secret().get_text()
+                if len(items) > 1:
+                    # This will never happen.  If you want this to happen,
+                    # add Secret.SearchFlags.ALL to the search flags.
+                    log.debug("Ignoring the other %d found passwords.",
+                              len(items) - 1)
+            else:
+                log.debug("Did not find any HTTP passwords for %s://%s:%s"
+                          " in the keyring.",
+                          uri.get_scheme(), uri.get_host(), uri.get_port())
+                username = self.username
+                password = self.password
+            callback(username, password)
+
+        service.search(schema, attrs, flags, cancellable=None,
+                       callback=search_callback)
 
     def save_to_keyring(self, uri, username, password):
-        GnomeKeyring.set_network_password_sync(
-            keyring=None,
-            user=username,
-            domain=uri.get_host(),
-            server=uri.get_host(),
-            object=None,
-            protocol=uri.get_scheme(),
-            authtype=None,
-            port=uri.get_port(),
-            password=password)
+        schema = Secret.get_schema(Secret.SchemaType.COMPAT_NETWORK)
+        attrs = dict(server=uri.get_host(),
+                     protocol=uri.get_scheme(),
+                     port=str(uri.get_port()),
+                     user=username)
+        label = '{user}@{server}:{port}'.format_map(attrs)
+
+        def password_stored_callback(source, result):
+            if not Secret.password_store_finish(result):
+                log.error(_("Failed to store HTTP password in the keyring."))
+            else:
+                log.debug("HTTP password stored in the keyring.")
+
+        log.debug("Storing the HTTP password for %s in the keyring.", label)
+        Secret.password_store(
+            schema, attrs, collection=Secret.COLLECTION_DEFAULT, label=label,
+            password=password, cancellable=None,
+            callback=password_stored_callback,
+        )
 
     def ask_the_user(self, auth, uri, callback):
         """
@@ -258,6 +297,10 @@ class Authenticator(object):
 
                 if username and password:
                     if m.get_password_save() == Gio.PasswordSave.PERMANENTLY:
+                        # NB: we're saving the password before even testing if
+                        # it actually works!  This is not too big of a problem:
+                        # if it fails to work, the user will get another prompt
+                        # and we will store the other password.
                         self.save_to_keyring(uri, username, password)
                     elif m.get_password_save() == Gio.PasswordSave.FOR_SESSION:
                         self.username = username
@@ -1188,19 +1231,25 @@ class Window(Gtk.ApplicationWindow):
             self.on_cancel_report()
 
     def send_email(self, sender, recipient, subject, body):
+        smtp_server = self.gsettings.get_string('smtp-server')
+        smtp_username = self.gsettings.get_string('smtp-username')
+        callback = functools.partial(self._send_email, sender, recipient, subject, body)
+        if smtp_username:
+            start_smtp_password_lookup(smtp_server, smtp_username, callback)
+        else:
+            callback('')
+
+    def _send_email(self, sender, recipient, subject, body, smtp_password):
+        smtp_server = self.gsettings.get_string('smtp-server')
+        smtp_port = self.gsettings.get_int('smtp-port')
+        smtp_username = self.gsettings.get_string('smtp-username')
+
         sender_name, sender_address = parseaddr(sender)
         recipient_name, recipient_address = parseaddr(recipient)
         msg = prepare_message(sender, recipient, subject, body)
 
         mail_protocol = self.gsettings.get_string('mail-protocol')
         factory, starttls = MAIL_PROTOCOLS[mail_protocol]
-
-        smtp_server = self.gsettings.get_string('smtp-server')
-        smtp_port = self.gsettings.get_int('smtp-port')
-
-        smtp_username = self.gsettings.get_string('smtp-username')
-        smtp_password = get_smtp_password(smtp_server, smtp_username)
-
         try:
             log.debug('Connecting to %s port %s',
                       smtp_server, smtp_port or '(default)')
@@ -2078,7 +2127,17 @@ class PreferencesDialog(Gtk.Dialog):
     def refresh_password_field(self, *args):
         server = self.gsettings.get_string("smtp-server")
         username = self.gsettings.get_string("smtp-username")
-        self.password_entry.set_text(get_smtp_password(server, username))
+
+        def callback(password):
+            # In theory the user could've focused the password field
+            # and started typing in a new password, in which case we shouldn't
+            # overwrite it!
+            self.password_entry.set_text(password)
+
+        if username:
+            start_smtp_password_lookup(server, username, callback)
+        else:
+            self.password_entry.set_text("")
 
     def update_password(self, *args):
         server = self.gsettings.get_string("smtp-server")
