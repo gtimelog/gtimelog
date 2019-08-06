@@ -2159,7 +2159,8 @@ class PreferencesDialog(Gtk.Dialog):
         server = self.gsettings.get_string("smtp-server")
         username = self.gsettings.get_string("smtp-username")
         password = self.password_entry.get_text()
-        set_smtp_password(server, username, password)
+        if username:
+            set_smtp_password(server, username, password)
 
 
 def main():
