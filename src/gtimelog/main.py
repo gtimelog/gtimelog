@@ -922,8 +922,8 @@ class Window(Gtk.ApplicationWindow):
             self.tasks_infobar.show()
         else:
             log.debug("Successfully downloaded tasks:\n  %s",
-                      content.decode('UTF-8', 'replace').replace('\n', '\n  '))
-            with open(cache_filename, 'wb') as f:
+                      content.replace('\n', '\n  '))
+            with open(cache_filename, 'w') as f:
                 f.write(content)
             self.check_reload_tasks()
             self.tasks_infobar.hide()
