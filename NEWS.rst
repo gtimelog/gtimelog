@@ -4,7 +4,7 @@ Changelog
 0.10.4 (unreleased)
 ~~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- Drop support for obsolete Python versions (3.3 and 3.4).
 
 
 0.10.3 (2016-10-07)
