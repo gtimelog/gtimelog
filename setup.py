@@ -54,12 +54,8 @@ setup(
         'Environment :: X11 Applications :: GTK',
         'License :: OSI Approved :: GNU General Public License (GPL)',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
-        # 2.6 might work, but I can't test it myself -- recent
-        # python-gobject versions dropped support for Python 2.6
         'Topic :: Office/Business',
     ],
 

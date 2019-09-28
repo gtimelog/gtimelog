@@ -5,6 +5,8 @@ Changelog
 0.9.4 (unreleased)
 ~~~~~~~~~~~~~~~~~~
 
+* Drop support for obsolete Python versions (3.3, 3.4).
+
 
 0.9.3 (2015-09-29)
 ~~~~~~~~~~~~~~~~~~
