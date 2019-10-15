@@ -16,6 +16,8 @@ Changelog
 - Fixed an AttributeError in the undocmented remote task list feature
   (GH: #153).
 
+- Add Python 3.8 support.
+
 
 0.11.3 (2019-04-23)
 ~~~~~~~~~~~~~~~~~~~
