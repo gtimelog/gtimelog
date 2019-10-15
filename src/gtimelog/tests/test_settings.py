@@ -15,10 +15,12 @@ class TestSettings(unittest.TestCase):
         self.real_isdir = os.path.isdir
         self.tempdir = None
         self.old_home = os.environ.get('HOME')
+        self.old_userprofile = os.environ.get('USERPROFILE')
         self.old_gtimelog_home = os.environ.get('GTIMELOG_HOME')
         self.old_xdg_config_home = os.environ.get('XDG_CONFIG_HOME')
         self.old_xdg_data_home = os.environ.get('XDG_DATA_HOME')
         os.environ['HOME'] = os.path.normpath('/tmp/home')
+        os.environ['USERPROFILE'] = os.path.normpath('/tmp/home')
         os.environ.pop('GTIMELOG_HOME', None)
         os.environ.pop('XDG_CONFIG_HOME', None)
         os.environ.pop('XDG_DATA_HOME', None)
@@ -28,6 +30,7 @@ class TestSettings(unittest.TestCase):
         if self.tempdir:
             shutil.rmtree(self.tempdir)
         self.restore_env('HOME', self.old_home)
+        self.restore_env('USERPROFILE', self.old_userprofile)
         self.restore_env('GTIMELOG_HOME', self.old_gtimelog_home)
         self.restore_env('XDG_CONFIG_HOME', self.old_xdg_config_home)
         self.restore_env('XDG_DATA_HOME', self.old_xdg_data_home)
