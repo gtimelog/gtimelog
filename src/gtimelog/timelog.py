@@ -11,10 +11,11 @@ import datetime
 import os
 import socket
 import sys
+import time
 import re
 from collections import defaultdict
 from hashlib import md5
-from operator import itemgetter
+from operator import attrgetter
 
 
 PY3 = sys.version_info[0] >= 3
@@ -75,6 +76,34 @@ def parse_time(t):
         raise ValueError('bad time: %r' % t)
     hour, min = map(int, m.groups())
     return datetime.time(hour, min)
+
+
+def parse_timezone(tz):
+    """Parse timezone UTC offset from '+HHMM'."""
+    m = re.match(r'^([+-])(\d+)(\d+)$', tz)
+    if not m:
+        raise ValueError('bad timezone: %r' % tz)
+    sign = m.group(0)
+    hr = int(m.group(1))
+    mn = int(m.group(2))
+    if sign == '-':
+        return -datetime.timedelta(hours=hr, minutes=mn)
+    else:
+        return datetime.timedelta(hours=hr, minutes=mn)
+
+
+def format_timezone(tz):
+    """Format timezone UTC offset as '+HHMM'.
+
+    Example:
+
+        >>> format_timezone(datetime.timedelta(hours=-2))
+        '-0200'
+
+    """
+    mn = tz.seconds // 60
+    hr, mn = divmod(mn, 60)
+    return '%+04d' % (hr * 100 + mn)
 
 
 def virtual_day(dt, virtual_midnight):
@@ -142,7 +171,27 @@ def get_mtime(filename):
         return None
 
 
+def get_current_utc_offset():
+    """Return the current UTC offset.
+
+    Returns a datetime.timedelta value.
+
+    The result is positive east of Greenwich and negative west of Greenwich.
+    """
+    ts = time.time()
+    utc_offset = (datetime.datetime.fromtimestamp(ts) -
+                  datetime.datetime.utcfromtimestamp(ts))
+    return utc_offset
+
+
 Entry = collections.namedtuple('Entry', 'start stop duration tags entry')
+
+
+class Item(collections.namedtuple('Item', 'timestamp entry utc_offset')):
+
+    @property
+    def utc_timestamp(self):
+        return self.timestamp - self.utc_offset
 
 
 class TimeCollection(object):
@@ -185,17 +234,16 @@ class TimeCollection(object):
         """
         if not self.items:
             return None
-        stop = self.items[-1][0]
-        entry = self.items[-1][1]
-        if len(self.items) == 1:
-            start = stop
+        item = self.items[-1]
+        if len(self.items) == 1 or different_days(self.items[-2].timestamp,
+                                                  item.timestamp,
+                                                  self.virtual_midnight):
+            prev = item
         else:
-            start = self.items[-2][0]
-        if different_days(start, stop, self.virtual_midnight):
-            start = stop
-        duration = stop - start
-        entry, tags = self._split_entry_and_tags(entry)
-        return Entry(start, stop, duration, tags, entry)
+            prev = self.items[-2]
+        duration = self._duration(prev, item)
+        entry, tags = self._split_entry_and_tags(item.entry)
+        return Entry(prev.timestamp, item.timestamp, duration, tags, entry)
 
     def all_entries(self):
         """Iterate over all entries.
@@ -203,17 +251,18 @@ class TimeCollection(object):
         Yields Entry tuples.  The first entry in each day has a duration
         of 0.
         """
-        stop = None
+        prev = None
         for item in self.items:
-            start = stop
-            stop = item[0]
-            entry = item[1]
-            if start is None or different_days(start, stop,
-                                               self.virtual_midnight):
-                start = stop
-            duration = stop - start
-            entry, tags = self._split_entry_and_tags(entry)
-            yield Entry(start, stop, duration, tags, entry)
+            if prev is None or different_days(prev.timestamp,
+                                              item.timestamp, self.virtual_midnight):
+                prev = item
+            duration = self._duration(prev, item)
+            entry, tags = self._split_entry_and_tags(item.entry)
+            yield Entry(prev.timestamp, item.timestamp, duration, tags, entry)
+
+    @staticmethod
+    def _duration(start, stop):
+        return stop.utc_timestamp - start.utc_timestamp
 
     @staticmethod
     def _split_entry_and_tags(entry):
@@ -931,7 +980,13 @@ class TimeLog(TimeCollection):
 
     def _read(self, f):
         items = []
+        utc_offset = datetime.timedelta(0)
         for line in f:
+            if line.startswith('# timezone='):
+                try:
+                    utc_offset = parse_timezone(line.partition('=')[-1].strip())
+                except ValueError:
+                    continue
             time, sep, entry = line.partition(': ')
             if not sep:
                 continue
@@ -940,7 +995,7 @@ class TimeLog(TimeCollection):
             except ValueError:
                 continue
             entry = entry.strip()
-            items.append((time, entry))
+            items.append(Item(time, entry, utc_offset))
         # There's code that relies on entries being sorted.  The entries really
         # should be already sorted in the file, but sometimes the user edits
         # timelog.txt directly and introduces errors.
@@ -948,7 +1003,7 @@ class TimeLog(TimeCollection):
         # there are errors
         # Note that we must preserve the relative order of entries with
         # the same timestamp: https://bugs.launchpad.net/gtimelog/+bug/708825
-        items.sort(key=itemgetter(0))
+        items.sort(key=attrgetter('utc_timestamp'))
         return items
 
     def window_for(self, min, max):
@@ -1002,17 +1057,22 @@ class TimeLog(TimeCollection):
         f.close()
         self.last_mtime = get_mtime(self.filename)
 
-    def append(self, entry, now=None):
+    def append(self, entry, now=None, utc_offset=None):
         """Append a new entry to the time log."""
-        if not now:
+        if now is None:
             now = datetime.datetime.now().replace(second=0, microsecond=0)
+        if utc_offset is None:
+            utc_offset = get_current_utc_offset()
         self.check_reload()
         need_space = False
         last = self.last_time()
         if last and different_days(now, last, self.virtual_midnight):
             need_space = True
-        self.items.append((now, entry))
-        self.window.items.append((now, entry))
+        if not self.items or utc_offset != self.items[-1].utc_offset:
+            self.raw_append('# timezone=%s' % format_timezone(utc_offset), need_space)
+            need_space = False
+        self.items.append(Item(now, entry, utc_offset))
+        self.window.items.append(Item(now, entry, utc_offset))
         line = '%s: %s' % (now.strftime("%Y-%m-%d %H:%M"), entry)
         self.raw_append(line, need_space)
 
