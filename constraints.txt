@@ -1,0 +1,2 @@
+# workaround for https://github.com/nedbat/coveragepy/issues/909
+coverage < 5.0

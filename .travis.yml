@@ -9,7 +9,7 @@ python:
   - pypy
   - pypy3
 install:
-  - pip install coverage coveralls coverage-python-version
+  - pip install coverage coveralls coverage-python-version -cconstraints.txt
   - pip install freezegun mock flake8
   - pip install --no-deps -e .
 script:
