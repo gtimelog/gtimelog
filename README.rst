@@ -32,6 +32,10 @@ For Ubuntu, sometimes a newer version can usually be found in the PPA:
 
   https://launchpad.net/~gtimelog-dev/+archive/ppa
 
+Fedora also holds a package of gtimelog to be installed with::
+
+  sudo dnf install gtimelog
+
 You can fetch the latest released version from PyPI ::
 
   $ pip install gtimelog
