@@ -1834,7 +1834,6 @@ class LogView(Gtk.TextView):
                     (format_duration(real_time_left), 'duration'),
                     (time_to_leave, 'time'),
                     (format_duration(-time_left), 'duration'),
-                    #(format_duration(time_left), 'duration'),
                 )
             else:
                 fmt = _('Time left at work: {0} (till {1:%H:%M})')
