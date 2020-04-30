@@ -1342,12 +1342,12 @@ class Window(Gtk.ApplicationWindow):
             GLib.timeout_add_seconds(1, self.check_reload_tasks)
 
     def check_reload(self):
-        if self.timelog.check_reload():
+        if self.timelog and self.timelog.check_reload():
             self.notify('timelog')
             self.tick(True)
 
     def check_reload_tasks(self):
-        if self.tasks.check_reload():
+        if self.tasks and self.tasks.check_reload():
             self.notify('tasks')
 
     def enable_add_entry(self):
