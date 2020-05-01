@@ -249,9 +249,10 @@ class TimeCollection(object):
         Return a tuple (category, task).
         """
         if ': ' in entry:
-            return tuple(entry.split(': ', 1))
+            cat, tsk = entry.split(': ', 1)
+            return cat.strip(), tsk.strip()
         elif entry.endswith(':'):
-            return entry.partition(':')[0], ''
+            return entry.partition(':')[0].strip(), ''
         else:
             return None, entry
 
