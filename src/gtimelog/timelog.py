@@ -118,10 +118,10 @@ def next_month(date):
         return datetime.date(date.year, date.month + 1, 1)
 
 
-def uniq(l):
+def uniq(items):
     """Return list with consecutive duplicates removed."""
-    result = l[:1]
-    for item in l[1:]:
+    result = items[:1]
+    for item in items[1:]:
         if item != result[-1]:
             result.append(item)
     return result

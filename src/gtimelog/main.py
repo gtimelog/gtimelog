@@ -1483,7 +1483,9 @@ class TaskEntry(Gtk.Entry):
         if self.history_pos == 0:
             self.history_undo = self.get_text()
             self.filtered_history = uniq([
-                l for l in self.history if l.startswith(self.history_undo)])
+                entry for entry in self.history
+                if entry.startswith(self.history_undo)
+            ])
         history = self.filtered_history
         new_pos = max(0, min(self.history_pos + delta, len(history)))
         if new_pos == 0:
