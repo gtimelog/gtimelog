@@ -1,0 +1,508 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-08-08 00:36+0200\n"
+"PO-Revision-Date: 2020-08-08 00:13+0200\n"
+"Last-Translator: John Erling Blad <jeblad@gmail.com>\n"
+"Language-Team: \n"
+"Language: nb\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.3\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Time Log"
+msgstr "Tidslogg"
+
+msgid "Track and time daily activities"
+msgstr "Spor og tidfest daglige aktiviteter"
+
+msgid "Failed to store SMTP password in the keyring."
+msgstr "Kunne ikke lagre SMTP-passord i nøkkelringen."
+
+#, python-brace-format
+msgid "{0} h {1} min"
+msgstr "{0} t {1} min"
+
+msgid "Failed to store HTTP password in the keyring."
+msgstr "Kunne ikke lagre HTTP-passord i nøkkelringen."
+
+#, python-format
+msgid ""
+"Authentication is required for \"%s\"\n"
+"You need a username and a password to access %s"
+msgstr ""
+"Autentisering er påkrevd for «%s»\n"
+"Du trenger et brukernavn og et passord for tilgang %s"
+
+msgid "Show version number and exit"
+msgstr "Vis versjonsnummer og avslutt"
+
+msgid "Show debug information on the console"
+msgstr "Vis feilsøkingsinformasjon i konsollet"
+
+msgid "Open the preferences dialog"
+msgstr "Åpne brukerinnstillinger"
+
+msgid "Open the preferences dialog on the email page"
+msgstr "Åpne brukerinnstillinger for e-postsiden"
+
+msgid ""
+"\n"
+"WARNING: GSettings schema for org.gtimelog is missing!  If you're running "
+"from a source checkout, be sure to run 'make'."
+msgstr ""
+"\n"
+"ADVARSEL: GSettings-skjema for org.gtimelog mangler! Hvis du kjører etter "
+"utsjekk av kildekode, så må du kjøre 'make'."
+
+#, python-brace-format
+msgid "Could not create {directory}: {error}"
+msgstr "Kunne ikke opprette: {directory}: {error}"
+
+#, python-brace-format
+msgid "Created {directory}"
+msgstr "Opprettet {directory}"
+
+#, fuzzy
+msgid "GTimeLog version: {}"
+msgstr "GTimeLog versjon: {}"
+
+msgid "Python version: {}"
+msgstr "Python versjon: {}"
+
+msgid "GTK+ version: {}.{}.{}"
+msgstr "GTK+ versjon: {}.{}.{}"
+
+msgid "PyGI version: {}"
+msgstr "PyGI versjon: {}"
+
+msgid "Data directory: {}"
+msgstr "Data folder: {}"
+
+msgid "Legacy config directory: {}"
+msgstr "Legacy konfigurasjonskatalog: {}"
+
+msgid "Settings will be migrated to GSettings (org.gtimelog) on first launch"
+msgstr ""
+"Innstillinger blir overført til GSettings (org.gtimelog) ved første kjøring"
+
+msgid "Settings already migrated to GSettings (org.gtimelog)"
+msgstr "Innstillinger er allerede migrert til GSettings (org.gtimelog)"
+
+#, python-brace-format
+msgid "Settings from {filename} migrated to GSettings (org.gtimelog)"
+msgstr "Innstillinger fra {filename} er migrert til GSettings (org.gtimelog)"
+
+msgid "Report already sent"
+msgstr "Rapport er allerede sendt"
+
+msgid "Report already sent (to {})"
+msgstr "Rapport er allerede sendt (til {})"
+
+msgid "Downloading tasks..."
+msgstr "Laster ned oppgaver..."
+
+msgid "Download failed."
+msgstr "Kunne ikke laste ned."
+
+msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
+msgstr "{0:%A, %Y-%m-%d} (uke {1:0>2})"
+
+msgid "{0}, week {1} ({2:%B %-d}-{3:%-d})"
+msgstr "{0}, uke {1} ({2:%B %-d}-{3:%-d})"
+
+msgid "{0:%B %Y}"
+msgstr "{0:%B %Y}"
+
+msgid "Report"
+msgstr "Rapport"
+
+msgid "Couldn't send email to {}: {}."
+msgstr "Kunne ikke sende e-post til {}: {}."
+
+#, python-format
+msgid "Couldn't send mail: %s"
+msgstr "Kunne ikke sende epost: %s"
+
+msgid "Couldn't append to {}: {}"
+msgstr "Kunne ikke legge til {}: {}"
+
+msgid "%H:%M"
+msgstr "%H:%M"
+
+msgid "{0:%A, %Y-%m-%d}\n"
+msgstr "{0:%A, %Y-%m-%d}\n"
+
+#, python-brace-format
+msgid "Total for {0}: {1} ({2} per day)"
+msgstr "Totalt {0}: {1} ({2} per dag)"
+
+#, python-brace-format
+msgid "Total for {0}: {1} ({2} this week, {3} per day)"
+msgstr "Totalt {0}: {1} ({2} denne uka, {3} per dag)"
+
+msgid "({0:%H:%M}-{1:%H:%M})"
+msgstr "({0:%H:%M}-{1:%H:%M})"
+
+#, python-brace-format
+msgid "Total work done: {0} ({1} this week, {2} per day)"
+msgstr "Totalt utført arbeid: {0} ({1} denne uka, {2} per dag)"
+
+#, python-brace-format
+msgid "Total work done: {0} ({1} this week)"
+msgstr "Totalt utført arbeid: {0} ({1} denne uka)"
+
+#, python-brace-format
+msgid "Total work done this week: {0} ({1} per day)"
+msgstr "Totalt utført arbeid denne uka: {0} ({1} per dag)"
+
+#, python-brace-format
+msgid "Total work done this week: {0}"
+msgstr "Totalt utført arbeid denne uka: {0}"
+
+#, python-brace-format
+msgid "Total work done this month: {0} ({1} per day)"
+msgstr "Totalt utført arbeid denne måneden: {0} ({1} per dag)"
+
+#, python-brace-format
+msgid "Total work done this month: {0}"
+msgstr "Totalt utført arbeid denne måneden: {0}"
+
+#, python-brace-format
+msgid "Total slacking: {0} ({1} this week, {2} per day)"
+msgstr "Totalt slacking: {0} ({1} denne uka, {2} per dag)"
+
+#, python-brace-format
+msgid "Total slacking: {0} ({1} this week)"
+msgstr "Totalt slacking: {0} ({1} denne uka)"
+
+#, python-brace-format
+msgid "Total slacking this week: {0} ({1} per day)"
+msgstr "Totalt slacking denne uka: {0} ({1} per dag)"
+
+#, python-brace-format
+msgid "Total slacking this week: {0}"
+msgstr "Totalt slacking denne uka: {0}"
+
+#, python-brace-format
+msgid "Total slacking this month: {0} ({1} per day)"
+msgstr "Totalt slacking denne måneden: {0} ({1} per dag)"
+
+#, python-brace-format
+msgid "Total slacking this month: {0}"
+msgstr "Totalt slacking denne måneden: {0}"
+
+msgid ""
+"Time left at work: {0} (should've finished at {1:%H:%M}, overtime of {2} "
+"until now)"
+msgstr ""
+"Gjenstående tid på arbeid: {0} (burde avsluttet {1:%H:%M}, overtid {2} "
+"inntil nå)"
+
+msgid "Time left at work: {0} (till {1:%H:%M})"
+msgstr "Gjenstående tid på arbeid: {0} (til {1:%H:%M})"
+
+#, python-brace-format
+msgid "At office today: {0} ({1} overtime)"
+msgstr "På kontoret i dag: {0} ({1} overtid)"
+
+#, python-brace-format
+msgid "At office today: {0} ({1} left)"
+msgstr "På kontoret i dag: {0} ({1} gjenstående)"
+
+msgid "Tasks"
+msgstr "Oppgaver"
+
+msgid "Other"
+msgstr "Annet"
+
+msgid "Preferences"
+msgstr "Innstillinger"
+
+msgid "Close"
+msgstr "Steng"
+
+#. pragma: nocover
+#. https://github.com/gtimelog/gtimelog/issues/95#issuecomment-252299266
+#. locale.bindtextdomain is missing on Windows!
+msgid "Unable to configure translations: no locale.bindtextdomain()"
+msgstr "Kan ikke konfigurere oversettelser: ingen locale.bindtextdomain()"
+
+msgid "Copyright © 2004–2019 Marius Gedminas and contributors."
+msgstr "Copyright © 2004–2019 Marius Gedminas og bidragsytere."
+
+msgid "A time tracking application"
+msgstr "En tidssporingsapplikasjon"
+
+msgid "Add"
+msgstr "Legg til"
+
+msgid "Daily"
+msgstr "Daglig"
+
+msgid "Weekly"
+msgstr "Ukentlig"
+
+msgid "Monthly"
+msgstr "Månedlig"
+
+msgid "Sender"
+msgstr "Avsender"
+
+msgid "Your Name <youremail@example.com>"
+msgstr "Ditt navn <dinepost@example.com>"
+
+msgid "Recipient"
+msgstr "Mottaker"
+
+msgid "email@example.com"
+msgstr "epost@example.com"
+
+msgid "Subject"
+msgstr "Emne"
+
+msgid "Cancel"
+msgstr "Avbryt"
+
+msgid "Send"
+msgstr "Send"
+
+msgid "Data entry"
+msgstr "Data oppføring"
+
+msgid "Virtual midnight"
+msgstr "Virtuell midnatt"
+
+msgid "Goals"
+msgstr "Mål"
+
+msgid "Work hours"
+msgstr "Arbeidstimer"
+
+msgid "Office hours"
+msgstr "Kontortimer"
+
+msgid "per day"
+msgstr "per dag"
+
+msgid "(including lunch break)"
+msgstr "(inkludert lunsj)"
+
+msgid "Entry"
+msgstr "Oppføring"
+
+msgid "Reports by email"
+msgstr "Rapporter med e-post"
+
+msgid "Name"
+msgstr "Navn"
+
+msgid "From"
+msgstr "Fra"
+
+msgid "To"
+msgstr "Til"
+
+msgid "Nickname used in the Subject line"
+msgstr "Kallenavn brukt på emnelinjen"
+
+msgid "SMTP server"
+msgstr "SMTP-tjener"
+
+msgid "Server"
+msgstr "Tjener"
+
+msgid "Port"
+msgstr "Port"
+
+msgid "Security"
+msgstr "Sikkerhet"
+
+msgid "None"
+msgstr "Ingen"
+
+msgid "TLS"
+msgstr "TLS"
+
+msgid "StartTLS"
+msgstr "StartTLS"
+
+msgid "Username"
+msgstr "Brukernavn"
+
+msgid "Password"
+msgstr "Passord"
+
+msgid "Email"
+msgstr "E-post"
+
+msgid "Keyboard Shortcuts"
+msgstr "Tastatursnarveier"
+
+msgid "About"
+msgstr "Om"
+
+msgid "Quit"
+msgstr "Avslutt"
+
+msgid "Edit log"
+msgstr "Rediger logg"
+
+msgid "Edit tasks"
+msgstr "Rediger oppgaver"
+
+msgid "Refresh tasks"
+msgstr "Gjenoppfrisk oppgaver"
+
+msgid "Report..."
+msgstr "Rapport..."
+
+msgid "About Time Log"
+msgstr "Om Tidslogg"
+
+msgid "Detail level"
+msgstr "Detaljnivå"
+
+msgid "Chronological"
+msgstr "Kronologisk"
+
+msgid "Grouped"
+msgstr "Gruppert"
+
+msgid "Summary"
+msgstr "Sammendrag"
+
+msgid "Time range"
+msgstr "Tidsrom"
+
+msgid "Day"
+msgstr "Dag"
+
+msgid "Week"
+msgstr "Uke"
+
+msgid "Month"
+msgstr "Måned"
+
+msgid "Filter"
+msgstr "Filter"
+
+msgctxt "shortcuts window"
+msgid "Entry"
+msgstr "Oppføring"
+
+msgctxt "shortcut window"
+msgid "Detail level"
+msgstr "Detaljnivå"
+
+msgctxt "shortcut window"
+msgid "Full chronological list"
+msgstr "Full kronologisk liste"
+
+msgctxt "shortcut window"
+msgid "Group by description"
+msgstr "Grupper etter beskrivelse"
+
+msgctxt "shortcut window"
+msgid "Group by category"
+msgstr "Grupper etter kategori"
+
+msgctxt "shortcut window"
+msgid "Time range"
+msgstr "Tidsområde"
+
+msgctxt "shortcut window"
+msgid "Day view"
+msgstr "Dagsvisning"
+
+msgctxt "shortcut window"
+msgid "Week view"
+msgstr "Ukesvisning"
+
+msgctxt "shortcut window"
+msgid "Month view"
+msgstr "Månedsvisning"
+
+msgctxt "shortcut window"
+msgid "Time navigation"
+msgstr "Navigering i tid"
+
+msgctxt "shortcut window"
+msgid "Go back in time"
+msgstr "Gå tilbake i tid"
+
+msgctxt "shortcut window"
+msgid "Go forward in time"
+msgstr "Gå forover i tid"
+
+msgctxt "shortcut window"
+msgid "Go back to today"
+msgstr "Gå tilbake til i dag"
+
+msgctxt "shortcut window"
+msgid "General"
+msgstr "Generelt"
+
+msgctxt "shortcut window"
+msgid "Menu"
+msgstr "Meny"
+
+msgctxt "shortcut window"
+msgid "Keyboard shortcuts"
+msgstr "Tastatursnarveier"
+
+msgctxt "shortcut window"
+msgid "Toggle search bar"
+msgstr "Bytt søkefeltet"
+
+msgctxt "shortcut window"
+msgid "Edit task log"
+msgstr "Rediger oppgavelista"
+
+msgctxt "shortcut window"
+msgid "Preferences"
+msgstr "Innstillinger"
+
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Avslutt"
+
+msgctxt "shortcut window"
+msgid "Task pane"
+msgstr "Oppgaverute"
+
+msgctxt "shortcut window"
+msgid "Toggle task pane"
+msgstr "Bytt oppgaverute"
+
+msgctxt "shortcut window"
+msgid "Edit task list"
+msgstr "Rediger oppgaveliste"
+
+msgctxt "shortcuts window"
+msgid "Reports"
+msgstr "Rapporter"
+
+msgctxt "shortcut window"
+msgid "Reporting"
+msgstr "Rapporterer"
+
+msgctxt "shortcut window"
+msgid "Switch to report mode"
+msgstr "Bytt til rappportmodus"
+
+msgctxt "shortcut window"
+msgid "Send report via email"
+msgstr "Send rapport via e-post"
+
+msgctxt "shortcut window"
+msgid "Return to task entry mode"
+msgstr "Tilbake til modus for oppgaveinnlegging"
