@@ -1,0 +1,528 @@
+# GTimeLog translation to French
+# Copyright (C) 2020 Stéphane Mangin <stephane.mangin@freesbee.fr>
+# This file is distributed under the same license as the GTimeLog package.
+# Marius Gedminas <marius@gedmin.as>, 2020.
+#
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gtimelog 0.12.0.dev0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-08-17 15:34+0300\n"
+"PO-Revision-Date: 2020-08-08 15:52+0200\n"
+"Last-Translator: Stéphane Mangin <stephane.mangin@freesbee.fr>\n"
+"Language-Team: <stephane.mangin@freesbee.fr>\n"
+"Language: fr_FR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
+"%100<10 || n%100>=20) ? 1 : 2);\n"
+
+msgid "Time Log"
+msgstr "Gestion du temps"
+
+msgid "Track and time daily activities"
+msgstr "Gérer ses activités quotidiennes"
+
+msgid "Failed to store SMTP password in the keyring."
+msgstr "Impossible de sauvegarder le mot de passe SMTP dans le portefeuille."
+
+#, python-brace-format
+msgid "{0} h {1} min"
+msgstr "{0} h {1} min"
+
+#, python-format
+msgid ""
+"Authentication is required for \"%s\"\n"
+"You need a username and a password to access %s"
+msgstr ""
+"L'authentification est requise pour \"%s\"\n"
+"Vous avez besoin d'un identifiant et d'un mot de passe pour accéder à %s"
+
+msgid "Show version number and exit"
+msgstr "Afficher le numéro de version et quitter"
+
+msgid "Show debug information on the console"
+msgstr "Afficher les informations de débogage sur le console"
+
+msgid "Open the preferences dialog"
+msgstr "Ouvrir les préférences"
+
+msgid "Open the preferences dialog on the email page"
+msgstr "Ouvrir les préférences dans la page email"
+
+msgid ""
+"\n"
+"WARNING: GSettings schema for org.gtimelog is missing!  If you're running "
+"from a source checkout, be sure to run 'make'."
+msgstr ""
+"\n"
+"DĖMESIO: Le schéma GSettings de org.gtimelog est manquant !  Si vous l'avez lancé "
+"depuis une source git, assurez-vous d'avoir lancer 'make' préalablement."
+
+#, python-brace-format
+msgid "Could not create {directory}: {error}"
+msgstr "Impossible de créer le répertoire {directory}: {error}"
+
+#, python-brace-format
+msgid "Created {directory}"
+msgstr "Répertoire {directory} créé"
+
+msgid "GTimeLog version: {}"
+msgstr "GTimeLog version: {}"
+
+msgid "Python version: {}"
+msgstr "Python version: {}"
+
+msgid "GTK+ version: {}.{}.{}"
+msgstr "GTK+ version: {}.{}.{}"
+
+msgid "PyGI version: {}"
+msgstr "PyGI version: {}"
+
+msgid "Data directory: {}"
+msgstr "Répertoire de données: {}"
+
+msgid "Legacy config directory: {}"
+msgstr "Répertoire historique de configuration: {}"
+
+msgid "Settings will be migrated to GSettings (org.gtimelog) on first launch"
+msgstr ""
+"La configuration va être migrée vers GSettings (org.gtimelog) au premier lancement"
+
+msgid "Settings already migrated to GSettings (org.gtimelog)"
+msgstr "La configuration a déjà été migrée vers GSettings (org.gtimelog)"
+
+#, python-brace-format
+msgid "Settings from {filename} migrated to GSettings (org.gtimelog)"
+msgstr "Le fichier de configuration {filename} a été migrée vers GSettings (org.gtimelog)"
+
+msgid "Report already sent"
+msgstr "Alerte déjà envoyée"
+
+msgid "Report already sent (to {})"
+msgstr "Alerte déjà envoyée (à {})"
+
+msgid "Downloading tasks..."
+msgstr "Téléchargement des tâches..."
+
+msgid "Download failed."
+msgstr "Téléchargement impossible."
+
+msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
+msgstr "{0:%A, %d/%m/%Y} (semaine {1:0>2})"
+
+msgid "{0}, week {1} ({2:%B %-d}-{3:%-d})"
+msgstr "{0}, semaine {1} ({2:%-d} au {3:%-d %B})"
+
+msgid "{0:%B %Y}"
+msgstr "{0:%Y %B}"
+
+msgid "Report"
+msgstr "Alerter"
+
+msgid "Couldn't send email to {}: {}."
+msgstr "Impossible d'envoyer l'email à {}: {}."
+
+#, python-format
+msgid "Couldn't send mail: %s"
+msgstr "Impossible d'envoyer l'email: %s"
+
+msgid "Couldn't append to {}: {}"
+msgstr "Ajout impossible dans {}: {}"
+
+msgid "%H:%M"
+msgstr "%H:%M"
+
+msgid "{0:%A, %Y-%m-%d}\n"
+msgstr "{0:%A, %d/%m/%Y}\n"
+
+#, python-brace-format
+msgid "Total for {0}: {1} ({2} per day)"
+msgstr "Total pour {0}: {1} ({2} par jour)"
+
+#, python-brace-format
+msgid "Total for {0}: {1} ({2} this week, {3} per day)"
+msgstr "Total pour {0}: {1} (cette semaine {2}, {3} par jour)"
+
+msgid "({0:%H:%M}-{1:%H:%M})"
+msgstr "({0:%H:%M}–{1:%H:%M})"
+
+#, python-brace-format
+msgid "Total work done: {0} ({1} this week, {2} per day)"
+msgstr "Travail total effectué: {0} (cette semaine {1}, {2} par jour)"
+
+#, python-brace-format
+msgid "Total work done: {0} ({1} this week)"
+msgstr "Travail total effectué: {0} (cette semaine {1})"
+
+#, python-brace-format
+msgid "Total work done this week: {0} ({1} per day)"
+msgstr "Travail total effectué cette semaine: {0} ({1} par jour)"
+
+#, python-brace-format
+msgid "Total work done this week: {0}"
+msgstr "Travail total effectué cette semaine: {0}"
+
+#, python-brace-format
+msgid "Total work done this month: {0} ({1} per day)"
+msgstr "Travail total effectué ce mois: {0} ({1} par jour)"
+
+#, python-brace-format
+msgid "Total work done this month: {0}"
+msgstr "Travail total effectué ce mois: {0}"
+
+#, python-brace-format
+msgid "Total slacking: {0} ({1} this week, {2} per day)"
+msgstr "Total de temps de pause: {0} (cette semaine {1}, {2} par jour)"
+
+#, python-brace-format
+msgid "Total slacking: {0} ({1} this week)"
+msgstr "Total de temps de pause: {0} (cette semaine {1})"
+
+#, python-brace-format
+msgid "Total slacking this week: {0} ({1} per day)"
+msgstr "Total de temps de pause cette semaine: {0} ({1} par jour)"
+
+#, python-brace-format
+msgid "Total slacking this week: {0}"
+msgstr "Total de temps de pause cette semaine: {0}"
+
+#, python-brace-format
+msgid "Total slacking this month: {0} ({1} per day)"
+msgstr "Total de temps de pause ce mois: {0} ({1} par jour)"
+
+#, python-brace-format
+msgid "Total slacking this month: {0}"
+msgstr "Total de temps de pause ce mois: {0}"
+
+msgid ""
+"Time left at work: {0} (should've finished at {1:%H:%M}, overtime of {2} "
+"until now)"
+msgstr "Temps restant au travail: {0} (fin estimée {1:%H:%M}, dépassement horaire de {2})"
+
+msgid "Time left at work: {0} (till {1:%H:%M})"
+msgstr "Temps restant au travail: {0} (jusqu'à {1:%H:%M})"
+
+#, python-brace-format
+msgid "At office today: {0} ({1} overtime)"
+msgstr "Au bureau aujourd'hui: {0} ({1} de dépassement)"
+
+#, python-brace-format
+msgid "At office today: {0} ({1} left)"
+msgstr "Au bureau aujourd'hui: {0} ({1} restante)"
+
+msgid "Tasks"
+msgstr "Tâches"
+
+msgid "Other"
+msgstr "Autre"
+
+msgid "Preferences"
+msgstr "Préférences"
+
+msgid "Close"
+msgstr "Fermer"
+
+#. pragma: nocover
+#. https://github.com/gtimelog/gtimelog/issues/95#issuecomment-252299266
+#. locale.bindtextdomain is missing on Windows!
+msgid "Unable to configure translations: no locale.bindtextdomain()"
+msgstr "Impossible de configurer les traductions: pas de locale.bindtextdomain()"
+
+msgid "Copyright © 2004–2020 Marius Gedminas and contributors."
+msgstr "Tous droits réservés © 2004–2020 Marius Gedminas et contributeurs."
+
+msgid "A time tracking application"
+msgstr "Une application de gestion de temps"
+
+msgid "Add"
+msgstr "Ajouter"
+
+msgid "Daily"
+msgstr "Quotidien"
+
+msgid "Weekly"
+msgstr "Hebdomadaire"
+
+msgid "Monthly"
+msgstr "Mensuel"
+
+msgid "Sender"
+msgstr "Expéditeurs"
+
+msgid "Your Name <youremail@example.com>"
+msgstr "Votre nom <emailas@example.com>"
+
+msgid "Recipient"
+msgstr "Destinataire"
+
+msgid "email@example.com"
+msgstr "emailas@example.com"
+
+msgid "Subject"
+msgstr "Sujet"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Send"
+msgstr "Envoyer"
+
+msgid "Data entry"
+msgstr "Entrée des données"
+
+msgid "Virtual midnight"
+msgstr "Minuit virtuel"
+
+msgid "Goals"
+msgstr "Objectifs"
+
+msgid "Work hours"
+msgstr "Heures de travail"
+
+msgid "Office hours"
+msgstr "Heures de bureau"
+
+msgid "per day"
+msgstr "par jour"
+
+msgid "(including lunch break)"
+msgstr "(pause déjeuner incluse)"
+
+msgid "Entry"
+msgstr "Entrée"
+
+msgid "Reports by email"
+msgstr "Alerter par email"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "From"
+msgstr "De"
+
+msgid "To"
+msgstr "à"
+
+msgid "Nickname used in the Subject line"
+msgstr "Surnom utilisé dans le sujet"
+
+msgid "SMTP server"
+msgstr "Serveur SMTP"
+
+msgid "Server"
+msgstr "Serveur"
+
+msgid "Port"
+msgstr "Port"
+
+msgid "Security"
+msgstr "Sécurité"
+
+msgid "None"
+msgstr "Aucun"
+
+msgid "TLS"
+msgstr "TLS"
+
+msgid "StartTLS"
+msgstr "StartTLS"
+
+msgid "Username"
+msgstr "Identifiant"
+
+msgid "Password"
+msgstr "Mot de passe"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Keyboard Shortcuts"
+msgstr "Raccourcis claviers"
+
+msgid "About"
+msgstr "À propos"
+
+msgid "Quit"
+msgstr "Quitter"
+
+msgid "Edit log"
+msgstr "Éditer le fichier des entrées"
+
+msgid "Edit tasks"
+msgstr "Éditer le fichier des tâches"
+
+msgid "Refresh tasks"
+msgstr "Rafraîchir les tâches"
+
+msgid "Report..."
+msgstr "Alerter..."
+
+msgid "About Time Log"
+msgstr "À propos de GTimeLog"
+
+msgid "Detail level"
+msgstr "Niveau de détails"
+
+msgid "Chronological"
+msgstr "Chronologique"
+
+msgid "Grouped"
+msgstr "Groupé"
+
+msgid "Summary"
+msgstr "Résumé"
+
+msgid "Time range"
+msgstr "Interval de temps"
+
+msgid "Day"
+msgstr "Jour"
+
+msgid "Week"
+msgstr "Semaine"
+
+msgid "Month"
+msgstr "Mois"
+
+msgid "Filter"
+msgstr "Filtre"
+
+msgctxt "shortcuts window"
+msgid "Entry"
+msgstr "Entrée"
+
+msgctxt "shortcut window"
+msgid "Detail level"
+msgstr "Niveau de détails"
+
+msgctxt "shortcut window"
+msgid "Full chronological list"
+msgstr "Liste chronologique complète"
+
+msgctxt "shortcut window"
+msgid "Group by description"
+msgstr "Grouper par description"
+
+msgctxt "shortcut window"
+msgid "Group by category"
+msgstr "Grouper par catégories"
+
+msgctxt "shortcut window"
+msgid "Time range"
+msgstr "Interval de temps"
+
+msgctxt "shortcut window"
+msgid "Day view"
+msgstr "Vue journée"
+
+msgctxt "shortcut window"
+msgid "Week view"
+msgstr "Vue semaine"
+
+msgctxt "shortcut window"
+msgid "Month view"
+msgstr "Vue mois"
+
+msgctxt "shortcut window"
+msgid "Time navigation"
+msgstr "Navigation temporelle"
+
+msgctxt "shortcut window"
+msgid "Go back in time"
+msgstr "Retour vers le futur"
+
+msgctxt "shortcut window"
+msgid "Go forward in time"
+msgstr "Avancer dans le temps"
+
+msgctxt "shortcut window"
+msgid "Go back to today"
+msgstr "Revenir à aujourd'hui"
+
+msgctxt "shortcut window"
+msgid "General"
+msgstr "Général"
+
+msgctxt "shortcut window"
+msgid "Menu"
+msgstr "Menu"
+
+msgctxt "shortcut window"
+msgid "Keyboard shortcuts"
+msgstr "Raccourcis claviers"
+
+msgctxt "shortcut window"
+msgid "Toggle search bar"
+msgstr "Afficher/masquer la barre de recherche"
+
+msgctxt "shortcut window"
+msgid "Edit task log"
+msgstr "Éditer le fichier des tâches"
+
+msgctxt "shortcut window"
+msgid "Preferences"
+msgstr "Préférences"
+
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Quitter"
+
+msgctxt "shortcut window"
+msgid "Task pane"
+msgstr "Nom de tâche"
+
+msgctxt "shortcut window"
+msgid "Toggle task pane"
+msgstr "Afficher/masquer le panneau des tâches"
+
+msgctxt "shortcut window"
+msgid "Edit task list"
+msgstr "Editer la liste de tâches"
+
+msgctxt "shortcuts window"
+msgid "Reports"
+msgstr "Alertes"
+
+msgctxt "shortcut window"
+msgid "Reporting"
+msgstr "Alerter"
+
+msgctxt "shortcut window"
+msgid "Switch to report mode"
+msgstr "Changer pour le mode d'alerte"
+
+msgctxt "shortcut window"
+msgid "Send report via email"
+msgstr "Alerter par email"
+
+msgctxt "shortcut window"
+msgid "Return to task entry mode"
+msgstr "Retourner en mode edition"
+
+#~ msgid "Couldn't execute %s: %s"
+#~ msgstr "Impossible d'exécuter %s: %s"
+
+#~ msgid "Couldn't send email: %s returned code %d"
+#~ msgstr "Impossible d'envoyer l'email: %s a retourné le code %d"
+
+#~ msgid "Help"
+#~ msgstr "Aide"
+
+#~ msgctxt "shortcut window"
+#~ msgid "Help"
+#~ msgstr "Aide"
+
+#~ msgid "Total for {0}: {1}"
+#~ msgstr "Total pour {0}: {1}"
+
+#~ msgid "J. Random Hacker <jrh@example.com>"
+#~ msgstr "Vardenis Pavardenis <vp@example.com>"
+
+#~ msgid "JRH"
+#~ msgstr "JRH"
+
+#~ msgid "Custom..."
+#~ msgstr "Spécifique..."
