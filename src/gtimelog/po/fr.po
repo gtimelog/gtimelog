@@ -58,8 +58,9 @@ msgid ""
 "from a source checkout, be sure to run 'make'."
 msgstr ""
 "\n"
-"DĖMESIO: Le schéma GSettings de org.gtimelog est manquant !  Si vous l'avez lancé "
-"depuis une source git, assurez-vous d'avoir lancer 'make' préalablement."
+"DĖMESIO: Le schéma GSettings de org.gtimelog est manquant !  Si vous l'avez "
+"lancé depuis une source git, assurez-vous d'avoir lancer 'make' "
+"préalablement."
 
 #, python-brace-format
 msgid "Could not create {directory}: {error}"
@@ -89,14 +90,17 @@ msgstr "Répertoire historique de configuration: {}"
 
 msgid "Settings will be migrated to GSettings (org.gtimelog) on first launch"
 msgstr ""
-"La configuration va être migrée vers GSettings (org.gtimelog) au premier lancement"
+"La configuration va être migrée vers GSettings (org.gtimelog) au premier "
+"lancement"
 
 msgid "Settings already migrated to GSettings (org.gtimelog)"
 msgstr "La configuration a déjà été migrée vers GSettings (org.gtimelog)"
 
 #, python-brace-format
 msgid "Settings from {filename} migrated to GSettings (org.gtimelog)"
-msgstr "Le fichier de configuration {filename} a été migrée vers GSettings (org.gtimelog)"
+msgstr ""
+"Le fichier de configuration {filename} a été migrée vers GSettings (org."
+"gtimelog)"
 
 msgid "Report already sent"
 msgstr "Alerte déjà envoyée"
@@ -200,7 +204,9 @@ msgstr "Total de temps de pause ce mois: {0}"
 msgid ""
 "Time left at work: {0} (should've finished at {1:%H:%M}, overtime of {2} "
 "until now)"
-msgstr "Temps restant au travail: {0} (fin estimée {1:%H:%M}, dépassement horaire de {2})"
+msgstr ""
+"Temps restant au travail: {0} (fin estimée {1:%H:%M}, dépassement horaire de "
+"{2})"
 
 msgid "Time left at work: {0} (till {1:%H:%M})"
 msgstr "Temps restant au travail: {0} (jusqu'à {1:%H:%M})"
@@ -229,7 +235,8 @@ msgstr "Fermer"
 #. https://github.com/gtimelog/gtimelog/issues/95#issuecomment-252299266
 #. locale.bindtextdomain is missing on Windows!
 msgid "Unable to configure translations: no locale.bindtextdomain()"
-msgstr "Impossible de configurer les traductions: pas de locale.bindtextdomain()"
+msgstr ""
+"Impossible de configurer les traductions: pas de locale.bindtextdomain()"
 
 msgid "Copyright © 2004–2020 Marius Gedminas and contributors."
 msgstr "Tous droits réservés © 2004–2020 Marius Gedminas et contributeurs."
