@@ -8,12 +8,7 @@ import datetime
 import locale
 import os
 
-try:
-    from configparser import RawConfigParser
-    PY3 = True
-except ImportError:
-    from ConfigParser import RawConfigParser
-    PY3 = False
+from configparser import RawConfigParser
 
 
 from gtimelog.timelog import parse_time
@@ -101,8 +96,8 @@ class Settings(object):
         config = RawConfigParser()
         config.add_section('gtimelog')
         config.set('gtimelog', 'list-email', self.email)
-        config.set('gtimelog', 'name', self.from_unicode(self.name))
-        config.set('gtimelog', 'sender', self.from_unicode(self.sender))
+        config.set('gtimelog', 'name', self.name)
+        config.set('gtimelog', 'sender', self.sender)
         config.set('gtimelog', 'editor', self.editor)
         config.set('gtimelog', 'mailer', self.mailer)
         config.set('gtimelog', 'spreadsheet', self.spreadsheet)
@@ -126,25 +121,14 @@ class Settings(object):
         config.set('gtimelog', 'start_in_tray', str(self.start_in_tray))
         return config
 
-    if PY3:  # pragma: PY3
-        def to_unicode(self, value):
-            return value  # ConfigParser already gives us unicode
-        def from_unicode(self, value):
-            return value  # ConfigParser already accepts unicode
-    else:  # pragma: PY2
-        def to_unicode(self, value):
-            return value.decode(self._encoding)
-        def from_unicode(self, value):
-            return value.encode(self._encoding)
-
     def load(self, filename=None):
         if filename is None:
             filename = self.get_config_file()
         config = self._config()
         config.read([filename])
         self.email = config.get('gtimelog', 'list-email')
-        self.name = self.to_unicode(config.get('gtimelog', 'name'))
-        self.sender = self.to_unicode(config.get('gtimelog', 'sender'))
+        self.name = config.get('gtimelog', 'name')
+        self.sender = config.get('gtimelog', 'sender')
         self.editor = config.get('gtimelog', 'editor')
         self.mailer = config.get('gtimelog', 'mailer')
         self.spreadsheet = config.get('gtimelog', 'spreadsheet')

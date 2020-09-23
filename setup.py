@@ -46,9 +46,8 @@ long_description = ''.join([
 ])
 
 tests_require = ['freezegun']
-if sys.version_info < (3,):
-    # Python 2 doesn't have unittest.mock
-    tests_require.append('mock')
+if sys.version_info < (3, 5, 0):
+    sys.exit("Python 3.5 is the minimum required version")
 
 setup(
     name='gtimelog',
@@ -64,7 +63,6 @@ setup(
         'Development Status :: 4 - Beta',
         'Environment :: X11 Applications :: GTK',
         'License :: OSI Approved :: GNU General Public License (GPL)',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
@@ -73,6 +71,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Office/Business',
     ],
+    python_requires='>= 3.5',
 
     packages=find_packages('src'),
     package_dir={'': 'src'},
@@ -83,9 +82,6 @@ setup(
     extras_require={
         'test': [
             'freezegun',
-        ],
-        'test:python_version == "2.7"': [
-            'mock',
         ],
     },
     zip_safe=False,

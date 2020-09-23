@@ -10,14 +10,10 @@ import csv
 import datetime
 import os
 import socket
-import sys
 import re
 from collections import defaultdict
 from hashlib import md5
 from operator import itemgetter
-
-
-PY3 = sys.version_info[0] >= 3
 
 
 def as_minutes(duration):
@@ -423,7 +419,7 @@ class Exports(object):
 
         The file has two columns: task title and time (in minutes).
         """
-        writer = CSVWriter(output)
+        writer = csv.writer(output)
         if title_row:
             writer.writerow(["task", "time (minutes)"])
         work, slack = self.window.grouped_entries()
@@ -439,7 +435,7 @@ class Exports(object):
         The file has four columns: date, time from midnight til arrival at
         work, slacking, and work (in decimal hours).
         """
-        writer = CSVWriter(output)
+        writer = csv.writer(output)
         if title_row:
             writer.writerow(["date", "day-start (hours)",
                              "slacking (hours)", "work (hours)"])
@@ -1127,23 +1123,3 @@ class TaskList(object):
     def reload(self):
         """Reload the task list."""
         self.load()
-
-
-class CSVWriter(object):
-
-    def __init__(self, *args, **kw):
-        self._writer = csv.writer(*args, **kw)
-
-    if PY3:  # pragma: PY3
-        def writerow(self, row):
-            self._writer.writerow(row)
-    else:  # pragma: PY2
-        def writerow(self, row):
-            self._writer.writerow([
-                s.encode('UTF-8') if isinstance(s, unicode) else s  # noqa: F821
-                for s in row
-            ])
-
-    def writerows(self, rows):
-        for row in rows:
-            self.writerow(row)

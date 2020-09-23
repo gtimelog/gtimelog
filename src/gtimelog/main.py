@@ -1,6 +1,4 @@
 """An application for keeping track of your time."""
-from __future__ import print_function, absolute_import
-
 import time
 import sys
 
@@ -88,20 +86,6 @@ from gtimelog.settings import Settings
 from gtimelog.timelog import (
     as_minutes, virtual_day, different_days, prev_month, next_month, uniq, parse_time,
     Reports, ReportRecord, TaskList, TimeLog)
-
-
-if str is bytes:
-    # Python 2: GTK+ gives us back UTF-8 strings
-    def to_unicode(s):
-        return s.decode('UTF-8')
-    def to_bytes(s):
-        return s
-else:
-    # Python 3: GTK+ gives us Unicode strings
-    def to_unicode(s):
-        return s
-    def to_bytes(s):
-        return s.encode('UTF-8')
 
 
 mark_time("gtimelog imports done")
@@ -1951,7 +1935,7 @@ class ReportView(Gtk.TextView):
             return # not loaded yet
         window = self.get_time_window()
         reports = Reports(window)
-        name = to_unicode(self.name)
+        name = self.name
         if self.time_range == 'day':
             self._subject = reports.daily_report_subject(name)
         elif self.time_range == 'week':
@@ -1969,8 +1953,8 @@ class ReportView(Gtk.TextView):
         window = self.get_time_window()
         reports = Reports(window, email_headers=False, style=self.report_style)
         output = StringIO()
-        recipient = to_unicode(self.recipient)
-        name = to_unicode(self.name)
+        recipient = self.recipient
+        name = self.name
         if self.time_range == 'day':
             reports.daily_report(output, recipient, name)
         elif self.time_range == 'week':
