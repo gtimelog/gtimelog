@@ -11,18 +11,10 @@ import textwrap
 import time
 import unittest
 import sys
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import StringIO
+from io import StringIO
 
 import freezegun
-try:
-    # Python 3
-    from unittest import mock
-except ImportError:
-    # Python 2
-    import mock
+from unittest import mock
 
 from gtimelog.timelog import (
     TimeLog, Reports, ReportRecord, Exports, TaskList, TimeCollection,
