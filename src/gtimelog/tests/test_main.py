@@ -22,7 +22,7 @@ class TestEmail(unittest.TestCase):
             sender='ASCII Name <test@example.com>',
             recipient='activity@example.com',
             subject='Report for Mr. Plain',
-            body='These are the activites done by Mr. Plain:\n...\n',
+            body='These are the activities done by Mr. Plain:\n...\n',
         )
         self.assertEqual("ASCII Name <test@example.com>", msg["From"])
         self.assertEqual("activity@example.com", msg["To"])
@@ -36,7 +36,7 @@ class TestEmail(unittest.TestCase):
             Subject: Report for Mr. Plain
             User-Agent: gtimelog/0.11.dev0
 
-            These are the activites done by Mr. Plain:
+            These are the activities done by Mr. Plain:
             ...
         ''').replace('0.11.dev0', __version__)
         self.assertEqual(expected, msg.as_string())
@@ -47,7 +47,7 @@ class TestEmail(unittest.TestCase):
             sender='Ünicødę Name <test@example.com>',
             recipient='Anöther nąme <activity@example.com>',
             subject='Report for Mr. ☃',
-            body='These are the activites done by Mr. ☃:\n...\n',
+            body='These are the activities done by Mr. ☃:\n...\n',
         )
         expected = textwrap.dedent('''\
             MIME-Version: 1.0
@@ -58,7 +58,7 @@ class TestEmail(unittest.TestCase):
             Subject: =?utf-8?b?UmVwb3J0IGZvciBNci4g4piD?=
             User-Agent: gtimelog/0.11.dev0
 
-            VGhlc2UgYXJlIHRoZSBhY3Rpdml0ZXMgZG9uZSBieSBNci4g4piDOgouLi4K
+            VGhlc2UgYXJlIHRoZSBhY3Rpdml0aWVzIGRvbmUgYnkgTXIuIOKYgzoKLi4uCg==
         ''').replace('0.11.dev0', __version__)
         self.assertEqual(expected, msg.as_string())
 

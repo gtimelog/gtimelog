@@ -238,7 +238,7 @@ class Authenticator(object):
                 # if several ones match (e.g. the user tried several different
                 # usernames).  This is good because if the wrong username gets
                 # picked and is rejected by the server, we'll ask the user
-                # again and then rememebr the more recently provided answer.
+                # again and then remember the more recently provided answer.
                 # This is bad only if multiple sets of credentials are valid
                 # but cause different data to be returned -- the user will
                 # be forced to launch Seahorse and remove the saved credentials
@@ -1678,7 +1678,7 @@ class LogView(Gtk.TextView):
         self.get_buffer().place_cursor(where)
 
     def scroll_to_end(self):
-        # If I do the scrolling immediatelly, it won't scroll to the end, usually.
+        # If I do the scrolling immediately, it won't scroll to the end, usually.
         # If I delay the scrolling, it works every time.
         # I only wish I knew how to disable the scroll animation.
         GLib.idle_add(self._scroll_to_end)

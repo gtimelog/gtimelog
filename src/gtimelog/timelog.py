@@ -441,7 +441,7 @@ class Exports(object):
                              "slacking (hours)", "work (hours)"])
 
         # sum timedeltas per date
-        # timelog must be cronological for this to be dependable
+        # timelog must be chronological for this to be dependable
 
         d0 = datetime.timedelta(0)
         days = {} # date -> [time_started, slacking, work]
