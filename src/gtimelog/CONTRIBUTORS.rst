@@ -33,6 +33,7 @@ In alphabetic order:
 - Rodrigo Daunoravicius
 - Rohan Mitchell
 - Shirish Agarwal  शिरीष अग्रवाल
+- Stéphane Mangin
 - Thom May
 - Till Hofmann
 - Tomaz Canabrava
