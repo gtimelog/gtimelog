@@ -63,7 +63,6 @@ setup(
         'Development Status :: 4 - Beta',
         'Environment :: X11 Applications :: GTK',
         'License :: OSI Approved :: GNU General Public License (GPL)',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
@@ -71,7 +70,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
         'Topic :: Office/Business',
     ],
-    python_requires='>= 3.5',
+    python_requires='>= 3.6',
 
     packages=find_packages('src'),
     package_dir={'': 'src'},

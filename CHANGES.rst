@@ -18,7 +18,8 @@ Changelog
 
 - Add Python 3.8 support.
 
-- Drop Python 2.7 support.
+- Drop Python 2.7 and 3.5 support.
+
 
 0.11.3 (2019-04-23)
 ~~~~~~~~~~~~~~~~~~~
