@@ -12,9 +12,18 @@ jobs:
       install: pip install tox
       script: tox -e flake8
       after_success:
+    # coveralls.io never reports commit statuses for some reason, and of course
+    # you don't get support for a free product
+    - name: coverage
+      python: 3.8
+      install: pip install tox
+      script:
+        - tox -e coverage
+        - coveage report -m --fail-under=100
+      after_success:
 install:
   - pip install coverage coveralls coverage-python-version -cconstraints.txt
-  - pip install freezegun mock flake8
+  - pip install freezegun flake8
   - pip install --no-deps -e .
 script:
   - coverage run -m gtimelog.tests

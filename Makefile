@@ -40,9 +40,7 @@ test:
 
 .PHONY: coverage
 coverage:
-	tox -p auto -e coverage,coverage3 -- -p
-	$(COVERAGE) combine
-	$(COVERAGE) report -m --fail-under=100
+	tox -e coverage
 
 .PHONY: coverage-diff
 coverage-diff: coverage
