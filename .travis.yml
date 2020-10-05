@@ -18,7 +18,6 @@ jobs:
       install: pip install tox
       script:
         - tox -e coverage
-        - coveage report -m --fail-under=100
       after_success:
 install:
   - pip install coverage coveralls -cconstraints.txt
