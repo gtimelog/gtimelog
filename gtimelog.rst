@@ -13,7 +13,7 @@ minimal time logging application
 :Manual section: 1
 
 
-SYNOPSYS
+SYNOPSIS
 ========
 
 **gtimelog** [options]
