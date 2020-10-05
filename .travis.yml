@@ -22,7 +22,7 @@ jobs:
         - coveage report -m --fail-under=100
       after_success:
 install:
-  - pip install coverage coveralls coverage-python-version -cconstraints.txt
+  - pip install coverage coveralls -cconstraints.txt
   - pip install freezegun flake8
   - pip install --no-deps -e .
 script:
