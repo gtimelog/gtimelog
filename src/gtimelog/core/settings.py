@@ -1,7 +1,3 @@
-"""
-Settings for GTimeLog
-"""
-
 from __future__ import absolute_import
 
 import datetime
@@ -9,8 +5,7 @@ import locale
 import os
 from configparser import RawConfigParser
 
-from gtimelog.timelog import parse_time
-
+from gtimelog.core.utils import parse_time
 
 legacy_default_home = os.path.normpath('~/.gtimelog')
 default_config_home = os.path.normpath('~/.config')
@@ -51,7 +46,8 @@ class Settings(object):
 
     report_style = 'plain'
 
-    def check_legacy_config(self):
+    @staticmethod
+    def check_legacy_config():
         envar_home = os.environ.get('GTIMELOG_HOME')
         if envar_home is not None:
             return os.path.expanduser(envar_home)
@@ -153,4 +149,3 @@ class Settings(object):
         config = self._config()
         with open(filename, 'w') as f:
             config.write(f)
-

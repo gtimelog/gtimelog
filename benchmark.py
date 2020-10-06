@@ -11,9 +11,9 @@ from operator import itemgetter
 pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
 
-from gtimelog.settings import Settings
-from gtimelog.timelog import TimeLog, parse_datetime
-
+from gtimelog.core.settings import Settings
+from gtimelog.core.timelog import parse_datetime
+from gtimelog.core.time import TimeLog
 
 fns = []
 

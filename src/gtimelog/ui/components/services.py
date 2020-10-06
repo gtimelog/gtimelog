@@ -2,19 +2,13 @@
 Keyring and secrets
 """
 import functools
-import logging
 from gettext import gettext as _
 
-from .utils import require_version
+from gi.repository import Gio, Gtk, GObject, Soup, Secret
 
+from gtimelog import root_logger
 
-require_version('Gtk', '3.0')
-require_version('Soup', '2.4')
-require_version('Secret', '1')
-from gi.repository import Gio, GObject, Gtk, Secret, Soup
-
-
-log = logging.getLogger('gtimelog.secrets')
+log = root_logger.getChild('services')
 
 
 def start_smtp_password_lookup(server, username, callback):
@@ -172,7 +166,8 @@ class Authenticator(object):
 
         mountoperation.connect('reply', on_reply)
         mountoperation.set_password_save(Gio.PasswordSave.PERMANENTLY)
-        mountoperation.do_ask_password(mountoperation,
+        mountoperation.do_ask_password(
+            mountoperation,
             _('Authentication is required for "%s"\n'
               'You need a username and a password to access %s') % (
                   auth.get_realm(), uri.get_host()),
@@ -207,7 +202,8 @@ class Authenticator(object):
         else:
             self.lookup_in_progress = True
             uri = message.get_uri()
-            self.find_password(auth, uri, retrying,
+            self.find_password(
+                auth, uri, retrying,
                 callback=functools.partial(
                     self.http_auth_finish, session, message, auth))
 

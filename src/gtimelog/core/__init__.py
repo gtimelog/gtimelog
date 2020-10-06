@@ -1,0 +1,3 @@
+"""
+Core code of gtimelog.
+"""

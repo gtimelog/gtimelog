@@ -1,22 +1,24 @@
-# -*- coding: utf-8 -*-
-"""Tests for gtimelog.main"""
-
+import doctest
 import textwrap
 import unittest
-from unittest import mock
 
+from gtimelog import __version__
+from gtimelog.core.utils import prepare_message
+from gtimelog.tests.commons import Checker
 
-gi = mock.MagicMock()
+gi = unittest.mock.MagicMock()
 gi.repository.Gtk.MAJOR_VERSION = 3
 gi.repository.Gtk.MINOR_VERSION = 18
-mock_gi = mock.patch.dict('sys.modules', {'gi': gi, 'gi.repository': gi.repository})
+mock_gi = unittest.mock.patch.dict('sys.modules', {
+    'gi': gi,
+    'gi.repository': gi.repository
+})
 
 
 @mock_gi
 class TestEmail(unittest.TestCase):
 
     def test_prepare_message_ascii(self):
-        from gtimelog.main import __version__, prepare_message
         msg = prepare_message(
             sender='ASCII Name <test@example.com>',
             recipient='activity@example.com',
@@ -41,7 +43,6 @@ class TestEmail(unittest.TestCase):
         self.assertEqual(expected, msg.as_string())
 
     def test_prepare_message_unicode(self):
-        from gtimelog.main import __version__, prepare_message
         msg = prepare_message(
             sender='Ünicødę Name <test@example.com>',
             recipient='Anöther nąme <activity@example.com>',
@@ -62,5 +63,13 @@ class TestEmail(unittest.TestCase):
         self.assertEqual(expected, msg.as_string())
 
 
+def additional_tests():  # for setup.py
+    return doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE,
+                                checker=Checker())
+
+
 def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)
+    return unittest.TestSuite([
+        unittest.defaultTestLoader.loadTestsFromName(__name__),
+        additional_tests(),
+    ])

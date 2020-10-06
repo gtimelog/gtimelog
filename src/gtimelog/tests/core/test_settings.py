@@ -1,11 +1,16 @@
-"""Tests for gtimelog.settings"""
-
 import os
 import shutil
 import tempfile
 import unittest
 
-from gtimelog.settings import Settings
+from gtimelog.core.settings import Settings
+
+
+def restore_env(envvar, value):
+    if value is not None:
+        os.environ[envvar] = value
+    else:
+        os.environ.pop(envvar, None)
 
 
 class TestSettings(unittest.TestCase):
@@ -29,17 +34,11 @@ class TestSettings(unittest.TestCase):
         os.path.isdir = self.real_isdir
         if self.tempdir:
             shutil.rmtree(self.tempdir)
-        self.restore_env('HOME', self.old_home)
-        self.restore_env('USERPROFILE', self.old_userprofile)
-        self.restore_env('GTIMELOG_HOME', self.old_gtimelog_home)
-        self.restore_env('XDG_CONFIG_HOME', self.old_xdg_config_home)
-        self.restore_env('XDG_DATA_HOME', self.old_xdg_data_home)
-
-    def restore_env(self, envvar, value):
-        if value is not None:
-            os.environ[envvar] = value
-        else:
-            os.environ.pop(envvar, None)
+        restore_env('HOME', self.old_home)
+        restore_env('USERPROFILE', self.old_userprofile)
+        restore_env('GTIMELOG_HOME', self.old_gtimelog_home)
+        restore_env('XDG_CONFIG_HOME', self.old_xdg_config_home)
+        restore_env('XDG_DATA_HOME', self.old_xdg_data_home)
 
     def mkdtemp(self):
         if self.tempdir is None:
