@@ -1,5 +1,4 @@
 import os
-import io
 import re
 import time
 import datetime
@@ -229,7 +228,7 @@ def parse_timelog(f):
 
 def get_contributors():
     contributors = []
-    with io.open(CONTRIBUTORS_FILE, encoding='UTF-8') as f:
+    with open(CONTRIBUTORS_FILE, encoding='UTF-8') as f:
         for line in f:
             if line.startswith('- '):
                 contributors.append(line[2:].strip())
