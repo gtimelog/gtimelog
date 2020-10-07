@@ -6,6 +6,13 @@ import shutil
 import tempfile
 
 
+def restore_env(envvar, value):
+    if value is not None:
+        os.environ[envvar] = value
+    else:
+        os.environ.pop(envvar, None)
+
+
 class Checker(doctest.OutputChecker):
     """Doctest output checker that can deal with unicode literals."""
 

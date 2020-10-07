@@ -1,10 +1,8 @@
-import doctest
 import unittest
+
 from gtimelog.core.utils import next_month, as_hours, format_duration, format_duration_short, format_duration_long, \
     parse_datetime, parse_time, virtual_day, different_days, first_of_month, prev_month, linear_unicity
 from datetime import date, timedelta, time, datetime
-
-from gtimelog.tests.commons import Checker
 
 
 def doctest_as_hours():
@@ -258,13 +256,5 @@ def doctest_linear_unicity():
     """
 
 
-def additional_tests():  # for setup.py
-    return doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE,
-                                checker=Checker())
-
-
 def test_suite():
-    return unittest.TestSuite([
-        unittest.defaultTestLoader.loadTestsFromName(__name__),
-        additional_tests(),
-    ])
+    return unittest.defaultTestLoader.loadTestsFromName(__name__)

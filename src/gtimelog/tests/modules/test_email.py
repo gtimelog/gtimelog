@@ -1,15 +1,14 @@
-import doctest
 import textwrap
 import unittest
+from unittest import mock
 
 from gtimelog import __version__
 from gtimelog.core.utils import prepare_message
-from gtimelog.tests.commons import Checker
 
-gi = unittest.mock.MagicMock()
+gi = mock.MagicMock()
 gi.repository.Gtk.MAJOR_VERSION = 3
 gi.repository.Gtk.MINOR_VERSION = 18
-mock_gi = unittest.mock.patch.dict('sys.modules', {
+mock_gi = mock.patch.dict('sys.modules', {
     'gi': gi,
     'gi.repository': gi.repository
 })
@@ -63,13 +62,5 @@ class TestEmail(unittest.TestCase):
         self.assertEqual(expected, msg.as_string())
 
 
-def additional_tests():  # for setup.py
-    return doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE,
-                                checker=Checker())
-
-
 def test_suite():
-    return unittest.TestSuite([
-        unittest.defaultTestLoader.loadTestsFromName(__name__),
-        additional_tests(),
-    ])
+    return unittest.defaultTestLoader.loadTestsFromTestCase(TestEmail)

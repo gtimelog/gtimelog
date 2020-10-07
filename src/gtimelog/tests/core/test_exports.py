@@ -1,4 +1,3 @@
-import doctest
 import unittest
 import sys
 from datetime import datetime, time
@@ -8,7 +7,6 @@ import freezegun
 from unittest import mock
 
 from gtimelog.core.exports import Exports
-from gtimelog.tests.commons import Checker
 from gtimelog.tests.core import make_time_window
 
 
@@ -142,13 +140,5 @@ def doctest_exports_icalendar():
     """
 
 
-def additional_tests():  # for setup.py
-    return doctest.DocTestSuite(optionflags=doctest.NORMALIZE_WHITESPACE,
-                                checker=Checker())
-
-
 def test_suite():
-    return unittest.TestSuite([
-        unittest.defaultTestLoader.loadTestsFromName(__name__),
-        additional_tests(),
-    ])
+    return unittest.defaultTestLoader.loadTestsFromName(__name__)

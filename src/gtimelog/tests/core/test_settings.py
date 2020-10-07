@@ -4,13 +4,7 @@ import tempfile
 import unittest
 
 from gtimelog.core.settings import Settings
-
-
-def restore_env(envvar, value):
-    if value is not None:
-        os.environ[envvar] = value
-    else:
-        os.environ.pop(envvar, None)
+from gtimelog.tests.commons import restore_env
 
 
 class TestSettings(unittest.TestCase):
@@ -131,4 +125,4 @@ class TestSettings(unittest.TestCase):
 
 
 def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)
+    return unittest.defaultTestLoader.loadTestsFromTestCase(TestSettings)
