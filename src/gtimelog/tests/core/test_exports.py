@@ -1,10 +1,10 @@
-import unittest
 import sys
+import unittest
 from datetime import datetime, time
 from io import StringIO
+from unittest import mock
 
 import freezegun
-from unittest import mock
 
 from gtimelog.core.exports import Exports
 from gtimelog.tests.core import make_time_window

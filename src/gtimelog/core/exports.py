@@ -3,7 +3,7 @@ import datetime
 import socket
 from hashlib import md5
 
-from gtimelog.core.utils import as_minutes, as_hours
+from gtimelog.core.utils import as_hours, as_minutes
 
 
 class Exports(object):

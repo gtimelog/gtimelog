@@ -5,6 +5,7 @@ from unittest import mock
 from gtimelog import __version__
 from gtimelog.core.utils import prepare_message
 
+
 gi = mock.MagicMock()
 gi.repository.Gtk.MAJOR_VERSION = 3
 gi.repository.Gtk.MINOR_VERSION = 18

@@ -1,6 +1,6 @@
+import sys
 import textwrap
 import unittest
-import sys
 from datetime import datetime, time, timedelta
 from io import StringIO
 

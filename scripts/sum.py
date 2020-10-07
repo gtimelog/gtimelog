@@ -1,6 +1,6 @@
 #!/usr/bin/python
-import sys
 import re
+import sys
 
 
 time_rx = re.compile(r'(\d+) hours?,? (\d+) min$'

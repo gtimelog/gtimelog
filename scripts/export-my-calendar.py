@@ -2,9 +2,11 @@
 """
 Experimental script to export GTimeLog data to iCalendar file.
 """
-import os
 import datetime
+import os
+
 import gtimelog
+
 
 # Hardcoded date range and output file
 d1 = datetime.datetime(2005, 2, 1)

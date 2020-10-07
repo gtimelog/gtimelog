@@ -15,6 +15,7 @@ from gtimelog.core.settings import Settings
 from gtimelog.core.tasks import parse_datetime
 from gtimelog.core.time import TimeLog
 
+
 fns = []
 
 

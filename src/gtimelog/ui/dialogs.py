@@ -1,9 +1,10 @@
 from gettext import gettext as _
-from gi.repository import Gtk, GLib, Gio
 
-from gtimelog.paths import PREFERENCES_UI_FILE
+from gi.repository import Gio, GLib, Gtk
+
 from gtimelog.core.utils import parse_time
-from gtimelog.ui.services import start_smtp_password_lookup, set_smtp_password
+from gtimelog.paths import PREFERENCES_UI_FILE
+from gtimelog.ui.services import set_smtp_password, start_smtp_password_lookup
 from gtimelog.ui.utils import MAIL_PROTOCOLS
 
 

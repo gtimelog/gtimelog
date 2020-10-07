@@ -2,7 +2,12 @@ import datetime
 from collections import defaultdict
 
 from gtimelog.core.time import TimeCollection
-from gtimelog.core.utils import format_duration_short, format_duration_long, report_categories, get_mtime
+from gtimelog.core.utils import (
+    format_duration_long,
+    format_duration_short,
+    get_mtime,
+    report_categories,
+)
 
 
 class Reports(object):

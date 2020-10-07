@@ -1,6 +1,6 @@
-from gi.repository import Gtk, Gdk, GObject
+from gi.repository import Gdk, GObject, Gtk
 
-from gtimelog.core.utils import uniq, mark_time
+from gtimelog.core.utils import mark_time, uniq
 
 
 class TaskEntry(Gtk.Entry):

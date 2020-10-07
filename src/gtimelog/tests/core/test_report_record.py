@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime, date
+from datetime import date, datetime
 
 import freezegun
 

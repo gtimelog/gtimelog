@@ -1,8 +1,14 @@
 """Tests for gtimelog"""
 import unittest
 
-from gtimelog.tests.core import test_utils, test_settings, test_time,\
-    test_report_record, test_exports, test_reports
+from gtimelog.tests.core import (
+    test_exports,
+    test_report_record,
+    test_reports,
+    test_settings,
+    test_time,
+    test_utils,
+)
 from gtimelog.tests.modules import test_email
 
 

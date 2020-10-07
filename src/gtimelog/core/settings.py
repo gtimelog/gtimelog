@@ -5,6 +5,7 @@ from configparser import RawConfigParser
 
 from gtimelog.core.utils import parse_time
 
+
 legacy_default_home = os.path.normpath('~/.gtimelog')
 default_config_home = os.path.normpath('~/.config')
 default_data_home = os.path.normpath('~/.local/share')

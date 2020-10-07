@@ -3,7 +3,15 @@ import collections
 import datetime
 import re
 
-from gtimelog.core.utils import different_days, get_mtime, virtual_day, parse_timelog, first_of_month, next_month
+from gtimelog.core.utils import (
+    different_days,
+    first_of_month,
+    get_mtime,
+    next_month,
+    parse_timelog,
+    virtual_day,
+)
+
 
 Entry = collections.namedtuple('Entry', 'start stop duration tags entry')
 

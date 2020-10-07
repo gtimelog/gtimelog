@@ -1,13 +1,13 @@
+import datetime
 import os
 import re
 import time
-import datetime
 from email.header import Header
 from email.mime.text import MIMEText
-from email.utils import parseaddr, formataddr
+from email.utils import formataddr, parseaddr
 from operator import itemgetter
 
-from gtimelog import __version__, DEBUG
+from gtimelog import DEBUG, __version__
 from gtimelog.paths import CONTRIBUTORS_FILE
 
 

@@ -1,10 +1,10 @@
 #!/usr/bin/python
 
-import re
-import os
-import sys
-import getopt
 import datetime
+import getopt
+import os
+import re
+import sys
 
 
 def read_timelog(filename):

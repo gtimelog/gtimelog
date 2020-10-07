@@ -1,18 +1,21 @@
 """
 UI components utils
 """
-import os
-import sys
 import collections
+import logging
+import os
 import smtplib
+import sys
 from gettext import gettext as _
+
 import gi
-from gi.repository import Gtk, GLib, GObject, Gio, Gdk
+from gi.repository import Gdk, Gio, GLib, GObject, Gtk
 
 from gtimelog import __version__
+from gtimelog.core.reports import ReportRecord
 from gtimelog.core.settings import Settings
 from gtimelog.core.utils import as_minutes
-from gtimelog.core.reports import ReportRecord
+
 
 log = logging.getLogger(__name__)
 

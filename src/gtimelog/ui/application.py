@@ -1,15 +1,27 @@
 import logging
 from gettext import gettext as _
-from gi.repository import Gtk, Gdk, GLib, Gio
+
+from gi.repository import Gdk, Gio, GLib, Gtk
 
 from gtimelog import __version__
-from gtimelog.paths import CSS_FILE, MENUS_UI_FILE, SHORTCUTS_UI_FILE, ABOUT_DIALOG_UI_FILE
 from gtimelog.core.settings import Settings
-from gtimelog.core.utils import mark_time, get_contributors
+from gtimelog.core.utils import get_contributors, mark_time
+from gtimelog.paths import (
+    ABOUT_DIALOG_UI_FILE,
+    CSS_FILE,
+    MENUS_UI_FILE,
+    SHORTCUTS_UI_FILE,
+)
 from gtimelog.ui.dialogs import PreferencesDialog
-from gtimelog.ui.utils import make_option, check_schema, create_data_directory, are_there_any_modals,\
-    open_in_editor
+from gtimelog.ui.utils import (
+    are_there_any_modals,
+    check_schema,
+    create_data_directory,
+    make_option,
+    open_in_editor,
+)
 from gtimelog.ui.windows import Window
+
 
 log = logging.getLogger(__name__)
 

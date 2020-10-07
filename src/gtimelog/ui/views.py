@@ -2,13 +2,14 @@ import datetime
 import re
 from gettext import gettext as _
 from io import StringIO
-from gi.repository import Gtk, GLib, GObject, Pango
 
+from gi.repository import GLib, GObject, Gtk, Pango
+
+from gtimelog.core.reports import ReportRecord, Reports
+from gtimelog.core.settings import Settings
 from gtimelog.core.utils import different_days
 from gtimelog.main import mark_time
-from gtimelog.core.settings import Settings
-from gtimelog.core.reports import Reports, ReportRecord
-from gtimelog.ui.utils import internationalised_format_duration, REPORT_KINDS
+from gtimelog.ui.utils import REPORT_KINDS, internationalised_format_duration
 
 
 class LogView(Gtk.TextView):

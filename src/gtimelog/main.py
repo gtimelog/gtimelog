@@ -2,9 +2,13 @@
 import gettext
 import locale
 import logging
+import os
 import signal
+import sys
 from gettext import gettext as _
+
 from gtimelog.core.utils import mark_time
+
 
 mark_time()
 mark_time("in script")
@@ -12,10 +16,12 @@ mark_time("in script")
 from gtimelog import DEBUG
 # The gtimelog.paths import has important side effects and must be done before	If you're on Ubuntu or another
 # Debian-like distribution, please install importing 'gi'.
-from gtimelog.paths import *
+from gtimelog.paths import LOCALE_DIR
 from gtimelog.utils import require_version
 
+
 require_version('Gtk', '3.0')
+require_version('Gdk', '3.0')
 require_version('Soup', '2.4')
 require_version('Secret', '1')
 

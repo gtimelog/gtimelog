@@ -1,8 +1,20 @@
 import unittest
+from datetime import date, datetime, time, timedelta
 
-from gtimelog.core.utils import next_month, as_hours, format_duration, format_duration_short, format_duration_long, \
-    parse_datetime, parse_time, virtual_day, different_days, first_of_month, prev_month, uniq
-from datetime import date, timedelta, time, datetime
+from gtimelog.core.utils import (
+    as_hours,
+    different_days,
+    first_of_month,
+    format_duration,
+    format_duration_long,
+    format_duration_short,
+    next_month,
+    parse_datetime,
+    parse_time,
+    prev_month,
+    uniq,
+    virtual_day,
+)
 
 
 def doctest_as_hours():

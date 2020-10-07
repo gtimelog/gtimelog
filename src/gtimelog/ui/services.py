@@ -2,9 +2,11 @@
 Keyring and secrets
 """
 import functools
+import logging
 from gettext import gettext as _
 
-from gi.repository import Gio, Gtk, GObject, Soup, Secret
+from gi.repository import Gio, GObject, Gtk, Secret, Soup
+
 
 log = logging.getLogger(__name__)
 

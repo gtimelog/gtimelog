@@ -1,5 +1,4 @@
 import codecs
-import collections
 
 from gtimelog.core.utils import get_mtime
 
