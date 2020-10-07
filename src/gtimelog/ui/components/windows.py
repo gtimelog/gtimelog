@@ -7,8 +7,9 @@ from email.utils import parseaddr
 from gettext import gettext as _
 from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Soup
 
-from gtimelog import root_logger, DEBUG
+from gtimelog import DEBUG
 from gtimelog.core.exceptions import EmailError
+from gtimelog.main import root_logger
 from gtimelog.ui.components.services import start_smtp_password_lookup, Authenticator
 from gtimelog.core.settings import Settings
 from gtimelog.core.timelog import TaskList

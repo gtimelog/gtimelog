@@ -9,10 +9,11 @@ from gettext import gettext as _
 import gi
 from gi.repository import Gtk, GLib, GObject, Gio, Gdk
 
-from gtimelog import root_logger, __version__
+from gtimelog import __version__
 from gtimelog.core.settings import Settings
 from gtimelog.core.utils import as_minutes
 from gtimelog.core.reports import ReportRecord
+from gtimelog.main import root_logger
 
 log = root_logger.getChild('application')
 

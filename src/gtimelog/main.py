@@ -1,12 +1,13 @@
 """An application for keeping track of your time."""
 import gettext
 import locale
+import logging
 import os
 import signal
 import sys
 from gettext import gettext as _
 
-from gtimelog import DEBUG, root_logger
+from gtimelog import DEBUG
 from gtimelog.core.utils import mark_time
 from gtimelog.paths import LOCALE_DIR
 
@@ -31,19 +32,23 @@ require_version('Gtk', '3.0')
 require_version('Soup', '2.4')
 require_version('Secret', '1')
 
-# Due to gi susceptibility, we load components at last
-from gtimelog.ui.components.application import Application
-
-log = root_logger.getChild('gtimelog')
 mark_time("in script")
 
 if DEBUG:
     os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
 
+root_logger = logging.getLogger()
+root_logger.addHandler(logging.StreamHandler())
+root_logger.setLevel(logging.DEBUG if DEBUG else logging.INFO)
+
+# Due to gi susceptibility, we load components at last
+from gtimelog.ui.components.application import Application
+
 
 def main():
     mark_time("in main()")
 
+    log = root_logger.getChild('gtimelog')
     # Tell Python's gettext.gettext() to use our translations
     gettext.bindtextdomain('gtimelog', LOCALE_DIR)
     gettext.textdomain('gtimelog')

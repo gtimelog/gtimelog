@@ -1,7 +1,8 @@
 from gettext import gettext as _
 from gi.repository import Gtk, Gdk, GLib, Gio
 
-from gtimelog import __version__, root_logger
+from gtimelog import __version__
+from gtimelog.main import root_logger
 from gtimelog.paths import CSS_FILE, MENUS_UI_FILE, SHORTCUTS_UI_FILE, ABOUT_DIALOG_UI_FILE
 from gtimelog.core.settings import Settings
 from gtimelog.core.utils import mark_time, get_contributors

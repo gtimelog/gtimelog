@@ -6,7 +6,7 @@ from gettext import gettext as _
 
 from gi.repository import Gio, Gtk, GObject, Soup, Secret
 
-from gtimelog import root_logger
+from gtimelog.main import root_logger
 
 log = root_logger.getChild('services')
 
