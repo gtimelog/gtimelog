@@ -1,7 +1,7 @@
 import unittest
 
 from gtimelog.core.utils import next_month, as_hours, format_duration, format_duration_short, format_duration_long, \
-    parse_datetime, parse_time, virtual_day, different_days, first_of_month, prev_month, linear_unicity
+    parse_datetime, parse_time, virtual_day, different_days, first_of_month, prev_month, uniq
 from datetime import date, timedelta, time, datetime
 
 
@@ -243,14 +243,14 @@ def doctest_next_month():
     """
 
 
-def doctest_linear_unicity():
+def doctest_uniq():
     """Tests for uniq
 
-        >>> linear_unicity(['a', 'b', 'b', 'c', 'd', 'b', 'd'])
+        >>> uniq(['a', 'b', 'b', 'c', 'd', 'b', 'd'])
         ['a', 'b', 'c', 'd', 'b', 'd']
-        >>> linear_unicity(['a'])
+        >>> uniq(['a'])
         ['a']
-        >>> linear_unicity([])
+        >>> uniq([])
         []
 
     """

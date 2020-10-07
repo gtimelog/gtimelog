@@ -1,6 +1,6 @@
 from gi.repository import Gtk, Gdk, GObject
 
-from gtimelog.core.utils import linear_unicity, mark_time
+from gtimelog.core.utils import uniq, mark_time
 
 
 class TaskEntry(Gtk.Entry):
@@ -91,7 +91,7 @@ class TaskEntry(Gtk.Entry):
             return
         if self.history_pos == 0:
             self.history_undo = self.get_text()
-            self.filtered_history = linear_unicity([
+            self.filtered_history = uniq([
                 entry for entry in self.history
                 if entry.startswith(self.history_undo)
             ])
