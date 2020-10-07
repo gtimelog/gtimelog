@@ -1,9 +1,11 @@
 import codecs
+import collections
 import datetime
 import re
 
-from gtimelog.core.timelog import Entry
 from gtimelog.core.utils import different_days, get_mtime, virtual_day, parse_timelog, first_of_month, next_month
+
+Entry = collections.namedtuple('Entry', 'start stop duration tags entry')
 
 
 class TimeCollection(object):

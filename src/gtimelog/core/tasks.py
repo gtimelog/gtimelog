@@ -3,8 +3,6 @@ import collections
 
 from gtimelog.core.utils import get_mtime
 
-Entry = collections.namedtuple('Entry', 'start stop duration tags entry')
-
 
 class TaskList(object):
     """Task list.
