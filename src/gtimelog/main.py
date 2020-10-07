@@ -11,23 +11,6 @@ from gtimelog import DEBUG
 from gtimelog.core.utils import mark_time
 from gtimelog.paths import LOCALE_DIR
 
-
-def require_version(namespace, version):
-    try:
-        import gi
-        gi.require_version(namespace, version)
-    except ValueError:
-        deb_package = "gir1.2-{namespace}-{version}".format(
-            namespace=namespace.lower(), version=version)
-        sys.exit("""Typelib files for {namespace}-{version} are not available.
-
-If you're on Ubuntu or another Debian-like distribution, please install
-them with
-
-    sudo apt install {deb_package}
-""".format(namespace=namespace, version=version, deb_package=deb_package))
-
-
 require_version('Gtk', '3.0')
 require_version('Soup', '2.4')
 require_version('Secret', '1')
