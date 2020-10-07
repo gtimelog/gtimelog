@@ -6,6 +6,7 @@ from gtimelog.tests.core import (
     test_report_record,
     test_reports,
     test_settings,
+    test_tasks,
     test_time,
     test_utils,
 )
@@ -17,6 +18,7 @@ def test_suite():
         test_utils.test_suite(),
         test_settings.test_suite(),
         test_time.test_suite(),
+        test_tasks.test_suite(),
         test_report_record.test_suite(),
         test_reports.test_suite(),
         test_exports.test_suite(),

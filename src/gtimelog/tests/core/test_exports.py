@@ -1,5 +1,5 @@
+import doctest
 import sys
-import unittest
 from datetime import datetime, time
 from io import StringIO
 from unittest import mock
@@ -141,4 +141,4 @@ def doctest_exports_icalendar():
 
 
 def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)
+    return doctest.DocTestSuite(__name__, optionflags=doctest.NORMALIZE_WHITESPACE)

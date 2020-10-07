@@ -1,4 +1,4 @@
-import unittest
+import doctest
 from datetime import date, datetime, time, timedelta
 
 from gtimelog.core.utils import (
@@ -269,4 +269,4 @@ def doctest_uniq():
 
 
 def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)
+    return doctest.DocTestSuite(__name__, optionflags=doctest.NORMALIZE_WHITESPACE)

@@ -1,3 +1,4 @@
+import doctest
 import sys
 import textwrap
 import unittest
@@ -360,5 +361,71 @@ def doctest_reports_custom_range_report_categorized():
     """
 
 
+class TestReport(unittest.TestCase):
+    TEST_TIMELOG = textwrap.dedent("""
+        2014-05-27 10:03: arrived
+        2014-05-27 10:13: edx: introduce topic to new sysadmins -- edx
+        2014-05-27 10:30: email
+        2014-05-27 12:11: meeting: how to support new courses?  -- edx meeting
+        2014-05-27 15:12: edx: write test procedure for EdX instances -- edx sysadmin
+        2014-05-27 17:03: cluster: set-up accounts, etc. -- sysadmin hpc
+        2014-05-27 17:14: support: how to run statistics on Hydra? -- support hydra
+        2014-05-27 17:36: off: pause **
+        2014-05-27 17:38: email
+        2014-05-27 19:06: off: dinner & family **
+        2014-05-27 22:19: cluster: fix shmmax-shmall issue -- sysadmin hpc
+        """)
+
+    def setUp(self):
+        self.tw = make_time_window(
+            StringIO(self.TEST_TIMELOG),
+            datetime(2014, 5, 27, 9, 0),
+            datetime(2014, 5, 27, 23, 59),
+            time(2, 0),
+        )
+
+    def test_report_tags(self):
+        rp = Reports(self.tw)
+        txt = StringIO()
+        # use same tags as in tests above, so we know the totals
+        rp._report_tags(txt, ['meeting', 'hpc'])
+        self.assertEqual(
+            txt.getvalue().strip(),
+            textwrap.dedent("""
+            Time spent in each area:
+              hpc          5:04
+              meeting      1:41
+            Note that area totals may not add up to the period totals,
+            as each entry may be belong to multiple areas (or none at all).
+            """).strip())
+
+    def test_daily_report_includes_tags(self):
+        rp = Reports(self.tw)
+        txt = StringIO()
+        rp.daily_report(txt, 'me@example.com', 'me')
+        self.assertIn('Time spent in each area', txt.getvalue())
+
+    def test_weekly_report_includes_tags(self):
+        rp = Reports(self.tw)
+        txt = StringIO()
+        rp.weekly_report(txt, 'me@example.com', 'me')
+        self.assertIn('Time spent in each area', txt.getvalue())
+
+    def test_monthly_report_includes_tags(self):
+        rp = Reports(self.tw)
+        txt = StringIO()
+        rp.monthly_report(txt, 'me@example.com', 'me')
+        self.assertIn('Time spent in each area', txt.getvalue())
+
+    def test_categorized_report_includes_tags(self):
+        rp = Reports(self.tw, style='categorized')
+        txt = StringIO()
+        rp.weekly_report(txt, 'me@example.com', 'me')
+        self.assertIn('Time spent in each area', txt.getvalue())
+        txt = StringIO()
+        rp.monthly_report(txt, 'me@example.com', 'me')
+        self.assertIn('Time spent in each area', txt.getvalue())
+
+
 def test_suite():
-    return unittest.defaultTestLoader.loadTestsFromName(__name__)
+    return doctest.DocTestSuite(__name__, optionflags=doctest.NORMALIZE_WHITESPACE)
