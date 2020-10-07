@@ -37,18 +37,18 @@ mark_time("in script")
 if DEBUG:
     os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
 
-root_logger = logging.getLogger()
-root_logger.addHandler(logging.StreamHandler())
-root_logger.setLevel(logging.DEBUG if DEBUG else logging.INFO)
+logger = logging.getLogger()
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.DEBUG if DEBUG else logging.INFO)
 
-# Due to gi susceptibility, we load components at last
+# Due to gi susceptibility, we load this components at last
 from gtimelog.ui.components.application import Application
 
 
 def main():
     mark_time("in main()")
 
-    log = root_logger.getChild('gtimelog')
+    log = logging.getLogger('gtimelog')
     # Tell Python's gettext.gettext() to use our translations
     gettext.bindtextdomain('gtimelog', LOCALE_DIR)
     gettext.textdomain('gtimelog')

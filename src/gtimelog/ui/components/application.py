@@ -1,8 +1,8 @@
+import logging
 from gettext import gettext as _
 from gi.repository import Gtk, Gdk, GLib, Gio
 
 from gtimelog import __version__
-from gtimelog.main import root_logger
 from gtimelog.paths import CSS_FILE, MENUS_UI_FILE, SHORTCUTS_UI_FILE, ABOUT_DIALOG_UI_FILE
 from gtimelog.core.settings import Settings
 from gtimelog.core.utils import mark_time, get_contributors
@@ -11,7 +11,7 @@ from gtimelog.ui.components.utils import make_option, check_schema, create_data_
     open_in_editor
 from gtimelog.ui.components.windows import Window
 
-log = root_logger.getChild('application')
+log = logging.getLogger(__name__)
 
 
 class Application(Gtk.Application):

@@ -13,10 +13,8 @@ from gtimelog import __version__
 from gtimelog.core.settings import Settings
 from gtimelog.core.utils import as_minutes
 from gtimelog.core.reports import ReportRecord
-from gtimelog.main import root_logger
 
-log = root_logger.getChild('application')
-
+log = logging.getLogger(__name__)
 
 MailProtocol = collections.namedtuple('MailProtocol', 'factory, startssl')
 MAIL_PROTOCOLS = {

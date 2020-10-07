@@ -1,5 +1,6 @@
 import datetime
 import functools
+import logging
 import os
 import smtplib
 from contextlib import closing
@@ -9,10 +10,9 @@ from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Soup
 
 from gtimelog import DEBUG
 from gtimelog.core.exceptions import EmailError
-from gtimelog.main import root_logger
 from gtimelog.ui.components.services import start_smtp_password_lookup, Authenticator
 from gtimelog.core.settings import Settings
-from gtimelog.core.timelog import TaskList
+from gtimelog.core.tasks import TaskList
 from gtimelog.core.time import TimeLog
 from gtimelog.core.utils import mark_time, prev_month, prepare_message, virtual_day, next_month
 from gtimelog.paths import UI_FILE, MENUS_UI_FILE
@@ -21,7 +21,7 @@ from gtimelog.ui.components.utils import copy_properties, swap_widget, internati
     MAIL_PROTOCOLS, REPORT_KINDS
 from gtimelog.ui.components.views import LogView, TaskListView, ReportView
 
-log = root_logger.getChild('window')
+log = logging.getLogger(__name__)
 soup_session = Soup.SessionAsync()
 authenticator = Authenticator(soup_session)
 soup_session.connect('authenticate', authenticator.http_auth_cb)
