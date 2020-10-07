@@ -77,8 +77,8 @@ def parse_time(t):
     m = re.match(r'^(\d+):(\d+)$', t)
     if not m:
         raise ValueError('bad time: %r' % t)
-    hour, minimum = map(int, m.groups())
-    return datetime.time(hour, minimum)
+    hour, minute = map(int, m.groups())
+    return datetime.time(hour, minute)
 
 
 def virtual_day(dt, virtual_midnight):
