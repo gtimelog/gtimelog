@@ -7,9 +7,7 @@ from __future__ import absolute_import
 import datetime
 import locale
 import os
-
 from configparser import RawConfigParser
-
 
 from gtimelog.timelog import parse_time
 

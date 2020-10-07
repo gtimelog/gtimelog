@@ -30,11 +30,12 @@ all: $(manpages) $(runtime_files)
 run: $(runtime_files)
 	./gtimelog
 
-.PHONY: check test
+.PHONY: check
 check: test
 	desktop-file-validate gtimelog.desktop
 	appstream-util validate-relax gtimelog.appdata.xml
 
+.PHONY: test
 test:
 	tox -p auto
 
@@ -50,6 +51,10 @@ coverage-diff: coverage
 .PHONY: flake8
 flake8:
 	tox -e flake8
+
+.PHONY: isort
+isort:
+	tox -e isort
 
 .PHONY: update-translations
 update-translations:

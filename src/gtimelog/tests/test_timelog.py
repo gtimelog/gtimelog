@@ -6,18 +6,23 @@ import doctest
 import os
 import re
 import shutil
+import sys
 import tempfile
 import textwrap
 import time
 import unittest
-import sys
 from io import StringIO
-
-import freezegun
 from unittest import mock
 
+import freezegun
+
 from gtimelog.timelog import (
-    TimeLog, Reports, ReportRecord, Exports, TaskList, TimeCollection,
+    Exports,
+    ReportRecord,
+    Reports,
+    TaskList,
+    TimeCollection,
+    TimeLog,
 )
 
 

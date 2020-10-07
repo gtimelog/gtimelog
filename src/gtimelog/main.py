@@ -1,6 +1,6 @@
 """An application for keeping track of your time."""
-import time
 import sys
+import time
 
 
 DEBUG = '--debug' in sys.argv
@@ -38,9 +38,10 @@ import re
 import signal
 import smtplib
 from contextlib import closing
-from email.utils import parseaddr, formataddr
+from email.utils import formataddr, parseaddr
 from gettext import gettext as _
 from io import StringIO
+
 
 mark_time("Python imports done")
 
@@ -53,24 +54,46 @@ if DEBUG:
 # importing 'gi'.
 
 from .paths import (
-    UI_FILE, PREFERENCES_UI_FILE, ABOUT_DIALOG_UI_FILE, SHORTCUTS_UI_FILE,
-    MENUS_UI_FILE, CSS_FILE, LOCALE_DIR, CONTRIBUTORS_FILE,
+    ABOUT_DIALOG_UI_FILE,
+    CONTRIBUTORS_FILE,
+    CSS_FILE,
+    LOCALE_DIR,
+    MENUS_UI_FILE,
+    PREFERENCES_UI_FILE,
+    SHORTCUTS_UI_FILE,
+    UI_FILE,
 )
-
-import gi
 from .utils import require_version
+
 
 require_version('Gtk', '3.0')
 require_version('Soup', '2.4')
-from gi.repository import Gtk, Gdk, GLib, Gio, GObject, Pango, Soup
+import gi
+from gi.repository import Gdk, Gio, GLib, GObject, Gtk, Pango, Soup
+
+
 mark_time("Gtk imports done")
 
 from gtimelog import __version__
-from gtimelog.secrets import start_smtp_password_lookup, set_smtp_password, Authenticator
+from gtimelog.secrets import (
+    Authenticator,
+    set_smtp_password,
+    start_smtp_password_lookup,
+)
 from gtimelog.settings import Settings
 from gtimelog.timelog import (
-    as_minutes, virtual_day, different_days, prev_month, next_month, uniq, parse_time,
-    Reports, ReportRecord, TaskList, TimeLog)
+    ReportRecord,
+    Reports,
+    TaskList,
+    TimeLog,
+    as_minutes,
+    different_days,
+    next_month,
+    parse_time,
+    prev_month,
+    uniq,
+    virtual_day,
+)
 
 
 mark_time("gtimelog imports done")

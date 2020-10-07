@@ -11,6 +11,12 @@ jobs:
       install: pip install tox
       script: tox -e flake8
       after_success:
+    - name: isort
+      python: 3.8
+      install: pip install tox
+      script:
+        - tox -e isort
+      after_success:
     # coveralls.io never reports commit statuses for some reason, and of course
     # you don't get support for a free product
     - name: coverage

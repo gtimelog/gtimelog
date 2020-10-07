@@ -2,8 +2,9 @@
 Misc utils
 """
 
-import gi
 import sys
+
+import gi
 
 
 def require_version(namespace, version):

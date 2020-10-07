@@ -3,7 +3,6 @@
 
 import textwrap
 import unittest
-
 from unittest import mock
 
 
@@ -17,7 +16,7 @@ mock_gi = mock.patch.dict('sys.modules', {'gi': gi, 'gi.repository': gi.reposito
 class TestEmail(unittest.TestCase):
 
     def test_prepare_message_ascii(self):
-        from gtimelog.main import prepare_message, __version__
+        from gtimelog.main import __version__, prepare_message
         msg = prepare_message(
             sender='ASCII Name <test@example.com>',
             recipient='activity@example.com',
@@ -42,7 +41,7 @@ class TestEmail(unittest.TestCase):
         self.assertEqual(expected, msg.as_string())
 
     def test_prepare_message_unicode(self):
-        from gtimelog.main import prepare_message, __version__
+        from gtimelog.main import __version__, prepare_message
         msg = prepare_message(
             sender='Ünicødę Name <test@example.com>',
             recipient='Anöther nąme <activity@example.com>',

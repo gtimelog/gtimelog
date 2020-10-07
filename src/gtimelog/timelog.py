@@ -9,8 +9,8 @@ import collections
 import csv
 import datetime
 import os
-import socket
 import re
+import socket
 from collections import defaultdict
 from hashlib import md5
 from operator import itemgetter

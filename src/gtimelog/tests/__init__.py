@@ -1,7 +1,7 @@
 """Tests for gtimelog"""
 import unittest
 
-from gtimelog.tests import test_timelog, test_settings, test_main
+from gtimelog.tests import test_main, test_settings, test_timelog
 
 
 def test_suite():

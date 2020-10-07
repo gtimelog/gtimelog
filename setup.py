@@ -1,10 +1,12 @@
 #!/usr/bin/env python
+import ast
+import io
 import os
 import re
-import io
 import sys
-import ast
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
+
 
 here = os.path.dirname(__file__)
 

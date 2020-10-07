@@ -1,16 +1,18 @@
 #!/usr/bin/python3
 from __future__ import print_function
+
 import gc
 import os
 import sys
 import time
 from operator import itemgetter
 
+
 pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
 
 from gtimelog.settings import Settings
-from gtimelog.timelog import parse_datetime, TimeLog
+from gtimelog.timelog import TimeLog, parse_datetime
 
 
 fns = []
