@@ -3,8 +3,8 @@ from gi.repository import Gtk, GLib, Gio
 
 from gtimelog.paths import PREFERENCES_UI_FILE
 from gtimelog.core.utils import parse_time
-from gtimelog.ui.components.services import start_smtp_password_lookup, set_smtp_password
-from gtimelog.ui.components.utils import MAIL_PROTOCOLS
+from gtimelog.ui.services import start_smtp_password_lookup, set_smtp_password
+from gtimelog.ui.utils import MAIL_PROTOCOLS
 
 
 class PreferencesDialog(Gtk.Dialog):

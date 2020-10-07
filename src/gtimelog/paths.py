@@ -26,13 +26,13 @@ if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
 
 
 ui_dir = os.path.join(here, 'ui')
-views_dir = os.path.join(ui_dir, 'views')
-CSS_FILE = os.path.join(views_dir, 'gtimelog.css')
-UI_FILE = os.path.join(views_dir, 'gtimelog.ui')
-PREFERENCES_UI_FILE = os.path.join(views_dir, 'preferences.ui')
-ABOUT_DIALOG_UI_FILE = os.path.join(views_dir, 'about.ui')
-SHORTCUTS_UI_FILE = os.path.join(views_dir, 'shortcuts.ui')
-MENUS_UI_FILE = os.path.join(views_dir, 'menus.ui')
+
+CSS_FILE = os.path.join(ui_dir, 'gtimelog.css')
+UI_FILE = os.path.join(ui_dir, 'gtimelog.ui')
+PREFERENCES_UI_FILE = os.path.join(ui_dir, 'preferences.ui')
+ABOUT_DIALOG_UI_FILE = os.path.join(ui_dir, 'about.ui')
+SHORTCUTS_UI_FILE = os.path.join(ui_dir, 'shortcuts.ui')
+MENUS_UI_FILE = os.path.join(ui_dir, 'menus.ui')
 
 LOCALE_DIR = os.path.join(here, 'locale')
 CONTRIBUTORS_FILE = os.path.join(here, 'CONTRIBUTORS.rst')

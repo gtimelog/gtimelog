@@ -8,7 +8,7 @@ from gtimelog.core.utils import different_days
 from gtimelog.main import mark_time
 from gtimelog.core.settings import Settings
 from gtimelog.core.reports import Reports, ReportRecord
-from gtimelog.ui.components.utils import internationalised_format_duration, REPORT_KINDS
+from gtimelog.ui.utils import internationalised_format_duration, REPORT_KINDS
 
 
 class LogView(Gtk.TextView):

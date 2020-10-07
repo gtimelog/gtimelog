@@ -2,9 +2,7 @@
 import gettext
 import locale
 import logging
-import os
 import signal
-import sys
 from gettext import gettext as _
 from gtimelog.core.utils import mark_time
 
@@ -29,7 +27,7 @@ logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.DEBUG if DEBUG else logging.INFO)
 
 # Due to gi susceptibility, we load this components at last
-from gtimelog.ui.components.application import Application
+from gtimelog.ui.application import Application
 
 
 def main():
