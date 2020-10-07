@@ -6,16 +6,20 @@ import os
 import signal
 import sys
 from gettext import gettext as _
+from gtimelog.core.utils import mark_time
+
+mark_time()
+mark_time("in script")
 
 from gtimelog import DEBUG
-from gtimelog.core.utils import mark_time
-from gtimelog.paths import LOCALE_DIR
+# The gtimelog.paths import has important side effects and must be done before	If you're on Ubuntu or another
+# Debian-like distribution, please install importing 'gi'.
+from gtimelog.paths import *
+from gtimelog.utils import require_version
 
 require_version('Gtk', '3.0')
 require_version('Soup', '2.4')
 require_version('Secret', '1')
-
-mark_time("in script")
 
 if DEBUG:
     os.environ['G_ENABLE_DIAGNOSTIC'] = '1'
