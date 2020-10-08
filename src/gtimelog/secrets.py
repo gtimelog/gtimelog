@@ -5,8 +5,7 @@ import functools
 import logging
 from gettext import gettext as _
 
-from .utils import require_version
-
+from gtimelog.main import require_version
 
 require_version('Gtk', '3.0')
 require_version('Soup', '2.4')

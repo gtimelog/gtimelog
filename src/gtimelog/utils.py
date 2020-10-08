@@ -80,7 +80,7 @@ def virtual_day(dt, virtual_midnight):
     Timestamps between midnight and "virtual midnight" (e.g. 2 am) are
     assigned to the previous "virtual day".
     """
-    if dt.time() < virtual_midnight:     # assign to previous day
+    if dt.time() < virtual_midnight:  # assign to previous day
         return dt.date() - datetime.timedelta(1)
     return dt.date()
 

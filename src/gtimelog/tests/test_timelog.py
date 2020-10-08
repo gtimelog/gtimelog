@@ -146,7 +146,9 @@ def doctest_parse_time():
 def doctest_virtual_day():
     """Tests for virtual_day
 
-        >>> from gtimelog.utils import virtual_day        >>> from datetime import datetime, time
+        >>> from datetime import datetime, time
+        >>> from gtimelog.utils import virtual_day
+
     Virtual midnight
 
         >>> vm = time(2, 0)
@@ -170,7 +172,9 @@ def doctest_virtual_day():
 def doctest_different_days():
     """Tests for different_days
 
-        >>> from gtimelog.utils import different_days        >>> from datetime import datetime, time
+        >>> from datetime import datetime, time
+        >>> from gtimelog.utils import different_days
+
     Virtual midnight
 
         >>> vm = time(2, 0)
