@@ -2,9 +2,6 @@
 Non-GUI bits of gtimelog.
 """
 
-from __future__ import unicode_literals
-
-import codecs
 import collections
 import csv
 import datetime
@@ -550,11 +547,11 @@ class Reports(object):
                         continue # skip empty "arrival" entries
 
                     entry = entry[:1].upper() + entry[1:]
-                    output.write(u"  %-61s  %+5s\n" %
+                    output.write("  %-61s  %+5s\n" %
                                  (entry, format_duration_short(duration)))
 
                 output.write('-' * 70 + '\n')
-                output.write(u"%+70s\n" % format_duration_short(totals[cat]))
+                output.write("%+70s\n" % format_duration_short(totals[cat]))
                 output.write('\n')
         output.write("Total work done this %s: %s\n" %
                      (period_name, format_duration_short(total_work)))
@@ -629,7 +626,7 @@ class Reports(object):
         if no_cat is not None:
             items.append(('(none)', no_cat))
         for cat, duration in items:
-            output.write(u"%-62s  %s\n" % (
+            output.write("%-62s  %s\n" % (
                 cat, format_duration_long(duration)))
         output.write('\n')
 
@@ -666,7 +663,7 @@ class Reports(object):
                     cat, datetime.timedelta(0)) + duration
 
                 entry = entry[:1].upper() + entry[1:]
-                output.write(u"%-62s  %s\n" %
+                output.write("%-62s  %s\n" %
                              (entry, format_duration_long(duration)))
             output.write('\n')
         output.write("Total work done this %s: %s\n" %
@@ -681,7 +678,7 @@ class Reports(object):
 
     def weekly_report_subject(self, who):
         week = self.window.min_timestamp.isocalendar()[1]
-        return u'Weekly report for %s (week %02d)' % (who, week)
+        return 'Weekly report for %s (week %02d)' % (who, week)
 
     def weekly_report(self, output, email, who):
         if self.style == 'categorized':
@@ -703,7 +700,7 @@ class Reports(object):
 
     def monthly_report_subject(self, who):
         month = self.window.min_timestamp.strftime('%Y/%m')
-        return u'Monthly report for %s (%s)' % (who, month)
+        return 'Monthly report for %s (%s)' % (who, month)
 
     def monthly_report(self, output, email, who):
         if self.style == 'categorized':
@@ -727,7 +724,7 @@ class Reports(object):
         min = self.window.min_timestamp.strftime('%Y-%m-%d')
         max = self.window.max_timestamp - datetime.timedelta(1)
         max = max.strftime('%Y-%m-%d')
-        return u'Custom date range report for %s (%s - %s)' % (who, min, max)
+        return 'Custom date range report for %s (%s - %s)' % (who, min, max)
 
     def custom_range_report_categorized(self, output, email, who):
         """Format a custom range report with entries displayed under categories."""
@@ -741,8 +738,8 @@ class Reports(object):
         weekday_names = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
         weekday = weekday_names[self.window.min_timestamp.weekday()]
         week = self.window.min_timestamp.isocalendar()[1]
-        return (u"{0:%Y-%m-%d} report for {who}"
-                u" ({weekday}, week {week:0>2})".format(
+        return ("{0:%Y-%m-%d} report for {who}"
+                " ({weekday}, week {week:0>2})".format(
                     self.window.min_timestamp, who=who,
                     weekday=weekday, week=week))
 
@@ -753,8 +750,8 @@ class Reports(object):
         """
         window = self.window
         if self.email_headers:
-            output.write(u"To: %s\n" % email)
-            output.write(u"Subject: %s\n" % self.daily_report_subject(who))
+            output.write("To: %s\n" % email)
+            output.write("Subject: %s\n" % self.daily_report_subject(who))
             output.write('\n')
         items = list(window.all_entries())
         if not items:
@@ -770,7 +767,7 @@ class Reports(object):
         if work:
             for start, entry, duration in work:
                 entry = entry[:1].upper() + entry[1:]
-                output.write(u"%-62s  %s\n" % (entry,
+                output.write("%-62s  %s\n" % (entry,
                                                format_duration_long(duration)))
                 cat, task = TimeCollection.split_category(entry)
                 categories[cat] = categories.get(
@@ -787,7 +784,7 @@ class Reports(object):
         if slack:
             for start, entry, duration in slack:
                 entry = entry[:1].upper() + entry[1:]
-                output.write(u"%-62s  %s\n" % (entry,
+                output.write("%-62s  %s\n" % (entry,
                                                format_duration_long(duration)))
             output.write('\n')
         output.write("Time spent slacking: %s\n" %
@@ -992,11 +989,10 @@ class TimeLog(TimeCollection):
 
     def raw_append(self, line, need_space):
         """Append a line to the time log file."""
-        f = codecs.open(self.filename, "a", encoding='UTF-8')
-        if need_space:
-            f.write('\n')
-        f.write(line + '\n')
-        f.close()
+        with open(self.filename, "a", encoding='utf-8') as f:
+            if need_space:
+                f.write('\n')
+            f.write(line + '\n')
         self.last_mtime = get_mtime(self.filename)
 
     def append(self, entry, now=None):
@@ -1106,7 +1102,7 @@ class TaskList(object):
         groups = {}
         self.last_mtime = get_mtime(self.filename)
         try:
-            with codecs.open(self.filename, encoding='UTF-8') as f:
+            with open(self.filename, encoding='utf-8') as f:
                 for line in f:
                     line = line.strip()
                     if not line or line.startswith('#'):
