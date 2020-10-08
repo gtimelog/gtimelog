@@ -9,8 +9,7 @@ import locale
 import os
 from configparser import RawConfigParser
 
-from gtimelog.timelog import parse_time
-
+from gtimelog.utils import parse_time
 
 legacy_default_home = os.path.normpath('~/.gtimelog')
 default_config_home = os.path.normpath('~/.config')

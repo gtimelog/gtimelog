@@ -63,8 +63,8 @@ from .paths import (
     SHORTCUTS_UI_FILE,
     UI_FILE,
 )
-from .utils import require_version
-
+from .utils import require_version, internationalized_format_duration, parse_time, virtual_day, different_days, \
+    prev_month, next_month, uniq
 
 require_version('Gtk', '3.0')
 require_version('Soup', '2.4')
@@ -86,13 +86,6 @@ from gtimelog.timelog import (
     Reports,
     TaskList,
     TimeLog,
-    as_minutes,
-    different_days,
-    next_month,
-    parse_time,
-    prev_month,
-    uniq,
-    virtual_day,
 )
 
 
@@ -113,16 +106,6 @@ MAIL_PROTOCOLS = {
 
 class EmailError(Exception):
     pass
-
-
-def format_duration(duration):
-    """Format a datetime.timedelta with minute precision.
-
-    The difference from gtimelog.timelog.format_duration() is that this
-    one is internationalized.
-    """
-    h, m = divmod(as_minutes(duration), 60)
-    return _('{0} h {1} min').format(h, m)
 
 
 def isascii(s):
@@ -1168,7 +1151,7 @@ class Window(Gtk.ApplicationWindow):
         if last_time is None:
             self.time_label.set_text(now.strftime(_('%H:%M')))
         else:
-            self.time_label.set_text(format_duration(now - last_time))
+            self.time_label.set_text(internationalized_format_duration(now - last_time))
         self.log_view.now = now
         if self.showing_today and virtual_day(now, self.get_virtual_midnight()) != self.date:
             self.date = None
@@ -1443,12 +1426,12 @@ class LogView(Gtk.TextView):
             self.w('\n')
             args = [
                 (self.filter_text, 'highlight'),
-                (format_duration(total), 'duration'),
+                (internationalized_format_duration(total), 'duration'),
             ]
             if self.time_range != 'day':
                 work_days = window.count_days() or 1
                 per_diem = total / work_days
-                args.append((format_duration(per_diem), 'duration'))
+                args.append((internationalized_format_duration(per_diem), 'duration'))
                 self.wfmt(_('Total for {0}: {1} ({2} per day)'), *args)
             else:
                 weekly_window = self.timelog.window_for_week(self.date)
@@ -1456,9 +1439,9 @@ class LogView(Gtk.TextView):
                 week_work, week_slacking = weekly_window.totals(
                     filter_text=self.filter_text)
                 week_total = week_work + week_slacking
-                args.append((format_duration(week_total), 'duration'))
+                args.append((internationalized_format_duration(week_total), 'duration'))
                 per_diem = week_total / work_days_in_week
-                args.append((format_duration(per_diem), 'duration'))
+                args.append((internationalized_format_duration(per_diem), 'duration'))
                 self.wfmt(_('Total for {0}: {1} ({2} this week, {3} per day)'), *args)
             self.w('\n')
         self.reposition_cursor()
@@ -1491,7 +1474,7 @@ class LogView(Gtk.TextView):
         self.scroll_to_iter(buffer.get_end_iter(), 0, False, 0, 0)
 
     def write_item(self, item):
-        self.w(format_duration(item.duration), 'duration')
+        self.w(internationalized_format_duration(item.duration), 'duration')
         self.w('\t')
         period = _('({0:%H:%M}-{1:%H:%M})').format(item.start, item.stop)
         self.w(period, 'time')
@@ -1500,7 +1483,7 @@ class LogView(Gtk.TextView):
         self.w(item.entry + '\n', tag)
 
     def write_group(self, entry, duration):
-        self.w(format_duration(duration), 'duration')
+        self.w(internationalized_format_duration(duration), 'duration')
         tag = ('slacking' if '**' in entry else None)
         self.w('\t' + entry + '\n', tag)
 
@@ -1567,18 +1550,18 @@ class LogView(Gtk.TextView):
         elif self.time_range == 'month':
             fmt1 = _('Total work done this month: {0} ({1} per day)')
             fmt2 = _('Total work done this month: {0}')
-        args = [(format_duration(total_work), 'duration')]
+        args = [(internationalized_format_duration(total_work), 'duration')]
         if self.time_range == 'day':
             weekly_window = self.timelog.window_for_week(self.date)
             week_total_work, week_total_slacking = weekly_window.totals()
             work_days = weekly_window.count_days()
-            args.append((format_duration(week_total_work), 'duration'))
+            args.append((internationalized_format_duration(week_total_work), 'duration'))
             per_diem = week_total_work / max(1, work_days)
         else:
             work_days = window.count_days()
             per_diem = total_work / max(1, work_days)
         if work_days:
-            args.append((format_duration(per_diem), 'duration'))
+            args.append((internationalized_format_duration(per_diem), 'duration'))
             self.wfmt(fmt1, *args)
         else:
             self.wfmt(fmt2, *args)
@@ -1593,14 +1576,14 @@ class LogView(Gtk.TextView):
         elif self.time_range == 'month':
             fmt1 = _('Total slacking this month: {0} ({1} per day)')
             fmt2 = _('Total slacking this month: {0}')
-        args = [(format_duration(total_slacking), 'duration')]
+        args = [(internationalized_format_duration(total_slacking), 'duration')]
         if self.time_range == 'day':
-            args.append((format_duration(week_total_slacking), 'duration'))
+            args.append((internationalized_format_duration(week_total_slacking), 'duration'))
             per_diem = week_total_slacking / max(1, work_days)
         else:
             per_diem = total_slacking / max(1, work_days)
         if work_days:
-            args.append((format_duration(per_diem), 'duration'))
+            args.append((internationalized_format_duration(per_diem), 'duration'))
             self.wfmt(fmt1, *args)
         else:
             self.wfmt(fmt2, *args)
@@ -1620,15 +1603,15 @@ class LogView(Gtk.TextView):
                 real_time_left = datetime.timedelta(0)
                 self.wfmt(
                     fmt,
-                    (format_duration(real_time_left), 'duration'),
+                    (internationalized_format_duration(real_time_left), 'duration'),
                     (time_to_leave, 'time'),
-                    (format_duration(-time_left), 'duration'),
+                    (internationalized_format_duration(-time_left), 'duration'),
                 )
             else:
                 fmt = _('Time left at work: {0} (till {1:%H:%M})')
                 self.wfmt(
                     fmt,
-                    (format_duration(time_left), 'duration'),
+                    (internationalized_format_duration(time_left), 'duration'),
                     (time_to_leave, 'time'),
                 )
 
@@ -1640,14 +1623,14 @@ class LogView(Gtk.TextView):
             if total > hours:
                 self.wfmt(
                     _('At office today: {0} ({1} overtime)'),
-                    (format_duration(total), 'duration'),
-                    (format_duration(total - hours), 'duration'),
+                    (internationalized_format_duration(total), 'duration'),
+                    (internationalized_format_duration(total - hours), 'duration'),
                 )
             else:
                 self.wfmt(
                     _('At office today: {0} ({1} left)'),
-                    (format_duration(total), 'duration'),
-                    (format_duration(hours - total), 'duration'),
+                    (internationalized_format_duration(total), 'duration'),
+                    (internationalized_format_duration(hours - total), 'duration'),
                 )
 
 

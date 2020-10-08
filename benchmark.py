@@ -12,8 +12,8 @@ pkgdir = os.path.join(os.path.dirname(__file__), 'src')
 sys.path.insert(0, pkgdir)
 
 from gtimelog.settings import Settings
-from gtimelog.timelog import TimeLog, parse_datetime
-
+from gtimelog.timelog import TimeLog
+from gtimelog.utils import parse_datetime
 
 fns = []
 

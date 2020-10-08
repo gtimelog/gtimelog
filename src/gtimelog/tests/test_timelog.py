@@ -42,7 +42,7 @@ class Checker(doctest.OutputChecker):
 def doctest_as_hours():
     """Tests for as_hours
 
-        >>> from gtimelog.timelog import as_hours
+        >>> from gtimelog.utils import as_hours
         >>> from datetime import timedelta
         >>> as_hours(timedelta(0))
         0.0
@@ -59,7 +59,7 @@ def doctest_as_hours():
 def doctest_format_duration():
     """Tests for format_duration.
 
-        >>> from gtimelog.timelog import format_duration
+        >>> from gtimelog.utils import format_duration
         >>> from datetime import timedelta
         >>> format_duration(timedelta(0))
         '0 h 0 min'
@@ -74,7 +74,7 @@ def doctest_format_duration():
 def doctest_format_short():
     """Tests for format_duration_short.
 
-        >>> from gtimelog.timelog import format_duration_short
+        >>> from gtimelog.utils import format_duration_short
         >>> from datetime import timedelta
         >>> format_duration_short(timedelta(0))
         '0:00'
@@ -93,7 +93,7 @@ def doctest_format_short():
 def doctest_format_duration_long():
     """Tests for format_duration_long.
 
-        >>> from gtimelog.timelog import format_duration_long
+        >>> from gtimelog.utils import format_duration_long
         >>> from datetime import timedelta
         >>> format_duration_long(timedelta(0))
         '0 min'
@@ -114,7 +114,7 @@ def doctest_format_duration_long():
 def doctest_parse_datetime():
     """Tests for parse_datetime
 
-        >>> from gtimelog.timelog import parse_datetime
+        >>> from gtimelog.utils import parse_datetime
         >>> parse_datetime('2005-02-03 02:13')
         datetime.datetime(2005, 2, 3, 2, 13)
         >>> parse_datetime('xyzzy')
@@ -132,7 +132,7 @@ def doctest_parse_datetime():
 def doctest_parse_time():
     """Tests for parse_time
 
-        >>> from gtimelog.timelog import parse_time
+        >>> from gtimelog.utils import parse_time
         >>> parse_time('02:13')
         datetime.time(2, 13)
         >>> parse_time('xyzzy')
@@ -146,9 +146,7 @@ def doctest_parse_time():
 def doctest_virtual_day():
     """Tests for virtual_day
 
-        >>> from datetime import datetime, time
-        >>> from gtimelog.timelog import virtual_day
-
+        >>> from gtimelog.utils import virtual_day        >>> from datetime import datetime, time
     Virtual midnight
 
         >>> vm = time(2, 0)
@@ -172,9 +170,7 @@ def doctest_virtual_day():
 def doctest_different_days():
     """Tests for different_days
 
-        >>> from datetime import datetime, time
-        >>> from gtimelog.timelog import different_days
-
+        >>> from gtimelog.utils import different_days        >>> from datetime import datetime, time
     Virtual midnight
 
         >>> vm = time(2, 0)
@@ -194,7 +190,7 @@ def doctest_different_days():
 def doctest_first_of_month():
     """Tests for first_of_month
 
-        >>> from gtimelog.timelog import first_of_month
+        >>> from gtimelog.utils import first_of_month
         >>> from datetime import date, timedelta
 
         >>> first_of_month(date(2007, 1, 1))
@@ -230,7 +226,7 @@ def doctest_first_of_month():
 def doctest_prev_month():
     """Tests for prev_month
 
-        >>> from gtimelog.timelog import prev_month
+        >>> from gtimelog.utils import prev_month
         >>> from datetime import date, timedelta
 
         >>> prev_month(date(2007, 3, 1))
@@ -267,7 +263,7 @@ def doctest_prev_month():
 def doctest_next_month():
     """Tests for next_month
 
-        >>> from gtimelog.timelog import next_month
+        >>> from gtimelog.utils import next_month
         >>> from datetime import date, timedelta
 
         >>> next_month(date(2007, 1, 1))
@@ -304,7 +300,7 @@ def doctest_next_month():
 def doctest_uniq():
     """Tests for uniq
 
-        >>> from gtimelog.timelog import uniq
+        >>> from gtimelog.utils import uniq
         >>> uniq(['a', 'b', 'b', 'c', 'd', 'b', 'd'])
         ['a', 'b', 'c', 'd', 'b', 'd']
         >>> uniq(['a'])
