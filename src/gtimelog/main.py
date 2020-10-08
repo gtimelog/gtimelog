@@ -2,8 +2,8 @@
 import sys
 import time
 
-
-DEBUG = '--debug' in sys.argv
+from gtimelog import DEBUG
+from gtimelog.email import MAIL_PROTOCOLS, EmailError, send_email
 
 
 if DEBUG:
@@ -23,11 +23,7 @@ else:
 mark_time()
 mark_time("in script")
 
-import collections
 import datetime
-import email
-import email.header
-import email.mime.text
 import functools
 import gettext
 import io
@@ -36,9 +32,6 @@ import logging
 import os
 import re
 import signal
-import smtplib
-from contextlib import closing
-from email.utils import formataddr, parseaddr
 from gettext import gettext as _
 from io import StringIO
 
@@ -74,7 +67,7 @@ from gi.repository import Gdk, Gio, GLib, GObject, Gtk, Pango, Soup
 
 mark_time("Gtk imports done")
 
-from gtimelog import __version__
+from gtimelog import DEBUG, __version__
 from gtimelog.secrets import (
     Authenticator,
     set_smtp_password,
@@ -102,19 +95,6 @@ mark_time("gtimelog imports done")
 log = logging.getLogger('gtimelog')
 
 
-MailProtocol = collections.namedtuple('MailProtocol', 'factory, startssl')
-
-MAIL_PROTOCOLS = {
-    'SMTP': MailProtocol(smtplib.SMTP, False),
-    'SMTPS': MailProtocol(smtplib.SMTP_SSL, False),
-    'SMTP (StartTLS)': MailProtocol(smtplib.SMTP, True),
-}
-
-
-class EmailError(Exception):
-    pass
-
-
 def format_duration(duration):
     """Format a datetime.timedelta with minute precision.
 
@@ -123,37 +103,6 @@ def format_duration(duration):
     """
     h, m = divmod(as_minutes(duration), 60)
     return _('{0} h {1} min').format(h, m)
-
-
-def isascii(s):
-    return all(0 <= ord(c) <= 127 for c in s)
-
-
-def address_header(name_and_address):
-    if isascii(name_and_address):
-        return name_and_address
-    name, addr = parseaddr(name_and_address)
-    name = str(email.header.Header(name, 'UTF-8'))
-    return formataddr((name, addr))
-
-
-def subject_header(header):
-    if isascii(header):
-        return header
-    return email.header.Header(header, 'UTF-8')
-
-
-def prepare_message(sender, recipient, subject, body):
-    if isascii(body):
-        msg = email.mime.text.MIMEText(body)
-    else:
-        msg = email.mime.text.MIMEText(body, _charset="UTF-8")
-    if sender:
-        msg["From"] = address_header(sender)
-    msg["To"] = address_header(recipient)
-    msg["Subject"] = subject_header(subject)
-    msg["User-Agent"] = "gtimelog/{}".format(__version__)
-    return msg
 
 
 def make_option(long_name, short_name=None, flags=0, arg=GLib.OptionArg.NONE,
@@ -1035,45 +984,14 @@ class Window(Gtk.ApplicationWindow):
 
     def send_email(self, sender, recipient, subject, body):
         smtp_server = self.gsettings.get_string('smtp-server')
+        smtp_port = self.gsettings.get_int('smtp-port')
         smtp_username = self.gsettings.get_string('smtp-username')
-        callback = functools.partial(self._send_email, sender, recipient, subject, body)
+        mail_protocol = self.gsettings.get_string('mail-protocol')
+        callback = functools.partial(send_email, mail_protocol, smtp_server, smtp_port, sender, recipient, subject, body)
         if smtp_username:
             start_smtp_password_lookup(smtp_server, smtp_username, callback)
         else:
             callback('')
-
-    def _send_email(self, sender, recipient, subject, body, smtp_password):
-        smtp_server = self.gsettings.get_string('smtp-server')
-        smtp_port = self.gsettings.get_int('smtp-port')
-        smtp_username = self.gsettings.get_string('smtp-username')
-
-        sender_name, sender_address = parseaddr(sender)
-        recipient_name, recipient_address = parseaddr(recipient)
-        msg = prepare_message(sender, recipient, subject, body)
-
-        mail_protocol = self.gsettings.get_string('mail-protocol')
-        factory, starttls = MAIL_PROTOCOLS[mail_protocol]
-        try:
-            log.debug('Connecting to %s port %s',
-                      smtp_server, smtp_port or '(default)')
-            with closing(factory(smtp_server, smtp_port)) as smtp:
-                if DEBUG:
-                    smtp.set_debuglevel(1)
-                if starttls:
-                    log.debug('Issuing STARTTLS')
-                    smtp.starttls()
-                if smtp_username:
-                    log.debug('Logging in as %s', smtp_username)
-                    smtp.login(smtp_username, smtp_password)
-                log.debug('Sending email from %s to %s',
-                          sender_address, recipient_address)
-                smtp.sendmail(sender_address, [recipient_address], msg.as_string())
-                log.debug('Closing SMTP connection')
-        except (OSError, smtplib.SMTPException) as e:
-            log.error(_("Couldn't send mail: %s"), e)
-            raise EmailError(e)
-        else:
-            log.debug('Email sent!')
 
     def record_sent_email(self, time_range, date, recipient):
         record = self.report_view.record

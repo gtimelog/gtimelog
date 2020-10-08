@@ -16,7 +16,8 @@ mock_gi = mock.patch.dict('sys.modules', {'gi': gi, 'gi.repository': gi.reposito
 class TestEmail(unittest.TestCase):
 
     def test_prepare_message_ascii(self):
-        from gtimelog.main import __version__, prepare_message
+        from gtimelog.email import prepare_message
+        from gtimelog.main import __version__
         msg = prepare_message(
             sender='ASCII Name <test@example.com>',
             recipient='activity@example.com',
@@ -41,7 +42,8 @@ class TestEmail(unittest.TestCase):
         self.assertEqual(expected, msg.as_string())
 
     def test_prepare_message_unicode(self):
-        from gtimelog.main import __version__, prepare_message
+        from gtimelog.email import prepare_message
+        from gtimelog.main import __version__
         msg = prepare_message(
             sender='Ünicødę Name <test@example.com>',
             recipient='Anöther nąme <activity@example.com>',
