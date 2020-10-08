@@ -63,15 +63,36 @@ from .paths import (
     SHORTCUTS_UI_FILE,
     UI_FILE,
 )
-from .utils import require_version, internationalized_format_duration, parse_time, virtual_day, different_days, \
-    prev_month, next_month, uniq
+from .utils import (
+    internationalized_format_duration,
+    parse_time,
+    virtual_day,
+    different_days,
+    prev_month,
+    next_month,
+    uniq
+)
+
+import gi
+
+
+def require_version(namespace, version):
+    try:
+        gi.require_version(namespace, version)
+    except ValueError:
+        deb_package = "gir1.2-{namespace}-{version}".format(
+            namespace=namespace.lower(), version=version)
+        sys.exit("""Typelib files for {namespace}-{version} are not available.
+If you're on Ubuntu or another Debian-like distribution, please install
+them with
+    sudo apt install {deb_package}
+""".format(namespace=namespace, version=version, deb_package=deb_package))
+
 
 require_version('Gtk', '3.0')
 require_version('Soup', '2.4')
-import gi
+
 from gi.repository import Gdk, Gio, GLib, GObject, Gtk, Pango, Soup
-
-
 mark_time("Gtk imports done")
 
 from gtimelog import __version__
