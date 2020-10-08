@@ -67,6 +67,7 @@ from .utils import require_version
 
 
 require_version('Gtk', '3.0')
+require_version('Gdk', '3.0')
 require_version('Soup', '2.4')
 import gi
 from gi.repository import Gdk, Gio, GLib, GObject, Gtk, Pango, Soup
