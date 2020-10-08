@@ -25,7 +25,7 @@ if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
             print("Failed: %s" % e)
 
 
-ui_dir = here
+ui_dir = os.path.join(here, 'ui')
 
 UI_FILE = os.path.join(ui_dir, 'gtimelog.ui')
 PREFERENCES_UI_FILE = os.path.join(ui_dir, 'preferences.ui')
