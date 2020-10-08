@@ -644,7 +644,7 @@ class Window(Gtk.ApplicationWindow):
 
         if not self.gsettings.get_boolean('settings-migrated'):
             old_settings = Settings()
-            old_settings.load()
+            loaded_files = old_settings.load()
             if old_settings.summary_view:
                 self.gsettings.set_string('detail-level', 'summary')
             elif old_settings.chronological:
@@ -667,7 +667,8 @@ class Window(Gtk.ApplicationWindow):
             self.gsettings.set_value('virtual-midnight', GLib.Variant('(ii)', (vm.hour, vm.minute)))
             self.gsettings.set_boolean('gtk-completion', bool(old_settings.enable_gtk_completion))
             self.gsettings.set_boolean('settings-migrated', True)
-            log.info(_('Settings from {filename} migrated to GSettings (org.gtimelog)').format(filename=old_settings.get_config_file()))
+            if loaded_files:
+                log.info(_('Settings from {filename} migrated to GSettings (org.gtimelog)').format(filename=old_settings.get_config_file()))
 
         mark_time('settings loaded')
 

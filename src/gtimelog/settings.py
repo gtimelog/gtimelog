@@ -123,7 +123,7 @@ class Settings(object):
         if filename is None:
             filename = self.get_config_file()
         config = self._config()
-        config.read([filename])
+        loaded_files = config.read([filename])
         self.email = config.get('gtimelog', 'list-email')
         self.name = config.get('gtimelog', 'name')
         self.sender = config.get('gtimelog', 'sender')
@@ -148,6 +148,7 @@ class Settings(object):
                                                       'prefer_app_indicator')
         self.report_style = config.get('gtimelog', 'report_style')
         self.start_in_tray = config.getboolean('gtimelog', 'start_in_tray')
+        return loaded_files
 
     def save(self, filename):
         config = self._config()
