@@ -47,8 +47,8 @@ long_description = ''.join([
 ])
 
 tests_require = ['freezegun']
-if sys.version_info < (3, 5, 0):
-    sys.exit("Python 3.5 is the minimum required version")
+if sys.version_info < (3, 6, 0):
+    sys.exit("Python 3.6 is the minimum required version")
 
 setup(
     name='gtimelog',
