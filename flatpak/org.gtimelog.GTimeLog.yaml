@@ -1,7 +1,7 @@
 ---
 app-id: org.gtimelog.GTimeLog
 runtime: org.gnome.Platform
-runtime-version: "3.32"
+runtime-version: "3.38"
 sdk: org.gnome.Sdk
 command: gtimelog
 tags:
@@ -9,8 +9,8 @@ tags:
 modules:
   - name: gtimelog
     sources:
-    - type: git
-      url: https://github.com/gtimelog/gtimelog.git
+      - type: git
+        url: https://github.com/gtimelog/gtimelog.git
     no-make-install: true
     buildsystem: simple
     build-commands:
