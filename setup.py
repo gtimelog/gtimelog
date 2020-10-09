@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import ast
-import io
 import os
 import re
 import sys
@@ -12,7 +11,7 @@ here = os.path.dirname(__file__)
 
 
 def read(filename):
-    with io.open(os.path.join(here, filename), 'r', encoding='utf-8') as f:
+    with open(os.path.join(here, filename), encoding='utf-8') as f:
         return f.read()
 
 

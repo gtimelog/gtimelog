@@ -30,7 +30,6 @@ import email.header
 import email.mime.text
 import functools
 import gettext
-import io
 import locale
 import logging
 import os
@@ -344,7 +343,7 @@ class Application(Gtk.Application):
 
     def get_contributors(self):
         contributors = []
-        with io.open(CONTRIBUTORS_FILE, encoding='UTF-8') as f:
+        with open(CONTRIBUTORS_FILE, encoding='utf-8') as f:
             for line in f:
                 if line.startswith('- '):
                     contributors.append(line[2:].strip())

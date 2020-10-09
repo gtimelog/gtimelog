@@ -2,8 +2,6 @@
 Settings for GTimeLog
 """
 
-from __future__ import absolute_import
-
 import datetime
 import locale
 import os
