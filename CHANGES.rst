@@ -13,7 +13,7 @@ Changelog
 
 - GTK 3.18 or newer is now required (GH: #131).
 
-- Fixed an AttributeError in the undocmented remote task list feature
+- Fixed an AttributeError in the undocumented remote task list feature
   (GH: #153).
 
 - Add Python 3.8 support.
@@ -47,7 +47,7 @@ Changelog
 - Keyboard shortcuts window (press Ctrl+Shift+?).
 
 - Dropped the help page (there was only one and it was only listing keyboard
-  shortucts, and it was also incomplete and had no translations).
+  shortcuts, and it was also incomplete and had no translations).
 
 - Bugfix: if timelog.txt was a symlink, changes to the symlink target would
   not get noticed automatically (GH: #128).
@@ -61,7 +61,7 @@ Changelog
   (GH: #109).
 
 * Bugfix: entries with just a category and no task that did not have
-  a trailing space after the ':' were considered to be uncategorized
+  a trailing space after the ':' were considered to be uncategorised
   (GH: #117).
 
 * Add Python 3.7 support.
