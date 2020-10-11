@@ -2,7 +2,7 @@
 # Options
 #
 
-PYTHON = python
+PYTHON = python3
 FILE_WITH_VERSION = src/gtimelog/__init__.py
 FILE_WITH_CHANGELOG = CHANGES.rst
 
@@ -24,40 +24,43 @@ schema_files = $(schema_dir)/gschemas.compiled
 runtime_files = $(schema_files) $(mo_files)
 
 .PHONY: all
-all: $(manpages) $(runtime_files)
+all: $(manpages) $(runtime_files)       ##: build everything
 
 .PHONY: run
-run: $(runtime_files)
+run: $(runtime_files)                   ##: run directly from the source tree
 	./gtimelog
 
-.PHONY: check
-check: test
-	desktop-file-validate gtimelog.desktop
-	appstream-util validate-relax gtimelog.appdata.xml
-
 .PHONY: test
-test:
+test:                                   ##: run tests
 	tox -p auto
 
+.PHONY: check
+check: test                             ##: run tests and additional checks
+# 'make check' is defined in release.mk and here's how you can override it
+define check_recipe =
+	desktop-file-validate gtimelog.desktop
+	appstream-util validate-relax gtimelog.appdata.xml
+endef
+
 .PHONY: coverage
-coverage:
+coverage:                               ##: measure test coverage
 	tox -e coverage
 
 .PHONY: coverage-diff
-coverage-diff: coverage
+coverage-diff: coverage                 ##: find untested code in this branch
 	$(COVERAGE) xml
 	diff-cover coverage.xml
 
 .PHONY: flake8
-flake8:
+flake8:                                 ##: check for style problems
 	tox -e flake8
 
 .PHONY: isort
-isort:
+isort:                                  ##: check for badly sorted improts
 	tox -e isort
 
 .PHONY: update-translations
-update-translations:
+update-translations:                    ##: extract new translatable strings from source code and ui files
 	git config filter.po.clean 'msgcat - --no-location'
 	cd $(po_dir) && intltool-update -g gtimelog -p
 	for po in $(po_files); do msgmerge -U $$po $(po_dir)/gtimelog.pot; done
@@ -66,17 +69,19 @@ update-translations:
 mo-files: $(mo_files)
 
 .PHONY: flatpak
-flatpak:
+flatpak:                                ##: build a flatpak package
 	# you may need to install the platform and sdk before this will work
-	# flatpak install flathub org.gnome.Platform//3.32 org.gnome.Sdk//3.32
+	# flatpak install flathub org.gnome.Platform//3.82 org.gnome.Sdk//3.38
+	# note that this builds the code from git master, not your local working tree!
 	flatpak-builder --force-clean build/flatpak flatpak/org.gtimelog.GTimeLog.yaml
 	# to run it do
 	# flatpak-builder --run build/flatpak flatpak/org.gtimelog.GTimeLog.yaml gtimelog
 
 .PHONY: flatpak-install
-flatpak-install:
+flatpak-install:                        ##: build and install a flatpak package
 	# you may need to install the platform and sdk before this will work
-	# flatpak install flathub org.gnome.Platform//3.30 org.gnome.Sdk//3.30
+	# flatpak install flathub org.gnome.Platform//3.38 org.gnome.Sdk//3.38
+	# note that this builds the code from git master, not your local working tree!
 	flatpak-builder --force-clean build/flatpak flatpak/org.gtimelog.GTimeLog.yaml --install --user
 	# to run it do
 	# flatpak run org.gtimelog.GTimeLog
@@ -89,7 +94,7 @@ $(schema_files): $(schema_dir)/org.gtimelog.gschema.xml
 	glib-compile-schemas $(schema_dir)
 
 .PHONY: clean
-clean:
+clean:                                  ##: clean build artifacts
 	rm -rf temp tmp build gtimelog.egg-info $(runtime_files) $(mo_dir)
 	find -name '*.pyc' -delete
 
