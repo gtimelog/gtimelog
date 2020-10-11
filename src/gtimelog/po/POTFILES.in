@@ -1,6 +1,7 @@
 [encoding: UTF-8]
 ../../gtimelog.desktop.in
 main.py
+secrets.py
 [type: gettext/glade]about.ui
 [type: gettext/glade]gtimelog.ui
 [type: gettext/glade]preferences.ui

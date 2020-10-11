@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.12.0.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-17 15:34+0300\n"
+"POT-Creation-Date: 2020-10-11 17:00+0300\n"
 "PO-Revision-Date: 2020-08-08 15:52+0200\n"
 "Last-Translator: Stéphane Mangin <stephane.mangin@freesbee.fr>\n"
 "Language-Team: <stephane.mangin@freesbee.fr>\n"
@@ -25,20 +25,9 @@ msgstr "Gestion du temps"
 msgid "Track and time daily activities"
 msgstr "Gérer ses activités quotidiennes"
 
-msgid "Failed to store SMTP password in the keyring."
-msgstr "Impossible de sauvegarder le mot de passe SMTP dans le portefeuille."
-
 #, python-brace-format
 msgid "{0} h {1} min"
 msgstr "{0} h {1} min"
-
-#, python-format
-msgid ""
-"Authentication is required for \"%s\"\n"
-"You need a username and a password to access %s"
-msgstr ""
-"L'authentification est requise pour \"%s\"\n"
-"Vous avez besoin d'un identifiant et d'un mot de passe pour accéder à %s"
 
 msgid "Show version number and exit"
 msgstr "Afficher le numéro de version et quitter"
@@ -238,7 +227,21 @@ msgid "Unable to configure translations: no locale.bindtextdomain()"
 msgstr ""
 "Impossible de configurer les traductions: pas de locale.bindtextdomain()"
 
-msgid "Copyright © 2004–2020 Marius Gedminas and contributors."
+msgid "Failed to store SMTP password in the keyring."
+msgstr "Impossible de sauvegarder le mot de passe SMTP dans le portefeuille."
+
+msgid "Failed to store HTTP password in the keyring."
+msgstr "Impossible de sauvegarder le mot de passe HTTP dans le portefeuille."
+
+#, python-format
+msgid ""
+"Authentication is required for \"%s\"\n"
+"You need a username and a password to access %s"
+msgstr ""
+"L'authentification est requise pour \"%s\"\n"
+"Vous avez besoin d'un identifiant et d'un mot de passe pour accéder à %s"
+
+msgid "Copyright © 2004–2019 Marius Gedminas and contributors."
 msgstr "Tous droits réservés © 2004–2020 Marius Gedminas et contributeurs."
 
 msgid "A time tracking application"

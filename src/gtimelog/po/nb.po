@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-08 00:36+0200\n"
+"POT-Creation-Date: 2020-10-11 17:00+0300\n"
 "PO-Revision-Date: 2020-08-08 00:13+0200\n"
 "Last-Translator: John Erling Blad <jeblad@gmail.com>\n"
 "Language-Team: \n"
@@ -24,23 +24,9 @@ msgstr "Tidslogg"
 msgid "Track and time daily activities"
 msgstr "Spor og tidfest daglige aktiviteter"
 
-msgid "Failed to store SMTP password in the keyring."
-msgstr "Kunne ikke lagre SMTP-passord i nøkkelringen."
-
 #, python-brace-format
 msgid "{0} h {1} min"
 msgstr "{0} t {1} min"
-
-msgid "Failed to store HTTP password in the keyring."
-msgstr "Kunne ikke lagre HTTP-passord i nøkkelringen."
-
-#, python-format
-msgid ""
-"Authentication is required for \"%s\"\n"
-"You need a username and a password to access %s"
-msgstr ""
-"Autentisering er påkrevd for «%s»\n"
-"Du trenger et brukernavn og et passord for tilgang %s"
 
 msgid "Show version number and exit"
 msgstr "Vis versjonsnummer og avslutt"
@@ -71,7 +57,6 @@ msgstr "Kunne ikke opprette: {directory}: {error}"
 msgid "Created {directory}"
 msgstr "Opprettet {directory}"
 
-#, fuzzy
 msgid "GTimeLog version: {}"
 msgstr "GTimeLog versjon: {}"
 
@@ -235,6 +220,20 @@ msgstr "Steng"
 #. locale.bindtextdomain is missing on Windows!
 msgid "Unable to configure translations: no locale.bindtextdomain()"
 msgstr "Kan ikke konfigurere oversettelser: ingen locale.bindtextdomain()"
+
+msgid "Failed to store SMTP password in the keyring."
+msgstr "Kunne ikke lagre SMTP-passord i nøkkelringen."
+
+msgid "Failed to store HTTP password in the keyring."
+msgstr "Kunne ikke lagre HTTP-passord i nøkkelringen."
+
+#, python-format
+msgid ""
+"Authentication is required for \"%s\"\n"
+"You need a username and a password to access %s"
+msgstr ""
+"Autentisering er påkrevd for «%s»\n"
+"Du trenger et brukernavn og et passord for tilgang %s"
 
 msgid "Copyright © 2004–2019 Marius Gedminas and contributors."
 msgstr "Copyright © 2004–2019 Marius Gedminas og bidragsytere."

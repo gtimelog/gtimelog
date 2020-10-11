@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-17 15:34+0300\n"
+"POT-Creation-Date: 2020-10-11 17:00+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,20 +23,8 @@ msgstr ""
 msgid "Track and time daily activities"
 msgstr ""
 
-msgid "Failed to store SMTP password in the keyring."
-msgstr ""
-
 #, python-brace-format
 msgid "{0} h {1} min"
-msgstr ""
-
-msgid "Failed to store HTTP password in the keyring."
-msgstr ""
-
-#, python-format
-msgid ""
-"Authentication is required for \"%s\"\n"
-"You need a username and a password to access %s"
 msgstr ""
 
 msgid "Show version number and exit"
@@ -224,6 +212,18 @@ msgstr ""
 #. https://github.com/gtimelog/gtimelog/issues/95#issuecomment-252299266
 #. locale.bindtextdomain is missing on Windows!
 msgid "Unable to configure translations: no locale.bindtextdomain()"
+msgstr ""
+
+msgid "Failed to store SMTP password in the keyring."
+msgstr ""
+
+msgid "Failed to store HTTP password in the keyring."
+msgstr ""
+
+#, python-format
+msgid ""
+"Authentication is required for \"%s\"\n"
+"You need a username and a password to access %s"
 msgstr ""
 
 msgid "Copyright © 2004–2019 Marius Gedminas and contributors."

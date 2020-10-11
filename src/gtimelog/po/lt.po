@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-17 15:34+0300\n"
+"POT-Creation-Date: 2020-10-11 17:00+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -25,23 +25,9 @@ msgstr "Laiko žurnalas"
 msgid "Track and time daily activities"
 msgstr "Sekti kasdieninius darbus"
 
-msgid "Failed to store SMTP password in the keyring."
-msgstr "Nepavyko išsaugoti SMTP slaptažodžio raktinėje."
-
 #, python-brace-format
 msgid "{0} h {1} min"
 msgstr "{0} val {1} min"
-
-msgid "Failed to store HTTP password in the keyring."
-msgstr "Nepavyko išsaugoti HTTP slaptažodžio raktinėje."
-
-#, python-format
-msgid ""
-"Authentication is required for \"%s\"\n"
-"You need a username and a password to access %s"
-msgstr ""
-"Reikia prisijungti prie \"%s\"\n"
-"Reikia naudotojo vardo ir slaptažodžio, kad pasiektumėte %s"
 
 msgid "Show version number and exit"
 msgstr "Rodyti programos versiją ir išeiti"
@@ -233,6 +219,20 @@ msgstr "Uždaryti"
 #. locale.bindtextdomain is missing on Windows!
 msgid "Unable to configure translations: no locale.bindtextdomain()"
 msgstr "Nepavyko įjungti vertimų: nėra locale.bindtextdomain()"
+
+msgid "Failed to store SMTP password in the keyring."
+msgstr "Nepavyko išsaugoti SMTP slaptažodžio raktinėje."
+
+msgid "Failed to store HTTP password in the keyring."
+msgstr "Nepavyko išsaugoti HTTP slaptažodžio raktinėje."
+
+#, python-format
+msgid ""
+"Authentication is required for \"%s\"\n"
+"You need a username and a password to access %s"
+msgstr ""
+"Reikia prisijungti prie \"%s\"\n"
+"Reikia naudotojo vardo ir slaptažodžio, kad pasiektumėte %s"
 
 msgid "Copyright © 2004–2019 Marius Gedminas and contributors."
 msgstr "Autorinės teisės © 2004–2019 Marius Gedminas ir kiti."
