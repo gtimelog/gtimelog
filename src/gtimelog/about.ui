@@ -7,7 +7,7 @@
     <property name="modal">True</property>
     <property name="program_name" translatable="yes">Time Log</property>
     <property name="version">(placeholder)</property>
-    <property name="copyright" translatable="yes">Copyright © 2004–2019 Marius Gedminas and contributors.</property>
+    <property name="copyright" translatable="yes">Copyright © 2004–2020 Marius Gedminas and contributors.</property>
     <property name="comments" translatable="yes">A time tracking application</property>
     <property name="website">https://gtimelog.org/</property>
     <property name="authors">Marius Gedminas
