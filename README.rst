@@ -3,8 +3,8 @@ GTimeLog
 
 GTimeLog is a simple app for keeping track of time.
 
-.. image:: https://travis-ci.org/gtimelog/gtimelog.svg?branch=master
-   :target: https://travis-ci.org/gtimelog/gtimelog
+.. image:: https://travis-ci.com/gtimelog/gtimelog.svg?branch=master
+   :target: https://travis-ci.com/gtimelog/gtimelog
    :alt: build status
 
 .. image:: https://ci.appveyor.com/api/projects/status/github/gtimelog/gtimelog?branch=master&svg=true
