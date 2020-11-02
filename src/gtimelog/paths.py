@@ -12,6 +12,11 @@ here = os.path.dirname(__file__)
 SCHEMA_DIR = os.path.join(here, 'data')
 if SCHEMA_DIR and not os.environ.get('GSETTINGS_SCHEMA_DIR'):
     # Have to do this before importing 'gi'.
+    # Note: it has been brought to my attention that I can do
+    #   source = Gio.SettingsSchemaSource.new_from_directory(SCHEMA_DIR,
+    #       Gio.SettingsSchemaSource.get_default(), False)
+    #   schema = source.lookup('...', False)
+    # to load schemas from any location
     os.environ['GSETTINGS_SCHEMA_DIR'] = SCHEMA_DIR
     if not os.path.exists(os.path.join(SCHEMA_DIR, 'gschemas.compiled')):
         # This, too, I have to do before importing 'gi'.
