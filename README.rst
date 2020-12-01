@@ -3,8 +3,8 @@ GTimeLog
 
 GTimeLog is a simple app for keeping track of time.
 
-.. image:: https://travis-ci.com/gtimelog/gtimelog.svg?branch=master
-   :target: https://travis-ci.com/gtimelog/gtimelog
+.. image:: https://github.com/gtimelog/gtimelog/workflows/build/badge.svg?branch=master
+   :target: https://github.com/gtimelog/gtimelog/actions
    :alt: build status
 
 .. image:: https://ci.appveyor.com/api/projects/status/github/gtimelog/gtimelog?branch=master&svg=true
@@ -49,7 +49,7 @@ You can run it from a source checkout (without an explicit installation step)::
 
 System requirements:
 
-- Python (2.7 or 3.5+)
+- Python (3.6+)
 - PyGObject
 - gobject-introspection type libraries for Gtk, Gdk, GLib, Gio, GObject, Pango,
   Soup, Secret
