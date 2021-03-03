@@ -1033,7 +1033,7 @@ class TimeLog(TimeCollection):
         """
         now = None
         date_match = re.match(r'(\d\d):(\d\d)\s+', entry)
-        delta_match = re.match(r'-([1-9]\d?|1\d\d)\s+', entry)
+        delta_match = re.match(r'[\-+]([1-9]\d?|1\d\d)\s+', entry)
         if date_match:
             h = int(date_match.group(1))
             m = int(date_match.group(2))
@@ -1048,12 +1048,19 @@ class TimeLog(TimeCollection):
                     now = None
         if delta_match:
             seconds = int(delta_match.group()) * 60
-            now = datetime.datetime.now().replace(second=0, microsecond=0)
-            now += datetime.timedelta(seconds=seconds)
-            if self.valid_time(now):
-                entry = entry[delta_match.end():]
+            # If positive, offset from the end of the last entry.
+            if seconds >= 0:
+                now = self.window.last_time()
+            # Otherwise, offset from the current time.
             else:
-                now = None
+                now = datetime.datetime.now().replace(second=0, microsecond=0)
+
+            if now is not None:
+                now += datetime.timedelta(seconds=seconds)
+                if self.valid_time(now):
+                    entry = entry[delta_match.end():]
+                else:
+                    now = None
         return entry, now
 
 

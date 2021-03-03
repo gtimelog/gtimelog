@@ -73,8 +73,10 @@ Back-dating Entries
 
 If you forget to enter an activity, you can enter it after the fact by
 prefixing it with a full time ("09:30 morning meeting") or a two digit minute-offset
-("-10 morning meeting").  Note that the new activity must still be after
-the last entered event, or things will become confusing!
+("-10 morning meeting" or "+10 morning meeting"). Where "-" offsets from the
+the current time and "+" offsets from the last entry.
+Note that the new activity must still be after the last entered event and before the
+current time, or things will become confusing!
 
 
 Tasks pane

@@ -20,6 +20,8 @@ Changelog
 
 - Drop Python 2.7 and 3.5 support.
 
+- Add support for positive time offset syntax in entries.
+
 
 0.11.3 (2019-04-23)
 ~~~~~~~~~~~~~~~~~~~
