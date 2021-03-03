@@ -22,6 +22,7 @@ In alphabetic order:
 - Jean Jordaan
 - Jeroen Langeveld
 - Jonatan Cloutier
+- Jonathan Snyder
 - Kees Cook
 - Lars Wirzenius
 - Laurynas Speičys
