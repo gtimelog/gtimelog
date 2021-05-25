@@ -288,6 +288,7 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.go-back", ["<Alt>Left"])
         self.set_accels_for_action("win.go-forward", ["<Alt>Right"])
         self.set_accels_for_action("win.go-home", ["<Alt>Home"])
+        self.set_accels_for_action("win.focus-task-entry", ["<Primary>L"])
         self.set_accels_for_action("app.edit-log", ["<Primary>E"])
         self.set_accels_for_action("app.edit-tasks", ["<Primary>T"])
         self.set_accels_for_action("app.shortcuts", ["<Primary>question"])
@@ -483,7 +484,7 @@ class Window(Gtk.ApplicationWindow):
             self.show_search_bar = PropertyAction.new("show-search-bar", win.search_bar, "search-mode-enabled")
             win.add_action(self.show_search_bar)
 
-            for action_name in ['go-back', 'go-forward', 'go-home', 'add-entry', 'report', 'send-report', 'cancel-report']:
+            for action_name in ['go-back', 'go-forward', 'go-home', 'focus-task-entry', 'add-entry', 'report', 'send-report', 'cancel-report']:
                 action = Gio.SimpleAction.new(action_name, None)
                 action.connect('activate', getattr(win, 'on_' + action_name.replace('-', '_')))
                 win.add_action(action)
@@ -965,6 +966,9 @@ class Window(Gtk.ApplicationWindow):
 
     def on_go_home(self, action, parameter):
         self.date = None
+
+    def on_focus_task_entry(self, action, parameter):
+        self.task_entry.grab_focus()
 
     def on_add_entry(self, action, parameter):
         mark_time()
