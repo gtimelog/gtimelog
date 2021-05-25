@@ -105,7 +105,7 @@
               <object class="GtkShortcutsShortcut">
                 <property name="visible">True</property>
                 <property name="accelerator">&lt;primary&gt;L</property>
-                <property name="title" translatable="yes" context="shortcut window">Add new entry</property>
+                <property name="title" translatable="yes" context="shortcut window">Focus the task entry</property>
               </object>
             </child>
             <child>
