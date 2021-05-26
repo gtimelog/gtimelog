@@ -16,6 +16,9 @@ Changelog
 - Fixed an AttributeError in the undocumented remote task list feature
   (GH: #153).
 
+- Make the undocumented remote task list feature validate TLS certificates (GH:
+  #214).
+
 - Add Python 3.8 and 3.9 support.
 
 - Drop Python 2.7 and 3.5 support.

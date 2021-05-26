@@ -170,7 +170,7 @@ def make_option(long_name, short_name=None, flags=0, arg=GLib.OptionArg.NONE,
     return option
 
 
-soup_session = Soup.SessionAsync()
+soup_session = Soup.Session()
 authenticator = Authenticator(soup_session)
 
 
