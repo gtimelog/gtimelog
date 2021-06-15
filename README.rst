@@ -76,7 +76,7 @@ Website: https://gtimelog.org
 Mailing list: gtimelog@googlegroups.com
 (archive at https://groups.google.com/group/gtimelog)
 
-IRC: #gtimelog on irc.freenode.net
+IRC: #gtimelog on chat.libera.net
 
 Source code: https://github.com/gtimelog/gtimelog
 
