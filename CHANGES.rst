@@ -27,6 +27,9 @@ Changelog
 
 - Focus the task entry on Ctrl+L (GH: #213).
 
+- Change entry search to be fuzzy. It is now only required to enter characters
+  of the entry in the correct order to find an entry.
+
 
 0.11.3 (2019-04-23)
 ~~~~~~~~~~~~~~~~~~~

@@ -1215,8 +1215,21 @@ class TaskEntry(Gtk.Entry):
         self.completion_choices_as_set = set()
         completion.set_model(self.completion_choices)
         completion.set_text_column(0)
+        completion.set_match_func(
+            self.completion_match_func, self.completion_choices)
         if self.gtk_completion_enabled:
             self.set_completion(completion)
+
+    def completion_match_func(self, completion, search_text, tree_iter, data):
+        entry = data.get_value(tree_iter, 0).lower()
+        pos = 0
+        for char in search_text:
+            new_pos = entry.find(char, pos)
+            if new_pos == -1:
+                return False
+            else:
+                pos = new_pos
+        return True
 
     def gtk_completion_enabled_changed(self, *args):
         if self.gtk_completion_enabled:
