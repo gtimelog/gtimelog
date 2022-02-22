@@ -30,6 +30,8 @@ Changelog
 - Change entry search to be fuzzy. It is now only required to enter characters
   of the entry in the correct order to find an entry.
 
+- Enforce minimum and maximum size for the task pane (GH: #219).
+
 
 0.11.3 (2019-04-23)
 ~~~~~~~~~~~~~~~~~~~

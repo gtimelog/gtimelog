@@ -58,6 +58,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
+                    <property name="width-request">50</property>
                     <child>
                       <object class="GtkSearchBar" id="search_bar">
                         <property name="visible">True</property>
@@ -104,13 +105,14 @@
                   </object>
                   <packing>
                     <property name="resize">True</property>
-                    <property name="shrink">True</property>
+                    <property name="shrink">False</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkBox" id="task_pane">
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
+                    <property name="width-request">50</property>
                     <child>
                       <object class="GtkScrolledWindow" id="scrolledwindow2">
                         <property name="visible">True</property>
@@ -182,7 +184,7 @@
                   </object>
                   <packing>
                     <property name="resize">False</property>
-                    <property name="shrink">True</property>
+                    <property name="shrink">False</property>
                   </packing>
                 </child>
               </object>
