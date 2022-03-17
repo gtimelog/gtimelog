@@ -21,7 +21,7 @@ Changelog
 
 - Add Python 3.8, 3.9, and 3.10 support.
 
-- Drop Python 2.7 and 3.5 support.
+- Drop Python 2.7, 3.5, and 3.6 support.
 
 - Add support for positive time offset syntax in entries.
 
