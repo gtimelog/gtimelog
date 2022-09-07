@@ -94,6 +94,24 @@
       </item>
     </section>
     <section>
+      <attribute name="label" translatable="yes">Sorting</attribute>
+      <item>
+        <attribute name="label" translatable="yes">As entered</attribute>
+        <attribute name="action">win.log-order</attribute>
+        <attribute name="target">asis</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Alphanumerical</attribute>
+        <attribute name="action">win.log-order</attribute>
+        <attribute name="target">alphanum</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">As Tasks file</attribute>
+        <attribute name="action">win.log-order</attribute>
+        <attribute name="target">tasks</attribute>
+      </item>
+    </section>
+    <section>
       <item>
         <attribute name="label" translatable="yes">Filter</attribute>
         <attribute name="action">win.show-search-bar</attribute>
