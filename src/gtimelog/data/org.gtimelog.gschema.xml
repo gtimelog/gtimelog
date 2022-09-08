@@ -8,6 +8,12 @@
         <value nick="summary" value="3"/>
     </enum>
 
+    <enum id="org.gtimelog.LogOrder">
+        <value nick="asis" value="1"/>
+        <value nick="alphanum" value="2"/>
+        <value nick="tasks" value="3"/>
+    </enum>
+
     <enum id="org.gtimelog.MailProtocol">
         <!-- maybe /usr/sbin/sendmail should be an allowed option? -->
         <value nick="SMTP" value="1"/>
@@ -27,6 +33,12 @@
             <default>"chronological"</default>
             <summary>Detail level</summary>
             <description>Detail level to show in the main pane.</description>
+        </key>
+
+        <key name="log-order" enum="org.gtimelog.LogOrder">
+            <default>"asis"</default>
+	    <summary>Log Tasks/Groups order</summary>
+            <description>Order of tasks and groups in Log view</description>
         </key>
 
         <key name="show-task-pane" type="b">
