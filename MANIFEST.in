@@ -8,7 +8,6 @@ include gtimelog.appdata.xml
 include runtests
 include tox.ini
 include appveyor.yml
-include .travis.yml
 include .coveragerc
 include .gitignore
 include .gitattributes
