@@ -958,6 +958,10 @@ class Window(Gtk.ApplicationWindow):
         assert self.time_range in {'day', 'week', 'month'}
         self.notify('subtitle')
 
+    def log_order_changed(self, obj, param_spec):
+        assert self.log_order in {'asis', 'alphanum', 'tasks'}
+        self.notify('subtitle')
+
     def on_search_changed(self, *args):
         self.filter_text = self.search_entry.get_text()
 
@@ -1338,6 +1342,10 @@ class LogView(Gtk.TextView):
         type=str, default='day', nick='Time range',
         blurb='Time range to show (day/week/month)')
 
+    log_order = GObject.Property(
+        type=str, default='asis', nick='Log order',
+        blurb='Log order of tasks/groups(asis/alphanum/tasks)')
+
     hours = GObject.Property(
         type=float, default=0, nick='Hours',
         blurb='Target number of work hours per day')
@@ -1371,6 +1379,7 @@ class LogView(Gtk.TextView):
         self.connect('notify::showing-today', self.queue_update)
         self.connect('notify::detail-level', self.queue_update)
         self.connect('notify::time-range', self.queue_update)
+        self.connect('notify::log-order', self.queue_update)
         self.connect('notify::hours', self.queue_footer_update)
         self.connect('notify::office-hours', self.queue_footer_update)
         self.connect('notify::current-task', self.queue_footer_update)
@@ -1440,6 +1449,7 @@ class LogView(Gtk.TextView):
             return # not loaded yet
         window = self.get_time_window()
         total = datetime.timedelta(0)
+        # TODO use log_order to change behaviour
         if self.detail_level == 'chronological':
             prev = None
             for item in window.all_entries():
@@ -1497,6 +1507,7 @@ class LogView(Gtk.TextView):
         self.scroll_to_end()
 
     def entry_added(self, same_day):
+        # TODO use log_order to change behaviour
         if (self.detail_level == 'chronological' and same_day
                 and not self.filter_text):
             self.delete_footer()
