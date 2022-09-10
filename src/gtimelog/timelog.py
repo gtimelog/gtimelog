@@ -1123,7 +1123,9 @@ class TaskList(object):
         except IOError:
             pass # the file's not there, so what?
         # append the "other" tasks at the end
-        self.groups = list(groups.items()) + [(self.other_title, others)]
+        self.groups = list(groups.items())
+        if others:
+            self.groups.append((self.other_title, others))
 
     def reload(self):
         """Reload the task list."""
