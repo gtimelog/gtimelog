@@ -1042,9 +1042,9 @@ class TestTaskList(Mixins, unittest.TestCase):
         '''))
         tasklist = TaskList(taskfile)
         self.assertEqual(tasklist.groups, [
-            ('Other', ['some task', 'other task']),
-            ('misc', ['paperwork']),
             ('project', ['do it', 'fix bugs']),
+            ('misc', ['paperwork']),
+            ('Other', ['some task', 'other task']),
         ])
 
     def test_unicode(self):

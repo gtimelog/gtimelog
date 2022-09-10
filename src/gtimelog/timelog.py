@@ -1107,6 +1107,7 @@ class TaskList(object):
     def load(self):
         """Load task list from a file named self.filename."""
         groups = {}
+        others = []
         self.last_mtime = get_mtime(self.filename)
         try:
             with open(self.filename, encoding='utf-8') as f:
@@ -1114,14 +1115,17 @@ class TaskList(object):
                     line = line.strip()
                     if not line or line.startswith('#'):
                         continue
-                    if ':' in line:
+                    if ':' in line:  # tasks with group prefix
                         group, task = [s.strip() for s in line.split(':', 1)]
-                    else:
-                        group, task = self.other_title, line
-                    groups.setdefault(group, []).append(task)
+                        groups.setdefault(group, []).append(task)
+                    else:  # "other" tasks
+                        others.append(line.strip())
         except IOError:
             pass # the file's not there, so what?
-        self.groups = sorted(groups.items())
+        # append the "other" tasks at the end
+        self.groups = list(groups.items())
+        if others:
+            self.groups.append((self.other_title, others))
 
     def reload(self):
         """Reload the task list."""
