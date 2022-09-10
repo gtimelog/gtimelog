@@ -32,6 +32,9 @@ Changelog
 
 - Enforce minimum and maximum size for the task pane (GH: #219).
 
+- Task pane now preserves the order of task groups to match the order in
+  tasks.txt (GH: #224).
+
 
 0.11.3 (2019-04-23)
 ~~~~~~~~~~~~~~~~~~~
