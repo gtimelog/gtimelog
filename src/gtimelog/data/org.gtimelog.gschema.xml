@@ -11,7 +11,8 @@
     <enum id="org.gtimelog.LogOrder">
         <value nick="asis" value="1"/>
         <value nick="alphanum" value="2"/>
-        <value nick="tasks" value="3"/>
+        <value nick="duration" value="3"/>
+        <value nick="tasks" value="4"/>
     </enum>
 
     <enum id="org.gtimelog.MailProtocol">

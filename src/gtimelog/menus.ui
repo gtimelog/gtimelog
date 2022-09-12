@@ -106,6 +106,11 @@
         <attribute name="target">alphanum</attribute>
       </item>
       <item>
+        <attribute name="label" translatable="yes">By duration</attribute>
+        <attribute name="action">win.log-order</attribute>
+        <attribute name="target">duration</attribute>
+      </item>
+      <item>
         <attribute name="label" translatable="yes">As Tasks file</attribute>
         <attribute name="action">win.log-order</attribute>
         <attribute name="target">tasks</attribute>

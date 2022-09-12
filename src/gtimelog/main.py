@@ -284,7 +284,8 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.time-range::month", ["<Alt>6"])
         self.set_accels_for_action("win.log-order::asis", ["<Alt>7"])
         self.set_accels_for_action("win.log-order::alphanum", ["<Alt>8"])
-        self.set_accels_for_action("win.log-order::tasks", ["<Alt>9"])
+        self.set_accels_for_action("win.log-order::duration", ["<Alt>9"])
+        self.set_accels_for_action("win.log-order::tasks", ["<Alt>0"])
         self.set_accels_for_action("win.show-task-pane", ["F9"])
         self.set_accels_for_action("win.show-menu", ["F10"])
         self.set_accels_for_action("win.show-search-bar", ["<Primary>F"])
@@ -462,7 +463,7 @@ class Window(Gtk.ApplicationWindow):
 
     log_order = GObject.Property(
         type=str, default='asis', nick='Log Order',
-        blurb='Log order for Tasks/Groups (asis/alphanum/tasks)')
+        blurb='Log order for Tasks/Groups (asis/alphanum/duration/tasks)')
 
     filter_text = GObject.Property(
         type=str, default='', nick='Filter text',
@@ -709,6 +710,7 @@ class Window(Gtk.ApplicationWindow):
         if self.tasks:
             self.unwatch_file(self.tasks.filename)
         self.tasks = tasks
+        self.log_view.set_tasks(self.tasks)
         mark_time("tasks presented")
         self.watch_file(self.tasks.filename, self.on_tasks_file_changed)
         self.update_edit_tasks_availability()
@@ -959,7 +961,7 @@ class Window(Gtk.ApplicationWindow):
         self.notify('subtitle')
 
     def log_order_changed(self, obj, param_spec):
-        assert self.log_order in {'asis', 'alphanum', 'tasks'}
+        assert self.log_order in {'asis', 'alphanum', 'duration', 'tasks'}
         self.notify('subtitle')
 
     def on_search_changed(self, *args):
@@ -1344,7 +1346,7 @@ class LogView(Gtk.TextView):
 
     log_order = GObject.Property(
         type=str, default='asis', nick='Log order',
-        blurb='Log order of tasks/groups(asis/alphanum/tasks)')
+        blurb='Log order of tasks/groups(asis/alphanum/duration/tasks)')
 
     hours = GObject.Property(
         type=float, default=0, nick='Hours',
@@ -1385,6 +1387,7 @@ class LogView(Gtk.TextView):
         self.connect('notify::current-task', self.queue_footer_update)
         self.connect('notify::now', self.queue_footer_update)
         self.connect('notify::filter-text', self.queue_update)
+        self.connect('notify::tasks', self.queue_update)
 
     def queue_update(self, *args):
         if not self._update_pending:
@@ -1449,7 +1452,6 @@ class LogView(Gtk.TextView):
             return # not loaded yet
         window = self.get_time_window()
         total = datetime.timedelta(0)
-        # TODO use log_order to change behaviour
         if self.detail_level == 'chronological':
             prev = None
             for item in window.all_entries():
@@ -1463,7 +1465,8 @@ class LogView(Gtk.TextView):
                     total += item.duration
                 prev = item.start
         elif self.detail_level == 'grouped':
-            work, slack = window.grouped_entries()
+            work, slack = window.grouped_entries(
+                sorted_by=self._get_log_order_key())
             for start, entry, duration in work + slack:
                 if self.filter_text in entry:
                     self.write_group(entry, duration)
@@ -1506,8 +1509,26 @@ class LogView(Gtk.TextView):
         self.add_footer()
         self.scroll_to_end()
 
+    def _get_log_order_key(self):
+        """
+        Returns a function suitable as key parameter for the ordered function
+
+        The parameter to be sorted is deemed a list item as returned by
+        TimeCollection.grouped_entries
+        """
+        if self.log_order == 'alphanum':
+            return lambda x: x[1]
+        elif self.log_order == 'duration':
+            return lambda x: x[2]
+        elif self.log_order == 'tasks':
+            return lambda x: self.tasks.index(x[1])
+        else:  # 'asis'
+            return None  # more or less equivalent to x[0]
+
+    def set_tasks(self, tasks):
+        self.tasks = tasks
+
     def entry_added(self, same_day):
-        # TODO use log_order to change behaviour
         if (self.detail_level == 'chronological' and same_day
                 and not self.filter_text):
             self.delete_footer()

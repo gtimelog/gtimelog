@@ -267,7 +267,7 @@ class TimeCollection(object):
                 count += 1
         return count
 
-    def grouped_entries(self, skip_first=True):
+    def grouped_entries(self, skip_first=True, sorted_by=None):
         """Return consolidated entries (grouped by entry title).
 
         Returns two lists: work entries and slacking entries.  Slacking
@@ -293,8 +293,8 @@ class TimeCollection(object):
                 start = min(start, old_start)
                 duration += old_duration
             entries[entry] = (start, entry, duration)
-        work = sorted(work.values())
-        slack = sorted(slack.values())
+        work = sorted(work.values(), key=sorted_by)
+        slack = sorted(slack.values(), key=sorted_by)
         return work, slack
 
     def categorized_work_entries(self, skip_first=True):
@@ -1080,6 +1080,8 @@ class TaskList(object):
 
     A TaskList has an attribute 'groups' which is a list of tuples
     (group_name, list_of_group_items).
+    It also has an attribute 'tasklist' which is an unsorted list of tasks,
+    potentially prefixed by 'group_name:'.
     """
 
     other_title = 'Other'
@@ -1107,6 +1109,7 @@ class TaskList(object):
     def load(self):
         """Load task list from a file named self.filename."""
         groups = {}
+        tasks = []
         others = []
         self.last_mtime = get_mtime(self.filename)
         try:
@@ -1118,15 +1121,34 @@ class TaskList(object):
                     if ':' in line:  # tasks with group prefix
                         group, task = [s.strip() for s in line.split(':', 1)]
                         groups.setdefault(group, []).append(task)
+                        tasks.append(group + ': ' + task)
                     else:  # "other" tasks
-                        others.append(line.strip())
+                        others.append(line)
+                        tasks.append(line)
         except IOError:
             pass # the file's not there, so what?
         # append the "other" tasks at the end
         self.groups = list(groups.items())
         if others:
             self.groups.append((self.other_title, others))
+        self.tasklist = tasks
 
     def reload(self):
         """Reload the task list."""
         self.load()
+
+    def index(self, value):
+        """
+        Return the index of a value in the tasklist
+
+        Like a list's index() function but returns the length of the list if
+        the value isn't listed, so that those values are deemed at the end of
+        the list
+        """
+        if not self.tasklist:
+            return -1  # no task, value doesn't really matter
+        try:
+            idx = self.tasklist.index(value)
+        except ValueError:
+            idx = len(self.tasklist)
+        return idx
