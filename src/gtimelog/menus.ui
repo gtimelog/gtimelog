@@ -98,12 +98,12 @@
       <item>
         <attribute name="label" translatable="yes">As entered</attribute>
         <attribute name="action">win.log-order</attribute>
-        <attribute name="target">asis</attribute>
+        <attribute name="target">start-time</attribute>
       </item>
       <item>
         <attribute name="label" translatable="yes">Alphanumerical</attribute>
         <attribute name="action">win.log-order</attribute>
-        <attribute name="target">alphanum</attribute>
+        <attribute name="target">name</attribute>
       </item>
       <item>
         <attribute name="label" translatable="yes">By duration</attribute>
@@ -113,7 +113,7 @@
       <item>
         <attribute name="label" translatable="yes">As Tasks file</attribute>
         <attribute name="action">win.log-order</attribute>
-        <attribute name="target">tasks</attribute>
+        <attribute name="target">task-list</attribute>
       </item>
     </section>
     <section>

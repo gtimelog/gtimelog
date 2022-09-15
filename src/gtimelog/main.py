@@ -282,10 +282,10 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.time-range::day", ["<Alt>4"])
         self.set_accels_for_action("win.time-range::week", ["<Alt>5"])
         self.set_accels_for_action("win.time-range::month", ["<Alt>6"])
-        self.set_accels_for_action("win.log-order::asis", ["<Alt>7"])
-        self.set_accels_for_action("win.log-order::alphanum", ["<Alt>8"])
+        self.set_accels_for_action("win.log-order::start-time", ["<Alt>7"])
+        self.set_accels_for_action("win.log-order::name", ["<Alt>8"])
         self.set_accels_for_action("win.log-order::duration", ["<Alt>9"])
-        self.set_accels_for_action("win.log-order::tasks", ["<Alt>0"])
+        self.set_accels_for_action("win.log-order::task-list", ["<Alt>0"])
         self.set_accels_for_action("win.show-task-pane", ["F9"])
         self.set_accels_for_action("win.show-menu", ["F10"])
         self.set_accels_for_action("win.show-search-bar", ["<Primary>F"])
@@ -462,8 +462,8 @@ class Window(Gtk.ApplicationWindow):
         blurb='Time range to show (day/week/month)')
 
     log_order = GObject.Property(
-        type=str, default='asis', nick='Log Order',
-        blurb='Log order for Tasks/Groups (asis/alphanum/duration/tasks)')
+        type=str, default='start-time', nick='Log Order',
+        blurb='Log order for Tasks/Groups (start-time/name/duration/task-list)')
 
     filter_text = GObject.Property(
         type=str, default='', nick='Filter text',
@@ -576,6 +576,7 @@ class Window(Gtk.ApplicationWindow):
         self.task_entry.bind_property('text', self.log_view, 'current_task', GObject.BindingFlags.DEFAULT)
         self.bind_property('subtitle', self.headerbar, 'subtitle', GObject.BindingFlags.DEFAULT)
         self.bind_property('filter_text', self.log_view, 'filter_text', GObject.BindingFlags.DEFAULT)
+        self.bind_property('tasks', self.log_view, 'tasks', GObject.BindingFlags.DEFAULT)
 
         self.search_bar = builder.get_object("search_bar")
         self.search_entry = builder.get_object("search_entry")
@@ -710,7 +711,6 @@ class Window(Gtk.ApplicationWindow):
         if self.tasks:
             self.unwatch_file(self.tasks.filename)
         self.tasks = tasks
-        self.log_view.set_tasks(self.tasks)
         mark_time("tasks presented")
         self.watch_file(self.tasks.filename, self.on_tasks_file_changed)
         self.update_edit_tasks_availability()
@@ -961,7 +961,7 @@ class Window(Gtk.ApplicationWindow):
         self.notify('subtitle')
 
     def log_order_changed(self, obj, param_spec):
-        assert self.log_order in {'asis', 'alphanum', 'duration', 'tasks'}
+        assert self.log_order in {'start-time', 'name', 'duration', 'task-list'}
         self.notify('subtitle')
 
     def on_search_changed(self, *args):
@@ -1345,8 +1345,8 @@ class LogView(Gtk.TextView):
         blurb='Time range to show (day/week/month)')
 
     log_order = GObject.Property(
-        type=str, default='asis', nick='Log order',
-        blurb='Log order of tasks/groups(asis/alphanum/duration/tasks)')
+        type=str, default='start-time', nick='Log order',
+        blurb='Log order of tasks/groups (start-time/name/duration/task-list)')
 
     hours = GObject.Property(
         type=float, default=0, nick='Hours',
@@ -1367,6 +1367,10 @@ class LogView(Gtk.TextView):
     filter_text = GObject.Property(
         type=str, default='', nick='Filter text',
         blurb='Show only tasks matching this substring')
+
+    tasks = GObject.Property(
+        type=object, nick='Tasks',
+        blurb='The task list (an instance of TaskList)')
 
     def __init__(self):
         Gtk.TextView.__init__(self)
@@ -1516,17 +1520,14 @@ class LogView(Gtk.TextView):
         The parameter to be sorted is deemed a list item as returned by
         TimeCollection.grouped_entries
         """
-        if self.log_order == 'alphanum':
+        if self.log_order == 'name':
             return lambda x: x[1]
         elif self.log_order == 'duration':
             return lambda x: x[2]
-        elif self.log_order == 'tasks':
-            return lambda x: self.tasks.index(x[1])
-        else:  # 'asis'
+        elif self.log_order == 'task-list':
+            return lambda x: self.tasks.order(x[1])
+        else:  # 'start-time'
             return None  # more or less equivalent to x[0]
-
-    def set_tasks(self, tasks):
-        self.tasks = tasks
 
     def entry_added(self, same_day):
         if (self.detail_level == 'chronological' and same_day

@@ -9,10 +9,10 @@
     </enum>
 
     <enum id="org.gtimelog.LogOrder">
-        <value nick="asis" value="1"/>
-        <value nick="alphanum" value="2"/>
+        <value nick="start-time" value="1"/>
+        <value nick="name" value="2"/>
         <value nick="duration" value="3"/>
-        <value nick="tasks" value="4"/>
+        <value nick="task-list" value="4"/>
     </enum>
 
     <enum id="org.gtimelog.MailProtocol">
@@ -37,7 +37,7 @@
         </key>
 
         <key name="log-order" enum="org.gtimelog.LogOrder">
-            <default>"asis"</default>
+            <default>"start-time"</default>
 	    <summary>Log Tasks/Groups order</summary>
             <description>Order of tasks and groups in Log view</description>
         </key>

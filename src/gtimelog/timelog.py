@@ -1080,8 +1080,10 @@ class TaskList(object):
 
     A TaskList has an attribute 'groups' which is a list of tuples
     (group_name, list_of_group_items).
-    It also has an attribute 'tasklist' which is an unsorted list of tasks,
-    potentially prefixed by 'group_name:'.
+
+    It also has an attribute 'task_order' which is a dictionary of task names,
+    potentially prefixed by 'group_name: ', with their value being their
+    original order in the task list.
     """
 
     other_title = 'Other'
@@ -1109,46 +1111,39 @@ class TaskList(object):
     def load(self):
         """Load task list from a file named self.filename."""
         groups = {}
-        tasks = []
+        task_order = {}
         others = []
         self.last_mtime = get_mtime(self.filename)
         try:
             with open(self.filename, encoding='utf-8') as f:
-                for line in f:
+                for index, line in enumerate(f):
                     line = line.strip()
                     if not line or line.startswith('#'):
                         continue
                     if ':' in line:  # tasks with group prefix
                         group, task = [s.strip() for s in line.split(':', 1)]
                         groups.setdefault(group, []).append(task)
-                        tasks.append(group + ': ' + task)
+                        task_order[group + ': ' + task] = index
                     else:  # "other" tasks
                         others.append(line)
-                        tasks.append(line)
+                        task_order[line] = index
         except IOError:
             pass # the file's not there, so what?
         # append the "other" tasks at the end
         self.groups = list(groups.items())
         if others:
             self.groups.append((self.other_title, others))
-        self.tasklist = tasks
+        self.task_order = task_order
 
     def reload(self):
         """Reload the task list."""
         self.load()
 
-    def index(self, value):
+    def order(self, value):
         """
-        Return the index of a value in the tasklist
+        Return the order index of a value in the task order list
 
-        Like a list's index() function but returns the length of the list if
-        the value isn't listed, so that those values are deemed at the end of
-        the list
+        If the value isn't in the task order dictionary, it returns a value
+        bigger than any index.
         """
-        if not self.tasklist:
-            return -1  # no task, value doesn't really matter
-        try:
-            idx = self.tasklist.index(value)
-        except ValueError:
-            idx = len(self.tasklist)
-        return idx
+        return self.task_order.get(value, len(self.task_order))
