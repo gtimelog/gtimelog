@@ -1469,8 +1469,8 @@ class LogView(Gtk.TextView):
                     total += item.duration
                 prev = item.start
         elif self.detail_level == 'grouped':
-            work, slack = window.grouped_entries(
-                sorted_by=self._get_log_order_key())
+            work, slack = window.grouped_entries(sorted_by=self.log_order,
+                                                 sorted_tasks=self.tasks)
             for start, entry, duration in work + slack:
                 if self.filter_text in entry:
                     self.write_group(entry, duration)
@@ -1512,22 +1512,6 @@ class LogView(Gtk.TextView):
         self.reposition_cursor()
         self.add_footer()
         self.scroll_to_end()
-
-    def _get_log_order_key(self):
-        """
-        Returns a function suitable as key parameter for the ordered function
-
-        The parameter to be sorted is deemed a list item as returned by
-        TimeCollection.grouped_entries
-        """
-        if self.log_order == 'name':
-            return lambda x: x[1]
-        elif self.log_order == 'duration':
-            return lambda x: x[2]
-        elif self.log_order == 'task-list':
-            return lambda x: self.tasks.order(x[1])
-        else:  # 'start-time'
-            return None  # more or less equivalent to x[0]
 
     def entry_added(self, same_day):
         if (self.detail_level == 'chronological' and same_day

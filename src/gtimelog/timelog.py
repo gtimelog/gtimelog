@@ -267,7 +267,8 @@ class TimeCollection(object):
                 count += 1
         return count
 
-    def grouped_entries(self, skip_first=True, sorted_by=None):
+    def grouped_entries(self, skip_first=True,
+                        sorted_by='start-time', sorted_tasks=None):
         """Return consolidated entries (grouped by entry title).
 
         Returns two lists: work entries and slacking entries.  Slacking
@@ -293,8 +294,9 @@ class TimeCollection(object):
                 start = min(start, old_start)
                 duration += old_duration
             entries[entry] = (start, entry, duration)
-        work = sorted(work.values(), key=sorted_by)
-        slack = sorted(slack.values(), key=sorted_by)
+        key_func = self._get_grouped_order_key(sorted_by, sorted_tasks)
+        work = sorted(work.values(), key=key_func)
+        slack = sorted(slack.values(), key=key_func)
         return work, slack
 
     def categorized_work_entries(self, skip_first=True):
@@ -360,6 +362,25 @@ class TimeCollection(object):
             else:
                 total_work += duration
         return total_work, total_slacking
+
+    def _get_grouped_order_key(self, sorted_by, sorted_tasks):
+        """
+        Returns a function suitable as key parameter for the ordered function
+
+        The parameter 'x' to be sorted is deemed a list item as returned by
+        TimeCollection.grouped_entries
+        """
+        # name is deemed unique as this function is used for grouped entries,
+        # hence sufficient to fully sort a list
+        if sorted_by == 'start-time':
+            return None  # hence sort by x
+        elif sorted_by == 'name':
+            return lambda x: x[1]
+        elif sorted_by == 'duration':  # return (duration, start-time, name)
+            return lambda x: (x[2], x[0], x[1])
+        elif sorted_by == 'task-list':
+            # name is also sent to order unknown entries in a stable way
+            return lambda x: (sorted_tasks.order(x[1]), x[1])
 
 
 class TimeWindow(TimeCollection):
