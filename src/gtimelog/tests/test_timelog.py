@@ -1037,7 +1037,7 @@ class TestTaskList(Mixins, unittest.TestCase):
             some task
             other task
             project: do it
-            project: fix bugs
+            project:fix bugs
             misc: paperwork
         '''))
         tasklist = TaskList(taskfile)
@@ -1046,6 +1046,9 @@ class TestTaskList(Mixins, unittest.TestCase):
             ('misc', ['paperwork']),
             ('Other', ['some task', 'other task']),
         ])
+        # also test that the order function works as foreseen
+        self.assertEqual(tasklist.order('project: fix bugs'), 4)
+        self.assertEqual(tasklist.order('unknown task'),  sys.maxsize)
 
     def test_unicode(self):
         taskfile = self.write_file('tasks.txt', '\N{SNOWMAN}')

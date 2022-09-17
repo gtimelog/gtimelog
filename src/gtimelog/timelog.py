@@ -8,6 +8,7 @@ import datetime
 import os
 import re
 import socket
+import sys
 from collections import defaultdict
 from hashlib import md5
 from operator import itemgetter
@@ -1167,4 +1168,4 @@ class TaskList(object):
         If the value isn't in the task order dictionary, it returns a value
         bigger than any index.
         """
-        return self.task_order.get(value, len(self.task_order))
+        return self.task_order.get(value, sys.maxsize)
