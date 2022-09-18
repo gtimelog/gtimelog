@@ -35,6 +35,9 @@ Changelog
 - Task pane now preserves the order of task groups to match the order in
   tasks.txt (GH: #224).
 
+- Grouped task entries can now be sorted by start date, name, duration or
+  according to tasks.txt order (GH: #228).
+
 
 0.11.3 (2019-04-23)
 ~~~~~~~~~~~~~~~~~~~

@@ -367,7 +367,7 @@ class TimeCollection(object):
     @classmethod
     def _get_grouped_order_key(cls, sorted_by, sorted_tasks):
         """
-        Returns a function suitable as key parameter for the ordered function
+        Returns a callable usable as the `key` argument of sorted().
 
         The parameter 'x' to be sorted is deemed a list item as returned by
         TimeCollection.grouped_entries

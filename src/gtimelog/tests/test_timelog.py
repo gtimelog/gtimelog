@@ -1048,7 +1048,7 @@ class TestTimeCollection(Mixins, unittest.TestCase):
 
         def tc_sorted(method):
             tc_key = TimeCollection._get_grouped_order_key
-            return tuple(x[1] for x in
+            return tuple(name for start_time, name, duration in
                          sorted(unsorted_list, key=tc_key(method, tasklist)))
 
         # we could have a loop but then it wouldn't be clear with which

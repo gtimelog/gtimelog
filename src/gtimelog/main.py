@@ -614,7 +614,6 @@ class Window(Gtk.ApplicationWindow):
         self.task_entry.connect('changed', self.task_entry_changed)
         self.connect('notify::detail-level', self.detail_level_changed)
         self.connect('notify::time-range', self.time_range_changed)
-        self.connect('notify::log-order', self.log_order_changed)
         self.connect('focus-in-event', self.gained_focus)
         mark_time('window ready')
 
@@ -958,10 +957,6 @@ class Window(Gtk.ApplicationWindow):
 
     def time_range_changed(self, obj, param_spec):
         assert self.time_range in {'day', 'week', 'month'}
-        self.notify('subtitle')
-
-    def log_order_changed(self, obj, param_spec):
-        assert self.log_order in {'start-time', 'name', 'duration', 'task-list'}
         self.notify('subtitle')
 
     def on_search_changed(self, *args):
