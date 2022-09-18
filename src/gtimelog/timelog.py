@@ -364,7 +364,8 @@ class TimeCollection(object):
                 total_work += duration
         return total_work, total_slacking
 
-    def _get_grouped_order_key(self, sorted_by, sorted_tasks):
+    @classmethod
+    def _get_grouped_order_key(cls, sorted_by, sorted_tasks):
         """
         Returns a function suitable as key parameter for the ordered function
 
