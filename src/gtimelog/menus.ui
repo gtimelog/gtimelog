@@ -94,6 +94,29 @@
       </item>
     </section>
     <section>
+      <attribute name="label" translatable="yes">Sorting</attribute>
+      <item>
+        <attribute name="label" translatable="yes">By start time</attribute>
+        <attribute name="action">win.log-order</attribute>
+        <attribute name="target">start-time</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">By name</attribute>
+        <attribute name="action">win.log-order</attribute>
+        <attribute name="target">name</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">By duration</attribute>
+        <attribute name="action">win.log-order</attribute>
+        <attribute name="target">duration</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">By task list order</attribute>
+        <attribute name="action">win.log-order</attribute>
+        <attribute name="target">task-list</attribute>
+      </item>
+    </section>
+    <section>
       <item>
         <attribute name="label" translatable="yes">Filter</attribute>
         <attribute name="action">win.show-search-bar</attribute>

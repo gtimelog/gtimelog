@@ -11,6 +11,7 @@ gtimelog.1
 gtimelogrc.5
 gtimelogrc.sample
 *~
+.*.swp
 tags
 coverage.xml
 locale

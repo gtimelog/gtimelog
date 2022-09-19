@@ -117,6 +117,10 @@ same title into one activity and just shows the total duration; and a
 third one groups all entries from the same categories into one line with
 the total duration.
 
+It is possible to sort the grouped entries by start time, alphanumerically
+(by task name), by duration (to better see where you've spent the most time)
+or respecting the order of the task list.
+
 You can use the headerbar buttons or Alt+Left/Right to see what you did on
 any previous day.  Hit the Home button (or Alt+Home) to return to today's
 view.  Adding a new entry also automatically switches you back to today's

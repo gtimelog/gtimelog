@@ -1008,7 +1008,7 @@ class Mixins(object):
         return filename
 
 
-class TestTimeCollection(unittest.TestCase):
+class TestTimeCollection(Mixins, unittest.TestCase):
 
     def test_split_category(self):
         sp = TimeCollection.split_category
@@ -1023,6 +1023,41 @@ class TestTimeCollection(unittest.TestCase):
         self.assertEqual(sp('project: '), ('project', ''))
         self.assertEqual(sp('project:'), ('project', ''))
 
+    def test_sorted_grouped_time_collection(self):
+        # the unsorted list is nromally a TimeCollection but we fake it
+        unsorted_list = (  # list of (start-time, name, duration)
+            (10_000, 'BBB: b', 20),
+            (30_000, 'CCC: c', 10),
+            (20_000, 'Alone', 12),
+            (40_000, 'AAA: a', 15),
+        )
+        taskfile = self.write_file('tasks.txt', textwrap.dedent('''\
+            Alone
+            # comments are skipped
+            BBB: b
+            AAA: a
+            CCC: c
+        '''))
+        tasklist = TaskList(taskfile)
+        sorted_by = {
+            'start-time': ('BBB: b', 'Alone', 'CCC: c', 'AAA: a'),
+            'name': ('AAA: a', 'Alone', 'BBB: b', 'CCC: c'),
+            'duration': ('CCC: c', 'Alone', 'AAA: a', 'BBB: b'),
+            'task-list': ('Alone', 'BBB: b', 'AAA: a', 'CCC: c'),
+        }
+
+        def tc_sorted(method):
+            tc_key = TimeCollection._get_grouped_order_key
+            return tuple(name for start_time, name, duration in
+                         sorted(unsorted_list, key=tc_key(method, tasklist)))
+
+        # we could have a loop but then it wouldn't be clear with which
+        # method the assert fails
+        self.assertEqual(tc_sorted('start-time'), sorted_by['start-time'])
+        self.assertEqual(tc_sorted('name'), sorted_by['name'])
+        self.assertEqual(tc_sorted('duration'), sorted_by['duration'])
+        self.assertEqual(tc_sorted('task-list'), sorted_by['task-list'])
+
 
 class TestTaskList(Mixins, unittest.TestCase):
 
@@ -1031,13 +1066,13 @@ class TestTaskList(Mixins, unittest.TestCase):
         self.assertFalse(tasklist.check_reload())
         tasklist.reload()  # no crash
 
-    def test_parsing(self):
+    def test_parsing_and_ordering(self):
         taskfile = self.write_file('tasks.txt', textwrap.dedent('''\
             # comments are skipped
             some task
             other task
             project: do it
-            project: fix bugs
+            project:fix bugs
             misc: paperwork
         '''))
         tasklist = TaskList(taskfile)
@@ -1046,6 +1081,9 @@ class TestTaskList(Mixins, unittest.TestCase):
             ('misc', ['paperwork']),
             ('Other', ['some task', 'other task']),
         ])
+        # also test that the order function works as foreseen
+        self.assertEqual(tasklist.order('project: fix bugs'), 4)
+        self.assertEqual(tasklist.order('unknown task'),  sys.maxsize)
 
     def test_unicode(self):
         taskfile = self.write_file('tasks.txt', '\N{SNOWMAN}')

@@ -66,6 +66,40 @@
         <child>
           <object class="GtkShortcutsGroup">
             <property name="visible">True</property>
+            <property name="title" translatable="yes" context="shortcut window">Sort order</property>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="accelerator">&lt;alt&gt;7</property>
+                <property name="title" translatable="yes" context="shortcut window">By start time</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="accelerator">&lt;alt&gt;8</property>
+                <property name="title" translatable="yes" context="shortcut window">By name</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="accelerator">&lt;alt&gt;9</property>
+                <property name="title" translatable="yes" context="shortcut window">By duration</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkShortcutsShortcut">
+                <property name="visible">True</property>
+                <property name="accelerator">&lt;alt&gt;0</property>
+                <property name="title" translatable="yes" context="shortcut window">By task list order</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkShortcutsGroup">
+            <property name="visible">True</property>
             <property name="title" translatable="yes" context="shortcut window">Time navigation</property>
             <child>
               <object class="GtkShortcutsShortcut">

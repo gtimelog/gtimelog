@@ -282,6 +282,10 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.time-range::day", ["<Alt>4"])
         self.set_accels_for_action("win.time-range::week", ["<Alt>5"])
         self.set_accels_for_action("win.time-range::month", ["<Alt>6"])
+        self.set_accels_for_action("win.log-order::start-time", ["<Alt>7"])
+        self.set_accels_for_action("win.log-order::name", ["<Alt>8"])
+        self.set_accels_for_action("win.log-order::duration", ["<Alt>9"])
+        self.set_accels_for_action("win.log-order::task-list", ["<Alt>0"])
         self.set_accels_for_action("win.show-task-pane", ["F9"])
         self.set_accels_for_action("win.show-menu", ["F10"])
         self.set_accels_for_action("win.show-search-bar", ["<Primary>F"])
@@ -457,6 +461,10 @@ class Window(Gtk.ApplicationWindow):
         type=str, default='day', nick='Time range',
         blurb='Time range to show (day/week/month)')
 
+    log_order = GObject.Property(
+        type=str, default='start-time', nick='Log Order',
+        blurb='Log order for Tasks/Groups (start-time/name/duration/task-list)')
+
     filter_text = GObject.Property(
         type=str, default='', nick='Filter text',
         blurb='Show only tasks matching this substring')
@@ -471,6 +479,9 @@ class Window(Gtk.ApplicationWindow):
 
             self.time_range = PropertyAction.new("time-range", win, "time-range")
             win.add_action(self.time_range)
+
+            self.log_order = PropertyAction.new("log-order", win, "log-order")
+            win.add_action(self.log_order)
 
             self.show_view_menu = PropertyAction.new("show-view-menu", win.view_button, "active")
             win.add_action(self.show_view_menu)
@@ -561,9 +572,11 @@ class Window(Gtk.ApplicationWindow):
         self.bind_property('date', self.log_view, 'date', GObject.BindingFlags.DEFAULT)
         self.bind_property('detail_level', self.log_view, 'detail_level', GObject.BindingFlags.SYNC_CREATE)
         self.bind_property('time_range', self.log_view, 'time_range', GObject.BindingFlags.SYNC_CREATE)
+        self.bind_property('log_order', self.log_view, 'log_order', GObject.BindingFlags.SYNC_CREATE)
         self.task_entry.bind_property('text', self.log_view, 'current_task', GObject.BindingFlags.DEFAULT)
         self.bind_property('subtitle', self.headerbar, 'subtitle', GObject.BindingFlags.DEFAULT)
         self.bind_property('filter_text', self.log_view, 'filter_text', GObject.BindingFlags.DEFAULT)
+        self.bind_property('tasks', self.log_view, 'tasks', GObject.BindingFlags.DEFAULT)
 
         self.search_bar = builder.get_object("search_bar")
         self.search_entry = builder.get_object("search_entry")
@@ -617,6 +630,7 @@ class Window(Gtk.ApplicationWindow):
     def load_settings(self):
         self.gsettings = Gio.Settings.new("org.gtimelog")
         self.gsettings.bind('detail-level', self, 'detail-level', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('log-order', self, 'log-order', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('show-task-pane', self.task_pane, 'visible', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('hours', self.log_view, 'hours', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('office-hours', self.log_view, 'office-hours', Gio.SettingsBindFlags.DEFAULT)
@@ -1325,6 +1339,10 @@ class LogView(Gtk.TextView):
         type=str, default='day', nick='Time range',
         blurb='Time range to show (day/week/month)')
 
+    log_order = GObject.Property(
+        type=str, default='start-time', nick='Log order',
+        blurb='Log order of tasks/groups (start-time/name/duration/task-list)')
+
     hours = GObject.Property(
         type=float, default=0, nick='Hours',
         blurb='Target number of work hours per day')
@@ -1345,6 +1363,10 @@ class LogView(Gtk.TextView):
         type=str, default='', nick='Filter text',
         blurb='Show only tasks matching this substring')
 
+    tasks = GObject.Property(
+        type=object, nick='Tasks',
+        blurb='The task list (an instance of TaskList)')
+
     def __init__(self):
         Gtk.TextView.__init__(self)
         self._extended_footer = False
@@ -1358,11 +1380,13 @@ class LogView(Gtk.TextView):
         self.connect('notify::showing-today', self.queue_update)
         self.connect('notify::detail-level', self.queue_update)
         self.connect('notify::time-range', self.queue_update)
+        self.connect('notify::log-order', self.queue_update)
         self.connect('notify::hours', self.queue_footer_update)
         self.connect('notify::office-hours', self.queue_footer_update)
         self.connect('notify::current-task', self.queue_footer_update)
         self.connect('notify::now', self.queue_footer_update)
         self.connect('notify::filter-text', self.queue_update)
+        self.connect('notify::tasks', self.queue_update)
 
     def queue_update(self, *args):
         if not self._update_pending:
@@ -1440,7 +1464,8 @@ class LogView(Gtk.TextView):
                     total += item.duration
                 prev = item.start
         elif self.detail_level == 'grouped':
-            work, slack = window.grouped_entries()
+            work, slack = window.grouped_entries(sorted_by=self.log_order,
+                                                 sorted_tasks=self.tasks)
             for start, entry, duration in work + slack:
                 if self.filter_text in entry:
                     self.write_group(entry, duration)

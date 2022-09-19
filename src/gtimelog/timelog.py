@@ -8,6 +8,7 @@ import datetime
 import os
 import re
 import socket
+import sys
 from collections import defaultdict
 from hashlib import md5
 from operator import itemgetter
@@ -267,7 +268,8 @@ class TimeCollection(object):
                 count += 1
         return count
 
-    def grouped_entries(self, skip_first=True):
+    def grouped_entries(self, skip_first=True,
+                        sorted_by='start-time', sorted_tasks=None):
         """Return consolidated entries (grouped by entry title).
 
         Returns two lists: work entries and slacking entries.  Slacking
@@ -293,8 +295,9 @@ class TimeCollection(object):
                 start = min(start, old_start)
                 duration += old_duration
             entries[entry] = (start, entry, duration)
-        work = sorted(work.values())
-        slack = sorted(slack.values())
+        key_func = self._get_grouped_order_key(sorted_by, sorted_tasks)
+        work = sorted(work.values(), key=key_func)
+        slack = sorted(slack.values(), key=key_func)
         return work, slack
 
     def categorized_work_entries(self, skip_first=True):
@@ -360,6 +363,26 @@ class TimeCollection(object):
             else:
                 total_work += duration
         return total_work, total_slacking
+
+    @classmethod
+    def _get_grouped_order_key(cls, sorted_by, sorted_tasks):
+        """
+        Returns a callable usable as the `key` argument of sorted().
+
+        The parameter 'x' to be sorted is deemed a list item as returned by
+        TimeCollection.grouped_entries
+        """
+        # name is deemed unique as this function is used for grouped entries,
+        # hence sufficient to fully sort a list
+        if sorted_by == 'start-time':
+            return None  # hence sort by x
+        elif sorted_by == 'name':
+            return lambda x: x[1]
+        elif sorted_by == 'duration':  # return (duration, start-time, name)
+            return lambda x: (x[2], x[0], x[1])
+        elif sorted_by == 'task-list':
+            # name is also sent to order unknown entries in a stable way
+            return lambda x: (sorted_tasks.order(x[1]), x[1])
 
 
 class TimeWindow(TimeCollection):
@@ -1080,6 +1103,10 @@ class TaskList(object):
 
     A TaskList has an attribute 'groups' which is a list of tuples
     (group_name, list_of_group_items).
+
+    It also has an attribute 'task_order' which is a dictionary of task names,
+    potentially prefixed by 'group_name: ', with their value being their
+    original order in the task list.
     """
 
     other_title = 'Other'
@@ -1107,26 +1134,39 @@ class TaskList(object):
     def load(self):
         """Load task list from a file named self.filename."""
         groups = {}
+        task_order = {}
         others = []
         self.last_mtime = get_mtime(self.filename)
         try:
             with open(self.filename, encoding='utf-8') as f:
-                for line in f:
+                for index, line in enumerate(f):
                     line = line.strip()
                     if not line or line.startswith('#'):
                         continue
                     if ':' in line:  # tasks with group prefix
                         group, task = [s.strip() for s in line.split(':', 1)]
                         groups.setdefault(group, []).append(task)
+                        task_order[group + ': ' + task] = index
                     else:  # "other" tasks
-                        others.append(line.strip())
+                        others.append(line)
+                        task_order[line] = index
         except IOError:
             pass # the file's not there, so what?
         # append the "other" tasks at the end
         self.groups = list(groups.items())
         if others:
             self.groups.append((self.other_title, others))
+        self.task_order = task_order
 
     def reload(self):
         """Reload the task list."""
         self.load()
+
+    def order(self, value):
+        """
+        Return the order index of a value in the task order list
+
+        If the value isn't in the task order dictionary, it returns a value
+        bigger than any index.
+        """
+        return self.task_order.get(value, sys.maxsize)
