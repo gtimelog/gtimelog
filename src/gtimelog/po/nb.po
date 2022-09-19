@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-25 14:50+0300\n"
+"POT-Creation-Date: 2022-09-19 11:24+0300\n"
 "PO-Revision-Date: 2021-08-04 15:37+0200\n"
 "Last-Translator: John Erling Blad <jeblad@gmail.com>\n"
 "Language-Team: \n"
@@ -391,6 +391,23 @@ msgstr "Uke"
 msgid "Month"
 msgstr "Måned"
 
+#, fuzzy
+msgid "Sorting"
+msgstr "Rapporterer"
+
+msgid "By start time"
+msgstr ""
+
+msgid "By name"
+msgstr ""
+
+msgid "By duration"
+msgstr ""
+
+#, fuzzy
+msgid "By task list order"
+msgstr "Rediger oppgaveliste"
+
 msgid "Filter"
 msgstr "Filter"
 
@@ -429,6 +446,27 @@ msgstr "Ukesvisning"
 msgctxt "shortcut window"
 msgid "Month view"
 msgstr "Månedsvisning"
+
+msgctxt "shortcut window"
+msgid "Sort order"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "By start time"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "By name"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "By duration"
+msgstr ""
+
+#, fuzzy
+msgctxt "shortcut window"
+msgid "By task list order"
+msgstr "Rediger oppgaveliste"
 
 msgctxt "shortcut window"
 msgid "Time navigation"

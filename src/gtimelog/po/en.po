@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-25 14:50+0300\n"
+"POT-Creation-Date: 2022-09-19 11:24+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -383,6 +383,21 @@ msgstr ""
 msgid "Month"
 msgstr ""
 
+msgid "Sorting"
+msgstr ""
+
+msgid "By start time"
+msgstr ""
+
+msgid "By name"
+msgstr ""
+
+msgid "By duration"
+msgstr ""
+
+msgid "By task list order"
+msgstr ""
+
 msgid "Filter"
 msgstr ""
 
@@ -420,6 +435,26 @@ msgstr ""
 
 msgctxt "shortcut window"
 msgid "Month view"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "Sort order"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "By start time"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "By name"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "By duration"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "By task list order"
 msgstr ""
 
 msgctxt "shortcut window"

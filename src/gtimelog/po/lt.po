@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-25 14:50+0300\n"
+"POT-Creation-Date: 2022-09-19 11:24+0300\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -16,8 +16,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n"
-"%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"(n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 msgid "Time Log"
 msgstr "Laiko žurnalas"
@@ -390,6 +390,23 @@ msgstr "Savaitė"
 msgid "Month"
 msgstr "Mėnuo"
 
+#, fuzzy
+msgid "Sorting"
+msgstr "Ataskaitos"
+
+msgid "By start time"
+msgstr ""
+
+msgid "By name"
+msgstr ""
+
+msgid "By duration"
+msgstr ""
+
+#, fuzzy
+msgid "By task list order"
+msgstr "Tvarkyti užduotis"
+
 msgid "Filter"
 msgstr "Filtruoti"
 
@@ -428,6 +445,27 @@ msgstr "Savaitė"
 msgctxt "shortcut window"
 msgid "Month view"
 msgstr "Mėnuo"
+
+msgctxt "shortcut window"
+msgid "Sort order"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "By start time"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "By name"
+msgstr ""
+
+msgctxt "shortcut window"
+msgid "By duration"
+msgstr ""
+
+#, fuzzy
+msgctxt "shortcut window"
+msgid "By task list order"
+msgstr "Tvarkyti užduotis"
 
 msgctxt "shortcut window"
 msgid "Time navigation"
