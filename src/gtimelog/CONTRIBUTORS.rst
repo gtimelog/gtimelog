@@ -13,6 +13,7 @@ In alphabetic order:
 - Danielle Madeley
 - Eduardo Habkost
 - Emanuele Aina
+- Eric Lavarde
 - Gaute Amundsen
 - Gintautas Miliauskas
 - Harald Friessnegger
