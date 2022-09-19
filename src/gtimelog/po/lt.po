@@ -390,22 +390,20 @@ msgstr "Savaitė"
 msgid "Month"
 msgstr "Mėnuo"
 
-#, fuzzy
 msgid "Sorting"
-msgstr "Ataskaitos"
+msgstr "Rikiavimas"
 
 msgid "By start time"
-msgstr ""
+msgstr "Pagal pradžios laiką"
 
 msgid "By name"
-msgstr ""
+msgstr "Pagal pavadinimą"
 
 msgid "By duration"
-msgstr ""
+msgstr "Pagal trukmę"
 
-#, fuzzy
 msgid "By task list order"
-msgstr "Tvarkyti užduotis"
+msgstr "Pagal užduočių sąrašą"
 
 msgid "Filter"
 msgstr "Filtruoti"
@@ -448,24 +446,23 @@ msgstr "Mėnuo"
 
 msgctxt "shortcut window"
 msgid "Sort order"
-msgstr ""
+msgstr "Rikiavimas"
 
 msgctxt "shortcut window"
 msgid "By start time"
-msgstr ""
+msgstr "Pagal pradžios laiką"
 
 msgctxt "shortcut window"
 msgid "By name"
-msgstr ""
+msgstr "Pagal pavadinimą"
 
 msgctxt "shortcut window"
 msgid "By duration"
-msgstr ""
+msgstr "Pagal trukmę"
 
-#, fuzzy
 msgctxt "shortcut window"
 msgid "By task list order"
-msgstr "Tvarkyti užduotis"
+msgstr "Pagal užduočių sąrašą"
 
 msgctxt "shortcut window"
 msgid "Time navigation"
