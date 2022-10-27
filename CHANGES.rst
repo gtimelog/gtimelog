@@ -19,7 +19,7 @@ Changelog
 - Make the undocumented remote task list feature validate TLS certificates (GH:
   #214).
 
-- Add Python 3.8, 3.9, and 3.10 support.
+- Add Python 3.8, 3.9, 3.10, and 3.11 support.
 
 - Drop Python 2.7, 3.5, and 3.6 support.
 
