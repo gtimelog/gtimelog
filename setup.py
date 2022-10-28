@@ -58,6 +58,7 @@ setup(
     url='https://gtimelog.org/',
     description=short_description,
     long_description=long_description,
+    long_description_content_type='text/x-rst',
     license='GPL',
     keywords='time log logging timesheets gnome gtk',
     classifiers=[
