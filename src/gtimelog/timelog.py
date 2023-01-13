@@ -956,6 +956,10 @@ class TimeLog(TimeCollection):
                 time = parse_datetime(time)
             except ValueError:
                 continue
+            # get rid of potential comments at the end of the line
+            # a comment starts with a hash preceded and followed by 1 space
+            # comment will simply be ignored and not appear in the UI
+            entry, sep, comment = entry.partition(' # ')
             entry = entry.strip()
             items.append((time, entry))
         # There's code that relies on entries being sorted.  The entries really
