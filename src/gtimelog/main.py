@@ -385,6 +385,9 @@ class Application(Gtk.Application):
             # window.present() doesn't work on wayland:
             # https://gitlab.gnome.org/GNOME/gtk/issues/624#note_119092
             window.present_with_time(GLib.get_monotonic_time() // 1000)
+            # the above workaround stopped working on gnome-shell 44, but maybe
+            # window.present() will be fixed one day?
+            window.present()
             return
 
         window = Window(self)
