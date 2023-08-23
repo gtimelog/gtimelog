@@ -10,7 +10,7 @@
         <p>GTimeLog is a small GNOME app for keeping track of your time. Its main goal is to be as unobtrusive as possible.</p>
     </description>
     <screenshots>
-        <screenshot width="878" height="571" type="default">https://gtimelog.org/gtimelog.png</screenshot>
+        <screenshot type="default">https://gtimelog.org/gtimelog.png</screenshot>
     </screenshots>
     <keywords>
         <keyword>time</keyword>
@@ -22,4 +22,8 @@
     <component>
         <translation type="gettext">gtimelog</translation>
     </component>
+    <content_rating type="oars-1.1" />
+    <releases>
+      <release version="0.11.3" date="2019-04-23" />
+    </releases>
 </application>
