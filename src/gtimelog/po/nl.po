@@ -1,0 +1,548 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# SPDX-FileCopyrightText: 2023 Heimen Stoffels <vistausss@fastmail.com>
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-09-19 11:24+0300\n"
+"PO-Revision-Date: 2023-09-04 20:10+0200\n"
+"Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
+"Language-Team: Dutch\n"
+"Language: nl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.3.2\n"
+
+msgid "Time Log"
+msgstr "Tĳdlogboek"
+
+msgid "Track and time daily activities"
+msgstr "Houd bij hoeveel tijd u besteedt aan dagelĳkse activiteiten"
+
+#, python-brace-format
+msgid "{0} h {1} min"
+msgstr "{0} uur, {1} min."
+
+msgid "Show version number and exit"
+msgstr "Toon het versienummer en sluit af"
+
+msgid "Show debug information on the console"
+msgstr "Toon foutopsporingsberichten op de opdrachtregel"
+
+msgid "Open the preferences dialog"
+msgstr "Open het voorkeurenvenster"
+
+msgid "Open the preferences dialog on the email page"
+msgstr "Open het voorkeurenvenster (e-mailpagina)"
+
+msgid ""
+"\n"
+"WARNING: GSettings schema for org.gtimelog is missing!  If you're running "
+"from a source checkout, be sure to run 'make'."
+msgstr ""
+"\n"
+"WAARSCHUWING: Het GSettings-schema van org.gtimelog ontbreekt!  Als u de "
+"toepassing zelf gecompileerd hebt, voer dan ‘make’ uit."
+
+#, python-brace-format
+msgid "Could not create {directory}: {error}"
+msgstr "‘{directory}’ kan niet worden aangemaakt: {error}"
+
+#, python-brace-format
+msgid "Created {directory}"
+msgstr "{directory} is aangemaakt"
+
+msgid "GTimeLog version: {}"
+msgstr "GTimeLog-versie: {}"
+
+msgid "Python version: {}"
+msgstr "Python-versie: {}"
+
+msgid "GTK+ version: {}.{}.{}"
+msgstr "GTK+-versie: {}.{}.{}"
+
+msgid "PyGI version: {}"
+msgstr "PyGI-versie: {}"
+
+msgid "Data directory: {}"
+msgstr "Gegevensmap: {}"
+
+msgid "Legacy config directory: {}"
+msgstr "Oude voorkeurenmap: {}"
+
+msgid "Settings will be migrated to GSettings (org.gtimelog) on first launch"
+msgstr ""
+"Na de eerste keer opstarten worden de voorkeuren gemigreerd naar GSettings "
+"(org.gtimelog)"
+
+msgid "Settings already migrated to GSettings (org.gtimelog)"
+msgstr "De voorkeuren zĳn al gemigreerd naar GSettings (org.gtimelog)"
+
+#, python-brace-format
+msgid "Settings from {filename} migrated to GSettings (org.gtimelog)"
+msgstr ""
+"De voorkeuren uit ‘{filename}’ zĳn gemigreerd naar GSettings (org.gtimelog)"
+
+msgid "Report already sent"
+msgstr "Dit verslag is al verstuurd"
+
+msgid "Report already sent (to {})"
+msgstr "Dit verslag is al verstuurd (aan {})"
+
+msgid "Downloading tasks..."
+msgstr "Bezig met ophalen van taken…"
+
+msgid "Download failed."
+msgstr "Het ophalen is mislukt."
+
+msgid "{0:%A, %Y-%m-%d} (week {1:0>2})"
+msgstr "{0:%A, %Y-%m-%d} (week {1:0>2})"
+
+msgid "{0}, week {1} ({2:%B %-d}-{3:%-d})"
+msgstr "{0}, week {1} ({2:%B %-d}-{3:%-d})"
+
+msgid "{0:%B %Y}"
+msgstr "{0:%B %Y}"
+
+msgid "Report"
+msgstr "Verslag"
+
+msgid "Couldn't send email to {}: {}."
+msgstr "Er kan geen e-mail worden verstuurd aan {}: {}."
+
+#, python-format
+msgid "Couldn't send mail: %s"
+msgstr "Er kan geen e-mail worden verstuurd: %s"
+
+msgid "Couldn't append to {}: {}"
+msgstr "Het toevoegen aan ‘{}’ is mislukt: {}"
+
+msgid "%H:%M"
+msgstr "%H:%M"
+
+msgid "{0:%A, %Y-%m-%d}\n"
+msgstr "{0:%A, %Y-%m-%d}\n"
+
+#, python-brace-format
+msgid "Total for {0}: {1} ({2} per day)"
+msgstr "Totaal van {0}: {1} ({2} per dag)"
+
+#, python-brace-format
+msgid "Total for {0}: {1} ({2} this week, {3} per day)"
+msgstr "Totaal van {0}: {1} ({2} deze week; {3} per dag)"
+
+msgid "({0:%H:%M}-{1:%H:%M})"
+msgstr "({0:%H:%M}-{1:%H:%M})"
+
+#, python-brace-format
+msgid "Total work done: {0} ({1} this week, {2} per day)"
+msgstr "Totale werktĳd: {0} ({1} deze week; {2} per dag)"
+
+#, python-brace-format
+msgid "Total work done: {0} ({1} this week)"
+msgstr "Totale werktĳd: {0} ({1} deze week)"
+
+#, python-brace-format
+msgid "Total work done this week: {0} ({1} per day)"
+msgstr "Totale werktĳd deze week: {0} ({1} per dag)"
+
+#, python-brace-format
+msgid "Total work done this week: {0}"
+msgstr "Totale werktĳd deze week: {0}"
+
+#, python-brace-format
+msgid "Total work done this month: {0} ({1} per day)"
+msgstr "Totale werktĳd deze maand: {0} ({1} per dag)"
+
+#, python-brace-format
+msgid "Total work done this month: {0}"
+msgstr "Totale werktĳd deze maand: {0}"
+
+#, python-brace-format
+msgid "Total slacking: {0} ({1} this week, {2} per day)"
+msgstr "Totale lanterfanttĳd: {0} ({1} deze week; {2} per dag)"
+
+#, python-brace-format
+msgid "Total slacking: {0} ({1} this week)"
+msgstr "Totale lanterfanttĳd: {0} ({1} deze week)"
+
+#, python-brace-format
+msgid "Total slacking this week: {0} ({1} per day)"
+msgstr "Totale lanterfanttĳd deze week: {0} ({1} per dag)"
+
+#, python-brace-format
+msgid "Total slacking this week: {0}"
+msgstr "Totale lanterfanttĳd deze week: {0}"
+
+#, python-brace-format
+msgid "Total slacking this month: {0} ({1} per day)"
+msgstr "Totale lanterfanttĳd deze maand: {0} ({1} per dag)"
+
+#, python-brace-format
+msgid "Total slacking this month: {0}"
+msgstr "Totale lanterfanttĳd deze maand: {0}"
+
+msgid ""
+"Time left at work: {0} (should've finished at {1:%H:%M}, overtime of {2} "
+"until now)"
+msgstr ""
+"Resterende werktĳd: {0} (u had klaar moeten zĳn om {1:%H:%M}, maar werkt "
+"nu {2} over)"
+
+msgid "Time left at work: {0} (till {1:%H:%M})"
+msgstr "Resterende werktĳd: {0} (tot {1:%H:%M})"
+
+#, python-brace-format
+msgid "At office today: {0} ({1} overtime)"
+msgstr "Totale kantoortĳd vandaag: {0} ({1} overtĳd)"
+
+#, python-brace-format
+msgid "At office today: {0} ({1} left)"
+msgstr "Totale kantoortĳd vandaag: {0} ({1} resterend)"
+
+msgid "Tasks"
+msgstr "Taken"
+
+msgid "Other"
+msgstr "Overig"
+
+msgid "Preferences"
+msgstr "Voorkeuren"
+
+msgid "Close"
+msgstr "Sluiten"
+
+#. pragma: nocover
+#. https://github.com/gtimelog/gtimelog/issues/95#issuecomment-252299266
+#. locale.bindtextdomain is missing on Windows!
+msgid "Unable to configure translations: no locale.bindtextdomain()"
+msgstr ""
+"De vertalingen kunnen niet worden ingesteld: geen locale.bindtextdomain()"
+
+msgid "Failed to store SMTP password in the keyring."
+msgstr "Het smtp-wachtwoord kan niet worden bewaard in de sleutelbos."
+
+msgid "Failed to store HTTP password in the keyring."
+msgstr "Het http-wachtwoord kan niet worden bewaard in de sleutelbos."
+
+#, python-format
+msgid ""
+"Authentication is required for \"%s\"\n"
+"You need a username and a password to access %s"
+msgstr ""
+"Authenticatie vereist voor ‘%s’.\n"
+"Log in met de gebruikersnaam en het wachtwoord van %s"
+
+msgid "Copyright © 2004–2020 Marius Gedminas and contributors."
+msgstr "Auteursrecht © 2004–2020 Marius Gedminas en bĳdragers."
+
+msgid "A time tracking application"
+msgstr "Een tĳdregistratietoepassing"
+
+msgid "Add"
+msgstr "Toevoegen"
+
+msgid "Daily"
+msgstr "Iedere dag"
+
+msgid "Weekly"
+msgstr "Iedere week"
+
+msgid "Monthly"
+msgstr "Iedere maand"
+
+msgid "Sender"
+msgstr "Afzender"
+
+msgid "Your Name <youremail@example.com>"
+msgstr "Mĳn naam <mĳne-mailadres@voorbeeld.nl>"
+
+msgid "Recipient"
+msgstr "Ontvanger"
+
+msgid "email@example.com"
+msgstr "e-mailadres@voorbeeld.nl"
+
+msgid "Subject"
+msgstr "Onderwerp"
+
+msgid "Cancel"
+msgstr "Annuleren"
+
+msgid "Send"
+msgstr "Versturen"
+
+msgid "Data entry"
+msgstr "Gegevensinvoer"
+
+msgid "Virtual midnight"
+msgstr "Virtuele middernacht"
+
+msgid "Goals"
+msgstr "Doelen"
+
+msgid "Work hours"
+msgstr "Werkuren"
+
+msgid "Office hours"
+msgstr "Kantooruren"
+
+msgid "per day"
+msgstr "per dag"
+
+msgid "(including lunch break)"
+msgstr "(inclusief lunchpauze)"
+
+msgid "Entry"
+msgstr "Item"
+
+msgid "Reports by email"
+msgstr "Verslagen via e-mail"
+
+msgid "Name"
+msgstr "Naam"
+
+msgid "From"
+msgstr "Van"
+
+msgid "To"
+msgstr "Aan"
+
+msgid "Nickname used in the Subject line"
+msgstr "Bĳnaam van de onderwerpregel"
+
+msgid "SMTP server"
+msgstr "Smtp-server"
+
+msgid "Server"
+msgstr "Server"
+
+msgid "Port"
+msgstr "Poort"
+
+msgid "Security"
+msgstr "Beveiliging"
+
+msgid "None"
+msgstr "Geen"
+
+msgid "TLS"
+msgstr "Tls"
+
+msgid "StartTLS"
+msgstr "StartTLS"
+
+msgid "Username"
+msgstr "Gebruikersnaam"
+
+msgid "Password"
+msgstr "Wachtwoord"
+
+msgid "Email"
+msgstr "E-mailadres"
+
+msgid "Keyboard Shortcuts"
+msgstr "Sneltoetsen"
+
+msgid "About"
+msgstr "Over"
+
+msgid "Quit"
+msgstr "Afsluiten"
+
+msgid "Edit log"
+msgstr "Logboek bewerken"
+
+msgid "Edit tasks"
+msgstr "Taken bewerken"
+
+msgid "Refresh tasks"
+msgstr "Taken herladen"
+
+msgid "Report..."
+msgstr "Verslag opmaken…"
+
+msgid "About Time Log"
+msgstr "Over Tĳdlogboek"
+
+msgid "Detail level"
+msgstr "Detailniveau"
+
+msgid "Chronological"
+msgstr "Chronologisch"
+
+msgid "Grouped"
+msgstr "Gegroepeerd"
+
+msgid "Summary"
+msgstr "Samenvatting"
+
+msgid "Time range"
+msgstr "Tĳdspanne"
+
+msgid "Day"
+msgstr "Dag"
+
+msgid "Week"
+msgstr "Week"
+
+msgid "Month"
+msgstr "Maand"
+
+msgid "Sorting"
+msgstr "Sorteren"
+
+msgid "By start time"
+msgstr "Op begintĳd"
+
+msgid "By name"
+msgstr "Op naam"
+
+msgid "By duration"
+msgstr "Op duur"
+
+msgid "By task list order"
+msgstr "Op takenlĳstvolgorde"
+
+msgid "Filter"
+msgstr "Filteren"
+
+msgctxt "shortcuts window"
+msgid "Entry"
+msgstr "Item"
+
+msgctxt "shortcut window"
+msgid "Detail level"
+msgstr "Detailniveau"
+
+msgctxt "shortcut window"
+msgid "Full chronological list"
+msgstr "Volledige chronologische lĳst"
+
+msgctxt "shortcut window"
+msgid "Group by description"
+msgstr "Groeperen op beschrĳving"
+
+msgctxt "shortcut window"
+msgid "Group by category"
+msgstr "Groeperen op categorie"
+
+msgctxt "shortcut window"
+msgid "Time range"
+msgstr "Tĳdspanne"
+
+msgctxt "shortcut window"
+msgid "Day view"
+msgstr "Dagweergave"
+
+msgctxt "shortcut window"
+msgid "Week view"
+msgstr "Weekweergave"
+
+msgctxt "shortcut window"
+msgid "Month view"
+msgstr "Maandweergave"
+
+msgctxt "shortcut window"
+msgid "Sort order"
+msgstr "Sorteervolgorde"
+
+msgctxt "shortcut window"
+msgid "By start time"
+msgstr "Op begintĳd"
+
+msgctxt "shortcut window"
+msgid "By name"
+msgstr "Op naam"
+
+msgctxt "shortcut window"
+msgid "By duration"
+msgstr "Op duur"
+
+msgctxt "shortcut window"
+msgid "By task list order"
+msgstr "Op takenlĳstvolgorde"
+
+msgctxt "shortcut window"
+msgid "Time navigation"
+msgstr "Tĳdmachine"
+
+msgctxt "shortcut window"
+msgid "Go back in time"
+msgstr "Ga terug in de tĳd"
+
+msgctxt "shortcut window"
+msgid "Go forward in time"
+msgstr "Ga vooruit in de tĳd"
+
+msgctxt "shortcut window"
+msgid "Go back to today"
+msgstr "Ga naar vandaag"
+
+msgctxt "shortcut window"
+msgid "General"
+msgstr "Algemeen"
+
+msgctxt "shortcut window"
+msgid "Menu"
+msgstr "Menu"
+
+msgctxt "shortcut window"
+msgid "Focus the task entry"
+msgstr "Taakitem focussen"
+
+msgctxt "shortcut window"
+msgid "Keyboard shortcuts"
+msgstr "Sneltoetsen"
+
+msgctxt "shortcut window"
+msgid "Toggle search bar"
+msgstr "Zoekbalk tonen/verbergen"
+
+msgctxt "shortcut window"
+msgid "Edit task log"
+msgstr "Taaklogboek bewerken"
+
+msgctxt "shortcut window"
+msgid "Preferences"
+msgstr "Voorkeuren"
+
+msgctxt "shortcut window"
+msgid "Quit"
+msgstr "Afsluiten"
+
+msgctxt "shortcut window"
+msgid "Task pane"
+msgstr "Takenpaneel"
+
+msgctxt "shortcut window"
+msgid "Toggle task pane"
+msgstr "Takenpaneel tonen/verbergen"
+
+msgctxt "shortcut window"
+msgid "Edit task list"
+msgstr "Takenlĳst bewerken"
+
+msgctxt "shortcuts window"
+msgid "Reports"
+msgstr "Verslagen"
+
+msgctxt "shortcut window"
+msgid "Reporting"
+msgstr "Verslagen"
+
+msgctxt "shortcut window"
+msgid "Switch to report mode"
+msgstr "Verslagmodus inschakelen"
+
+msgctxt "shortcut window"
+msgid "Send report via email"
+msgstr "Verslag versturen per e-mail"
+
+msgctxt "shortcut window"
+msgid "Return to task entry mode"
+msgstr "Terug naar taakitemmodus"
