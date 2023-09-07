@@ -12,6 +12,11 @@
     <property name="step_increment">0.5</property>
     <property name="page_increment">1</property>
   </object>
+  <object class="GtkAdjustment" id="rounding_time_adjustment">
+    <property name="upper">240</property>
+    <property name="step_increment">5</property>
+    <property name="page_increment">0</property>
+  </object>
   <object class="GtkStack" id="dialog_stack">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -81,6 +86,48 @@
                   <packing>
                     <property name="left_attach">1</property>
                     <property name="top_attach">0</property>
+                  </packing>
+                </child>
+                                <child>
+                  <object class="GtkLabel" id="rounding_time_label">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Rounding Time (minutes)</property>
+                    <property name="xalign">1</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkSpinButton" id="rounding_time_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="numeric">1</property>
+                    <property name="width_chars">5</property>
+                    <property name="max_width_chars">5</property>
+                    <property name="text">0</property>
+                    <property name="xalign">1</property>
+                    <property name="adjustment">rounding_time_adjustment</property>
+                    <property name="activates_default">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">1</property>
+                    <property name="top_attach">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkCheckButton" id="rounding_time_force_above_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">(Force rounding above)</property>
+                    <property name="xalign">1</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">2</property>
+                    <property name="top_attach">1</property>
                   </packing>
                 </child>
               </object>
@@ -547,6 +594,7 @@
     <property name="mode">GTK_SIZE_GROUP_HORIZONTAL</property>
     <widgets>
       <widget name="virtual_midnight_label"/>
+      <widget name="rounding_time_label"/>
       <widget name="hours_label"/>
       <widget name="office_hours_label"/>
     </widgets>

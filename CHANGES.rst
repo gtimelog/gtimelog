@@ -7,6 +7,9 @@ Changelog
 - You can now back-date new log items using a single-digit hour, e.g. "9:30
   morning meeting" (GH: #254).
 
+- Add time rounding option in minutes (max: 240 minutes) with force rounding
+  above option except for start entries `**` (GH: #263).
+
 - The hidden history completion feature (PageUp/PageDown) ignores time
   correction prefix when looking up past entries, so you can do things like
   type "9:30 st", press PageUp and complete that to "9:30 started working".
