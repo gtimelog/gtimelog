@@ -648,6 +648,8 @@ class Window(Gtk.ApplicationWindow):
         self.gsettings.connect('changed::task-list-edit-url', self.update_edit_tasks_availability)
         self.gsettings.connect('changed::virtual-midnight', self.virtual_midnight_changed)
         self.update_edit_tasks_availability()
+        self.gsettings.bind('rounding-time', self.log_view, 'rounding-time', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('rounding-time-force-above', self.log_view, 'rounding-time-force-above', Gio.SettingsBindFlags.DEFAULT)
 
         x, y = self.gsettings.get_value('window-position')
         w, h = self.gsettings.get_value('window-size')
@@ -682,6 +684,8 @@ class Window(Gtk.ApplicationWindow):
                     self.gsettings.set_string('task-list-edit-url', arg)
             vm = old_settings.virtual_midnight
             self.gsettings.set_value('virtual-midnight', GLib.Variant('(ii)', (vm.hour, vm.minute)))
+            self.gsettings.set_int('rounding-time', old_settings.rounding_time)
+            self.gsettings.set_boolean('rounding-time-force-above', old_settings.rounding_time_force_above)
             self.gsettings.set_boolean('gtk-completion', bool(old_settings.enable_gtk_completion))
             self.gsettings.set_boolean('settings-migrated', True)
             if loaded_files:
@@ -691,7 +695,7 @@ class Window(Gtk.ApplicationWindow):
 
     def load_log(self):
         mark_time("loading timelog")
-        timelog = TimeLog(Settings().get_timelog_file(), self.get_virtual_midnight())
+        timelog = TimeLog(Settings().get_timelog_file(), self.get_virtual_midnight(), self.get_rounding_time(), self.get_rounding_time_force_above())
         mark_time("timelog loaded")
         self.timelog = timelog
         self.tick(True)
@@ -885,6 +889,14 @@ class Window(Gtk.ApplicationWindow):
     def get_virtual_midnight(self):
         h, m = self.gsettings.get_value('virtual-midnight')
         return datetime.time(h, m)
+
+    def get_rounding_time(self):
+        value = self.gsettings.get_int('rounding-time')
+        return value
+
+    def get_rounding_time_force_above(self):
+        value = self.gsettings.get_boolean('rounding-time-force-above')
+        return value
 
     def get_today(self):
         return virtual_day(datetime.datetime.now(), self.get_virtual_midnight())
@@ -1354,6 +1366,14 @@ class LogView(Gtk.TextView):
         type=float, default=0, nick='Office Hours',
         blurb='Target number of office hours per day')
 
+    rounding_time = GObject.Property(
+        type=int, default=0, nick='Rounding Time',
+        blurb='Round time using this value')
+
+    rounding_time_force_above = GObject.Property(
+        type=bool, default=False, nick='Rounding Time Force Above',
+        blurb='Force rounding up')
+
     current_task = GObject.Property(
         type=str, nick='Current task',
         blurb='Current task in progress')
@@ -1386,6 +1406,8 @@ class LogView(Gtk.TextView):
         self.connect('notify::log-order', self.queue_update)
         self.connect('notify::hours', self.queue_footer_update)
         self.connect('notify::office-hours', self.queue_footer_update)
+        self.connect('notify::rounding-time', self.queue_footer_update)
+        self.connect('notify::rounding-time-force-above', self.queue_footer_update)
         self.connect('notify::current-task', self.queue_footer_update)
         self.connect('notify::now', self.queue_footer_update)
         self.connect('notify::filter-text', self.queue_update)
@@ -1899,6 +1921,12 @@ class PreferencesDialog(Gtk.Dialog):
         virtual_midnight_entry = builder.get_object('virtual_midnight_entry')
         self.virtual_midnight_entry = virtual_midnight_entry
 
+        rounding_time_entry = builder.get_object('rounding_time_entry')
+        self.rounding_time_entry = rounding_time_entry
+
+        rounding_time_force_above_entry = builder.get_object('rounding_time_force_above_entry')
+        self.rounding_time_force_above_entry = rounding_time_force_above_entry
+
         hours_entry = builder.get_object('hours_entry')
         office_hours_entry = builder.get_object('office_hours_entry')
         name_entry = builder.get_object('name_entry')
@@ -1921,6 +1949,8 @@ class PreferencesDialog(Gtk.Dialog):
         self.gsettings.connect('changed::virtual-midnight', self.virtual_midnight_changed)
         self.virtual_midnight_changed()
         self.virtual_midnight_entry.connect('focus-out-event', self.virtual_midnight_set)
+        self.gsettings.bind('rounding-time', rounding_time_entry, 'value', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('rounding-time-force-above', rounding_time_force_above_entry, 'active', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('mail-protocol', protocol_combo, 'active-id', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('smtp-server', server_entry, 'text', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.connect('changed::smtp-port', self.smtp_port_changed)

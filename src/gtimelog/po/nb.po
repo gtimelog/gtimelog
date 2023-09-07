@@ -281,6 +281,12 @@ msgstr "Data oppføring"
 msgid "Virtual midnight"
 msgstr "Virtuell midnatt"
 
+msgid "Rounding Time (minutes)"
+msgstr ""
+
+msgid "(Force rounding above)"
+msgstr ""
+
 msgid "Goals"
 msgstr "Mål"
 

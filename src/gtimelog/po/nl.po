@@ -282,6 +282,12 @@ msgstr "Gegevensinvoer"
 msgid "Virtual midnight"
 msgstr "Virtuele middernacht"
 
+msgid "Rounding Time (minutes)"
+msgstr ""
+
+msgid "(Force rounding above)"
+msgstr ""
+
 msgid "Goals"
 msgstr "Doelen"
 

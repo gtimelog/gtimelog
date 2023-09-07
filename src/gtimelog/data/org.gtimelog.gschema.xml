@@ -86,6 +86,19 @@
             <description>Hour and minute that say when a work day ends and another begins.</description>
         </key>
 
+        <key name="rounding-time" type="i">
+            <default>0</default>
+            <summary>Rounding Time</summary>
+            <description>Rounding time in minutes to round the time recorded.</description>
+            <range min="0" max="65535" />
+        </key>
+
+        <key name="rounding-time-force-above" type="b">
+            <default>false</default>
+            <summary>Rounding Time Force Above</summary>
+            <description>Force the rounding up if rounding is less than current time.</description>
+        </key>
+
         <key name="name" type="s">
             <default>"Anonymous"</default>
             <summary>Name</summary>
