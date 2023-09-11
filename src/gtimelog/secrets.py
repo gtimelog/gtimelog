@@ -9,9 +9,8 @@ from .utils import require_version
 
 
 require_version('Gtk', '3.0')
-require_version('Soup', '2.4')
 require_version('Secret', '1')
-from gi.repository import Gio, GObject, Gtk, Secret, Soup
+from gi.repository import Gio, GObject, Gtk, Secret
 
 
 log = logging.getLogger('gtimelog.secrets')
@@ -53,12 +52,11 @@ def set_smtp_password(server, username, password):
 
 
 class Authenticator(object):
-    def __init__(self, soup_session: Soup.SessionAsync):
+    def __init__(self):
         self.pending = []
         self.lookup_in_progress = False
         self.username = None
         self.password = None
-        soup_session.connect('authenticate', self.http_auth_cb)
 
     def find_in_keyring(self, uri, callback):
         """
