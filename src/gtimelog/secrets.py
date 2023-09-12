@@ -212,6 +212,8 @@ class Authenticator(object):
     def http_auth_finish(self, message, auth, username, password):
         if username and password:
             auth.authenticate(username, password)
+        else:
+            auth.cancel()
 
         self.lookup_in_progress = False
         self.maybe_pop_queue()
