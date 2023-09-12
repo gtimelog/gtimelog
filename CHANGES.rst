@@ -13,6 +13,8 @@ Changelog
 
 - GTK 3.18 or newer is now required (GH: #131).
 
+- Soap 3.0 is now required (GH: #238).
+
 - Fixed an AttributeError in the undocumented remote task list feature
   (GH: #153).
 
