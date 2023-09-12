@@ -67,7 +67,7 @@ from .utils import require_version
 
 require_version('Gtk', '3.0')
 require_version('Gdk', '3.0')
-require_version('Soup', '2.4')
+require_version('Soup', '3.0')
 import gi
 from gi.repository import Gdk, Gio, GLib, GObject, Gtk, Pango, Soup
 
@@ -171,7 +171,7 @@ def make_option(long_name, short_name=None, flags=0, arg=GLib.OptionArg.NONE,
 
 
 soup_session = Soup.Session()
-authenticator = Authenticator(soup_session)
+authenticator = Authenticator()
 
 
 class Application(Gtk.Application):
@@ -749,8 +749,7 @@ class Window(Gtk.ApplicationWindow):
 
     def cancel_tasks_download(self, hide=True):
         if self._download:
-            old_message, old_url = self._download
-            soup_session.cancel_message(old_message, Soup.Status.CANCELLED)
+            self.cancellable.cancel()
             self._download = None
         if hide:
             self.tasks_infobar.hide()
@@ -767,25 +766,36 @@ class Window(Gtk.ApplicationWindow):
         cache_filename = Settings().get_task_list_cache_file()
         self.tasks_infobar.set_message_type(Gtk.MessageType.INFO)
         self.tasks_infobar_label.set_text(_("Downloading tasks..."))
+        self.cancellable = Gio.Cancellable()
         self.tasks_infobar.connect('response', lambda *args: self.cancel_tasks_download())
         self.tasks_infobar.show()
         self.tasks_infobar.queue_resize()
         log.debug("Downloading tasks from %s", url)
         message = Soup.Message.new('GET', url)
         self._download = (message, url)
-        soup_session.queue_message(message, self.tasks_downloaded, cache_filename)
+        message.connect('authenticate', authenticator.http_auth_cb)
+        soup_session.send_and_read_async(
+            message,
+            GLib.PRIORITY_DEFAULT,
+            self.cancellable,
+            self.tasks_downloaded,
+            cache_filename
+        )
 
-    def tasks_downloaded(self, session, message, cache_filename):
-        content = message.response_body.data
-        if message.status_code != Soup.Status.OK:
-            url = message.get_uri().to_string(just_path_and_query=False)
+    def tasks_downloaded(self, session, result, cache_filename):
+        message = soup_session.get_async_result_message(result)
+        status_code = message.get_status()
+        if status_code != Soup.Status.OK:
+            url = message.get_uri().to_string()
 
-            log.error("Failed to download tasks from %s: %d %s", url, message.status_code, message.reason_phrase)
+            log.error("Failed to download tasks from %s: %d %s",
+                      url, status_code, message.get_reason_phrase())
             self.tasks_infobar.set_message_type(Gtk.MessageType.ERROR)
             self.tasks_infobar_label.set_text(_("Download failed."))
             self.tasks_infobar.connect('response', lambda *args: self.tasks_infobar.hide())
             self.tasks_infobar.show()
         else:
+            content = soup_session.send_and_read_finish(result).get_data().decode()
             log.debug("Successfully downloaded tasks:\n  %s",
                       content.replace('\n', '\n  '))
             with open(cache_filename, 'w') as f:
