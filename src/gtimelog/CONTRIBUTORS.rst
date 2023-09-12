@@ -30,6 +30,7 @@ In alphabetic order:
 - Laurynas Speičys
 - Martin Pitt
 - Michael Vogt
+- Nathan Pratta Teodosio
 - Olivier Crête
 - Patrick Gerken
 - Radek Muzatko
