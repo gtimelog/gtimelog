@@ -188,10 +188,10 @@ class Authenticator(object):
 
         self.find_in_keyring(uri, keyring_callback)
 
-    def http_auth_cb(self, session, message, auth, retrying, *args):
-        session.pause_message(message)
-        self.pending.insert(0, (session, message, auth, retrying))
+    def http_auth_cb(self, message, auth, retrying, *args):
+        self.pending.insert(0, (message, auth, retrying))
         self.maybe_pop_queue()
+        return True
 
     def maybe_pop_queue(self):
         # I don't think we need any locking, because GIL.
@@ -199,7 +199,7 @@ class Authenticator(object):
             return
 
         try:
-            (session, message, auth, retrying) = self.pending.pop()
+            (message, auth, retrying) = self.pending.pop()
         except IndexError:
             pass
         else:
@@ -207,12 +207,11 @@ class Authenticator(object):
             uri = message.get_uri()
             self.find_password(auth, uri, retrying,
                 callback=functools.partial(
-                    self.http_auth_finish, session, message, auth))
+                    self.http_auth_finish, message, auth))
 
-    def http_auth_finish(self, session, message, auth, username, password):
+    def http_auth_finish(self, message, auth, username, password):
         if username and password:
             auth.authenticate(username, password)
 
-        session.unpause_message(message)
         self.lookup_in_progress = False
         self.maybe_pop_queue()
