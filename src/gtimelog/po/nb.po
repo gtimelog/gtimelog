@@ -71,10 +71,10 @@ msgid "PyGI version: {}"
 msgstr "PyGI versjon: {}"
 
 msgid "Data directory: {}"
-msgstr "Data folder: {}"
+msgstr "Datamappe: {}"
 
 msgid "Legacy config directory: {}"
-msgstr "Legacy konfigurasjonskatalog: {}"
+msgstr "Avleggs konfigurasjonskatalog: {}"
 
 msgid "Settings will be migrated to GSettings (org.gtimelog) on first launch"
 msgstr ""
@@ -172,19 +172,19 @@ msgstr "Totalt slacking: {0} ({1} denne uka)"
 
 #, python-brace-format
 msgid "Total slacking this week: {0} ({1} per day)"
-msgstr "Totalt slacking denne uka: {0} ({1} per dag)"
+msgstr "Total lediggang denne uka: {0} ({1} per dag)"
 
 #, python-brace-format
 msgid "Total slacking this week: {0}"
-msgstr "Totalt slacking denne uka: {0}"
+msgstr "Total lediggang denne uka: {0}"
 
 #, python-brace-format
 msgid "Total slacking this month: {0} ({1} per day)"
-msgstr "Totalt slacking denne måneden: {0} ({1} per dag)"
+msgstr "Total lediggang denne måneden: {0} ({1} per dag)"
 
 #, python-brace-format
 msgid "Total slacking this month: {0}"
-msgstr "Totalt slacking denne måneden: {0}"
+msgstr "Total lediggang denne måneden: {0}"
 
 msgid ""
 "Time left at work: {0} (should've finished at {1:%H:%M}, overtime of {2} "
@@ -276,7 +276,7 @@ msgid "Send"
 msgstr "Send"
 
 msgid "Data entry"
-msgstr "Data oppføring"
+msgstr "Dataoppføring"
 
 msgid "Virtual midnight"
 msgstr "Virtuell midnatt"
