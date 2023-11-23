@@ -286,6 +286,12 @@ msgstr "Entrée des données"
 msgid "Virtual midnight"
 msgstr "Minuit virtuel"
 
+msgid "Rounding Time (minutes)"
+msgstr "Arrondir le temps (minutes)"
+
+msgid "(Force rounding above)"
+msgstr "(au supérieur)"
+
 msgid "Goals"
 msgstr "Objectifs"
 

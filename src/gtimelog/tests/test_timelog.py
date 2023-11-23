@@ -1304,6 +1304,155 @@ class TestTimeLog(Mixins, unittest.TestCase):
                           datetime.time(2, 0))
         self.assertEqual(timelog.parse_correction("+200 did stuff"),
                          ("+200 did stuff", None))
+    @freezegun.freeze_time("2014-11-12 10:00:00.00")
+    def test_appending_without_rounded_time_tasks(self):
+        # Test rounding method
+        current_datetime = datetime.datetime.now()
+        current_date = current_datetime.date()
+        current_time = current_datetime.time()
+        timelog = TimeLog(self.tempfile(), current_time, rounding_time=0, rounding_time_force_above=False)
+
+        # Check emptyness before adding tasks
+        w = timelog.window_for_day(current_date)
+        self.assertEqual(list(w.all_entries()), [])
+
+        oracle = {
+            'started ***': (
+                current_datetime,
+                datetime.timedelta(minutes=0)
+            ),
+            'sample task no time': (
+                current_datetime.replace(hour=10, minute=5),
+                datetime.timedelta(minutes=5)
+            ),
+            'break **': (
+                current_datetime.replace(hour=10, minute=58),
+                datetime.timedelta(minutes=53)
+            ),
+            'sample task smallest time rounded': (
+                current_datetime.replace(hour=11, minute=12),
+                datetime.timedelta(minutes=14)
+            ),
+            'sample task normal time rounded': (
+                current_datetime.replace(hour=11, minute=59),
+                datetime.timedelta(minutes=47)
+            ),
+        }
+        for entry in oracle:
+            _datetime, duration = oracle.get(entry)
+            timelog.append(entry, now=_datetime)
+        w = timelog.window_for_day(current_date)
+        for entry in w.all_entries():
+            _datetime, duration = oracle.get(entry.entry, (False, False))
+            self.assertEqual(duration, entry.duration, f"Entry '{entry.entry}' has the wrong duration")
+    @freezegun.freeze_time("2014-11-12 10:00:00.00")
+    def test_appending_with_rounded_time_tasks(self):
+        # Test rounding method
+        current_datetime = datetime.datetime.now()
+        current_date = current_datetime.date()
+        current_time = current_datetime.time()
+        timelog = TimeLog(self.tempfile(), current_time, rounding_time=15, rounding_time_force_above=False)
+
+        # Check emptyness before adding tasks
+        w = timelog.window_for_day(current_date)
+        self.assertEqual(list(w.all_entries()), [])
+
+        oracle = {
+            'started ***': (
+                current_datetime,
+                datetime.timedelta(minutes=0)
+            ),
+            'sample task no time': (
+                current_datetime.replace(hour=10, minute=5),
+                datetime.timedelta(minutes=0)
+            ),
+            'break **': (
+                current_datetime.replace(hour=10, minute=58),
+                datetime.timedelta(minutes=60)
+            ),
+            'sample task smallest time rounded': (
+                current_datetime.replace(hour=11, minute=12),
+                datetime.timedelta(minutes=15)
+            ),
+            'sample task normal time rounded': (
+                current_datetime.replace(hour=11, minute=59),
+                datetime.timedelta(minutes=45)
+            ),
+        }
+        for entry in oracle:
+            _datetime, duration = oracle.get(entry)
+            timelog.append(entry, now=_datetime)
+        w = timelog.window_for_day(current_date)
+        for entry in w.all_entries():
+            _datetime, duration = oracle.get(entry.entry, (False, False))
+            self.assertEqual(duration, entry.duration, f"Entry '{entry.entry}' has the wrong duration")
+
+    @freezegun.freeze_time("2014-11-12 10:00:00.00")
+    def test_appending_with_force_above_rounded_time_tasks(self):
+        # Test rounding method
+        current_datetime = datetime.datetime.now()
+        current_date = current_datetime.date()
+        current_time = current_datetime.time()
+        timelog = TimeLog(self.tempfile(), current_time, rounding_time=15, rounding_time_force_above=True)
+
+        # Check emptyness before adding tasks
+        w = timelog.window_for_day(current_date)
+        self.assertEqual(list(w.all_entries()), [])
+
+        oracle = {
+            'started ***': (
+                current_datetime,
+                datetime.timedelta(minutes=0)
+            ),
+            'sample task no time': (
+                current_datetime.replace(hour=10, minute=5),
+                datetime.timedelta(minutes=15)
+            ),
+            'break **': (
+                current_datetime.replace(hour=10, minute=58),
+                datetime.timedelta(minutes=45)
+            ),
+            'sample task smallest time rounded': (
+                current_datetime.replace(hour=11, minute=12),
+                datetime.timedelta(minutes=15)
+            ),
+            'sample task normal time rounded': (
+                current_datetime.replace(hour=11, minute=59),
+                datetime.timedelta(minutes=45)
+            ),
+        }
+        for entry in oracle:
+            _datetime, duration = oracle.get(entry)
+            timelog.append(entry, now=_datetime)
+        w = timelog.window_for_day(current_date)
+        for entry in w.all_entries():
+            _datetime, duration = oracle.get(entry.entry, (False, False))
+            self.assertEqual(duration, entry.duration, f"Entry '{entry.entry}' has the wrong duration")
+
+    @freezegun.freeze_time("2014-11-12 10:00:00.00")
+    def test_get_rounding_delta_and_method(self):
+        # Test rounding method
+        current_datetime = datetime.datetime.now()
+        current_time = current_datetime.time()
+        timelog = TimeLog(self.tempfile(), current_time, rounding_time=15, rounding_time_force_above=True)
+        oracle = {
+            'started ***': "average",
+            'sample task no time': "up",
+            'break **': "up"
+        }
+        for entry, method in oracle.items():
+            result_delta, result_method = timelog.get_rounding_delta_and_method(entry)
+            self.assertEqual(result_method, method, f"Entry '{entry}' has an invalid rounding method")
+
+        timelog = TimeLog(self.tempfile(), current_time, rounding_time=15, rounding_time_force_above=False)
+        oracle = {
+            'started ***': "average",
+            'sample task no time': "average",
+            'break **': "average"
+        }
+        for entry, method in oracle.items():
+            result_delta, result_method = timelog.get_rounding_delta_and_method(entry)
+            self.assertEqual(result_method, method, f"Entry '{entry}' has an invalid rounding method")
 
 
 class TestTotals(unittest.TestCase):

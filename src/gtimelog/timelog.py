@@ -136,6 +136,30 @@ def get_mtime(filename):
         return None
 
 
+def round_dt(dt, date_delta=datetime.timedelta(minutes=0), to='average'):
+    """
+    Round a datetime object to a multiple of a timedelta
+    dt : datetime.datetime object, default now.
+    dateDelta : timedelta object, we round to a multiple of this, default 1 minute.
+    from:  http://stackoverflow.com/questions/3463930/how-to-round-the-minute-of-a-datetime-object-python
+    """
+    round_to = date_delta.total_seconds()
+    seconds = (dt - dt.min).seconds
+
+    if seconds % round_to == 0 and dt.microsecond == 0:
+        rounding = (seconds + round_to / 2) // round_to * round_to
+    else:
+        if to == 'up':
+            # // is a floor division, not a comment on following line (like in javascript):
+            rounding = (seconds + dt.microsecond/1000000 + round_to) // round_to * round_to
+        # elif to == 'down':
+        #     rounding = seconds // round_to * round_to
+        else:
+            rounding = (seconds + round_to / 2) // round_to * round_to
+
+    return dt + datetime.timedelta(0, rounding - seconds, - dt.microsecond)
+
+
 Entry = collections.namedtuple('Entry', 'start stop duration tags entry')
 
 
@@ -907,9 +931,11 @@ class TimeLog(TimeCollection):
     the end.
     """
 
-    def __init__(self, filename, virtual_midnight):
+    def __init__(self, filename, virtual_midnight, rounding_time=0, rounding_time_force_above=False):
         super(TimeLog, self).__init__(virtual_midnight)
         self.filename = filename
+        self.rounding_time = rounding_time
+        self.rounding_time_force_above = rounding_time_force_above
         self.reread()
 
     def virtual_today(self):
@@ -1018,10 +1044,28 @@ class TimeLog(TimeCollection):
             f.write(line + '\n')
         self.last_mtime = get_mtime(self.filename)
 
-    def append(self, entry, now=None):
-        """Append a new entry to the time log."""
+    def get_rounding_delta_and_method(self, entry):
+        """Retrieve rounding delta and method for a specific entry name"""
+        method = "average"
+        # We should not force round above start lines
+        if '***' not in entry:
+            if self.rounding_time_force_above:
+                method = "up"
+        delta = datetime.timedelta(minutes=self.rounding_time)
+        return delta, method
+
+    def get_entry_time(self, entry, now=None):
         if not now:
             now = datetime.datetime.now().replace(second=0, microsecond=0)
+
+        if self.rounding_time:
+            delta, method = self.get_rounding_delta_and_method(entry)
+            now = round_dt(now, delta, method)
+        return now
+
+    def append(self, entry, now=None):
+        """Append a new entry to the time log."""
+        now = self.get_entry_time(entry, now)
         self.check_reload()
         need_space = False
         last = self.last_time()

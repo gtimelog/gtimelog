@@ -40,6 +40,12 @@ Changelog
 - Grouped task entries can now be sorted by start date, name, duration or
   according to tasks.txt order (GH: #228).
 
+- Grouped task entries can now be sorted by start date, name, duration or
+  according to tasks.txt order (GH: #228).
+
+- Add time rounding option in minutes (max: 240 minutes) with force rounding
+  above option except for start entries `***` (GH: #237).
+
 
 0.11.3 (2019-04-23)
 ~~~~~~~~~~~~~~~~~~~

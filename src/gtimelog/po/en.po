@@ -272,6 +272,12 @@ msgstr ""
 msgid "Virtual midnight"
 msgstr ""
 
+msgid "Rounding Time (minutes)"
+msgstr ""
+
+msgid "(Force rounding above)"
+msgstr ""
+
 msgid "Goals"
 msgstr ""
 
