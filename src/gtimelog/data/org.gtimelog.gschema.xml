@@ -38,7 +38,7 @@
 
         <key name="log-order" enum="org.gtimelog.LogOrder">
             <default>"start-time"</default>
-	    <summary>Log Tasks/Groups order</summary>
+            <summary>Log Tasks/Groups order</summary>
             <description>Order of tasks and groups in Log view</description>
         </key>
 
@@ -161,6 +161,12 @@
             <default>true</default>
             <summary>Use completion</summary>
             <description>If true, the task entry will use the standard GTK+ completion.  If false, it'll only use the custom prefix completion on PageUp/PageDown.</description>
+        </key>
+
+        <key name="editor" type="s">
+            <default>""</default>
+            <summary>Text editor to use for editing timelog.txt or tasks.txt</summary>
+            <description>If blank, gtimelog will use your system default editor.  If the value contains '%s', it will be replaced with the filename, otherwise the filename will be appended as an extra argument.</description>
         </key>
 
     </schema>

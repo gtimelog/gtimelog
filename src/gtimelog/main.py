@@ -1,4 +1,6 @@
 """An application for keeping track of your time."""
+import shlex
+import subprocess
 import sys
 import time
 
@@ -309,9 +311,30 @@ class Application(Gtk.Application):
     def on_quit(self, action, parameter):
         self.quit()
 
+    @staticmethod
+    def prepare_args(program, filename):
+        args = shlex.split(program)
+        had_percent_s = False
+        for i, arg in enumerate(args):
+            if '%s' in arg:
+                args[i] = arg.replace('%s', filename)
+                had_percent_s = True
+        if not had_percent_s:
+            args.append(filename)
+        return args
+
+    def run_in_background(self, program, filename):
+        args = self.prepare_args(program, filename)
+        subprocess.Popen(args)
+        # XXX: error handling!
+
     def open_in_editor(self, filename):
         self.create_if_missing(filename)
-        if os.name == 'nt':
+        gsettings = Gio.Settings.new("org.gtimelog")
+        editor = gsettings.get_string('editor')
+        if editor:
+            self.run_in_background(editor, filename)
+        elif os.name == 'nt':
             os.startfile(filename)
         else:
             uri = GLib.filename_to_uri(filename, None)
