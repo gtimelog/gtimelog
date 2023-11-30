@@ -1028,11 +1028,11 @@ class TimeLog(TimeCollection):
         _, last_entry = self.items.pop()
         with open(self.filename, "r", encoding='utf-8') as f:
             lines = f.readlines()
-        with open(self.filename, "w", encoding='utf-8') as f:
+        lines = lines[:-1]
+        if not lines[-1].strip():
+            # remove line which divides days if necessary
             lines = lines[:-1]
-            if not lines[-1].strip():
-                # remove line which divides days if necessary
-                lines = lines[:-1]
+        with open(self.filename, "w", encoding='utf-8') as f:
             f.write(''.join(lines))
         return last_entry
 
