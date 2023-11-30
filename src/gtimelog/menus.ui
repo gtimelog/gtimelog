@@ -26,6 +26,10 @@
         <attribute name="action">app.edit-log</attribute>
       </item>
       <item>
+        <attribute name="label" translatable="yes">Edit last item</attribute>
+        <attribute name="action">app.edit-last-item</attribute>
+      </item>
+      <item>
         <attribute name="label" translatable="yes">Edit tasks</attribute>
         <attribute name="action">app.edit-tasks</attribute>
       </item>
