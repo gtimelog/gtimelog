@@ -295,7 +295,7 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.go-home", ["<Alt>Home"])
         self.set_accels_for_action("win.focus-task-entry", ["<Primary>L"])
         self.set_accels_for_action("app.edit-log", ["<Primary>E"])
-        self.set_accels_for_action("app.edit-last-item", ["<Primary>BackSpace"])
+        self.set_accels_for_action("app.edit-last-item", ["<Primary><Shift>BackSpace"])
         self.set_accels_for_action("app.edit-tasks", ["<Primary>T"])
         self.set_accels_for_action("app.shortcuts", ["<Primary>question"])
         self.set_accels_for_action("app.preferences", ["<Primary>P"])
