@@ -184,7 +184,6 @@ class Application(Gtk.Application):
             'about',
             'quit',
             'edit-log',
-            'edit-last-item',
             'edit-tasks',
             'refresh-tasks',
         ]
@@ -294,8 +293,8 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.go-forward", ["<Alt>Right"])
         self.set_accels_for_action("win.go-home", ["<Alt>Home"])
         self.set_accels_for_action("win.focus-task-entry", ["<Primary>L"])
+        self.set_accels_for_action("win.edit-last-entry", ["<Primary><Shift>BackSpace"])
         self.set_accels_for_action("app.edit-log", ["<Primary>E"])
-        self.set_accels_for_action("app.edit-last-item", ["<Primary><Shift>BackSpace"])
         self.set_accels_for_action("app.edit-tasks", ["<Primary>T"])
         self.set_accels_for_action("app.shortcuts", ["<Primary>question"])
         self.set_accels_for_action("app.preferences", ["<Primary>P"])
@@ -320,14 +319,6 @@ class Application(Gtk.Application):
     def on_edit_log(self, action, parameter):
         filename = Settings().get_timelog_file()
         self.open_in_editor(filename)
-
-    def on_edit_last_item(self, action, parameter):
-        window = self.get_active_window()
-        text = window.timelog.remove_last_entry()
-        if text is not None:
-            window.task_entry.set_text(text)
-        window.task_entry.grab_focus()
-        window.task_entry.select_region(-1, -1)
 
     def on_edit_tasks(self, action, parameter):
         gsettings = Gio.Settings.new("org.gtimelog")
@@ -484,6 +475,18 @@ class Window(Gtk.ApplicationWindow):
 
     class Actions(object):
 
+        simple_actions = [
+            'go-back',
+            'go-forward',
+            'go-home',
+            'focus-task-entry',
+            'add-entry',
+            'edit-last-entry',
+            'report',
+            'send-report',
+            'cancel-report',
+        ]
+
         def __init__(self, win):
             PropertyAction = Gio.PropertyAction
 
@@ -508,7 +511,7 @@ class Window(Gtk.ApplicationWindow):
             self.show_search_bar = PropertyAction.new("show-search-bar", win.search_bar, "search-mode-enabled")
             win.add_action(self.show_search_bar)
 
-            for action_name in ['go-back', 'go-forward', 'go-home', 'focus-task-entry', 'add-entry', 'report', 'send-report', 'cancel-report']:
+            for action_name in self.simple_actions:
                 action = Gio.SimpleAction.new(action_name, None)
                 action.connect('activate', getattr(win, 'on_' + action_name.replace('-', '_')))
                 win.add_action(action)
@@ -1006,6 +1009,15 @@ class Window(Gtk.ApplicationWindow):
 
     def on_focus_task_entry(self, action, parameter):
         self.task_entry.grab_focus()
+
+    def on_edit_last_entry(self, action, parameter):
+        text = self.timelog.remove_last_entry()
+        if text is not None:
+            self.notify('timelog')
+            self.tick(True)
+            self.task_entry.set_text(text)
+        self.task_entry.grab_focus()
+        self.task_entry.select_region(-1, -1)
 
     def on_add_entry(self, action, parameter):
         mark_time()

@@ -1011,20 +1011,29 @@ class TimeLog(TimeCollection):
 
     def remove_last_entry(self):
         self.check_reload()
-        if self.window.items:
-            self.window.items.pop()
-        else:
-            # entries list is empty, so nothing to remove
+        if not self.window.items:
+            # last day's entries list is empty, so nothing to remove
             return None
-        _, last_entry = self.items.pop()
         with open(self.filename, "r", encoding='utf-8') as f:
             lines = f.readlines()
-        lines = lines[:-1]
-        if not lines[-1].strip():
-            # remove line which divides days if necessary
-            lines = lines[:-1]
+        for idx, line in enumerate(reversed(lines), start=1):
+            time, sep, entry = line.partition(': ')
+            if not sep:
+                continue
+            try:
+                time = parse_datetime(time)
+            except ValueError:
+                continue
+            last_entry = entry.strip()
+            break
+        else:
+            # maybe timelog.txt got replaced after we did check_reload() but
+            # before we re-read it?
+            return None  # pragma: nocover
+        lines[-idx] = '##' + lines[-idx]
         with open(self.filename, "w", encoding='utf-8') as f:
-            f.write(''.join(lines))
+            f.writelines(lines)
+        self.reread()
         return last_entry
 
     def raw_append(self, line, need_space):

@@ -1190,17 +1190,15 @@ class TestTimeLog(Mixins, unittest.TestCase):
 
     @freezegun.freeze_time("2018-12-09 16:27")
     def test_remove_last_entry(self):
-
         TEST_TIMELOG = textwrap.dedent("""
             2018-12-09 08:30: start at home
             2018-12-09 08:40: emails
+            # comment
             2018-12-09 12:15: coding
         """)
-
         filename = self.tempfile()
         self.write_file(filename, TEST_TIMELOG)
         timelog = TimeLog(filename, datetime.time(2, 0))
-        timelog.reread()
         last_entry = timelog.remove_last_entry()
         self.assertEqual(last_entry, 'coding')
         items_after_call = [
@@ -1212,6 +1210,22 @@ class TestTimeLog(Mixins, unittest.TestCase):
             self.assertEqual(f.read(), textwrap.dedent("""
                 2018-12-09 08:30: start at home
                 2018-12-09 08:40: emails
+                # comment
+                ##2018-12-09 12:15: coding
+            """))
+
+        last_entry = timelog.remove_last_entry()
+        self.assertEqual(last_entry, 'emails')
+        items_after_call = [
+            (datetime.datetime(2018, 12, 9, 8, 30), 'start at home')]
+        self.assertEqual(timelog.items, items_after_call)
+        self.assertEqual(timelog.window.items, items_after_call)
+        with open(filename) as f:
+            self.assertEqual(f.read(), textwrap.dedent("""
+                2018-12-09 08:30: start at home
+                ##2018-12-09 08:40: emails
+                # comment
+                ##2018-12-09 12:15: coding
             """))
 
     @freezegun.freeze_time("2018-12-10 10:40")
@@ -1239,6 +1253,8 @@ class TestTimeLog(Mixins, unittest.TestCase):
             self.assertEqual(f.read(), textwrap.dedent("""
                 2018-12-09 08:30: start at home
                 2018-12-09 08:40: emails
+
+                ##2018-12-10 08:30: start at home
             """))
 
         # no further remove possible at beginning of the day:
