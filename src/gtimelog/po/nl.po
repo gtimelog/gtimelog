@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-19 11:24+0300\n"
+"POT-Creation-Date: 2024-01-30 14:15+0200\n"
 "PO-Revision-Date: 2023-09-04 20:10+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: Dutch\n"
@@ -357,6 +357,10 @@ msgstr "Afsluiten"
 msgid "Edit log"
 msgstr "Logboek bewerken"
 
+#, fuzzy
+msgid "Edit last item"
+msgstr "Takenlĳst bewerken"
+
 msgid "Edit tasks"
 msgstr "Taken bewerken"
 
@@ -493,6 +497,11 @@ msgstr "Menu"
 
 msgctxt "shortcut window"
 msgid "Focus the task entry"
+msgstr "Taakitem focussen"
+
+#, fuzzy
+msgctxt "shortcut window"
+msgid "Edit last task entry"
 msgstr "Taakitem focussen"
 
 msgctxt "shortcut window"

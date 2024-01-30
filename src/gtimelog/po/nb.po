@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-07 11:54+0200\n"
+"POT-Creation-Date: 2024-01-30 14:15+0200\n"
 "PO-Revision-Date: 2022-10-07 11:57+0200\n"
 "Last-Translator: John Erling Blad <jeblad@gmail.com>\n"
 "Language-Team:  <gnome-no@gnome.org>\n"
@@ -356,6 +356,10 @@ msgstr "Avslutt"
 msgid "Edit log"
 msgstr "Rediger logg"
 
+#, fuzzy
+msgid "Edit last item"
+msgstr "Rediger oppgaveliste"
+
 msgid "Edit tasks"
 msgstr "Rediger oppgaver"
 
@@ -492,6 +496,11 @@ msgstr "Meny"
 
 msgctxt "shortcut window"
 msgid "Focus the task entry"
+msgstr "Tilbake til oppgaveinnlegging"
+
+#, fuzzy
+msgctxt "shortcut window"
+msgid "Edit last task entry"
 msgstr "Tilbake til oppgaveinnlegging"
 
 msgctxt "shortcut window"

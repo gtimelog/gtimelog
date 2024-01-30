@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.10.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-19 11:24+0300\n"
+"POT-Creation-Date: 2024-01-30 14:15+0200\n"
 "PO-Revision-Date: 2015-09-04 10:53+0300\n"
 "Last-Translator: Marius Gedminas <marius@gedmin.as>\n"
 "Language-Team: <marius@gedmin.as>\n"
@@ -354,6 +354,10 @@ msgstr "Išeiti"
 msgid "Edit log"
 msgstr "Taisyti žurnalą"
 
+#, fuzzy
+msgid "Edit last item"
+msgstr "Tvarkyti užduotis"
+
 msgid "Edit tasks"
 msgstr "Tvarkyti užduotis"
 
@@ -490,6 +494,11 @@ msgstr "Meniu"
 
 msgctxt "shortcut window"
 msgid "Focus the task entry"
+msgstr "Fokusuoti įvesties lauką"
+
+#, fuzzy
+msgctxt "shortcut window"
+msgid "Edit last task entry"
 msgstr "Fokusuoti įvesties lauką"
 
 msgctxt "shortcut window"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gtimelog 0.12.0.dev0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-09-19 11:24+0300\n"
+"POT-Creation-Date: 2024-01-30 14:15+0200\n"
 "PO-Revision-Date: 2020-08-08 15:52+0200\n"
 "Last-Translator: Stéphane Mangin <stephane.mangin@freesbee.fr>\n"
 "Language-Team: <stephane.mangin@freesbee.fr>\n"
@@ -361,6 +361,10 @@ msgstr "Quitter"
 msgid "Edit log"
 msgstr "Éditer le fichier des entrées"
 
+#, fuzzy
+msgid "Edit last item"
+msgstr "Editer la liste de tâches"
+
 msgid "Edit tasks"
 msgstr "Éditer le fichier des tâches"
 
@@ -501,6 +505,11 @@ msgstr "Menu"
 #, fuzzy
 msgctxt "shortcut window"
 msgid "Focus the task entry"
+msgstr "Retourner en mode edition"
+
+#, fuzzy
+msgctxt "shortcut window"
+msgid "Edit last task entry"
 msgstr "Retourner en mode edition"
 
 msgctxt "shortcut window"
