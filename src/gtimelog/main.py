@@ -184,6 +184,7 @@ class Application(Gtk.Application):
             'about',
             'quit',
             'edit-log',
+            'edit-last-item',
             'edit-tasks',
             'refresh-tasks',
         ]
@@ -294,6 +295,7 @@ class Application(Gtk.Application):
         self.set_accels_for_action("win.go-home", ["<Alt>Home"])
         self.set_accels_for_action("win.focus-task-entry", ["<Primary>L"])
         self.set_accels_for_action("app.edit-log", ["<Primary>E"])
+        self.set_accels_for_action("app.edit-last-item", ["<Primary>BackSpace"])
         self.set_accels_for_action("app.edit-tasks", ["<Primary>T"])
         self.set_accels_for_action("app.shortcuts", ["<Primary>question"])
         self.set_accels_for_action("app.preferences", ["<Primary>P"])
@@ -318,6 +320,14 @@ class Application(Gtk.Application):
     def on_edit_log(self, action, parameter):
         filename = Settings().get_timelog_file()
         self.open_in_editor(filename)
+
+    def on_edit_last_item(self, action, parameter):
+        window = self.get_active_window()
+        text = window.timelog.remove_last_entry()
+        if text is not None:
+            window.task_entry.set_text(text)
+        window.task_entry.grab_focus()
+        window.task_entry.select_region(-1, -1)
 
     def on_edit_tasks(self, action, parameter):
         gsettings = Gio.Settings.new("org.gtimelog")

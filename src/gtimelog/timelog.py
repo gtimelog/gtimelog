@@ -1018,6 +1018,24 @@ class TimeLog(TimeCollection):
             f.write(line + '\n')
         self.last_mtime = get_mtime(self.filename)
 
+    def remove_last_entry(self):
+        self.check_reload()
+        if self.window.items:
+            self.window.items.pop()
+        else:
+            # entries list is empty, so nothing to remove
+            return None
+        _, last_entry = self.items.pop()
+        with open(self.filename, "r", encoding='utf-8') as f:
+            lines = f.readlines()
+        lines = lines[:-1]
+        if not lines[-1].strip():
+            # remove line which divides days if necessary
+            lines = lines[:-1]
+        with open(self.filename, "w", encoding='utf-8') as f:
+            f.write(''.join(lines))
+        return last_entry
+
     def append(self, entry, now=None):
         """Append a new entry to the time log."""
         if not now:

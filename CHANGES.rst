@@ -40,6 +40,8 @@ Changelog
 - Grouped task entries can now be sorted by start date, name, duration or
   according to tasks.txt order (GH: #228).
 
+- Add the ability to change the last entry using Primary+BackSpace (GH: #247).
+
 
 0.11.3 (2019-04-23)
 ~~~~~~~~~~~~~~~~~~~

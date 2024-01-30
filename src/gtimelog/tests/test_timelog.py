@@ -1188,6 +1188,63 @@ class TestTimeLog(Mixins, unittest.TestCase):
         timelog.append('now')
         self.assertEqual(timelog.items[-1][0], datetime.datetime(2015, 5, 12, 16, 27))
 
+    @freezegun.freeze_time("2018-12-09 16:27")
+    def test_remove_last_entry(self):
+
+        TEST_TIMELOG = textwrap.dedent("""
+            2018-12-09 08:30: start at home
+            2018-12-09 08:40: emails
+            2018-12-09 12:15: coding
+        """)
+
+        filename = self.tempfile()
+        self.write_file(filename, TEST_TIMELOG)
+        timelog = TimeLog(filename, datetime.time(2, 0))
+        timelog.reread()
+        last_entry = timelog.remove_last_entry()
+        self.assertEqual(last_entry, 'coding')
+        items_after_call = [
+            (datetime.datetime(2018, 12, 9, 8, 30), 'start at home'),
+            (datetime.datetime(2018, 12, 9, 8, 40), 'emails')]
+        self.assertEqual(timelog.items, items_after_call)
+        self.assertEqual(timelog.window.items, items_after_call)
+        with open(filename) as f:
+            self.assertEqual(f.read(), textwrap.dedent("""
+                2018-12-09 08:30: start at home
+                2018-12-09 08:40: emails
+            """))
+
+    @freezegun.freeze_time("2018-12-10 10:40")
+    def test_remove_last_entry_start_of_day(self):
+
+        TEST_TIMELOG = textwrap.dedent("""
+            2018-12-09 08:30: start at home
+            2018-12-09 08:40: emails
+
+            2018-12-10 08:30: start at home
+        """)
+
+        filename = self.tempfile()
+        self.write_file(filename, TEST_TIMELOG)
+        timelog = TimeLog(filename, datetime.time(2, 0))
+        timelog.reread()
+        last_entry = timelog.remove_last_entry()
+        self.assertEqual(last_entry, 'start at home')
+        items_after_call = [
+            (datetime.datetime(2018, 12, 9, 8, 30), 'start at home'),
+            (datetime.datetime(2018, 12, 9, 8, 40), 'emails')]
+        self.assertEqual(timelog.items, items_after_call)
+        self.assertEqual(timelog.window.items, [])
+        with open(filename) as f:
+            self.assertEqual(f.read(), textwrap.dedent("""
+                2018-12-09 08:30: start at home
+                2018-12-09 08:40: emails
+            """))
+
+        # no further remove possible at beginning of the day:
+        last_entry = timelog.remove_last_entry()
+        self.assertIsNone(last_entry)
+
     @freezegun.freeze_time("2015-05-12 16:27")
     def test_valid_time_accepts_any_time_in_the_past_when_log_is_empty(self):
         timelog = TimeLog(StringIO(), datetime.time(2, 0))
