@@ -237,8 +237,8 @@ msgstr ""
 "Authenticatie vereist voor ‘%s’.\n"
 "Log in met de gebruikersnaam en het wachtwoord van %s"
 
-msgid "Copyright © 2004–2020 Marius Gedminas and contributors."
-msgstr "Auteursrecht © 2004–2020 Marius Gedminas en bĳdragers."
+msgid "Copyright © 2004–2024 Marius Gedminas and contributors."
+msgstr "Auteursrecht © 2004–2024 Marius Gedminas en bĳdragers."
 
 msgid "A time tracking application"
 msgstr "Een tĳdregistratietoepassing"

@@ -227,7 +227,7 @@ msgid ""
 "You need a username and a password to access %s"
 msgstr ""
 
-msgid "Copyright © 2004–2020 Marius Gedminas and contributors."
+msgid "Copyright © 2004–2024 Marius Gedminas and contributors."
 msgstr ""
 
 msgid "A time tracking application"

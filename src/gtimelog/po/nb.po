@@ -236,8 +236,8 @@ msgstr ""
 "Autentisering er påkrevd for «%s»\n"
 "Du trenger et brukernavn og et passord for tilgang %s"
 
-msgid "Copyright © 2004–2020 Marius Gedminas and contributors."
-msgstr "Copyright © 2004–2020 Marius Gedminas og bidragsytere."
+msgid "Copyright © 2004–2024 Marius Gedminas and contributors."
+msgstr "Copyright © 2004–2024 Marius Gedminas og bidragsytere."
 
 msgid "A time tracking application"
 msgstr "En tidssporingsapplikasjon"
