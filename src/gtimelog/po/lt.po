@@ -354,9 +354,8 @@ msgstr "Išeiti"
 msgid "Edit log"
 msgstr "Taisyti žurnalą"
 
-#, fuzzy
 msgid "Edit last item"
-msgstr "Tvarkyti užduotis"
+msgstr "Taisyti paskutinį įrašą"
 
 msgid "Edit tasks"
 msgstr "Tvarkyti užduotis"
@@ -496,10 +495,9 @@ msgctxt "shortcut window"
 msgid "Focus the task entry"
 msgstr "Fokusuoti įvesties lauką"
 
-#, fuzzy
 msgctxt "shortcut window"
 msgid "Edit last task entry"
-msgstr "Fokusuoti įvesties lauką"
+msgstr "Perkelti paskutinį žurnalo įrašą į įvesties lauką"
 
 msgctxt "shortcut window"
 msgid "Keyboard shortcuts"
