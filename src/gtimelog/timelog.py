@@ -1010,14 +1010,6 @@ class TimeLog(TimeCollection):
         max = max + datetime.timedelta(1)
         return self.window_for(min, max)
 
-    def raw_append(self, line, need_space):
-        """Append a line to the time log file."""
-        with open(self.filename, "a", encoding='utf-8') as f:
-            if need_space:
-                f.write('\n')
-            f.write(line + '\n')
-        self.last_mtime = get_mtime(self.filename)
-
     def remove_last_entry(self):
         self.check_reload()
         if self.window.items:
@@ -1035,6 +1027,14 @@ class TimeLog(TimeCollection):
         with open(self.filename, "w", encoding='utf-8') as f:
             f.write(''.join(lines))
         return last_entry
+
+    def raw_append(self, line, need_space):
+        """Append a line to the time log file."""
+        with open(self.filename, "a", encoding='utf-8') as f:
+            if need_space:
+                f.write('\n')
+            f.write(line + '\n')
+        self.last_mtime = get_mtime(self.filename)
 
     def append(self, entry, now=None):
         """Append a new entry to the time log."""
