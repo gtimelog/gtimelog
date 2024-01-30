@@ -1,4 +1,6 @@
 """An application for keeping track of your time."""
+import shlex
+import subprocess
 import sys
 import time
 
@@ -309,9 +311,36 @@ class Application(Gtk.Application):
     def on_quit(self, action, parameter):
         self.quit()
 
+    @staticmethod
+    def prepare_args(program, filename):
+        args = shlex.split(program)
+        had_percent_s = False
+        for i, arg in enumerate(args):
+            if '%s' in arg:
+                args[i] = arg.replace('%s', filename)
+                had_percent_s = True
+        if not had_percent_s:
+            args.append(filename)
+        return args
+
+    def run_in_background(self, program, filename):
+        args = self.prepare_args(program, filename)
+        try:
+            subprocess.Popen(args)
+        except OSError as e:
+            log.error(_("Couldn't execute %s: %s"), args, e)
+            window = self.get_active_window()
+            if window is not None:
+                # XXX: info_bar is only visible in reporting mode!!!
+                window.show_info_bar(_("Couldn't execute {}: {}").format(args, e))
+
     def open_in_editor(self, filename):
         self.create_if_missing(filename)
-        if os.name == 'nt':
+        gsettings = Gio.Settings.new("org.gtimelog")
+        editor = gsettings.get_string('editor')
+        if editor:
+            self.run_in_background(editor, filename)
+        elif os.name == 'nt':
             os.startfile(filename)
         else:
             uri = GLib.filename_to_uri(filename, None)
@@ -325,8 +354,9 @@ class Application(Gtk.Application):
         gsettings = Gio.Settings.new("org.gtimelog")
         if gsettings.get_boolean('remote-task-list'):
             uri = gsettings.get_string('task-list-edit-url')
-            if self.get_active_window() is not None:
-                self.get_active_window().editing_remote_tasks = True
+            window = self.get_active_window()
+            if window is not None:
+                window.editing_remote_tasks = True
             Gtk.show_uri(None, uri, Gdk.CURRENT_TIME)
         else:
             filename = Settings().get_task_list_file()
@@ -335,8 +365,9 @@ class Application(Gtk.Application):
     def on_refresh_tasks(self, action, parameter):
         gsettings = Gio.Settings.new("org.gtimelog")
         if gsettings.get_boolean('remote-task-list'):
-            if self.get_active_window() is not None:
-                self.get_active_window().download_tasks()
+            window = self.get_active_window()
+            if window is not None:
+                window.download_tasks()
 
     def create_if_missing(self, filename):
         if not os.path.exists(filename):
@@ -747,19 +778,19 @@ class Window(Gtk.ApplicationWindow):
 
     def update_already_sent_indication(self, *args):
         if self.report_view.report_status == 'sent':
-            self.infobar_label.set_text(_("Report already sent"))
-            self.infobar.show()
-            # https://github.com/gtimelog/gtimelog/issues/89
-            self.infobar.queue_resize()
+            self.show_info_bar(_("Report already sent"))
         elif self.report_view.report_status == 'sent-elsewhere':
-            self.infobar_label.set_text(
+            self.show_info_bar(
                 _("Report already sent (to {})").format(
                     self.report_view.report_sent_to))
-            self.infobar.show()
-            # https://github.com/gtimelog/gtimelog/issues/89
-            self.infobar.queue_resize()
         else:
             self.infobar.hide()
+
+    def show_info_bar(self, text):
+        self.infobar_label.set_text(text)
+        self.infobar.show()
+        # https://github.com/gtimelog/gtimelog/issues/89
+        self.infobar.queue_resize()
 
     def cancel_tasks_download(self, hide=True):
         if self._download:
@@ -1080,9 +1111,8 @@ class Window(Gtk.ApplicationWindow):
         try:
             self.send_email(sender, recipient, subject, body)
         except EmailError as e:
-            self.infobar_label.set_text(
+            self.show_info_bar(
                 _("Couldn't send email to {}: {}.").format(recipient, e))
-            self.infobar.show()
         else:
             self.record_sent_email(self.report_view.time_range,
                                    self.report_view.date,
