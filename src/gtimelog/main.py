@@ -1013,6 +1013,7 @@ class Window(Gtk.ApplicationWindow):
     def on_edit_last_entry(self, action, parameter):
         text = self.timelog.remove_last_entry()
         if text is not None:
+            self.date = None
             self.notify('timelog')
             self.tick(True)
             self.task_entry.set_text(text)
