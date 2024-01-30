@@ -939,9 +939,8 @@ class TimeLog(TimeCollection):
                 self.filename.seek(0)
                 self.items = self._read(self.filename)
             else:
-                with open(self.filename, 'rb') as f:
-                    data = f.read()
-                self.items = self._read(data.decode('UTF-8').splitlines())
+                with open(self.filename, encoding='utf-8') as f:
+                    self.items = self._read(f)
         except IOError:
             self.items = []
         self.window = self.window_for_day(self.day)

@@ -208,6 +208,24 @@ def parse_and_sort_unicode_piecemeal():
 
 
 @mark
+def parse_and_sort_python3():
+    items = []
+    filename = Settings().get_timelog_file()
+    for line in open(filename, 'r', encoding='UTF-8'):
+        time, sep, entry = line.partition(': ')
+        if not sep:
+            continue
+        try:
+            time = parse_datetime(time)
+        except ValueError:
+            continue
+        entry = entry.strip()
+        items.append((time, entry))
+    items.sort(key=itemgetter(0))
+    return items
+
+
+@mark
 def full():
     return TimeLog(Settings().get_timelog_file(), Settings().virtual_midnight).items
 
