@@ -35,12 +35,16 @@ test:                                   ##: run tests
 	tox -p auto
 
 .PHONY: check
-check: test                             ##: run tests and additional checks
-# 'make check' is defined in release.mk and here's how you can override it
-define check_recipe =
+check: check-desktop-file check-appstream-metadata ##: run tests and additional checks
+
+.PHONY: check
+check-desktop-file:                     ##: validate desktop file
 	desktop-file-validate gtimelog.desktop
-	appstream-util validate-relax gtimelog.appdata.xml
-endef
+
+.PHONY: check
+check-appstream-metadata:               ##: validate appstream metadata file
+	appstreamcli validate --strict --explain --pedantic gtimelog.appdata.xml
+
 
 .PHONY: coverage
 coverage:                               ##: measure test coverage
