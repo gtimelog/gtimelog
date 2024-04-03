@@ -19,3 +19,4 @@ recursive-include src/gtimelog/po *.po *.pot *.in
 recursive-include flatpak *.yaml
 
 prune docs/build
+prune src/gtimelog/locale
