@@ -105,7 +105,8 @@ clean:                                  ##: clean build artifacts
 include release.mk
 
 .PHONY: distcheck
-distcheck: distcheck-wheel  # add to the list of checks defined in release.mk
+distcheck: distcheck-wheel    # add to the list of checks defined in release.mk
+distcheck: distcheck-appdata  # add to the list of checks defined in release.mk
 
 .PHONY: distcheck-wheel
 distcheck-wheel:
@@ -113,6 +114,15 @@ distcheck-wheel:
 	  unzip -l dist/$$pkg_and_version-py2.py3-none-any.whl | \
 	  grep -q gtimelog.mo && \
 	  echo "wheel seems to be ok"
+
+APPDATA_FILE = gtimelog.appdata.xml
+APPDATA_FORMAT = "<release version="'"'$(changelog_ver)'"'" date="'"'"$(changelog_date)"'"'" />"
+
+.PHONY: distcheck-appdata
+distcheck-appdata:
+	@ver_and_date=$(APPDATA_FORMAT) && \
+	    grep -q "^$$ver_and_date$$" $(APPDATA_FILE) || { \
+	        echo "$(APPDATA_FILE) has no entry for $$ver_and_date"; exit 1; }
 
 %.1: %.rst
 	rst2man $< > $@
