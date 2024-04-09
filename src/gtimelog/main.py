@@ -1786,9 +1786,6 @@ class ReportView(Gtk.TextView):
         self.connect('notify::recipient', self.update_already_sent_indication)
         self.bind_property('body', self.get_buffer(), 'text',
                            GObject.BindingFlags.BIDIRECTIONAL)
-        # GTK+ themes other than Adwaita ignore the 'monospace' property and
-        # use a proportional font for text widgets.
-        self.override_font(Pango.FontDescription.from_string("Monospace"))
 
         filename = Settings().get_report_log_file()
         self.record = ReportRecord(filename)
