@@ -1,5 +1,5 @@
-/* GTK+ themes other than Adwaita ignore the 'monospace' property and
+/* Some GTK+ themes (e.g. 'win32') ignore the 'monospace' property and
    use a proportional font for text widgets. */
 .monospace {
-	font-family: monospace;
+    font-family: monospace;
 }
