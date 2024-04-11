@@ -1,1 +1,5 @@
-/* We don't have any custom CSS today! */
+/* GTK+ themes other than Adwaita ignore the 'monospace' property and
+   use a proportional font for text widgets. */
+.monospace {
+	font-family: monospace;
+}
