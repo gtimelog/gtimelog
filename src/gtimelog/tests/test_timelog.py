@@ -1298,6 +1298,12 @@ class TestTimeLog(Mixins, unittest.TestCase):
         self.assertEqual(timelog.parse_correction("15:20 did stuff"),
                          ("did stuff", datetime.datetime(2015, 5, 12, 15, 20)))
 
+    @freezegun.freeze_time("2015-05-12 16:27")
+    def test_parse_correction_allows_single_digit_hour(self):
+        timelog = TimeLog(StringIO(), datetime.time(2, 0))
+        self.assertEqual(timelog.parse_correction("9:20 did stuff"),
+                         ("did stuff", datetime.datetime(2015, 5, 12, 9, 20)))
+
     @freezegun.freeze_time("2015-05-13 00:27")
     def test_parse_correction_handles_virtual_midnight_yesterdays_time(self):
         # Regression test for https://github.com/gtimelog/gtimelog/issues/33

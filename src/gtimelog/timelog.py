@@ -1081,7 +1081,7 @@ class TimeLog(TimeCollection):
         timestamp stripped.
         """
         now = None
-        date_match = re.match(r'(\d\d):(\d\d)\s+', entry)
+        date_match = re.match(r'(\d\d?):(\d\d)\s+', entry)
         delta_match = re.match(r'[\-+]([1-9]\d?|1\d\d)\s+', entry)
         if date_match:
             h = int(date_match.group(1))

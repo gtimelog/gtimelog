@@ -4,7 +4,8 @@ Changelog
 0.12.1 (unreleased)
 ~~~~~~~~~~~~~~~~~~~
 
-- Nothing changed yet.
+- You can now back-date new log items using a single-digit hour, e.g. "9:30
+  morning meeting" (GH: #254).
 
 
 0.12.0 (2024-04-03)
