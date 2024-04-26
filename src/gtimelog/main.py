@@ -1259,6 +1259,7 @@ class TaskEntry(Gtk.Entry):
         self.filtered_history = []
         self.history_pos = 0
         self.history_undo = ''
+        self.history_prefix = ''
 
     def set_up_completion(self):
         completion = self.gtk_completion = Gtk.EntryCompletion()
@@ -1332,15 +1333,27 @@ class TaskEntry(Gtk.Entry):
             return True
         return Gtk.Entry.do_key_press_event(self, event)
 
+    def _split_correction(self, entry):
+        """Split entry into time correction and entry itself.
+
+        Returns a tuple (prefix, suffix).  ``prefix`` will be an empty string
+        if no correction was recognized.  ``prefix + suffix == entry`` will
+        always be true.
+        """
+        suffix, corrected_time = self.timelog.parse_correction(entry)
+        return (entry[:-len(suffix)], suffix)
+
     def _do_history(self, delta):
         """Handle movement in history."""
         if not self.history:
             return
         if self.history_pos == 0:
-            self.history_undo = self.get_text()
+            entry = self.get_text()
+            self.history_undo = entry
+            self.history_prefix, search_prefix = self._split_correction(entry)
             self.filtered_history = uniq([
                 entry for entry in self.history
-                if entry.startswith(self.history_undo)
+                if entry.startswith(search_prefix)
             ])
         history = self.filtered_history
         new_pos = max(0, min(self.history_pos + delta, len(history)))
@@ -1348,9 +1361,10 @@ class TaskEntry(Gtk.Entry):
             self.set_text(self.history_undo)
             self.set_position(-1)
         else:
-            self.set_text(history[-new_pos])
+            self.set_text(self.history_prefix + history[-new_pos])
             self.select_region(len(self.history_undo), -1)
-        # Do this after on_changed reset history_pos to 0
+        # The above indirectly calls on_changed(), which resets history_pos to 0
+        # Make sure to set the new value for history_pos afterwards!
         self.history_pos = new_pos
 
 
