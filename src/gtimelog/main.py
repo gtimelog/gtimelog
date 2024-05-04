@@ -659,6 +659,7 @@ class Window(Gtk.ApplicationWindow):
         self.gsettings.bind('gtk-completion', self.task_entry, 'gtk-completion-enabled', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.connect('changed::remote-task-list', self.load_tasks)
         self.gsettings.connect('changed::task-list-url', self.load_tasks)
+        self.gsettings.connect('changed::remote-auth-header', self.load_tasks)
         self.gsettings.connect('changed::task-list-edit-url', self.update_edit_tasks_availability)
         self.gsettings.connect('changed::virtual-midnight', self.virtual_midnight_changed)
         self.update_edit_tasks_availability()
@@ -690,6 +691,7 @@ class Window(Gtk.ApplicationWindow):
             self.gsettings.set_string('list-email', old_settings.email)
             self.gsettings.set_string('report-style', old_settings.report_style)
             self.gsettings.set_string('task-list-url', old_settings.task_list_url)
+            self.gsettings.set_string('remote-auth-header', old_settings.auth_header)
             self.gsettings.set_boolean('remote-task-list', bool(old_settings.task_list_url))
             for arg in old_settings.edit_task_list_cmd.split():
                 if arg.startswith(('http://', 'https://')):
@@ -774,6 +776,7 @@ class Window(Gtk.ApplicationWindow):
         self.cancel_tasks_download(hide=False)
 
         url = self.gsettings.get_string('task-list-url')
+        auth_header = self.gsettings.get_string('remote-auth-header')
         if not url:
             log.debug("Not downloading tasks: URL not specified")
             return
@@ -788,6 +791,9 @@ class Window(Gtk.ApplicationWindow):
         message = Soup.Message.new('GET', url)
         self._download = (message, url)
         message.connect('authenticate', authenticator.http_auth_cb)
+        if (auth_header and not auth_header.isspace()):
+            message.get_request_headers().append('Authorization', auth_header)
+
         soup_session.send_and_read_async(
             message,
             GLib.PRIORITY_DEFAULT,
