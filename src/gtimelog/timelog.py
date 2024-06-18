@@ -244,6 +244,11 @@ class TimeCollection(object):
         """
         if ': ' in entry:
             cat, tsk = entry.split(': ', 1)
+            t, _, c = cat.partition('@')
+            if c and t:
+                # if category string can be further partitioned into non empty strings by '@'
+                # use 1st as task and 2nd as category
+                cat, tsk = c, t
             return cat.strip(), tsk.strip()
         elif entry.endswith(':'):
             return entry.partition(':')[0].strip(), ''
@@ -279,6 +284,10 @@ class TimeCollection(object):
         work = {}
         slack = {}
         for start, stop, duration, tags, entry in self.all_entries():
+            cat, task = self.split_category(entry)
+            entry = task if task is not None else ''
+            if cat:
+                entry = cat + ': ' + entry
             if skip_first:
                 # XXX: in case of for multi-day windows, this should skip
                 # the 1st entry of each day
