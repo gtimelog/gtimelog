@@ -6,9 +6,12 @@ Changelog
 
 - You can now back-date new log items using a single-digit hour, e.g. "9:30
   morning meeting" (GH: #254).
+
 - The hidden history completion feature (PageUp/PageDown) ignores time
   correction prefix when looking up past entries, so you can do things like
   type "9:30 st", press PageUp and complete that to "9:30 started working".
+
+- Fix text alignment issues with times involving a lot of 1s (GH: #256).
 
 
 0.12.0 (2024-04-03)

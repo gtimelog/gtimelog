@@ -1454,7 +1454,7 @@ class LogView(Gtk.TextView):
         em = pango_context.get_font_description().get_size()
         tabs = Pango.TabArray.new(2, False)
         tabs.set_tab(0, Pango.TabAlign.LEFT, 9 * em)
-        tabs.set_tab(1, Pango.TabAlign.LEFT, 12.5 * em)
+        tabs.set_tab(1, Pango.TabAlign.LEFT, 19.5 * em)
         self.set_tabs(tabs)
 
     def set_up_tags(self):
