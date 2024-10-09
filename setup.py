@@ -46,9 +46,8 @@ long_description = ''.join([
     older_changes,
 ])
 
-tests_require = ['freezegun']
-if sys.version_info < (3, 6, 0):
-    sys.exit("Python 3.6 is the minimum required version")
+if sys.version_info < (3, 7, 0):
+    sys.exit("Python 3.7 is the minimum required version")
 
 setup(
     name='gtimelog',
@@ -81,8 +80,6 @@ setup(
     package_dir={'': 'src'},
     include_package_data=True,
     package_data={'': ['locale/*/LC_MESSAGES/gtimelog.mo']},
-    test_suite='gtimelog.tests',
-    tests_require=tests_require,
     extras_require={
         'test': [
             'freezegun',
