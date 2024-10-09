@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import argparse
 import re
 import sys
@@ -62,7 +62,7 @@ def main():
         total += time
 
     if args.decimal:
-        print("** Total: %.2f hours" % total)
+        print("** Total: %.2f hours" % (total / 60.0))
     else:
         print("** Total: %s" % format_time(total))
 
