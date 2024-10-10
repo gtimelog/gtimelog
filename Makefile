@@ -129,3 +129,23 @@ distcheck-appdata:
 
 %.5: %.rst
 	rst2man $< > $@
+
+.PHONY: update-github-branch-protection-rules
+update-github-branch-protection-rules:  ##: update GitHub branch protection rules
+	gh api -X PUT -H "Accept: application/vnd.github+json" \
+		-H "X-GitHub-Api-Version: 2022-11-28" \
+		/repos/{owner}/{repo}/branches/master/protection/required_status_checks/contexts \
+		-f "contexts[]=check-manifest"                         \
+		-f "contexts[]=check-python-versions"                  \
+		-f "contexts[]=flake8"                                 \
+		-f "contexts[]=isort"                                  \
+		-f "contexts[]=Python 3.7"                             \
+		-f "contexts[]=Python 3.8"                             \
+		-f "contexts[]=Python 3.9"                             \
+		-f "contexts[]=Python 3.10"                            \
+		-f "contexts[]=Python 3.11"                            \
+		-f "contexts[]=Python 3.12"                            \
+		-f "contexts[]=Python 3.13"                            \
+		-f "contexts[]=Python pypy3.10"                        \
+		-f "contexts[]=continuous-integration/appveyor/branch" \
+		-f "contexts[]=continuous-integration/appveyor/pr"
