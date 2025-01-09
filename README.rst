@@ -3,7 +3,7 @@ GTimeLog
 
 GTimeLog is a simple app for keeping track of time.
 
-.. image:: https://github.com/gtimelog/gtimelog/workflows/build/badge.svg?branch=master
+.. image:: https://github.com/gtimelog/gtimelog/actions/workflows/build.yml/badge.svg?branch=master
    :target: https://github.com/gtimelog/gtimelog/actions
    :alt: build status
 
