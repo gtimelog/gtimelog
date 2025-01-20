@@ -15,6 +15,8 @@ Changelog
 
 - Add Python 3.13 support.
 
+- Drop Python 3.7 support.
+
 
 0.12.0 (2024-04-03)
 ~~~~~~~~~~~~~~~~~~~
