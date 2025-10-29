@@ -48,7 +48,7 @@ jobs:
         run: |
           python -m pip install -U pip
           python -m pip install -U setuptools wheel
-          python -m pip install -U coverage coveralls -cconstraints.txt
+          python -m pip install -U coverage coveralls -c constraints.txt
           python -m pip install -U freezegun
           python -m pip install --no-deps -e .
 
