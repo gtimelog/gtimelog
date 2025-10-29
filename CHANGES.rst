@@ -13,9 +13,9 @@ Changelog
 
 - Fix text alignment issues with times involving a lot of 1s (GH: #256).
 
-- Add Python 3.13 support.
+- Add Python 3.13 and 3.14 support.
 
-- Drop Python 3.7 support.
+- Drop Python 3.7, 3.8 and 3.9 support.
 
 
 0.12.0 (2024-04-03)
