@@ -53,12 +53,12 @@ jobs:
           python -m pip install --no-deps -e .
 
       - name: Run tests
-        run: python -m coverage run -m gtimelog.tests
+        run: coverage run -m gtimelog.tests
 
       - name: Check test coverage
         run: |
-          python -m coverage report -m --fail-under=100
-          python -m coverage xml
+          coverage report -m --fail-under=100
+          coverage xml
 
       - name: Report to coveralls
         uses: coverallsapp/github-action@v2
