@@ -227,7 +227,7 @@ def parse_and_sort_python3():
 
 @mark
 def full():
-    return TimeLog(Settings().get_timelog_file(), Settings().virtual_midnight).items
+    return TimeLog(Settings().get_timelog_file(), Settings().virtual_midnight, Settings().rounding_time).items
 
 
 def main():
