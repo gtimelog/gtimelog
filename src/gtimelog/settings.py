@@ -40,6 +40,7 @@ class Settings(object):
     virtual_midnight = datetime.time(2, 0)
 
     task_list_url = ''
+    auth_header = ''
     edit_task_list_cmd = ''
 
     show_office_hours = True
