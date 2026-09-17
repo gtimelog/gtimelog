@@ -13,6 +13,9 @@ Changelog
 
 - Fix text alignment issues with times involving a lot of 1s (GH: #256).
 
+- Completion match mode is configurable (exact, prefix, substring, fuzzy,
+  has-chars (default)).
+
 - Add Python 3.13 and 3.14 support.
 
 - Drop Python 3.7, 3.8 and 3.9 support.

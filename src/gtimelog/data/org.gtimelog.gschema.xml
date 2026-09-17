@@ -22,6 +22,14 @@
         <value nick="SMTP (StartTLS)" value="3"/>
     </enum>
 
+    <enum id="org.gtimelog.CompletionMatchMode">
+        <value nick="exact" value="0"/>
+        <value nick="prefix" value="1"/>
+        <value nick="substring" value="2"/>
+        <value nick="has-chars" value="3"/>
+        <value nick="fuzzy" value="4"/>
+    </enum>
+
     <schema path="/org/gtimelog/" id="org.gtimelog">
 
         <key name="settings-migrated" type="b">
@@ -161,6 +169,12 @@
             <default>true</default>
             <summary>Use completion</summary>
             <description>If true, the task entry will use the standard GTK+ completion.  If false, it'll only use the custom prefix completion on PageUp/PageDown.</description>
+        </key>
+
+        <key name="gtk-completion-match-mode" enum="org.gtimelog.CompletionMatchMode">
+            <default>"has-chars"</default>
+            <summary>Completion match mode</summary>
+            <description>Method for matching completion options against input.</description>
         </key>
 
     </schema>

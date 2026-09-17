@@ -36,6 +36,7 @@ import os
 import re
 import signal
 import smtplib
+import warnings
 from contextlib import closing
 from email.utils import formataddr, parseaddr
 from gettext import gettext as _
@@ -657,6 +658,7 @@ class Window(Gtk.ApplicationWindow):
         self.gsettings.bind('report-style', self.report_view, 'report-style', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('remote-task-list', self.app.actions.refresh_tasks, 'enabled', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.bind('gtk-completion', self.task_entry, 'gtk-completion-enabled', Gio.SettingsBindFlags.DEFAULT)
+        self.gsettings.bind('gtk-completion-match-mode', self.task_entry, 'gtk-completion-match-mode', Gio.SettingsBindFlags.DEFAULT)
         self.gsettings.connect('changed::remote-task-list', self.load_tasks)
         self.gsettings.connect('changed::task-list-url', self.load_tasks)
         self.gsettings.connect('changed::task-list-edit-url', self.update_edit_tasks_availability)
@@ -1231,6 +1233,14 @@ class Window(Gtk.ApplicationWindow):
         return True
 
 
+class MatchMode(GObject.GEnum):
+    EXACT = 0
+    PREFIX = 1
+    SUBSTRING = 2
+    HAS_CHARS = 3
+    FUZZY = 4
+
+
 class TaskEntry(Gtk.Entry):
 
     timelog = GObject.Property(
@@ -1244,6 +1254,10 @@ class TaskEntry(Gtk.Entry):
     gtk_completion_enabled = GObject.Property(
         type=bool, default=True, nick='Completion enabled',
         blurb='GTK+ completion enabled?')
+
+    gtk_completion_match_mode = GObject.Property(
+        type=MatchMode, default=MatchMode.HAS_CHARS, nick='Match mode',
+        blurb='Method for matching completion options against input')
 
     def __init__(self):
         Gtk.Entry.__init__(self)
@@ -1274,6 +1288,42 @@ class TaskEntry(Gtk.Entry):
 
     def completion_match_func(self, completion, search_text, tree_iter, data):
         entry = data.get_value(tree_iter, 0).lower()
+
+        match_mode = self.gtk_completion_match_mode
+        if match_mode == MatchMode.EXACT:
+            return entry == search_text
+        elif match_mode == MatchMode.PREFIX:
+            return entry.startswith(search_text)
+        elif match_mode == MatchMode.SUBSTRING:
+            return search_text in entry
+        elif match_mode == MatchMode.FUZZY:
+            # Very custom fuzzy search logic
+            pos = 0
+            n_matched = 0
+            n_skipped = 0
+            threshold = int(len(search_text) * 0.8)  # minimum matching characters
+            for i, char in enumerate(search_text):
+                new_pos = entry.find(char, pos)
+                if new_pos >= 0 and new_pos <= pos + 2:
+                    # allow single skipped characters
+                    n_matched += 1
+                    if new_pos > pos + 1:
+                        if n_skipped > 0:
+                            # disallow multiple consecutive skipped characters
+                            return False
+                        n_skipped += 1
+                    else:
+                        n_skipped = 0
+                    pos = new_pos
+                else:
+                    if i > len(search_text) - threshold and not n_matched:
+                        # return early when we can't possibly match
+                        return False
+            return n_matched >= threshold
+        elif match_mode != MatchMode.HAS_CHARS:
+            warnings.warn('Unknown completion match mode: %s' % match_mode)
+            # fall back to has-chars mode
+
         pos = 0
         for char in search_text:
             new_pos = entry.find(char, pos)
