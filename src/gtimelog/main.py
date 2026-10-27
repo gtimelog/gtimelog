@@ -584,6 +584,7 @@ class Window(Gtk.ApplicationWindow):
         self.log_view = LogView()
         swap_widget(builder, 'log_view', self.log_view)
         self.bind_property('timelog', self.task_entry, 'timelog', GObject.BindingFlags.DEFAULT)
+        self.bind_property('tasks', self.task_entry, 'tasks', GObject.BindingFlags.DEFAULT)
         self.bind_property('timelog', self.log_view, 'timelog', GObject.BindingFlags.DEFAULT)
         self.bind_property('showing_today', self.log_view, 'showing_today', GObject.BindingFlags.DEFAULT)
         self.bind_property('date', self.log_view, 'date', GObject.BindingFlags.DEFAULT)
@@ -1237,6 +1238,10 @@ class TaskEntry(Gtk.Entry):
         type=object, default=None, nick='Time log',
         blurb='Time log object')
 
+    tasks = GObject.Property(
+        type=object, default=None, nick='Tasks',
+        blurb='Task list object')
+
     completion_limit = GObject.Property(
         type=int, default=1000, nick='Completion limit',
         blurb='Maximum number of items in the completion popup')
@@ -1250,6 +1255,7 @@ class TaskEntry(Gtk.Entry):
         self.set_up_history()
         self.set_up_completion()
         self.connect('notify::timelog', self.timelog_changed)
+        self.connect('notify::tasks', self.timelog_changed)
         self.connect('notify::completion-limit', self.timelog_changed)
         self.connect('changed', self.on_changed)
         self.connect('notify::gtk-completion-enabled', self.gtk_completion_enabled_changed)
@@ -1295,21 +1301,32 @@ class TaskEntry(Gtk.Entry):
         self.completion_choices.clear()
         if self.timelog is None:
             mark_time('no history')
+        else:
+            self.history = [item[1] for item in self.timelog.items]
+            mark_time('history prepared')
+            # if there are duplicate entries, we want to keep the last one
+            # e.g. if timelog.items contains [a, b, a, c], we want
+            # self.completion_choices to be [b, a, c].
+            entries = []
+            for entry in reversed(self.history):
+                if entry not in self.completion_choices_as_set:
+                    entries.append(entry)
+                    self.completion_choices_as_set.add(entry)
+            mark_time('unique items selected')
+            for entry in reversed(entries[:self.completion_limit]):
+                self.completion_choices.append([entry])
+            mark_time('history completion initialized')
+        self.add_task_completions()
+
+    def add_task_completions(self):
+        """Add tasks from tasks.txt to the completion choices."""
+        if self.tasks is None:
             return
-        self.history = [item[1] for item in self.timelog.items]
-        mark_time('history prepared')
-        # if there are duplicate entries, we want to keep the last one
-        # e.g. if timelog.items contains [a, b, a, c], we want
-        # self.completion_choices to be [b, a, c].
-        entries = []
-        for entry in reversed(self.history):
+        for entry in self.tasks.all_tasks():
             if entry not in self.completion_choices_as_set:
-                entries.append(entry)
+                self.completion_choices.append([entry])
                 self.completion_choices_as_set.add(entry)
-        mark_time('unique items selected')
-        for entry in reversed(entries[:self.completion_limit]):
-            self.completion_choices.append([entry])
-        mark_time('history completion initialized')
+        mark_time('task list completion initialized')
 
     def entry_added(self):
         if self.timelog is None:

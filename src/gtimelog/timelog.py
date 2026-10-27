@@ -1188,6 +1188,15 @@ class TaskList(object):
         """Reload the task list."""
         self.load()
 
+    def all_tasks(self):
+        """Return a list of all tasks, in the order they appear in the file.
+
+        Tasks with a group prefix are returned as 'group: task', the same
+        way they would be entered into the time log.  Duplicates are listed
+        only once.
+        """
+        return sorted(self.task_order, key=self.task_order.get)
+
     def order(self, value):
         """
         Return the order index of a value in the task order list

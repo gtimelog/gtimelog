@@ -13,6 +13,9 @@ Changelog
 
 - Fix text alignment issues with times involving a lot of 1s (GH: #256).
 
+- Tasks from tasks.txt are now offered in the task entry completion menu,
+  in addition to past time log entries (GH: #217).
+
 - Add Python 3.13, 3.14, and 3.15 support.
 
 - Drop Python 3.7, 3.8, and 3.9 support.

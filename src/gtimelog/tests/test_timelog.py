@@ -1085,6 +1085,41 @@ class TestTaskList(Mixins, unittest.TestCase):
         self.assertEqual(tasklist.order('project: fix bugs'), 4)
         self.assertEqual(tasklist.order('unknown task'),  sys.maxsize)
 
+    def test_all_tasks(self):
+        taskfile = self.write_file('tasks.txt', textwrap.dedent('''\
+            # comments are skipped
+            some task
+            project: do it
+
+            project:fix bugs
+            misc: paperwork
+            other task
+        '''))
+        tasklist = TaskList(taskfile)
+        self.assertEqual(tasklist.all_tasks(), [
+            'some task',
+            'project: do it',
+            'project: fix bugs',
+            'misc: paperwork',
+            'other task',
+        ])
+
+    def test_all_tasks_duplicates(self):
+        taskfile = self.write_file('tasks.txt', textwrap.dedent('''\
+            project: do it
+            some task
+            project: do it
+        '''))
+        tasklist = TaskList(taskfile)
+        self.assertEqual(sorted(tasklist.all_tasks()), [
+            'project: do it',
+            'some task',
+        ])
+
+    def test_all_tasks_missing_file(self):
+        tasklist = TaskList('/nosuchfile')
+        self.assertEqual(tasklist.all_tasks(), [])
+
     def test_unicode(self):
         taskfile = self.write_file('tasks.txt', '\N{SNOWMAN}')
         tasklist = TaskList(taskfile)
