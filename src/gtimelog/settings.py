@@ -38,6 +38,8 @@ class Settings(object):
     hours = 8
     office_hours = 9
     virtual_midnight = datetime.time(2, 0)
+    rounding_time = 0
+    rounding_time_force_above = False
 
     task_list_url = ''
     edit_task_list_cmd = ''
@@ -106,6 +108,8 @@ class Settings(object):
         config.set('gtimelog', 'office-hours', str(self.office_hours))
         config.set('gtimelog', 'virtual_midnight',
                    self.virtual_midnight.strftime('%H:%M'))
+        config.set('gtimelog', 'rounding_time', str(self.rounding_time))
+        config.set('gtimelog', 'rounding_time_force_above', str(self.rounding_time_force_above))
         config.set('gtimelog', 'task_list_url', self.task_list_url)
         config.set('gtimelog', 'edit_task_list_cmd', self.edit_task_list_cmd)
         config.set('gtimelog', 'show_office_hours',
@@ -137,6 +141,8 @@ class Settings(object):
         self.office_hours = config.getfloat('gtimelog', 'office-hours')
         self.virtual_midnight = parse_time(config.get('gtimelog',
                                                       'virtual_midnight'))
+        self.rounding_time = config.getint('gtimelog', 'rounding_time')
+        self.rounding_time_force_above = config.getboolean('gtimelog', 'rounding_time_force_above')
         self.task_list_url = config.get('gtimelog', 'task_list_url')
         self.edit_task_list_cmd = config.get('gtimelog', 'edit_task_list_cmd')
         self.show_office_hours = config.getboolean('gtimelog',
