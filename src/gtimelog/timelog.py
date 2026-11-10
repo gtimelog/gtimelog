@@ -941,7 +941,8 @@ class TimeLog(TimeCollection):
             else:
                 with open(self.filename, encoding='utf-8') as f:
                     self.items = self._read(f)
-        except IOError:
+        except (IOError, UnicodeDecodeError):
+            # the file's not there (or not UTF-8), so start empty
             self.items = []
         self.window = self.window_for_day(self.day)
 
@@ -1176,8 +1177,8 @@ class TaskList(object):
                     else:  # "other" tasks
                         others.append(line)
                         task_order[line] = index
-        except IOError:
-            pass # the file's not there, so what?
+        except (IOError, UnicodeDecodeError):
+            pass # the file's not there (or not UTF-8), so what?
         # append the "other" tasks at the end
         self.groups = list(groups.items())
         if others:
