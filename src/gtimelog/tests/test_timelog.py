@@ -1066,6 +1066,13 @@ class TestTaskList(Mixins, unittest.TestCase):
         self.assertFalse(tasklist.check_reload())
         tasklist.reload()  # no crash
 
+    def test_non_utf8_file_is_treated_as_missing(self):
+        filename = os.path.join(self.mkdtemp(), 'tasks.txt')
+        with open(filename, 'wb') as f:
+            f.write('café\n'.encode('latin-1'))
+        tasklist = TaskList(filename)  # no crash
+        self.assertEqual(tasklist.groups, [])
+
     def test_parsing_and_ordering(self):
         taskfile = self.write_file('tasks.txt', textwrap.dedent('''\
             # comments are skipped
@@ -1133,6 +1140,13 @@ class TestTimeLog(Mixins, unittest.TestCase):
         os.unlink(logfile)
         self.assertTrue(timelog.check_reload())
         self.assertFalse(timelog.check_reload())
+
+    def test_non_utf8_file_is_treated_as_empty(self):
+        logfile = os.path.join(self.mkdtemp(), 'timelog.txt')
+        with open(logfile, 'wb') as f:
+            f.write('2026-01-01 10:00: café\n'.encode('latin-1'))
+        timelog = TimeLog(logfile, datetime.time(2, 0))  # no crash
+        self.assertEqual(timelog.items, [])
 
     def test_window_for_day(self):
         timelog = TimeLog(StringIO(), datetime.time(2, 0))
