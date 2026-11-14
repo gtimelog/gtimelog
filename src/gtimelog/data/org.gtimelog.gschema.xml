@@ -157,6 +157,12 @@
             <description>URL for editing tasks for the task pane.  Will be opened in a browser window if the user asks to edit tasks.</description>
         </key>
 
+        <key name="remote-auth-header" type="s">
+            <default>""</default>
+            <summary>Remote authentication token</summary>
+            <description>Authentication token for when task-list-url is protected</description>
+        </key>
+
         <key name="gtk-completion" type="b">
             <default>true</default>
             <summary>Use completion</summary>
