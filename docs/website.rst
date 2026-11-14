@@ -23,11 +23,11 @@ Documentation
 Download
 ========
 
-You can get GTimeLog from the `Python Package Index`_::
+You can install GTimeLog from the official repositories on Debian_ and Ubuntu_.
+
+Alternatively, you can get GTimeLog from the `Python Package Index`_::
 
     pip install gtimelog
-
-Packages exist in Debian_ and in Ubuntu_, but they're outdated at the moment.
 
 .. _Python Package Index: https://pypi.python.org/pypi/gtimelog
 .. _debian: https://packages.debian.org/gtimelog
