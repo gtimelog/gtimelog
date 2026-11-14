@@ -69,6 +69,9 @@ def parse_time(t):
         raise ValueError('bad time: %r' % t)
     hour, min = map(int, m.groups())
     return datetime.time(hour, min)
+    
+def by_duration(e):
+    return e[1]
 
 
 def virtual_day(dt, virtual_midnight):
@@ -676,7 +679,7 @@ class Reports(object):
         categories = {}
         if work:
             work = [(entry, duration) for start, entry, duration in work]
-            work.sort()
+            work.sort(reverse=True, key=by_duration)
             for entry, duration in work:
                 if not duration:
                     continue # skip empty "arrival" entries
@@ -698,6 +701,21 @@ class Reports(object):
         tags = self.window.set_of_all_tags()
         if tags:
             self._report_tags(output, tags)
+            
+        output.write('\nSlacking:\n\n')
+        
+        if slack:
+            slack = [(entry, duration) for start, entry, duration in slack]
+            slack.sort(reverse=True, key=by_duration)
+            for entry, duration in slack:
+                if not duration:
+                    continue
+                
+                entry = entry[:1].upper() + entry[1:]
+                output.write(u"%-62s  %s\n" %
+                             (entry, format_duration_long(duration)))
+            output.write('\n')
+        output.write("Total slacking this %s: %s\n" % (period_name, format_duration_long(total_slacking)))
 
     def weekly_report_subject(self, who):
         week = self.window.min_timestamp.isocalendar()[1]
